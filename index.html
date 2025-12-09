@@ -326,7 +326,6 @@ function checkBudget(price, budgetStr) {
   return true;
 }
 
-// --- CARD RENDERING & SWIPE ---
 function renderCards() {
   const container = document.getElementById('cards-wrapper');
   container.innerHTML = '';
@@ -351,42 +350,81 @@ function renderCards() {
         <div class="price-tag">${p.price} AZN</div>
       </div>
     `;
+    
+    // Only the top card needs the swipe/click logic
     if (index === 0) initSwipe(card, p);
-    card.addEventListener('dblclick', () => openModal(p));
+    
+    // REMOVED: card.addEventListener('dblclick', ...) <- No longer needed
+    
     container.appendChild(card);
   });
 }
 
+
 function initSwipe(card, product) {
   let startX = 0, currentX = 0, isDragging = false;
-  const onStart = (e) => { isDragging = true; startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX; card.style.transition = 'none'; };
+
+  const onStart = (e) => {
+    isDragging = true;
+    // Get correct X coordinate for Mouse or Touch
+    startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    currentX = 0; // Reset currentX ensures previous swipes don't interfere
+    card.style.transition = 'none';
+  };
+
   const onMove = (e) => {
     if (!isDragging) return;
-    currentX = (e.type.includes('mouse') ? e.clientX : e.touches[0].clientX) - startX;
-    card.style.transform = `translateX(${currentX}px) rotate(${currentX / 15}deg)`;
+    const x = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    currentX = x - startX;
+    
+    // Visual feedback for swiping
+    const rotate = currentX / 15;
+    card.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
   };
+
   const onEnd = () => {
     if (!isDragging) return;
     isDragging = false;
+    
+    // --- NEW CLICK DETECTION LOGIC ---
+    // If moved less than 10 pixels, consider it a CLICK
+    if (Math.abs(currentX) < 10) {
+      openModal(product); // Open the info modal
+      // Reset card position visually just in case
+      card.style.transform = 'translateX(0) rotate(0)';
+      return;
+    }
+    // ---------------------------------
+
+    // --- SWIPE LOGIC ---
     if (Math.abs(currentX) > 100) {
       const dir = currentX > 0 ? 1 : -1;
       card.style.transition = 'transform 0.4s ease';
       card.style.transform = `translateX(${dir * window.innerWidth * 1.5}px) rotate(${dir * 30}deg)`;
+      
       setTimeout(() => {
         card.remove();
         state.cardStack.shift();
-        if (dir === 1) redirectToWhatsApp(product); // Direct to WA on Like
+        if (dir === 1) redirectToWhatsApp(product);
         else logUserAction('Skipped', product.name);
         renderCards();
       }, 300);
     } else {
+      // If swipe was too weak, bounce back
       card.style.transition = 'transform 0.3s ease';
       card.style.transform = 'translateX(0)';
     }
     currentX = 0;
   };
-  card.addEventListener('mousedown', onStart); document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onEnd);
-  card.addEventListener('touchstart', onStart); document.addEventListener('touchmove', onMove); document.addEventListener('touchend', onEnd);
+
+  // Event Listeners
+  card.addEventListener('mousedown', onStart);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+  
+  card.addEventListener('touchstart', onStart);
+  document.addEventListener('touchmove', onMove);
+  document.addEventListener('touchend', onEnd);
 }
 
 // --- ALL PRODUCTS VIEW ---
