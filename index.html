@@ -474,9 +474,14 @@ function loadMoreGrid() {
 // --- ACTIONS ---
 function redirectToWhatsApp(p) {
   logUserAction('Like_WhatsApp', p.name);
-  const text = `Salam Brendimo! Mən bu məhsulu bəyəndim: ${p.name} - ${p.price} AZN. Sifariş etmək istəyirəm.`;
+  
+  // We use \n for new lines to make it look clean
+  // We add the Image URL at the bottom so WhatsApp creates a preview
+  const text = `Salam Brendimo! 🎁\n\nMən bu məhsulu bəyəndim:\n*${p.name}*\nQiymət: ${p.price} AZN\n\nBu da şəkli:\n${p.image}\n\nSifariş etmək istəyirəm.`;
+  
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-  // Slight delay to allow animation to finish visually
+  
+  // Slight delay to ensure the UI animation finishes before switching apps
   setTimeout(() => window.location.href = url, 100); 
 }
 
