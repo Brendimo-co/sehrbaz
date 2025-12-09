@@ -4,24 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Brendimo Hədiyyə Sehrbazı</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* --- CSS STYLES --- */
 
-/* RESET */
+/* RESET & BASE */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent; }
 body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-/* MAIN CONTAINER */
+/* LAYOUT */
 .wizard-wrapper {
-  flex: 1;
-  width: 100%;
-  max-width: 440px;
-  margin: 0 auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
+  flex: 1; width: 100%; max-width: 440px; margin: 0 auto; padding: 20px 20px 80px 20px; /* Added bottom padding for floating btns */
+  display: flex; flex-direction: column; position: relative;
 }
 
 /* HEADER */
@@ -30,18 +24,18 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
 .logo { font-size: 20px; font-weight: 800; color: #c21a1a; letter-spacing: -0.5px; }
 .step-indicator { font-size: 12px; color: #999; font-weight: 600; background: #eee; padding: 4px 8px; border-radius: 12px; }
 
-/* PROGRESS BAR */
+/* PROGRESS */
 .progress-container { height: 4px; background: #eee; border-radius: 2px; margin-bottom: 30px; overflow: hidden; }
 .progress-fill { height: 100%; background: #c21a1a; width: 20%; transition: width 0.4s ease; }
 
-/* STEPS (WIZARD) */
+/* STEPS */
 .step-content { display: none; animation: fadeIn 0.4s ease; }
 .step-content.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 .title { font-size: 24px; font-weight: 700; margin-bottom: 24px; text-align: center; line-height: 1.3; }
 
-/* GRID OPTIONS */
+/* OPTIONS GRID */
 .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .option-card {
   background: white; border: 2px solid #f0f0f0; border-radius: 16px; padding: 20px 10px;
@@ -52,49 +46,78 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
 .option-icon { font-size: 32px; margin-bottom: 8px; display: block; }
 .option-text { font-size: 15px; font-weight: 600; color: #333; }
 
-/* TINDER CARDS CONTAINER */
-#cards-wrapper {
-  position: relative; width: 100%; height: 420px; margin-top: 20px; perspective: 1000px;
-}
+/* TINDER CARDS */
+#cards-wrapper { position: relative; width: 100%; height: 460px; margin-top: 10px; perspective: 1000px; }
 .card {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background: white; border-radius: 20px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-  overflow: hidden; transform-origin: 50% 100%;
-  will-change: transform; touch-action: none; /* Crucial for mobile drag */
+  background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  overflow: hidden; transform-origin: 50% 100%; will-change: transform; touch-action: none;
   display: flex; flex-direction: column;
 }
-
-.card img { width: 100%; height: 260px; object-fit: cover; pointer-events: none; }
+.card img { width: 100%; height: 280px; object-fit: cover; pointer-events: none; }
 .card-info { padding: 20px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-.card h3 { font-size: 20px; margin-bottom: 6px; }
-.card p { font-size: 14px; color: #666; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.price-tag { font-size: 18px; font-weight: 800; color: #c21a1a; margin-top: 8px; }
+/* Responsive Text Clamping */
+.card h3 { 
+  font-size: clamp(18px, 4vw, 22px); margin-bottom: 4px; 
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card p { 
+  font-size: 14px; color: #666; line-height: 1.4; 
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.price-tag { font-size: 20px; font-weight: 800; color: #c21a1a; margin-top: 8px; }
 .match-badge {
   position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.7);
-  color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700;
-  backdrop-filter: blur(4px);
+  color: #fff; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; backdrop-filter: blur(4px);
 }
 
-/* ACTION BUTTONS */
-.actions {
-  display: flex; justify-content: center; gap: 20px; margin-top: 20px;
-}
+/* ACTIONS */
+.actions { display: flex; justify-content: center; gap: 20px; margin-top: 20px; position: relative; z-index: 10; }
 .action-btn {
   width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 24px;
-  cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s;
+  cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: transform 0.2s;
   display: flex; align-items: center; justify-content: center;
 }
 .btn-skip { background: white; color: #ff4b4b; }
-.btn-like { background: #c21a1a; color: white; }
+.btn-like { background: #25D366; color: white; /* WhatsApp Green */ }
 .action-btn:active { transform: scale(0.9); }
 
-/* PRODUCT DETAILS MODAL */
-.modal {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white;
-  z-index: 100; padding: 24px; overflow-y: auto; display: none; animation: slideUp 0.3s ease;
+/* FLOATING BUTTONS */
+.floating-bar {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 12px; z-index: 90;
 }
-.modal.active { display: block; }
+.float-btn {
+  background: #1d1d1f; color: white; border: none; padding: 10px 16px; border-radius: 30px;
+  font-size: 13px; font-weight: 600; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  display: flex; align-items: center; gap: 6px; text-decoration: none; white-space: nowrap;
+}
+.float-btn.wheel { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; }
+
+/* ALL PRODUCTS MODAL/VIEW */
+.all-products-view {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fafafa;
+  z-index: 100; overflow-y: auto; padding: 20px; display: none;
+}
+.all-products-view.active { display: block; animation: slideUp 0.3s ease; }
+.close-view-btn { 
+  position: sticky; top: 0; background: rgba(250,250,250,0.9); padding: 10px 0;
+  display: flex; justify-content: flex-end; margin-bottom: 10px; z-index: 2; backdrop-filter: blur(5px);
+}
+.grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 40px; }
+.grid-item { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.grid-item img { width: 100%; height: 140px; object-fit: cover; }
+.grid-info { padding: 10px; }
+.grid-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.grid-price { font-size: 14px; color: #c21a1a; font-weight: 700; }
+.load-more-btn {
+  width: 100%; padding: 12px; background: #eee; border: none; border-radius: 8px;
+  font-weight: 600; color: #555; cursor: pointer; margin-bottom: 40px;
+}
+
+/* MODAL */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; padding: 24px; overflow-y: auto; display: none; }
+.modal.active { display: block; animation: slideUp 0.3s ease; }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
 /* LOADER */
@@ -103,7 +126,6 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
 @keyframes spin { 100% { transform: rotate(360deg); } }
 
 .hidden { display: none !important; }
-
 </style>
 </head>
 <body>
@@ -135,7 +157,7 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
     <div class="options-grid" onclick="handleOptionClick(event, 'occasion')">
       <div class="option-card" data-val="Ad günü"><span class="option-icon">🎂</span><span class="option-text">Ad günü</span></div>
       <div class="option-card" data-val="Yubiley"><span class="option-icon">🥂</span><span class="option-text">Yubiley</span></div>
-      <div class="option-card" data-val="Yeni il"><span class="option-icon">🎄</span><span class="option-text">Yeni il</span></div>
+      <div class="option-card" data-val="Yeni İl"><span class="option-icon">🎄</span><span class="option-text">Yeni İl</span></div>
       <div class="option-card" data-val="Səbəbsiz"><span class="option-icon">💝</span><span class="option-text">Sadəcə Hədiyyə</span></div>
     </div>
   </div>
@@ -171,54 +193,71 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
   </div>
 
   <div class="step-content" id="step-loading">
-    <div class="loader">
-      <div class="spinner"></div>
-      <p>Sehrbaz sizin üçün seçim edir...</p>
-    </div>
+    <div class="loader"><div class="spinner"></div><p>Sehrbaz sizin üçün seçim edir...</p></div>
   </div>
 
   <div class="step-content" id="step-results">
     <h2 class="title" style="font-size: 20px; margin-bottom: 10px;">Sizin üçün seçdiklərimiz</h2>
     <div id="cards-wrapper"></div>
-    
     <div class="actions">
       <button class="action-btn btn-skip" id="btn-skip">✕</button>
-      <button class="action-btn btn-like" id="btn-like">♥</button>
+      <button class="action-btn btn-like" id="btn-like">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </button>
     </div>
   </div>
+</div>
 
+<div class="floating-bar">
+  <button class="float-btn" onclick="openAllProducts()">🛍️ Bütün Məhsullar</button>
+  <a href="https://brendimo-co.github.io/sanscarxi/" target="_blank" class="float-btn wheel" onclick="logUserAction('SpinWheel')">🎁 Hədiyyə Çarxı</a>
+</div>
+
+<div id="all-products-view" class="all-products-view">
+  <div class="close-view-btn">
+    <button onclick="closeAllProducts()" style="background:none; border:none; font-size:16px; font-weight:700; color:#333;">✕ Bağla</button>
+  </div>
+  <h2 class="title" style="font-size:20px;">Bütün Məhsullar</h2>
+  <div class="grid-container" id="all-products-grid">
+    </div>
+  <button id="load-more-btn" class="load-more-btn" onclick="loadMoreGrid()">Daha Çox Göstər (6)</button>
 </div>
 
 <div id="product-modal" class="modal">
-  <div class="header">
-    <div class="back-btn" onclick="closeModal()">✕ Bağla</div>
-  </div>
+  <div class="header"><div class="back-btn" onclick="closeModal()">✕ Bağla</div></div>
   <img id="modal-img" src="" style="width:100%; border-radius:12px; margin-bottom:15px;">
   <h2 id="modal-title" style="margin-bottom:10px;"></h2>
   <h3 id="modal-price" style="color:#c21a1a; margin-bottom:15px;"></h3>
   <p id="modal-desc" style="line-height:1.6; color:#555; margin-bottom:20px;"></p>
-  <a id="modal-link" href="#" target="_blank" style="display:block; width:100%; padding:15px; background:#c21a1a; color:white; text-align:center; border-radius:12px; text-decoration:none; font-weight:700;">Sifariş et</a>
+  <button id="modal-whatsapp-btn" class="float-btn" style="width:100%; justify-content:center; background:#25D366; color:white;">WhatsApp ilə Sifariş</button>
 </div>
 
 <script>
 // --- CONFIGURATION ---
-const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbztp8UrgbssLeCbkkA-oyh-unKxUBdXw45rXB0gQpp3vNpMO54PudFkdmlfu_6au_fdBg/exec"; 
+const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxe3u8E5WYNQp_e_OIDlJbR7rbmTVLdHHzc2rrhseUhFwddRDv74s2PhZKOKm3l3Qpw/exec"; 
+const WHATSAPP_NUMBER = "994556742535";
 
-// --- STATE MANAGEMENT ---
+// --- STATE ---
 let currentStep = 0;
 const totalSteps = 5;
 const state = { who: null, occasion: null, mood: null, style: null, budget: null, products: [], cardStack: [] };
+let gridLimit = 6; // Start with 6 items (3 rows x 2 cols)
+
+// --- LOGGING ---
+function logUserAction(action, details = '') {
+  fetch(SHEETS_ENDPOINT, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'log', action: action, details: details })
+  }).catch(console.error);
+}
 
 // --- NAVIGATION ---
 function updateUI() {
-  // Update Header & Progress
   document.getElementById('step-count').textContent = (currentStep < totalSteps) ? `ADDIM ${currentStep + 1}/${totalSteps}` : 'NƏTİCƏ';
   document.getElementById('progress-bar').style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
-  
-  // Back button visibility
   document.querySelector('.back-btn').style.opacity = currentStep === 0 ? '0' : '1';
 
-  // Show correct step div
   document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
   
   if (currentStep < totalSteps) {
@@ -232,58 +271,44 @@ function updateUI() {
 }
 
 function goBack() {
-  if (currentStep > 0) {
-    currentStep--;
-    updateUI();
-  }
+  if (currentStep > 0) { currentStep--; updateUI(); }
 }
 
 function handleOptionClick(e, key) {
   const card = e.target.closest('.option-card');
   if (!card) return;
-  
   state[key] = card.getAttribute('data-val');
+  logUserAction('StepCompleted', `${key}: ${state[key]}`);
   currentStep++;
   updateUI();
 }
 
-// --- DATA FETCHING ---
+// --- DATA ---
 async function fetchProducts() {
   try {
-    // Correct URL construction
     const response = await fetch(`${SHEETS_ENDPOINT}?action=getProducts`);
     const data = await response.json();
-    
     state.products = data.products || [];
     processMatches();
-    
-    // Move to results
     currentStep++;
     updateUI();
     renderCards();
-    
   } catch (error) {
-    console.error("Error loading products:", error);
     document.getElementById('step-loading').innerHTML = "<p>Xəta baş verdi. Zəhmət olmasa yeniləyin.</p>";
   }
 }
 
-// --- MATCHING LOGIC ---
 function processMatches() {
   state.cardStack = state.products.map(p => {
     let score = 0;
-    // Simple tag matching
     if (match(p.target, state.who)) score += 40;
     if (match(p.occasion, state.occasion)) score += 20;
     if (match(p.mood, state.mood)) score += 15;
     if (match(p.style, state.style)) score += 15;
-    
-    // Budget check
-    if (!checkBudget(p.price, state.budget)) score -= 30; // Penalty
-
-    p.score = Math.min(100, Math.max(0, score)); // Clamp 0-100
+    if (!checkBudget(p.price, state.budget)) score -= 30;
+    p.score = Math.min(100, Math.max(0, score));
     return p;
-  }).sort((a, b) => b.score - a.score); // Sort best matches first
+  }).sort((a, b) => b.score - a.score);
 }
 
 function match(dbField, userSelect) {
@@ -301,7 +326,7 @@ function checkBudget(price, budgetStr) {
   return true;
 }
 
-// --- CARD RENDERING & SWIPE LOGIC ---
+// --- CARD RENDERING & SWIPE ---
 function renderCards() {
   const container = document.getElementById('cards-wrapper');
   container.innerHTML = '';
@@ -311,11 +336,10 @@ function renderCards() {
     return;
   }
 
-  // Render top 5 cards only for performance
   state.cardStack.slice(0, 5).forEach((p, index) => {
     const card = document.createElement('div');
     card.className = 'card';
-    card.style.zIndex = state.cardStack.length - index; // Stack order
+    card.style.zIndex = state.cardStack.length - index;
     card.innerHTML = `
       <div class="match-badge">${p.score}% Uyğunluq</div>
       <img src="${p.image}" alt="${p.name}">
@@ -327,117 +351,115 @@ function renderCards() {
         <div class="price-tag">${p.price} AZN</div>
       </div>
     `;
-    
-    // Attach Swipe Events to the TOP card only
     if (index === 0) initSwipe(card, p);
-    
-    // Double click to view details
     card.addEventListener('dblclick', () => openModal(p));
-    
     container.appendChild(card);
   });
 }
 
 function initSwipe(card, product) {
   let startX = 0, currentX = 0, isDragging = false;
-
-  const onStart = (e) => {
-    isDragging = true;
-    startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-    card.style.transition = 'none';
-  };
-
+  const onStart = (e) => { isDragging = true; startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX; card.style.transition = 'none'; };
   const onMove = (e) => {
     if (!isDragging) return;
-    const x = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-    currentX = x - startX;
-    const rotate = currentX / 15;
-    card.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
+    currentX = (e.type.includes('mouse') ? e.clientX : e.touches[0].clientX) - startX;
+    card.style.transform = `translateX(${currentX}px) rotate(${currentX / 15}deg)`;
   };
-
   const onEnd = () => {
     if (!isDragging) return;
     isDragging = false;
-    
-    // Threshold to swipe
     if (Math.abs(currentX) > 100) {
-      const dir = currentX > 0 ? 1 : -1; // 1 = right (like), -1 = left (skip)
-      const endX = dir * window.innerWidth * 1.5;
-      
+      const dir = currentX > 0 ? 1 : -1;
       card.style.transition = 'transform 0.4s ease';
-      card.style.transform = `translateX(${endX}px) rotate(${dir * 30}deg)`;
-      
+      card.style.transform = `translateX(${dir * window.innerWidth * 1.5}px) rotate(${dir * 30}deg)`;
       setTimeout(() => {
         card.remove();
-        state.cardStack.shift(); // Remove from data
-        if (dir === 1) sendLike(product);
-        renderCards(); // Re-render next batch
+        state.cardStack.shift();
+        if (dir === 1) redirectToWhatsApp(product); // Direct to WA on Like
+        else logUserAction('Skipped', product.name);
+        renderCards();
       }, 300);
     } else {
-      // Reset position
-      card.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
-      card.style.transform = 'translateX(0) rotate(0)';
+      card.style.transition = 'transform 0.3s ease';
+      card.style.transform = 'translateX(0)';
     }
     currentX = 0;
   };
-
-  // Mouse Events
-  card.addEventListener('mousedown', onStart);
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', onEnd);
-  
-  // Touch Events
-  card.addEventListener('touchstart', onStart);
-  document.addEventListener('touchmove', onMove);
-  document.addEventListener('touchend', onEnd);
+  card.addEventListener('mousedown', onStart); document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onEnd);
+  card.addEventListener('touchstart', onStart); document.addEventListener('touchmove', onMove); document.addEventListener('touchend', onEnd);
 }
 
-// --- BUTTON CONTROLS ---
-document.getElementById('btn-skip').onclick = () => simulateSwipe(-1);
-document.getElementById('btn-like').onclick = () => simulateSwipe(1);
-
-function simulateSwipe(dir) {
-  const card = document.querySelector('.card');
-  if (!card) return;
-  
-  card.style.transition = 'transform 0.5s ease';
-  card.style.transform = `translateX(${dir * window.innerWidth}px) rotate(${dir * 30}deg)`;
-  
-  setTimeout(() => {
-    const product = state.cardStack[0];
-    state.cardStack.shift();
-    if(dir === 1) sendLike(product);
-    renderCards();
-  }, 300);
+// --- ALL PRODUCTS VIEW ---
+function openAllProducts() {
+  logUserAction('ViewAllProducts');
+  if(state.products.length === 0) fetchProducts(); // Fetch if clicked on step 1
+  document.getElementById('all-products-view').classList.add('active');
+  renderGrid();
 }
 
-// --- MODAL & LIKES ---
+function closeAllProducts() {
+  document.getElementById('all-products-view').classList.remove('active');
+}
+
+function renderGrid() {
+  const container = document.getElementById('all-products-grid');
+  container.innerHTML = '';
+  // Use state.products (all items) or state.cardStack (filtered items)? 
+  // User said "All Products", so we use state.products if available, otherwise fetch.
+  const source = state.products.length ? state.products : [];
+  
+  source.slice(0, gridLimit).forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'grid-item';
+    el.onclick = () => openModal(p);
+    el.innerHTML = `
+      <img src="${p.image}" loading="lazy">
+      <div class="grid-info">
+        <div class="grid-title">${p.name}</div>
+        <div class="grid-price">${p.price} AZN</div>
+      </div>
+    `;
+    container.appendChild(el);
+  });
+  
+  const btn = document.getElementById('load-more-btn');
+  if(gridLimit >= source.length) btn.style.display = 'none';
+  else btn.style.display = 'block';
+}
+
+function loadMoreGrid() {
+  gridLimit += 6; // Load 3 more rows (6 items)
+  renderGrid();
+  logUserAction('LoadMoreProducts');
+}
+
+// --- ACTIONS ---
+function redirectToWhatsApp(p) {
+  logUserAction('Like_WhatsApp', p.name);
+  const text = `Salam Brendimo! Mən bu məhsulu bəyəndim: ${p.name} - ${p.price} AZN. Sifariş etmək istəyirəm.`;
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  // Slight delay to allow animation to finish visually
+  setTimeout(() => window.location.href = url, 100); 
+}
+
+// --- MODAL ---
 function openModal(p) {
+  logUserAction('ViewDetails', p.name);
   document.getElementById('modal-img').src = p.image;
   document.getElementById('modal-title').textContent = p.name;
   document.getElementById('modal-price').textContent = p.price + ' AZN';
   document.getElementById('modal-desc').textContent = p.description;
-  document.getElementById('modal-link').href = p.url;
+  
+  // Set Modal WhatsApp Button
+  const btn = document.getElementById('modal-whatsapp-btn');
+  btn.onclick = () => redirectToWhatsApp(p);
+  
   document.getElementById('product-modal').classList.add('active');
 }
+function closeModal() { document.getElementById('product-modal').classList.remove('active'); }
 
-function closeModal() {
-  document.getElementById('product-modal').classList.remove('active');
-}
-
-function sendLike(product) {
-  // Use mode: 'no-cors' to avoid CORS errors with simple GAS POSTs
-  fetch(SHEETS_ENDPOINT, {
-    method: 'POST',
-    mode: 'no-cors', 
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'like', productId: product.id })
-  }).catch(e => console.log('Like tracking error', e)); // Silent fail for UX
-}
-
-// Start
+// Init
 updateUI();
 </script>
-
 </body>
 </html>
