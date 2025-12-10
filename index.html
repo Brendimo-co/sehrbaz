@@ -263,11 +263,22 @@ let gridLimit = 6; // Start with 6 items (3 rows x 2 cols)
 
 // --- LOGGING ---
 function logUserAction(action, details = '') {
+  // If we haven't fetched the IP yet, use 'Loading...'
+  const currentIP = typeof userIP !== 'undefined' ? userIP : 'Unknown';
+  
   fetch(SHEETS_ENDPOINT, {
-    method: 'POST', mode: 'no-cors',
+    method: 'POST',
+    mode: 'no-cors',
+    // keepalive ensures the request completes even if the user closes the tab
+    keepalive: true, 
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'log', action: action, details: details })
-  }).catch(console.error);
+    body: JSON.stringify({ 
+      type: 'log', 
+      action: action, 
+      // We append the IP to the details column automatically
+      details: `[IP: ${currentIP}] ${details}` 
+    })
+  }).catch(e => console.log("Logging failed", e));
 }
 
 // --- NAVIGATION ---
@@ -521,6 +532,40 @@ function closeModal() { document.getElementById('product-modal').classList.remov
 
 // Init
 updateUI();
+
+  // --- SESSION TRACKING (IP, DEVICE, TIME) ---
+
+let sessionStartTime = Date.now();
+let userIP = "Fetching...";
+
+async function initTracking() {
+  try {
+    // 1. Get User IP (using free API)
+    const response = await fetch('https://api.ipify.org?format=json');
+    const data = await response.json();
+    userIP = data.ip;
+  } catch (err) {
+    userIP = "Hidden/Error";
+  }
+
+  // 2. Get Device Info
+  const device = navigator.userAgent; // Contains info like "iPhone", "Android", "Chrome"
+
+  // 3. Log the Start of Session
+  logUserAction('SessionStart', `Device: ${device}`);
+}
+
+// 4. Track Time Spent (Triggered when user switches tabs or closes app)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    const timeSpent = Math.round((Date.now() - sessionStartTime) / 1000); // Seconds
+    logUserAction('SessionEnd', `Total Time: ${timeSpent} seconds`);
+  }
+});
+
+// Start tracking immediately
+initTracking();
+  
 </script>
 </body>
 </html>
