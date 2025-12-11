@@ -211,6 +211,123 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
   font-weight: bold;
 }
 
+/* --- FADING SPELL STYLES (NEW) --- */
+
+/* GLOBAL STICKY BAR (Main Page) */
+.global-spell-wrapper {
+    background: #1a1a1a;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #FFD700;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    animation: slideDown 0.5s ease;
+}
+
+.gs-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.gs-amount {
+    color: #FFD700;
+    font-size: 18px;
+    font-variant-numeric: tabular-nums;
+}
+
+.gs-timer-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.gs-timer-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FFD700, #ff4b4b);
+    width: 100%;
+    transition: width 1s linear; 
+}
+
+/* MODAL BAR STYLES */
+.spell-box {
+  background: linear-gradient(135deg, #2b2b2b 0%, #1a1a1a 100%);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 15px;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border-left: 4px solid #FFD700; 
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.spell-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.spell-amount {
+  font-size: 20px;
+  font-weight: 800;
+  color: #FFD700; /* Gold */
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Shake animation when price drops */
+.shake-text {
+  animation: shake 0.5s;
+  color: #ff4b4b !important; /* Turn red briefly */
+}
+
+.spell-timer-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.spell-timer-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #FFD700, #ff4b4b);
+  transform-origin: left;
+  transition: width 1s linear; 
+}
+
+.spell-warning {
+  font-size: 11px;
+  color: #ccc;
+  text-align: right;
+  font-style: italic;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes slideDown { 
+    from { transform: translateY(-20px); opacity: 0; } 
+    to { transform: translateY(0); opacity: 1; } 
+}
+  
 /* ACTIONS */
 .actions { display: flex; justify-content: center; gap: 20px; margin-top: 20px; position: relative; z-index: 10; }
 .action-btn {
@@ -377,8 +494,7 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
 .logo:active { opacity: 0.7; } 
   
  
-  <!-- Meta Pixel Code -->
-<script>
+  <script>
 !function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -393,7 +509,6 @@ fbq('track', 'PageView');
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 /></noscript>
-<!-- End Meta Pixel Code -->
 </style>
 </head>
 <body>
@@ -475,6 +590,17 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
   </div>
 
   <div class="step-content" id="step-results">
+    
+    <div id="global-spell-bar" class="global-spell-wrapper hidden">
+        <div class="gs-info">
+            <span>🔥 Aktiv Endirim:</span>
+            <span id="gs-amount" class="gs-amount">-6.00 ₼</span>
+        </div>
+        <div class="gs-timer-track">
+            <div id="gs-timer-fill" class="gs-timer-fill"></div>
+        </div>
+    </div>
+
     <h2 class="title" style="font-size: 20px; margin-bottom: 10px;">Sizin üçün seçdiklərimiz</h2>
     <div id="cards-wrapper"></div>
     <div class="actions">
@@ -503,11 +629,28 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 
 <div id="product-modal" class="modal">
   <div class="header"><div class="back-btn" onclick="closeModal()">✕ Bağla</div></div>
+  
   <img id="modal-img" src="" style="width:100%; border-radius:12px; margin-bottom:15px;">
-  <h2 id="modal-title" style="margin-bottom:10px;"></h2>
+  
+  <h2 id="modal-title" style="margin-bottom:5px;"></h2>
+  
+  <div id="modal-spell-box" class="spell-box hidden">
+    <div class="spell-header">
+      <span>⚡ Endirim Əriyir...</span>
+      <span class="spell-amount" id="modal-spell-amount">-6.00 ₼</span>
+    </div>
+    <div class="spell-timer-track">
+      <div class="spell-timer-bar" id="modal-spell-bar"></div>
+    </div>
+    <p class="spell-warning">Hər 30 saniyədən bir 0.50 qəpik azalır!</p>
+  </div>
+
   <h3 id="modal-price" style="color:#c21a1a; margin-bottom:15px;"></h3>
   <p id="modal-desc" style="line-height:1.6; color:#555; margin-bottom:20px;"></p>
-  <button id="modal-whatsapp-btn" class="float-btn" style="width:100%; justify-content:center; background:#25D366; color:white;">WhatsApp ilə Sifariş</button>
+  
+  <button id="modal-whatsapp-btn" class="float-btn" style="width:100%; justify-content:center; background:#25D366; color:white;">
+    WhatsApp ilə Sifariş Et
+  </button>
 </div>
 
 <script>
@@ -572,10 +715,10 @@ function handleOptionClick(e, key) {
   updateUI();
 }
 
-// --- DATA ---
+  
 // --- DATA ---
 
-// 1. Yeni Qarışdırma Funksiyası (Bunu skriptin istənilən yerinə əlavə edə bilərsiniz)
+// 1. Shuffle Function
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -584,56 +727,43 @@ function shuffleArray(array) {
   return array;
 }
 
-// 2. Fetch Products (Yüklənən kimi qarışdırırıq ki, "Bütün məhsullar" bölməsi də qarışıq olsun)
-// --- NEW FETCH & ANIMATION LOGIC ---
-
+// 2. Fetch Products with 6-second Magic Animation
 async function fetchProducts() {
   const statusTextEl = document.getElementById('magic-status-text');
   
-  // 1. STORYTELLING MESSAGES (Timed for 6 seconds total)
-  // We have 4 messages. If we show each for 1.5 seconds, that equals exactly 6 seconds.
+  // STORYTELLING MESSAGES
   const messages = [
-    "Ulduzlar yoxlanılır... ✨",        // 0s - 1.5s
-    "Zövqlər analiz edilir... 🧠",      // 1.5s - 3.0s
-    "Axtardığın seçimlər ümumiləşdirilir... 🔍",  // 3.0s - 4.5s
-    "Sehr tamamlanır... 🪄"             // 4.5s - 6.0s
+    "Ulduzlar yoxlanılır... ✨",        
+    "Zövqlər analiz edilir... 🧠",      
+    "Axtardığın seçimlər ümumiləşdirilir... 🔍",  
+    "Sehr tamamlanır... 🪄"             
   ];
   
   let msgIndex = 0;
-  
-  // Set initial text immediately
   statusTextEl.textContent = messages[0];
 
-  // 2. SLOWER INTERVAL (1500ms = 1.5 seconds)
   const textInterval = setInterval(() => {
     msgIndex++;
     if (msgIndex < messages.length) {
-      // Trigger CSS reflow for fade animation restart
       statusTextEl.style.animation = 'none';
       statusTextEl.offsetHeight; 
-      statusTextEl.style.animation = 'textFade 1.0s ease'; // Slower fade for smoother look
-      
+      statusTextEl.style.animation = 'textFade 1.0s ease';
       statusTextEl.textContent = messages[msgIndex];
     }
-  }, 1500); // Change text every 1.5 seconds
+  }, 1500); 
 
   try {
-    // 3. WAIT FOR 6 SECONDS (6000ms)
     const [response, _] = await Promise.all([
       fetch(`${SHEETS_ENDPOINT}?action=getProducts`), 
-      new Promise(resolve => setTimeout(resolve, 6000)) // <--- CHANGED TO 6000
+      new Promise(resolve => setTimeout(resolve, 6000)) 
     ]);
 
     const data = await response.json();
-    
-    // Stop the text cycle
     clearInterval(textInterval);
 
-    // 4. Process Data
     state.products = shuffleArray(data.products || []);
     processMatches();
     
-    // 5. Move to next step
     currentStep++;
     updateUI();
     renderCards();
@@ -645,37 +775,24 @@ async function fetchProducts() {
   }
 }
   
-// 3. Process Matches (Əvvəl qarışdırır, sonra xallara görə düzür)
+// 3. Process Matches
 function processMatches() {
-  // 1. Siyahını qarışdırırıq (Shuffle)
   let candidates = shuffleArray([...state.products]);
-
-  // 2. QƏTİ FİLTR (STRICT FILTER)
-  // Əgər istifadəçi "Kim üçün" (state.who) seçimi edibsə, 
-  // uyğun gəlməyən bütün digər məhsulları siyahıdan silirik.
   if (state.who) {
     candidates = candidates.filter(p => match(p.target, state.who));
   }
 
-  // 3. Xalları hesablayırıq
   state.cardStack = candidates.map(p => {
     let score = 0;
-    
-    // Target (Kim üçün) artıq yuxarıda filtrlənib, ona görə buna xal verməyə ehtiyac yoxdur,
-    // amma "Həmkar" kimi ümumi kateqoriyalar üçün saxlayırıq.
     if (match(p.target, state.who)) score += 40; 
-    
     if (match(p.occasion, state.occasion)) score += 20;
     if (match(p.mood, state.mood)) score += 15;
     if (match(p.style, state.style)) score += 15;
     if (!checkBudget(p.price, state.budget)) score -= 30;
-    
     p.score = Math.min(100, Math.max(0, score));
     return p;
   }).sort((a, b) => b.score - a.score);
 }
-
-// Digər funksiyalar (match, checkBudget və s.) olduğu kimi qalır...
 
 function match(dbField, userSelect) {
   if (!dbField || !userSelect) return false;
@@ -706,7 +823,6 @@ function renderCards() {
     card.className = 'card';
     card.style.zIndex = state.cardStack.length - index;
     
-    // YENİ HTML STRUKTURU
     card.innerHTML = `
       <div class="card-image-box">
          <div class="match-badge">🔥 ${p.score}%</div>
@@ -741,9 +857,8 @@ function initSwipe(card, product) {
 
   const onStart = (e) => {
     isDragging = true;
-    // Get correct X coordinate for Mouse or Touch
     startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-    currentX = 0; // Reset currentX ensures previous swipes don't interfere
+    currentX = 0; 
     card.style.transition = 'none';
   };
 
@@ -752,7 +867,6 @@ function initSwipe(card, product) {
     const x = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     currentX = x - startX;
     
-    // Visual feedback for swiping
     const rotate = currentX / 15;
     card.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
   };
@@ -761,17 +875,14 @@ function initSwipe(card, product) {
     if (!isDragging) return;
     isDragging = false;
     
-    // --- NEW CLICK DETECTION LOGIC ---
-    // If moved less than 10 pixels, consider it a CLICK
+    // CLICK DETECTION
     if (Math.abs(currentX) < 10) {
-      openModal(product); // Open the info modal
-      // Reset card position visually just in case
+      openModal(product); 
       card.style.transform = 'translateX(0) rotate(0)';
       return;
     }
-    // ---------------------------------
 
-    // --- SWIPE LOGIC ---
+    // SWIPE LOGIC
     if (Math.abs(currentX) > 100) {
       const dir = currentX > 0 ? 1 : -1;
       card.style.transition = 'transform 0.4s ease';
@@ -780,19 +891,21 @@ function initSwipe(card, product) {
       setTimeout(() => {
         card.remove();
         state.cardStack.shift();
-        if (dir === 1) redirectToWhatsApp(product);
+        if (dir === 1) {
+            // ACTIVATE GLOBAL DISCOUNT IF THEY LIKE
+            activateGlobalDiscount();
+            redirectToWhatsApp(product);
+        }
         else logUserAction('Skipped', product.name);
         renderCards();
       }, 300);
     } else {
-      // If swipe was too weak, bounce back
       card.style.transition = 'transform 0.3s ease';
       card.style.transform = 'translateX(0)';
     }
     currentX = 0;
   };
 
-  // Event Listeners
   card.addEventListener('mousedown', onStart);
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup', onEnd);
@@ -805,7 +918,7 @@ function initSwipe(card, product) {
 // --- ALL PRODUCTS VIEW ---
 function openAllProducts() {
   logUserAction('ViewAllProducts');
-  if(state.products.length === 0) fetchProducts(); // Fetch if clicked on step 1
+  if(state.products.length === 0) fetchProducts(); 
   document.getElementById('all-products-view').classList.add('active');
   renderGrid();
 }
@@ -817,8 +930,6 @@ function closeAllProducts() {
 function renderGrid() {
   const container = document.getElementById('all-products-grid');
   container.innerHTML = '';
-  // Use state.products (all items) or state.cardStack (filtered items)? 
-  // User said "All Products", so we use state.products if available, otherwise fetch.
   const source = state.products.length ? state.products : [];
   
   source.slice(0, gridLimit).forEach(p => {
@@ -840,97 +951,171 @@ function renderGrid() {
   else btn.style.display = 'block';
 }
 
+  
 function loadMoreGrid() {
-  gridLimit += 6; // Load 3 more rows (6 items)
+  gridLimit += 6; 
   renderGrid();
   logUserAction('LoadMoreProducts');
 }
 
-// --- ACTIONS ---
-function redirectToWhatsApp(p) {
-  logUserAction('Like_WhatsApp', p.name);
-  
-  // We use \n for new lines to make it look clean
-  // We add the Image URL at the bottom so WhatsApp creates a preview
-  const text = `Salam Brendimo! 🎁\n\nMən bu məhsulu bəyəndim:\n*${p.name}*\nQiymət: ${p.price} AZN\n\nBu da şəkli:\n${p.image}\n\nSifariş etmək istəyirəm.`;
-  
-  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-  
-  // Slight delay to ensure the UI animation finishes before switching apps
-  setTimeout(() => window.location.href = url, 100); 
+
+// --- GLOBAL DISCOUNT LOGIC (SINGLETON) ---
+let globalDiscount = 6.00;     // Starts at 6 AZN
+const discountStep = 0.50;     // Drops by 0.50 AZN
+const stepDuration = 30;       // Every 30 seconds
+let secondsLeftInStep = 30;    // Countdown for current step
+let isTimerActive = false;     // Ensures it only starts once
+let globalTimerInterval = null;
+
+function activateGlobalDiscount() {
+    if (isTimerActive) return; 
+    isTimerActive = true;
+
+    // Show Bars
+    const mainBar = document.getElementById('global-spell-bar');
+    const modalBar = document.getElementById('modal-spell-box');
+    
+    if(mainBar) mainBar.classList.remove('hidden');
+    if(modalBar) modalBar.classList.remove('hidden');
+
+    globalTimerInterval = setInterval(() => {
+        secondsLeftInStep--;
+        updateDiscountProgressUI();
+
+        if (secondsLeftInStep <= 0) {
+            secondsLeftInStep = stepDuration; 
+            
+            if (globalDiscount > 0) {
+                globalDiscount -= discountStep;
+                // Fix floating point math
+                globalDiscount = Math.round(globalDiscount * 100) / 100;
+                triggerDropEffect(); 
+            } else {
+                globalDiscount = 0;
+                clearInterval(globalTimerInterval); 
+            }
+        }
+        updateDiscountTextUI();
+    }, 1000);
 }
 
-// --- MODAL ---
+function updateDiscountTextUI() {
+    const formattedPrice = `-${globalDiscount.toFixed(2)} ₼`;
+    
+    const gsAmount = document.getElementById('gs-amount');
+    const msAmount = document.getElementById('modal-spell-amount');
+    
+    if(gsAmount) gsAmount.textContent = formattedPrice;
+    if(msAmount) msAmount.textContent = formattedPrice;
+    
+    if(globalDiscount === 0) {
+         if(gsAmount) gsAmount.textContent = "0.00 ₼";
+         const warn = document.querySelector('.spell-warning');
+         if(warn) warn.textContent = "Endirim müddəti bitdi.";
+    }
+}
+
+function updateDiscountProgressUI() {
+    const percent = (secondsLeftInStep / stepDuration) * 100;
+    
+    const gsFill = document.getElementById('gs-timer-fill');
+    const msFill = document.getElementById('modal-spell-bar');
+    
+    if(gsFill) gsFill.style.width = `${percent}%`;
+    if(msFill) msFill.style.width = `${percent}%`;
+}
+
+function triggerDropEffect() {
+    const els = [document.getElementById('gs-amount'), document.getElementById('modal-spell-amount')];
+    els.forEach(el => {
+        if(el) {
+            el.classList.add('shake-text');
+            setTimeout(() => el.classList.remove('shake-text'), 500);
+        }
+    });
+}
+
+// --- MODAL & ACTIONS ---
+
 function openModal(p) {
   logUserAction('ViewDetails', p.name);
+  
+  // 1. Trigger Global Timer
+  activateGlobalDiscount(); 
+  
+  // 2. Set Modal Content
   document.getElementById('modal-img').src = p.image;
   document.getElementById('modal-title').textContent = p.name;
   document.getElementById('modal-price').textContent = p.price + ' AZN';
   document.getElementById('modal-desc').textContent = p.description;
   
-  // Set Modal WhatsApp Button
+  // 3. Update Text
+  updateDiscountTextUI();
+  
+  // 4. Set Button
   const btn = document.getElementById('modal-whatsapp-btn');
   btn.onclick = () => redirectToWhatsApp(p);
   
   document.getElementById('product-modal').classList.add('active');
 }
+
 function closeModal() { document.getElementById('product-modal').classList.remove('active'); }
+
+function redirectToWhatsApp(p) {
+  logUserAction('Like_WhatsApp', p.name);
+  
+  const finalPrice = Math.max(0, p.price - globalDiscount).toFixed(2);
+  const discountVal = globalDiscount.toFixed(2);
+  
+  let priceText = `${p.price} AZN`;
+  if (globalDiscount > 0) {
+    priceText = `${p.price} AZN\n🔥 Aktiv Endirim: -${discountVal} AZN\n✅ YEKUN: ${finalPrice} AZN`;
+  }
+  
+  const text = `Salam Brendimo! 🎁\n\nMən bu məhsulu bəyəndim:\n*${p.name}*\n${priceText}\n\nBu da şəkli:\n${p.image}\n\nSifariş etmək istəyirəm.`;
+  
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  
+  setTimeout(() => window.location.href = url, 100); 
+}
 
 // Init
 updateUI();
 
-  // --- SESSION TRACKING (IP, DEVICE, TIME) ---
-
+// --- SESSION TRACKING ---
 let sessionStartTime = Date.now();
 let userIP = "Fetching...";
 
 async function initTracking() {
   try {
-    // 1. Get User IP (using free API)
     const response = await fetch('https://api.ipify.org?format=json');
     const data = await response.json();
     userIP = data.ip;
-  } catch (err) {
-    userIP = "Hidden/Error";
-  }
-
-  // 2. Get Device Info
-  const device = navigator.userAgent; // Contains info like "iPhone", "Android", "Chrome"
-
-  // 3. Log the Start of Session
+  } catch (err) { userIP = "Hidden/Error"; }
+  const device = navigator.userAgent; 
   logUserAction('SessionStart', `Device: ${device}`);
 }
 
-// 4. Track Time Spent (Triggered when user switches tabs or closes app)
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') {
-    const timeSpent = Math.round((Date.now() - sessionStartTime) / 1000); // Seconds
+    const timeSpent = Math.round((Date.now() - sessionStartTime) / 1000); 
     logUserAction('SessionEnd', `Total Time: ${timeSpent} seconds`);
   }
 });
 
-
 function restartApp() {
-  // Bütün seçimləri sıfırla
   state.who = null;
   state.occasion = null;
   state.mood = null;
   state.style = null;
   state.budget = null;
   
-  // 1-ci addıma qaytar
   currentStep = 0;
-  
-  // UI-ı yenilə
   updateUI();
-  
-  // Əgər modal və ya grid açıqdırsa bağla
   closeAllProducts();
   closeModal();
 }
-
   
-// Start tracking immediately
 initTracking();
   
 </script>
