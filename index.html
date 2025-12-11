@@ -826,8 +826,9 @@ function renderCards() {
     card.innerHTML = `
       <div class="card-image-box">
          <div class="match-badge">🔥 ${p.score}%</div>
-         <img src="${p.image}" alt="${p.name}">
-      </div>
+<img src="${fixImageLink(p.image)}" alt="${p.name}">
+
+</div>
       
       <div class="card-info">
         <div class="card-text-group">
@@ -937,8 +938,9 @@ function renderGrid() {
     el.className = 'grid-item';
     el.onclick = () => openModal(p);
     el.innerHTML = `
-      <img src="${p.image}" loading="lazy">
-      <div class="grid-info">
+<img src="${fixImageLink(p.image)}" loading="lazy">
+
+<div class="grid-info">
         <div class="grid-title">${p.name}</div>
         <div class="grid-price">${p.price} AZN</div>
       </div>
@@ -1115,6 +1117,29 @@ function restartApp() {
   closeAllProducts();
   closeModal();
 }
+
+function fixImageLink(url) {
+  if (!url) return 'https://via.placeholder.com/300?text=No+Image'; // Fallback
+
+  // 1. Fix Google Drive Links
+  if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
+    // Extract the ID
+    const idMatch = url.match(/[-\w]{25,}/);
+    if (idMatch) {
+      // Use the high-performance Google User Content server
+      return `https://lh3.googleusercontent.com/d/${idMatch[0]}`;
+    }
+  }
+
+  // 2. Fix GitHub Blob Links (which are HTML pages)
+  if (url.includes('github.com') && url.includes('/blob/')) {
+    // Convert to raw.githubusercontent.com
+    return url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+  }
+
+  return url;
+}
+
   
 initTracking();
   
