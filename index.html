@@ -645,11 +645,30 @@ function initSwipe(card, product) {
 }
 
 // --- ALL PRODUCTS VIEW ---
-function openAllProducts() {
+// --- ALL PRODUCTS VIEW (FIXED) ---
+async function openAllProducts() {
   logUserAction('ViewAllProducts');
-  if(state.products.length === 0) fetchProducts(); 
   document.getElementById('all-products-view').classList.add('active');
-  renderGrid();
+  
+  // If we already have products, just show them
+  if (state.products.length > 0) {
+    renderGrid();
+    return;
+  }
+
+  // If no products yet, show a loader and fetch immediately (without magic animation)
+  const container = document.getElementById('all-products-grid');
+  container.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding-top:40px; color:#666;">Məhsullar yüklənir...</div>';
+  
+  try {
+    const response = await fetch(`${SHEETS_ENDPOINT}?action=getProducts`);
+    const data = await response.json();
+    state.products = shuffleArray(data.products || []);
+    renderGrid();
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding-top:40px;">İnternet əlaqəsini yoxlayın.</div>';
+  }
 }
 
 function closeAllProducts() {
