@@ -261,9 +261,92 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
 /* LOADER */
-.loader { text-align: center; margin-top: 50px; color: #888; }
-.spinner { width: 30px; height: 30px; border: 3px solid #ddd; border-top-color: #c21a1a; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px; }
-@keyframes spin { 100% { transform: rotate(360deg); } }
+/* --- MAGIC LOADER ANIMATIONS --- */
+.magic-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh; /* Center on screen */
+  position: relative;
+}
+
+.magic-wand-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.magic-wand {
+  font-size: 64px;
+  z-index: 2;
+  animation: waveWand 2.5s ease-in-out infinite;
+  transform-origin: bottom left;
+}
+
+/* Glowing Aura behind the wand */
+.magic-aura {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(194, 26, 26, 0.4) 0%, rgba(255, 215, 0, 0) 70%);
+  border-radius: 50%;
+  animation: pulseGlow 2s infinite;
+  z-index: 1;
+}
+
+/* Floating Sparkles */
+.sparkle {
+  position: absolute;
+  color: #FFD700;
+  font-size: 20px;
+  opacity: 0;
+  animation: sparkleFloat 2s infinite;
+}
+.s1 { top: 0; right: 0; animation-delay: 0.2s; }
+.s2 { top: 20px; left: -10px; animation-delay: 0.5s; font-size: 14px; }
+.s3 { bottom: 0; right: -10px; animation-delay: 0.8s; font-size: 24px; }
+.s4 { bottom: 20px; left: 0; animation-delay: 1.2s; }
+
+/* Text Animation */
+.magic-text {
+  margin-top: 30px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #555;
+  min-height: 24px; /* Prevent layout jump */
+  text-align: center;
+  animation: textFade 0.5s;
+}
+
+/* KEYFRAMES */
+@keyframes waveWand {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-15deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(10deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes pulseGlow {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.5); opacity: 0.2; }
+  100% { transform: scale(0.8); opacity: 0.5; }
+}
+
+@keyframes sparkleFloat {
+  0% { transform: translateY(0) scale(0); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(-40px) scale(1.2); opacity: 0; }
+}
+
+@keyframes textFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 .hidden { display: none !important; }
 
@@ -378,7 +461,17 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
   </div>
 
   <div class="step-content" id="step-loading">
-    <div class="loader"><div class="spinner"></div><p>🎩 Sehrbaz ideal hədiyyə axtarır...  🪄✨ ...</p></div>
+    <div class="magic-loader-container">
+      <div class="magic-wand-wrapper">
+        <div class="magic-wand">🪄</div>
+        <div class="magic-aura"></div>
+        <div class="sparkle s1">✨</div>
+        <div class="sparkle s2">⭐</div>
+        <div class="sparkle s3">✨</div>
+        <div class="sparkle s4">💫</div>
+      </div>
+      <p class="magic-text" id="magic-status-text">Sehrbaz işə başladı...</p>
+    </div>
   </div>
 
   <div class="step-content" id="step-results">
@@ -492,24 +585,65 @@ function shuffleArray(array) {
 }
 
 // 2. Fetch Products (Yüklənən kimi qarışdırırıq ki, "Bütün məhsullar" bölməsi də qarışıq olsun)
+// --- NEW FETCH & ANIMATION LOGIC ---
+
 async function fetchProducts() {
+  const statusTextEl = document.getElementById('magic-status-text');
+  
+  // 1. STORYTELLING MESSAGES (Timed for 6 seconds total)
+  // We have 4 messages. If we show each for 1.5 seconds, that equals exactly 6 seconds.
+  const messages = [
+    "Ulduzlar yoxlanılır... ✨",        // 0s - 1.5s
+    "Zövqlər analiz edilir... 🧠",      // 1.5s - 3.0s
+    "Axtardığın seçimlər ümumiləşdirilir... 🔍",  // 3.0s - 4.5s
+    "Sehr tamamlanır... 🪄"             // 4.5s - 6.0s
+  ];
+  
+  let msgIndex = 0;
+  
+  // Set initial text immediately
+  statusTextEl.textContent = messages[0];
+
+  // 2. SLOWER INTERVAL (1500ms = 1.5 seconds)
+  const textInterval = setInterval(() => {
+    msgIndex++;
+    if (msgIndex < messages.length) {
+      // Trigger CSS reflow for fade animation restart
+      statusTextEl.style.animation = 'none';
+      statusTextEl.offsetHeight; 
+      statusTextEl.style.animation = 'textFade 1.0s ease'; // Slower fade for smoother look
+      
+      statusTextEl.textContent = messages[msgIndex];
+    }
+  }, 1500); // Change text every 1.5 seconds
+
   try {
-    const response = await fetch(`${SHEETS_ENDPOINT}?action=getProducts`);
+    // 3. WAIT FOR 6 SECONDS (6000ms)
+    const [response, _] = await Promise.all([
+      fetch(`${SHEETS_ENDPOINT}?action=getProducts`), 
+      new Promise(resolve => setTimeout(resolve, 6000)) // <--- CHANGED TO 6000
+    ]);
+
     const data = await response.json();
     
-    // Məhsulları gələn kimi qarışdırırıq
+    // Stop the text cycle
+    clearInterval(textInterval);
+
+    // 4. Process Data
     state.products = shuffleArray(data.products || []);
-    
     processMatches();
+    
+    // 5. Move to next step
     currentStep++;
     updateUI();
     renderCards();
+    
   } catch (error) {
+    clearInterval(textInterval);
     console.error(error);
-    document.getElementById('step-loading').innerHTML = "<p>Xəta baş verdi. Zəhmət olmasa yeniləyin.</p>";
+    document.getElementById('step-loading').innerHTML = "<p style='text-align:center; margin-top:50px;'>Xəta baş verdi. İnternet əlaqəsini yoxlayın.</p>";
   }
 }
-
   
 // 3. Process Matches (Əvvəl qarışdırır, sonra xallara görə düzür)
 function processMatches() {
