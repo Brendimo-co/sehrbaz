@@ -4,12 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Brendimo Hədiyyə Sehrbazı</title>
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="🎁 Brendimo Hədiyyə Sehrbazı">
-  <meta property="og:description" content="Hədiyyə axtarışından yorulmusan? 30 saniyəyə ideal hədiyyəni tap! Sənə özəl seçimləri görmək üçün daxil ol.">
-  <meta property="og:image" content="https://github.com/Brendimo-co/sehrbaz/blob/main/Gemini_Generated_Image_hzsbephzsbephzsb.png?raw=true">
-  <meta property="og:url" content="https://brendimo-co.github.io/sehrbaz/">
-  
+<meta property="og:type" content="website">
+<meta property="og:title" content="🎁 Brendimo Hədiyyə Sehrbazı">
+<meta property="og:description" content="Hədiyyə axtarışından yorulmusan? 30 saniyəyə ideal hədiyyəni tap!">
+<meta property="og:image" content="https://github.com/Brendimo-co/sehrbaz/blob/main/Gemini_Generated_Image_hzsbephzsbephzsb.png?raw=true">
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* --- CSS STYLES --- */
@@ -30,18 +29,12 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
 .logo { font-size: 20px; font-weight: 800; color: #c21a1a; letter-spacing: -0.5px; cursor: pointer; }
 .step-indicator { font-size: 12px; color: #999; font-weight: 600; background: #eee; padding: 4px 8px; border-radius: 12px; }
 
-/* TOP NAV ACTIONS (NEW) */
-.top-actions {
-  display: flex; gap: 10px; justify-content: center; margin-bottom: 25px;
-}
+/* TOP ACTIONS */
+.top-actions { display: flex; gap: 10px; justify-content: center; margin-bottom: 25px; }
 .top-btn {
-  background: white; border: 1px solid #e5e5e5; 
-  padding: 8px 14px; border-radius: 20px; 
-  font-size: 12px; font-weight: 600; color: #333; 
-  text-decoration: none; cursor: pointer; 
-  display: flex; align-items: center; gap: 6px; 
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-  transition: transform 0.1s;
+  background: white; border: 1px solid #e5e5e5; padding: 8px 14px; border-radius: 20px; 
+  font-size: 12px; font-weight: 600; color: #333; cursor: pointer; display: flex; align-items: center; gap: 6px; 
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03); text-decoration: none; transition: transform 0.1s;
 }
 .top-btn:active { transform: scale(0.95); }
 .top-btn.wheel { background: linear-gradient(135deg, #fffcf2, #fff8e1); color: #b78900; border-color: #ffe082; }
@@ -68,144 +61,123 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
 .option-icon { font-size: 32px; margin-bottom: 8px; display: block; }
 .option-text { font-size: 15px; font-weight: 600; color: #333; }
 
-/* --- REFINED CARD DESIGN --- */
+/* CARDS STACK */
 #cards-wrapper { 
-  position: relative; 
-  width: 100%; 
-  height: 65vh;       
-  max-height: 600px; 
-  min-height: 450px;
-  margin-top: 20px; 
-  perspective: 1000px; 
+  position: relative; width: 100%; height: 65vh; max-height: 600px; min-height: 450px;
+  margin-top: 10px; perspective: 1000px; 
 }
-
 .card {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background: #ffffff; 
-  border-radius: 28px; 
-  box-shadow: 0 20px 50px -12px rgba(0,0,0,0.1);
-  overflow: hidden; 
-  transform-origin: 50% 100%; will-change: transform; touch-action: none;
-  display: flex; flex-direction: column;
-  padding: 12px; 
+  background: #ffffff; border-radius: 28px; box-shadow: 0 20px 50px -12px rgba(0,0,0,0.1);
+  overflow: hidden; transform-origin: 50% 100%; will-change: transform; touch-action: none;
+  display: flex; flex-direction: column; padding: 12px; 
 }
-
 .card-image-box {
-  position: relative;
-  width: 100%;
-  height: 68%; 
-  border-radius: 20px;
-  overflow: hidden;
-  background: #f4f4f5; 
-  display: flex; align-items: center; justify-content: center;
+  position: relative; width: 100%; height: 68%; border-radius: 20px;
+  overflow: hidden; background: #f4f4f5; display: flex; align-items: center; justify-content: center;
 }
+.card-image-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
 
-.card-image-box img { 
-  width: 100%; height: 100%; 
-  object-fit: cover; 
-  transition: transform 0.5s ease;
-}
-
+/* BADGES */
 .match-badge {
-  position: absolute; top: 12px; right: 12px; 
-  background: rgba(255, 255, 255, 0.9); 
-  color: #c21a1a; 
-  padding: 6px 12px; 
-  border-radius: 20px; 
-  font-size: 12px; font-weight: 800; 
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  backdrop-filter: blur(4px);
-  z-index: 2;
+  position: absolute; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.9);
+  color: #c21a1a; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 800;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08); backdrop-filter: blur(4px); z-index: 2;
+}
+.badge-bestseller {
+  position: absolute; top: 12px; left: 12px; background: #FFD700; color: #000;
+  padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 800;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 3; display: flex; align-items: center; gap: 4px;
+}
+.badge-lowstock {
+  position: absolute; bottom: 12px; left: 12px; background: #c21a1a; color: white;
+  padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 3;
 }
 
-.card-info { 
-  flex: 1; 
-  padding: 16px 8px 8px 8px; 
-  display: flex; flex-direction: column; justify-content: flex-end;
-}
-
+.card-info { flex: 1; padding: 16px 8px 8px 8px; display: flex; flex-direction: column; justify-content: flex-end; }
 .card h3 { 
-  font-size: 22px; font-weight: 700; color: #1a1a1a;
-  margin: 0 0 6px 0; letter-spacing: -0.5px;
-  line-height: 1.2;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  font-size: 22px; font-weight: 700; color: #1a1a1a; margin: 0 0 6px 0; letter-spacing: -0.5px;
+  line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-
 .card-desc-preview {
-  font-size: 14px; color: #888; font-weight: 400;
-  margin-bottom: auto; 
-  line-height: 1.4;
+  font-size: 14px; color: #888; font-weight: 400; margin-bottom: auto; line-height: 1.4;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-
-.card-footer {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-top: 12px;
-}
-
-.price-tag { 
-  font-size: 26px; font-weight: 800; color: #1a1a1a; letter-spacing: -1px;
-}
+.card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+.price-tag { font-size: 26px; font-weight: 800; color: #1a1a1a; letter-spacing: -1px; }
 .price-currency { font-size: 16px; font-weight: 600; color: #999; margin-left: 4px; }
-
 .swipe-hint {
   width: 40px; height: 40px; background: #1a1a1a; border-radius: 50%;
   display: flex; align-items: center; justify-content: center; color: white;
   font-size: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-/* --- DISCOUNT BARS --- */
-.global-spell-wrapper {
-    background: #1a1a1a; color: white; padding: 10px 15px; border-radius: 12px;
+/* --- THE COOL FEAR-INDUCING DISCOUNT BAR --- */
+.fear-bar-wrapper {
+    background: linear-gradient(135deg, #111, #222);
+    color: white; padding: 12px 16px; border-radius: 12px;
     margin-bottom: 20px; border: 1px solid #FFD700;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2); animation: slideDown 0.5s ease;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    animation: slideDown 0.6s ease;
+    position: relative; overflow: hidden;
 }
-.gs-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-weight: 700; }
-.gs-amount { color: #FFD700; font-size: 18px; font-variant-numeric: tabular-nums; }
-.gs-timer-track { width: 100%; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden; }
-.gs-timer-fill { height: 100%; background: linear-gradient(90deg, #FFD700, #ff4b4b); width: 100%; transition: width 1s linear; }
-
-/* MODAL BAR */
-.spell-box {
-  background: linear-gradient(135deg, #2b2b2b 0%, #1a1a1a 100%);
-  border-radius: 12px; padding: 12px 16px; margin-bottom: 15px; color: white;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2); border-left: 4px solid #FFD700; 
-  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+.fear-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.fear-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #ccc; }
+.fear-amount { 
+    font-size: 22px; font-weight: 800; color: #FFD700; 
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); 
+    font-variant-numeric: tabular-nums;
 }
-.spell-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.spell-amount { font-size: 20px; font-weight: 800; color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); font-variant-numeric: tabular-nums; }
-.shake-text { animation: shake 0.5s; color: #ff4b4b !important; }
-.spell-timer-track { width: 100%; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
-.spell-timer-bar { height: 100%; width: 100%; background: linear-gradient(90deg, #FFD700, #ff4b4b); transform-origin: left; transition: width 1s linear; }
-.spell-warning { font-size: 11px; color: #ccc; text-align: right; font-style: italic; }
+.shake-it { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; color: #ff4d4d !important; text-shadow: 0 0 10px rgba(255, 77, 77, 0.6); }
 
-@keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
-@keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-@keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-/* ALL PRODUCTS */
-.all-products-view {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fafafa;
-  z-index: 100; overflow-y: auto; padding: 20px; display: none;
+.timer-track { width: 100%; height: 6px; background: rgba(255,255,255,0.15); border-radius: 3px; overflow: hidden; }
+.timer-fill { 
+    height: 100%; background: linear-gradient(90deg, #FFD700, #ff4d4d); 
+    width: 100%; transition: width 1s linear; 
 }
+.fear-warning { 
+    margin-top: 6px; font-size: 11px; color: #ff6b6b; font-weight: 600; 
+    text-align: right; font-style: italic; opacity: 0; animation: flashWarn 2s infinite; 
+}
+@keyframes flashWarn { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+@keyframes shake { 
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+/* NOTIFICATION TOAST */
+.notif-toast {
+    position: fixed; top: 15px; left: 50%; transform: translateX(-50%) translateY(-100px);
+    background: white; border-radius: 30px; padding: 8px 16px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 999;
+    display: flex; align-items: center; gap: 10px; min-width: 280px;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid #eee;
+}
+.notif-toast.show { transform: translateX(-50%) translateY(0); }
+.notif-icon { width: 32px; height: 32px; background: #e0f2fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.notif-content { display: flex; flex-direction: column; }
+.notif-title { font-size: 11px; color: #888; font-weight: 600; }
+.notif-desc { font-size: 13px; font-weight: 700; color: #333; }
+
+/* MODAL */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; padding: 24px; overflow-y: auto; display: none; }
+.modal.active { display: block; animation: slideUp 0.3s ease; }
+
+/* ALL PRODUCTS GRID */
+.all-products-view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fafafa; z-index: 100; overflow-y: auto; padding: 20px; display: none; }
 .all-products-view.active { display: block; animation: slideUp 0.3s ease; }
-.close-view-btn { 
-  position: sticky; top: 0; background: rgba(250,250,250,0.9); padding: 10px 0;
-  display: flex; justify-content: flex-end; margin-bottom: 10px; z-index: 2; backdrop-filter: blur(5px);
-}
 .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 40px; }
-.grid-item { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.grid-item { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; }
 .grid-item img { width: 100%; height: 140px; object-fit: cover; }
 .grid-info { padding: 10px; }
 .grid-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .grid-price { font-size: 14px; color: #c21a1a; font-weight: 700; }
-.load-more-btn {
-  width: 100%; padding: 12px; background: #eee; border: none; border-radius: 8px;
-  font-weight: 600; color: #555; cursor: pointer; margin-bottom: 40px;
-}
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-/* LOADER */
+/* MAGIC LOADER */
 .magic-loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; position: relative; }
 .magic-wand-wrapper { position: relative; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; }
 .magic-wand { font-size: 64px; z-index: 2; animation: waveWand 2.5s ease-in-out infinite; transform-origin: bottom left; }
@@ -215,21 +187,17 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
 .s2 { top: 20px; left: -10px; animation-delay: 0.5s; font-size: 14px; }
 .s3 { bottom: 0; right: -10px; animation-delay: 0.8s; font-size: 24px; }
 .s4 { bottom: 20px; left: 0; animation-delay: 1.2s; }
-.magic-text { margin-top: 30px; font-size: 18px; font-weight: 600; color: #555; min-height: 24px; text-align: center; animation: textFade 0.5s; }
+.magic-text { margin-top: 30px; font-size: 18px; font-weight: 600; color: #555; text-align: center; animation: textFade 0.5s; min-height: 25px; }
 
 @keyframes waveWand { 0% { transform: rotate(0deg); } 25% { transform: rotate(-15deg); } 50% { transform: rotate(0deg); } 75% { transform: rotate(10deg); } 100% { transform: rotate(0deg); } }
 @keyframes pulseGlow { 0% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.5); opacity: 0.2; } 100% { transform: scale(0.8); opacity: 0.5; } }
 @keyframes sparkleFloat { 0% { transform: translateY(0) scale(0); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-40px) scale(1.2); opacity: 0; } }
 @keyframes textFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 .hidden { display: none !important; }
 
-/* MODAL */
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; padding: 24px; overflow-y: auto; display: none; }
-.modal.active { display: block; animation: slideUp 0.3s ease; }
-#modal-desc { font-size: 16px; line-height: 1.7; color: #444; margin-bottom: 30px; white-space: pre-line; }
-#modal-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-top: 10px; }
-#modal-price { font-size: 28px; font-weight: 800; color: #c21a1a; margin-top: 5px; margin-bottom: 20px;}
-
+</style>
 <script>
 !function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -245,9 +213,16 @@ fbq('track', 'PageView');
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 /></noscript>
-</style>
 </head>
 <body>
+
+<div id="notif-toast" class="notif-toast">
+    <div class="notif-icon">📦</div>
+    <div class="notif-content">
+        <span class="notif-title" id="notif-user">...</span>
+        <span class="notif-desc" id="notif-product">...</span>
+    </div>
+</div>
 
 <div class="wizard-wrapper">
  <div class="header">
@@ -325,36 +300,35 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
         <div class="sparkle s3">✨</div>
         <div class="sparkle s4">💫</div>
       </div>
-      <p class="magic-text" id="magic-status-text">Sehrbaz işə başladı...</p>
+      <p class="magic-text" id="magic-status-text">Sehrli alqoritm işə düşdü...</p>
     </div>
   </div>
 
   <div class="step-content" id="step-results">
     
-    <div id="global-spell-bar" class="global-spell-wrapper hidden">
-        <div class="gs-info">
-            <span>🔥 Aktiv Endirim:</span>
-            <span id="gs-amount" class="gs-amount">-6.00 ₼</span>
+    <div id="fear-bar-main" class="fear-bar-wrapper hidden">
+        <div class="fear-header">
+            <span class="fear-title">🔥 ENDİRİM ƏRİYİR...</span>
+            <span id="gs-amount" class="fear-amount">-6.00 ₼</span>
         </div>
-        <div class="gs-timer-track">
-            <div id="gs-timer-fill" class="gs-timer-fill"></div>
+        <div class="timer-track">
+            <div id="gs-timer-fill" class="timer-fill"></div>
         </div>
+        <div class="fear-warning">Tələsin! Hər 30 saniyədə 0.50 ₼ itirirsiniz!</div>
     </div>
 
     <h2 class="title" style="font-size: 20px; margin-bottom: 10px;">Sizin üçün seçdiklərimiz</h2>
     <div id="cards-wrapper"></div>
-   
   </div>
 </div>
 
 <div id="all-products-view" class="all-products-view">
-  <div class="close-view-btn">
-    <button onclick="closeAllProducts()" style="background:none; border:none; font-size:16px; font-weight:700; color:#333;">✕ Bağla</button>
+  <div style="position:sticky; top:0; z-index:2; display:flex; justify-content:flex-end; padding-bottom:10px;">
+    <button onclick="closeAllProducts()" style="background:#eee; border:none; padding:8px 16px; border-radius:20px; font-weight:700;">✕ Bağla</button>
   </div>
   <h2 class="title" style="font-size:20px;">Bütün Məhsullar</h2>
-  <div class="grid-container" id="all-products-grid">
-    </div>
-  <button id="load-more-btn" class="load-more-btn" onclick="loadMoreGrid()">Daha Çox Göstər (6)</button>
+  <div class="grid-container" id="all-products-grid"></div>
+  <button id="load-more-btn" class="load-more-btn" onclick="loadMoreGrid()" style="width:100%; padding:12px; background:#eee; border:none; border-radius:8px;">Daha Çox Göstər (6)</button>
 </div>
 
 <div id="product-modal" class="modal">
@@ -363,48 +337,36 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
   <img id="modal-img" src="" style="width:100%; border-radius:12px; margin-bottom:15px;">
   
   <h2 id="modal-title" style="margin-bottom:5px;"></h2>
-  
-  <div id="modal-spell-box" class="spell-box hidden">
-    <div class="spell-header">
-      <span>⚡ Endirim Əriyir...</span>
-      <span class="spell-amount" id="modal-spell-amount">-6.00 ₼</span>
-    </div>
-    <div class="spell-timer-track">
-      <div class="spell-timer-bar" id="modal-spell-bar"></div>
-    </div>
-    <p class="spell-warning">Hər 30 saniyədən bir 0.50 qəpik azalır!</p>
-  </div>
 
-  <h3 id="modal-price" style="color:#c21a1a; margin-bottom:15px;"></h3>
-  <p id="modal-desc"></p>
+  <div id="fear-bar-modal" class="fear-bar-wrapper" style="margin-bottom: 15px; padding: 10px;">
+      <div class="fear-header">
+          <span class="fear-title" style="font-size: 11px;">⚠️ QAÇIRMA!</span>
+          <span id="modal-fear-amount" class="fear-amount" style="font-size: 18px;">-6.00 ₼</span>
+      </div>
+      <div class="timer-track" style="height: 4px;">
+          <div id="modal-timer-fill" class="timer-fill"></div>
+      </div>
+  </div>
   
-  <button id="modal-whatsapp-btn" class="float-btn" style="width:100%; justify-content:center; background:#25D366; color:white;">
+  <h3 id="modal-price" style="color:#c21a1a; margin-bottom:20px; font-size:28px;"></h3>
+  
+  <p id="modal-desc" style="line-height:1.6; color:#444; margin-bottom:30px; white-space: pre-line;"></p>
+  
+  <button id="modal-whatsapp-btn" class="float-btn" style="width:100%; padding:16px; border-radius:12px; border:none; font-weight:700; font-size:16px; background:#25D366; color:white;">
     WhatsApp ilə Sifariş Et
   </button>
 </div>
 
 <script>
 // --- CONFIGURATION ---
-const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxe3u8E5WYNQp_e_OIDlJbR7rbmTVLdHHzc2rrhseUhFwddRDv74s2PhZKOKm3l3Qpw/exec"; 
+const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwnQvncFk983Q0zEO7WLoug87JKEvXoH1VgKTC9wxHCyIgWVGQMYvrV0KnsJDs4LncR/exec"; 
 const WHATSAPP_NUMBER = "994556742535";
 
 // --- STATE ---
 let currentStep = 0;
 const totalSteps = 5;
-const state = { who: null, occasion: null, mood: null, style: null, budget: null, products: [], cardStack: [] };
+const state = { who: null, occasion: null, mood: null, style: null, budget: null, products: [], cardStack: [], orders: [] };
 let gridLimit = 6; 
-
-// --- LOGGING ---
-function logUserAction(action, details = '') {
-  const currentIP = typeof userIP !== 'undefined' ? userIP : 'Unknown';
-  fetch(SHEETS_ENDPOINT, {
-    method: 'POST',
-    mode: 'no-cors',
-    keepalive: true, 
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'log', action: action, details: `[IP: ${currentIP}] ${details}` })
-  }).catch(e => console.log("Logging failed", e));
-}
 
 // --- NAVIGATION ---
 function updateUI() {
@@ -421,12 +383,11 @@ function updateUI() {
     fetchProducts();
   } else {
     document.getElementById('step-results').classList.add('active');
+    activateGlobalDiscount(); // START THE FEAR!
   }
 }
 
-function goBack() {
-  if (currentStep > 0) { currentStep--; updateUI(); }
-}
+function goBack() { if (currentStep > 0) { currentStep--; updateUI(); } }
 
 function handleOptionClick(e, key) {
   const card = e.target.closest('.option-card');
@@ -437,8 +398,7 @@ function handleOptionClick(e, key) {
   updateUI();
 }
   
-// --- DATA ---
-
+// --- DATA FETCHING & MAGIC TEXT ---
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -447,15 +407,22 @@ function shuffleArray(array) {
   return array;
 }
 
-// 2. Fetch Products with 4.5-second Magic Animation
 async function fetchProducts() {
   const statusTextEl = document.getElementById('magic-status-text');
   
+  // 10 TEXT OPTIONS - FEAR REMOVAL DURING LOADING
   const messages = [
-    "Ulduzlar yoxlanılır... ✨",          
-    "Zövqlər analiz edilir... 🧠",       
-    "Axtardığın seçimlər ümumiləşdirilir... 🔍",  
-    "Sehr tamamlanır... 🪄"              
+    "Sehrli alqoritm işə düşdü... 🪄",
+    "Hədiyyə bəyənilsin... ❤️",
+    "Xüsusi hiss etdirsin... ✨",
+    "Ucuz görsənməsin... 💎",
+    "Axtarmaq vaxt almasın... ⏳",
+    "Zövqlər analiz edilir... 🧠",
+    "Ən keyfiyyətli seçimlər... 🌟",
+    "Sıradan olanlar silinir... ❌",
+    "Büdcənizə uyğunlaşır... 📉",
+    "Sevindirmək zəmanəti... 🎁",
+    "İdeal hədiyyə tapıldı! 🎯"
   ];
   
   let msgIndex = 0;
@@ -466,26 +433,33 @@ async function fetchProducts() {
     if (msgIndex < messages.length) {
       statusTextEl.style.animation = 'none';
       statusTextEl.offsetHeight; 
-      statusTextEl.style.animation = 'textFade 1.0s ease';
+      statusTextEl.style.animation = 'textFade 0.5s ease';
       statusTextEl.textContent = messages[msgIndex];
     }
-  }, 1100); 
+  }, 450); 
 
   try {
-    const [response, _] = await Promise.all([
-      fetch(`${SHEETS_ENDPOINT}?action=getProducts`), 
-      new Promise(resolve => setTimeout(resolve, 4500)) 
+    const [prodRes, orderRes, _] = await Promise.all([
+      fetch(`${SHEETS_ENDPOINT}?action=getProducts`),
+      fetch(`${SHEETS_ENDPOINT}?action=getOrders`),
+      new Promise(resolve => setTimeout(resolve, 4800)) 
     ]);
 
-    const data = await response.json();
+    const prodData = await prodRes.json();
+    const orderData = await orderRes.json();
+    
     clearInterval(textInterval);
 
-    state.products = shuffleArray(data.products || []);
-    processMatches();
+    state.products = shuffleArray(prodData.products || []);
+    state.orders = orderData.orders || [];
+
+    applyBadges(state.products);
     
+    processMatches();
     currentStep++;
     updateUI();
     renderCards();
+    startOrderNotifications();
     
   } catch (error) {
     clearInterval(textInterval);
@@ -493,13 +467,19 @@ async function fetchProducts() {
     document.getElementById('step-loading').innerHTML = "<p style='text-align:center; margin-top:50px;'>Xəta baş verdi. İnternet əlaqəsini yoxlayın.</p>";
   }
 }
+
+function applyBadges(products) {
+    products.forEach(p => { delete p.isBestSeller; delete p.isLowStock; });
+    if(products[2]) products[2].isBestSeller = true;
+    const lowStockIndices = [1, 4, 9, 16, 23];
+    lowStockIndices.forEach(idx => {
+        if(products[idx]) products[idx].isLowStock = true;
+    });
+}
   
-// 3. Process Matches
 function processMatches() {
   let candidates = shuffleArray([...state.products]);
-  if (state.who) {
-    candidates = candidates.filter(p => match(p.target, state.who));
-  }
+  if (state.who) candidates = candidates.filter(p => match(p.target, state.who));
 
   state.cardStack = candidates.map(p => {
     let score = 0;
@@ -521,56 +501,51 @@ function match(dbField, userSelect) {
 function checkBudget(price, budgetStr) {
   const p = Number(price);
   if (!budgetStr) return true;
-  if (budgetStr === '0-20') return p <= 20;
-  if (budgetStr === '20-50') return p > 20 && p <= 50;
-  if (budgetStr === '50-100') return p > 50 && p <= 100;
-  if (budgetStr === '100+') return p > 100;
+  if (budgetStr === '0-30') return p <= 30;
+  if (budgetStr === '30-60') return p > 30 && p <= 60;
+  if (budgetStr === '60-120') return p > 60 && p <= 120;
+  if (budgetStr === '120+') return p > 120;
   return true;
 }
 
+// --- RENDER CARDS ---
 function renderCards() {
   const container = document.getElementById('cards-wrapper');
   container.innerHTML = '';
   
   if (state.cardStack.length === 0) {
-    container.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#888;"><div style="font-size:40px; margin-bottom:10px;">🤔</div><p>Başqa seçim qalmadı.</p></div>';
+    container.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#888;"><p>Başqa seçim qalmadı.</p></div>';
     return;
   }
 
   state.cardStack.slice(0, 3).forEach((p, index) => {
     const card = document.createElement('div');
     card.className = 'card';
-    
     const scale = 1 - (index * 0.05);
     const translateY = index * 20;
     card.style.zIndex = state.cardStack.length - index;
     card.style.transform = `translateY(${translateY}px) scale(${scale})`;
-    
-    if (index !== 0) {
-       card.style.opacity = '0.5';
-    } else {
-       card.style.boxShadow = "0 20px 50px -12px rgba(0,0,0,0.15)";
-    }
+    if (index !== 0) card.style.opacity = '0.5';
+    else card.style.boxShadow = "0 20px 50px -12px rgba(0,0,0,0.15)";
+
+    let badgesHtml = `<div class="match-badge">${p.score}% Uyğunluq</div>`;
+    if (p.isBestSeller) badgesHtml += `<div class="badge-bestseller">🏆 Həftənin Best Selleri</div>`;
+    if (p.isLowStock) badgesHtml += `<div class="badge-lowstock">⚠️ Cəmi 4 ədəd qaldı</div>`;
 
     card.innerHTML = `
       <div class="card-image-box">
-         <div class="match-badge">${p.score}% Uyğunluq</div>
+         ${badgesHtml}
          <img src="${fixImageLink(p.image)}" alt="${p.name}" draggable="false">
       </div>
-      
       <div class="card-info">
         <h3>${p.name}</h3>
-        <p class="card-desc-preview">${p.description || 'Ətraflı məlumat üçün toxunun...'}</p>
-        
+        <p class="card-desc-preview">${p.description || 'Ətraflı məlumat...'}</p>
         <div class="card-footer">
-          <div>
-            <span class="price-tag">${p.price}</span><span class="price-currency">AZN</span>
-          </div>
+          <div><span class="price-tag">${p.price}</span><span class="price-currency">AZN</span></div>
           <div class="swipe-hint">👉</div>
         </div>
       </div>
     `;
-    
     if (index === 0) initSwipe(card, p);
     container.appendChild(card);
   });
@@ -578,153 +553,74 @@ function renderCards() {
 
 function initSwipe(card, product) {
   let startX = 0, currentX = 0, isDragging = false;
-
   const onStart = (e) => {
     isDragging = true;
     startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-    currentX = 0; 
     card.style.transition = 'none';
   };
-
   const onMove = (e) => {
     if (!isDragging) return;
     const x = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     currentX = x - startX;
-    
-    const rotate = currentX / 15;
-    card.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
+    card.style.transform = `translateX(${currentX}px) rotate(${currentX / 15}deg)`;
   };
-
   const onEnd = () => {
     if (!isDragging) return;
     isDragging = false;
-    
-    // CLICK DETECTION (Open Modal)
-    if (Math.abs(currentX) < 10) {
-      openModal(product); 
-      card.style.transform = 'translateY(0) scale(1) rotate(0)'; 
-      return;
-    }
-
-    // SWIPE LOGIC
+    if (Math.abs(currentX) < 10) { openModal(product); card.style.transform = 'translateY(0) scale(1) rotate(0)'; return; }
     if (Math.abs(currentX) > 100) {
       const dir = currentX > 0 ? 1 : -1;
-      
       card.style.transition = 'transform 0.4s ease';
       card.style.transform = `translateX(${dir * window.innerWidth * 1.5}px) rotate(${dir * 30}deg)`;
-      
       setTimeout(() => {
         card.remove();
         state.cardStack.shift();
-        
-        // Right Swipe (Like)
-        if (dir === 1) {
-            activateGlobalDiscount();
-            redirectToWhatsApp(product);
-        } else {
-            // Left Swipe (Skip)
-            logUserAction('Skipped', product.name);
-        }
+        if (dir === 1) redirectToWhatsApp(product);
+        else logUserAction('Skipped', product.name);
         renderCards();
       }, 300);
     } else {
-      // RESET POSITION (Not swiped far enough)
-      card.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-      card.style.transform = 'translateX(0) translateY(0) scale(1) rotate(0)';
+      card.style.transition = 'transform 0.3s';
+      card.style.transform = 'translateY(0) scale(1) rotate(0)';
     }
     currentX = 0;
   };
-
-  card.addEventListener('mousedown', onStart);
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', onEnd);
-  
-  card.addEventListener('touchstart', onStart);
-  document.addEventListener('touchmove', onMove);
-  document.addEventListener('touchend', onEnd);
+  card.addEventListener('mousedown', onStart); document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onEnd);
+  card.addEventListener('touchstart', onStart); document.addEventListener('touchmove', onMove); document.addEventListener('touchend', onEnd);
 }
 
-// --- ALL PRODUCTS VIEW ---
-// --- ALL PRODUCTS VIEW (FIXED) ---
-async function openAllProducts() {
-  logUserAction('ViewAllProducts');
-  document.getElementById('all-products-view').classList.add('active');
-  
-  // If we already have products, just show them
-  if (state.products.length > 0) {
-    renderGrid();
-    return;
-  }
-
-  // If no products yet, show a loader and fetch immediately (without magic animation)
-  const container = document.getElementById('all-products-grid');
-  container.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding-top:40px; color:#666;">Məhsullar yüklənir...</div>';
-  
-  try {
-    const response = await fetch(`${SHEETS_ENDPOINT}?action=getProducts`);
-    const data = await response.json();
-    state.products = shuffleArray(data.products || []);
-    renderGrid();
-  } catch (error) {
-    console.error(error);
-    container.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding-top:40px;">İnternet əlaqəsini yoxlayın.</div>';
-  }
+// --- ORDER NOTIFICATIONS ---
+function startOrderNotifications() {
+    if (state.orders.length === 0) return;
+    setInterval(() => {
+        const order = state.orders[Math.floor(Math.random() * state.orders.length)];
+        const phone = order.phone || "555555555";
+        const maskedPhone = `*******${phone.slice(-2)}`;
+        
+        const toast = document.getElementById('notif-toast');
+        document.getElementById('notif-user').textContent = `${maskedPhone} nömrəsi indicə aldı:`;
+        document.getElementById('notif-product').textContent = order.product;
+        
+        toast.classList.add('show');
+        setTimeout(() => { toast.classList.remove('show'); }, 5000);
+    }, 30000); 
 }
 
-function closeAllProducts() {
-  document.getElementById('all-products-view').classList.remove('active');
-}
-
-function renderGrid() {
-  const container = document.getElementById('all-products-grid');
-  container.innerHTML = '';
-  const source = state.products.length ? state.products : [];
-  
-  source.slice(0, gridLimit).forEach(p => {
-    const el = document.createElement('div');
-    el.className = 'grid-item';
-    el.onclick = () => openModal(p);
-    el.innerHTML = `
-<img src="${fixImageLink(p.image)}" loading="lazy">
-<div class="grid-info">
-        <div class="grid-title">${p.name}</div>
-        <div class="grid-price">${p.price} AZN</div>
-      </div>
-    `;
-    container.appendChild(el);
-  });
-  
-  const btn = document.getElementById('load-more-btn');
-  if(gridLimit >= source.length) btn.style.display = 'none';
-  else btn.style.display = 'block';
-}
-
-  
-function loadMoreGrid() {
-  gridLimit += 6; 
-  renderGrid();
-  logUserAction('LoadMoreProducts');
-}
-
-
-// --- GLOBAL DISCOUNT LOGIC (SINGLETON) ---
-let globalDiscount = 6.00;     // Starts at 6 AZN
-const discountStep = 0.50;     // Drops by 0.50 AZN
-const stepDuration = 30;       // Every 30 seconds
-let secondsLeftInStep = 30;    // Countdown for current step
-let isTimerActive = false;     // Ensures it only starts once
+// --- GLOBAL DISCOUNT LOGIC (THE FEAR FACTOR) ---
+let globalDiscount = 6.00;     
+const discountStep = 0.50;     
+const stepDuration = 30;       
+let secondsLeftInStep = 30;    
+let isTimerActive = false;     
 let globalTimerInterval = null;
 
 function activateGlobalDiscount() {
     if (isTimerActive) return; 
     isTimerActive = true;
 
-    // Show Bars
-    const mainBar = document.getElementById('global-spell-bar');
-    const modalBar = document.getElementById('modal-spell-box');
-    
+    // Show Main Bar
+    const mainBar = document.getElementById('fear-bar-main');
     if(mainBar) mainBar.classList.remove('hidden');
-    if(modalBar) modalBar.classList.remove('hidden');
 
     globalTimerInterval = setInterval(() => {
         secondsLeftInStep--;
@@ -735,7 +631,6 @@ function activateGlobalDiscount() {
             
             if (globalDiscount > 0) {
                 globalDiscount -= discountStep;
-                // Fix floating point math
                 globalDiscount = Math.round(globalDiscount * 100) / 100;
                 triggerDropEffect(); 
             } else {
@@ -749,60 +644,93 @@ function activateGlobalDiscount() {
 
 function updateDiscountTextUI() {
     const formattedPrice = `-${globalDiscount.toFixed(2)} ₼`;
-    
     const gsAmount = document.getElementById('gs-amount');
-    const msAmount = document.getElementById('modal-spell-amount');
+    const msAmount = document.getElementById('modal-fear-amount');
     
     if(gsAmount) gsAmount.textContent = formattedPrice;
     if(msAmount) msAmount.textContent = formattedPrice;
-    
-    if(globalDiscount === 0) {
-         if(gsAmount) gsAmount.textContent = "0.00 ₼";
-         const warn = document.querySelector('.spell-warning');
-         if(warn) warn.textContent = "Endirim müddəti bitdi.";
-    }
 }
 
 function updateDiscountProgressUI() {
     const percent = (secondsLeftInStep / stepDuration) * 100;
-    
     const gsFill = document.getElementById('gs-timer-fill');
-    const msFill = document.getElementById('modal-spell-bar');
+    const msFill = document.getElementById('modal-timer-fill');
     
     if(gsFill) gsFill.style.width = `${percent}%`;
     if(msFill) msFill.style.width = `${percent}%`;
 }
 
 function triggerDropEffect() {
-    const els = [document.getElementById('gs-amount'), document.getElementById('modal-spell-amount')];
+    const els = [document.getElementById('gs-amount'), document.getElementById('modal-fear-amount')];
     els.forEach(el => {
         if(el) {
-            el.classList.add('shake-text');
-            setTimeout(() => el.classList.remove('shake-text'), 500);
+            el.classList.add('shake-it');
+            setTimeout(() => el.classList.remove('shake-it'), 500);
         }
     });
 }
 
-// --- MODAL & ACTIONS ---
+// --- ALL PRODUCTS ---
+async function openAllProducts() {
+  document.getElementById('all-products-view').classList.add('active');
+  logUserAction('ViewAllProducts');
+  if (state.products.length > 0) { renderGrid(); return; }
+  
+  const container = document.getElementById('all-products-grid');
+  container.innerHTML = '<div style="grid-column:1/-1;text-align:center;">Yüklənir...</div>';
+  try {
+    const response = await fetch(`${SHEETS_ENDPOINT}?action=getProducts`);
+    const data = await response.json();
+    state.products = shuffleArray(data.products || []);
+    applyBadges(state.products); 
+    renderGrid();
+  } catch(e) { container.innerHTML = '<p style="text-align:center">Yüklənmə xətası.</p>'; }
+}
 
+function closeAllProducts() { document.getElementById('all-products-view').classList.remove('active'); }
+
+function renderGrid() {
+  const container = document.getElementById('all-products-grid');
+  container.innerHTML = '';
+  state.products.slice(0, gridLimit).forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'grid-item';
+    el.onclick = () => openModal(p);
+    
+    let badge = "";
+    if (p.isBestSeller) badge = `<div class="badge-bestseller" style="top:5px; left:5px; font-size:10px;">🏆 Best Seller</div>`;
+    else if (p.isLowStock) badge = `<div class="badge-lowstock" style="bottom:5px; left:5px; font-size:10px;">⚠️ 4 ədəd qaldı</div>`;
+
+    el.innerHTML = `
+        ${badge}
+        <img src="${fixImageLink(p.image)}" loading="lazy">
+        <div class="grid-info">
+            <div class="grid-title">${p.name}</div>
+            <div class="grid-price">${p.price} AZN</div>
+        </div>`;
+    container.appendChild(el);
+  });
+  document.getElementById('load-more-btn').style.display = (gridLimit >= state.products.length) ? 'none' : 'block';
+}
+function loadMoreGrid() { gridLimit += 6; renderGrid(); logUserAction('LoadMoreProducts'); }
+
+// --- MODAL & WHATSAPP ---
 function openModal(p) {
   logUserAction('ViewDetails', p.name);
-  
-  activateGlobalDiscount(); 
-  
+  activateGlobalDiscount(); // Ensure timer is running
+
   document.getElementById('modal-img').src = fixImageLink(p.image);
   document.getElementById('modal-title').textContent = p.name;
   document.getElementById('modal-price').textContent = p.price + ' AZN';
   document.getElementById('modal-desc').textContent = p.description;
   
   updateDiscountTextUI();
-  
+  updateDiscountProgressUI();
+
   const btn = document.getElementById('modal-whatsapp-btn');
   btn.onclick = () => redirectToWhatsApp(p);
-  
   document.getElementById('product-modal').classList.add('active');
 }
-
 function closeModal() { document.getElementById('product-modal').classList.remove('active'); }
 
 function redirectToWhatsApp(p) {
@@ -816,73 +744,51 @@ function redirectToWhatsApp(p) {
     priceText = `${p.price} AZN\n🔥 Aktiv Endirim: -${discountVal} AZN\n✅ YEKUN: ${finalPrice} AZN`;
   }
   
-  const text = `Salam Brendimo! 🎁\n\nMən bu məhsulu bəyəndim:\n*${p.name}*\n${priceText}\n\nBu da şəkli:\n${fixImageLink(p.image)}\n\nSifariş etmək istəyirəm.`;
-  
+  const text = `Salam Brendimo! 🎁\n\nBu məhsulu bəyəndim:\n*${p.name}*\n${priceText}\n\nLink:\n${fixImageLink(p.image)}\n\nSifariş etmək istəyirəm.`;
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-  
   setTimeout(() => window.location.href = url, 100); 
 }
 
-// Init
-updateUI();
+// --- UTILS & LOGGING ---
+function logUserAction(action, details = '') {
+  const currentIP = typeof userIP !== 'undefined' ? userIP : 'Unknown';
+  fetch(SHEETS_ENDPOINT, {
+    method: 'POST', mode: 'no-cors', keepalive: true, 
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'log', action: action, details: `[IP: ${currentIP}] ${details}` })
+  }).catch(e => console.log(e));
+}
 
-// --- SESSION TRACKING ---
-let sessionStartTime = Date.now();
+function fixImageLink(url) {
+  if (!url) return 'https://via.placeholder.com/300?text=No+Image';
+  if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
+    const idMatch = url.match(/[-\w]{25,}/);
+    if (idMatch) return `https://googleusercontent.com/profile/picture/0${idMatch[0]}`;
+  }
+  if (url.includes('github.com') && url.includes('/blob/')) {
+    return url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+  }
+  return url;
+}
+
+function restartApp() {
+  state.who = null; state.occasion = null; state.mood = null; state.style = null; state.budget = null;
+  currentStep = 0; updateUI(); closeAllProducts(); closeModal();
+}
+
+// TRACKING
 let userIP = "Fetching...";
-
 async function initTracking() {
   try {
     const response = await fetch('https://api.ipify.org?format=json');
     const data = await response.json();
     userIP = data.ip;
   } catch (err) { userIP = "Hidden/Error"; }
-  const device = navigator.userAgent; 
-  logUserAction('SessionStart', `Device: ${device}`);
+  logUserAction('SessionStart', navigator.userAgent);
 }
 
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') {
-    const timeSpent = Math.round((Date.now() - sessionStartTime) / 1000); 
-    logUserAction('SessionEnd', `Total Time: ${timeSpent} seconds`);
-  }
-});
-
-function restartApp() {
-  state.who = null;
-  state.occasion = null;
-  state.mood = null;
-  state.style = null;
-  state.budget = null;
-  
-  currentStep = 0;
-  updateUI();
-  closeAllProducts();
-  closeModal();
-}
-
-function fixImageLink(url) {
-  if (!url) return 'https://via.placeholder.com/300?text=No+Image';
-
-  // 1. Fix Google Drive Links
-  if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
-    const idMatch = url.match(/[-\w]{25,}/);
-    if (idMatch) {
-      // FIXED: Added 'https' and '${...}' syntax
-      return `https://googleusercontent.com/profile/picture/0${idMatch[0]}`;
-    }
-  }
-
-  // 2. Fix GitHub Blob Links
-  if (url.includes('github.com') && url.includes('/blob/')) {
-    return url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
-  }
-
-  return url;
-}
-
-  
 initTracking();
-  
+updateUI();
 </script>
 </body>
 </html>
