@@ -413,10 +413,8 @@ async function fetchProducts() {
   // 10 TEXT OPTIONS - FEAR REMOVAL DURING LOADING
   const messages = [
     "Sehrli alqoritm işə düşdü... 🪄",
-    "Hədiyyə bəyənilsin... ❤️",
     "Xüsusi hiss etdirsin... ✨",
     "Ucuz görsənməsin... 💎",
-    "Axtarmaq vaxt almasın... ⏳",
     "Zövqlər analiz edilir... 🧠",
     "Ən keyfiyyətli seçimlər... 🌟",
     "Sıradan olanlar silinir... ❌",
@@ -442,7 +440,7 @@ async function fetchProducts() {
     const [prodRes, orderRes, _] = await Promise.all([
       fetch(`${SHEETS_ENDPOINT}?action=getProducts`),
       fetch(`${SHEETS_ENDPOINT}?action=getOrders`),
-      new Promise(resolve => setTimeout(resolve, 4800)) 
+      new Promise(resolve => setTimeout(resolve, 5800)) 
     ]);
 
     const prodData = await prodRes.json();
@@ -602,8 +600,8 @@ function startOrderNotifications() {
         document.getElementById('notif-product').textContent = order.product;
         
         toast.classList.add('show');
-        setTimeout(() => { toast.classList.remove('show'); }, 5000);
-    }, 30000); 
+        setTimeout(() => { toast.classList.remove('show'); }, 9000);
+    }, 40000); 
 }
 
 // --- GLOBAL DISCOUNT LOGIC (THE FEAR FACTOR) ---
