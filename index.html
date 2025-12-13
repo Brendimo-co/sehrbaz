@@ -695,12 +695,9 @@ async function fetchProducts() {
   // 10 TEXT OPTIONS - FEAR REMOVAL DURING LOADING
   const messages = [
    "Sehrli axtarış işə düşdü... 🪄",
-    "Şablon hədiyyələr dərhal silinir... ❌",
-    "Yalnız 'Bahalı' təəssüratı yaradanlar... 💎",
+    "Standart hədiyyələr dərhal silinir...",
     "Ona özünü dəyərli hiss etdirəcək... ✨",
-    "Büdcənizə ən uyğun mükəmməllik... 📉",
     "Bəyənməmək riski aradan qaldırılır... 🛡️",
-    "Yaddaqalan emosiyalar hazırlanır... 🎁", 
    "Sizin üçün xüsusi Endirim əlavə olunur 🪄",
     "Və... İdeal seçim tapıldı! 🎯"
   ];
@@ -716,13 +713,13 @@ async function fetchProducts() {
       statusTextEl.style.animation = 'textFade 0.5s ease';
       statusTextEl.textContent = messages[msgIndex];
     }
-  }, 1100); 
+  }, 800); 
 
   try {
     const [prodRes, orderRes, _] = await Promise.all([
       fetch(`${SHEETS_ENDPOINT}?action=getProducts`),
       fetch(`${SHEETS_ENDPOINT}?action=getOrders`),
-      new Promise(resolve => setTimeout(resolve, 10500)) 
+      new Promise(resolve => setTimeout(resolve, 4800)) 
     ]);
 
     const prodData = await prodRes.json();
