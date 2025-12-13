@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="az">
 <head>
@@ -181,11 +182,58 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
   user-select: none;
   display: flex; flex-direction: column; padding: 12px; 
 }
+/* 1. Ensure the container holds the image and stamps together */
 .card-image-box {
-  position: relative; width: 100%; height: 68%; border-radius: 20px;
-  overflow: hidden; background: #f4f4f5; display: flex; align-items: center; justify-content: center;
+  position: relative; /* Acts as the anchor */
+  width: 100%; 
+  height: 68%; /* Or whatever height you prefer */
+  border-radius: 20px;
+  overflow: hidden; 
+  background: #f4f4f5; 
+  display: block; /* changed from flex to block to prevent squeezing */
 }
-.card-image-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+
+.card-image-box img { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+  display: block;
+}
+
+/* 2. The Stamps (Floating Labels) */
+.swipe-overlay {
+  position: absolute; /* This floats them ON TOP of the image */
+  top: 40px;
+  padding: 8px 12px;
+  border: 4px solid;
+  border-radius: 8px;
+  font-size: 24px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: rgba(255, 255, 255, 0.2); /* Semi-transparent */
+  backdrop-filter: blur(2px);
+  z-index: 10;
+  opacity: 0; /* HIDDEN BY DEFAULT */
+  pointer-events: none; /* Crucial: Allows you to touch 'through' the text */
+  transition: opacity 0.1s ease;
+}
+
+/* 3. Specific Styles for Like (Green) */
+.overlay-like {
+  left: 40px;
+  color: #4CAF50;
+  border-color: #4CAF50;
+  transform: rotate(-20deg);
+}
+
+/* 4. Specific Styles for Nope (Red) */
+.overlay-nope {
+  right: 40px;
+  color: #c21a1a;
+  border-color: #c21a1a;
+  transform: rotate(20deg);
+}
 
 /* BADGES */
 .match-badge {
@@ -770,23 +818,20 @@ function renderCards() {
       <div class="swipe-overlay overlay-nope">KEÇ</div>
     `;
 
-    card.innerHTML = `
-      <div class="card-image-box">
-         ${indicatorsHtml}
-         ${badgesHtml}
-         <img src="${fixImageLink(p.image)}" alt="${p.name}" draggable="false">
-      </div>
-      <div class="card-info">
-        <h3>${p.name}</h3>
-        <p class="card-desc-preview">${p.description || 'Ətraflı məlumat...'}</p>
-        <div class="card-footer">
-          <div><span class="price-tag">${p.price}</span><span class="price-currency">AZN</span></div>
-          <div class="swipe-hint" style="font-size:12px; width:auto; padding:0 10px; border-radius:20px;">
-             👈 Keç / Al 👉
-          </div>
-        </div>
-      </div>
-    `;
+   // Inside renderCards():
+card.innerHTML = `
+  <div class="card-image-box">
+     <div class="swipe-overlay overlay-like">BƏYƏNDİM</div>
+     <div class="swipe-overlay overlay-nope">KEÇ</div>
+     
+     ${badgesHtml}
+     
+     <img src="${fixImageLink(p.image)}" alt="${p.name}" draggable="false">
+  </div>
+  
+  <div class="card-info">
+    </div>
+`;
     if (index === 0) initSwipe(card, p);
     container.appendChild(card);
   });
