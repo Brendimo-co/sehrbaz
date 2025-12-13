@@ -359,7 +359,38 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
 }
 
 //
+/* --- SWIPE INDICATORS (Tinder Style) --- */
+.swipe-overlay {
+  position: absolute;
+  top: 30px;
+  padding: 8px 20px;
+  border: 4px solid;
+  border-radius: 12px;
+  font-size: 28px;
+  font-weight: 800;
+  text-transform: uppercase;
+  opacity: 0; /* Gizli başlayır */
+  z-index: 10;
+  letter-spacing: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(2px);
+  transform: rotate(0deg);
+  transition: opacity 0.1s ease;
+}
 
+.overlay-like {
+  left: 30px;
+  color: #4CAF50; /* Yaşıl */
+  border-color: #4CAF50;
+  transform: rotate(-15deg);
+}
+
+.overlay-nope {
+  right: 30px;
+  color: #c21a1a; /* Qırmızı */
+  border-color: #c21a1a;
+  transform: rotate(15deg);
+}
  
   
 </style>
@@ -457,10 +488,10 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
   <div class="step-content" id="step-3">
     <h2 class="title">Hədiyyənin xarakteri necə olmalıdır?</h2>
     <div class="options-grid" onclick="handleOptionClick(event, 'style')">
-      <div class="option-card" data-val="Praktik"><span class="option-icon">✨</span><span class="option-text">Praktik: Gündəlik istifadə edə biləcəyi, işə yarayan bir əşya.</span></div>
-      <div class="option-card" data-val="Emosional"><span class="option-icon">🏛️</span><span class="option-text">Emosional: Nadir, qeyri-adi, heç kimdə olmayan</span></div>
-      <div class="option-card" data-val="Lüks"><span class="option-icon">💎</span><span class="option-text">Lüks/Status: Brend, keyfiyyətli və prestijli bir əşya.</span></div>
-      <div class="option-card" data-val="Gülüş"><span class="option-icon">💎</span><span class="option-text">Gülüş və Təbəssüm: (Zarafatcıl, əyləncəli, stressi alan hədiyyə).</span></div>
+      <div class="option-card" data-val="Praktik"><span class="option-icon">😇</span><span class="option-text">Praktik: Gündəlik istifadə edə biləcəyi, işə yarayan bir əşya.</span></div>
+      <div class="option-card" data-val="Emosional"><span class="option-icon">😲</span><span class="option-text">Emosional: Nadir, qeyri-adi, heç kimdə olmayan</span></div>
+      <div class="option-card" data-val="Lüks"><span class="option-icon">😎</span><span class="option-text">Lüks/Status: Brend, keyfiyyətli və prestijli bir əşya.</span></div>
+      <div class="option-card" data-val="Gülüş"><span class="option-icon">🤭</span><span class="option-text">Gülüş və Təbəssüm: (Zarafatcıl, əyləncəli, stressi alan hədiyyə).</span></div>
     </div>
   </div>
 
@@ -501,7 +532,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
         <div class="fear-warning">Tələsin! Hər 30 saniyədə 0.50 ₼ itirirsiniz!</div>
     </div>
 
-    <h2 class="title" style="font-size: 20px; margin-bottom: 10px;">Sizin üçün seçdiklərimiz</h2>
+    <h2 class="title" style="font-size: 20px; margin-bottom: 10px;">Onu xoşbəxt edəcək seçimlər ✨</h2>
     <div id="cards-wrapper"></div>
   </div>
 </div>
@@ -696,7 +727,7 @@ function renderCards() {
   container.innerHTML = '';
   
   if (state.cardStack.length === 0) {
-    container.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#888;"><p>Başqa seçim qalmadı.</p></div>';
+    container.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#888;"><p>Başqa seçim qalmadı.</p><button onclick="restartApp()" style="margin-top:10px; padding:10px 20px; background:#333; color:white; border:none; border-radius:8px;">Yenidən Başla</button></div>';
     return;
   }
 
@@ -711,11 +742,18 @@ function renderCards() {
     else card.style.boxShadow = "0 20px 50px -12px rgba(0,0,0,0.15)";
 
     let badgesHtml = `<div class="match-badge">${p.score}% Uyğunluq</div>`;
-    if (p.isBestSeller) badgesHtml += `<div class="badge-bestseller">🏆 Həftənin Best Selleri</div>`;
+    if (p.isBestSeller) badgesHtml += `<div class="badge-bestseller">🏆 Best Seller</div>`;
     if (p.isLowStock) badgesHtml += `<div class="badge-lowstock">⚠️ Cəmi 4 ədəd qaldı</div>`;
+
+    // YENİ: Swipe Göstəriciləri
+    const indicatorsHtml = `
+      <div class="swipe-overlay overlay-like">BƏYƏNDİM</div>
+      <div class="swipe-overlay overlay-nope">KEÇ</div>
+    `;
 
     card.innerHTML = `
       <div class="card-image-box">
+         ${indicatorsHtml}
          ${badgesHtml}
          <img src="${fixImageLink(p.image)}" alt="${p.name}" draggable="false">
       </div>
@@ -724,7 +762,9 @@ function renderCards() {
         <p class="card-desc-preview">${p.description || 'Ətraflı məlumat...'}</p>
         <div class="card-footer">
           <div><span class="price-tag">${p.price}</span><span class="price-currency">AZN</span></div>
-          <div class="swipe-hint">👉</div>
+          <div class="swipe-hint" style="font-size:12px; width:auto; padding:0 10px; border-radius:20px;">
+             👈 Keç / Al 👉
+          </div>
         </div>
       </div>
     `;
@@ -733,40 +773,83 @@ function renderCards() {
   });
 }
 
-function initSwipe(card, product) {
+  function initSwipe(card, product) {
   let startX = 0, currentX = 0, isDragging = false;
+  const likeInd = card.querySelector('.overlay-like');
+  const nopeInd = card.querySelector('.overlay-nope');
+
   const onStart = (e) => {
     isDragging = true;
     startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     card.style.transition = 'none';
   };
+
   const onMove = (e) => {
     if (!isDragging) return;
     const x = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     currentX = x - startX;
+    
+    // Kartın hərəkəti və dönməsi
     card.style.transform = `translateX(${currentX}px) rotate(${currentX / 15}deg)`;
+
+    // Opacity Məntiqi (Nə qədər çox çəksə, o qədər aydın görünür)
+    const opacity = Math.min(1, Math.abs(currentX) / 80);
+    
+    if (currentX > 0) {
+      // SAĞA (Bəyəndim)
+      if(likeInd) likeInd.style.opacity = opacity;
+      if(nopeInd) nopeInd.style.opacity = 0;
+    } else {
+      // SOLA (Bəyənmədim)
+      if(nopeInd) nopeInd.style.opacity = opacity;
+      if(likeInd) likeInd.style.opacity = 0;
+    }
   };
+
   const onEnd = () => {
     if (!isDragging) return;
     isDragging = false;
-    if (Math.abs(currentX) < 10) { openModal(product); card.style.transform = 'translateY(0) scale(1) rotate(0)'; return; }
+    
+    // Reset indicators
+    if(likeInd) likeInd.style.opacity = 0;
+    if(nopeInd) nopeInd.style.opacity = 0;
+
+    // Klikləmə (Modalı aç)
+    if (Math.abs(currentX) < 10) { 
+        openModal(product); 
+        card.style.transform = 'translateY(0) scale(1) rotate(0)'; 
+        return; 
+    }
+
+    // Swipe Qərarı
     if (Math.abs(currentX) > 100) {
-      const dir = currentX > 0 ? 1 : -1;
+      const dir = currentX > 0 ? 1 : -1; // 1 = Sağ (Bəyəndi), -1 = Sol (Keçdi)
+      
+      // Uçuş animasiyası
       card.style.transition = 'transform 0.4s ease';
       card.style.transform = `translateX(${dir * window.innerWidth * 1.5}px) rotate(${dir * 30}deg)`;
+      
       setTimeout(() => {
         card.remove();
         state.cardStack.shift();
-        if (dir === 1) redirectToWhatsApp(product);
-        else logUserAction('Skipped', product.name);
-        renderCards();
+        
+        if (dir === 1) {
+            // SAĞA: WhatsApp-a yönləndir
+            redirectToWhatsApp(product);
+        } else {
+            // SOLA: Log yaz və növbəti karta keç
+            logUserAction('Skipped', product.name);
+            renderCards();
+        }
       }, 300);
     } else {
-      card.style.transition = 'transform 0.3s';
+      // Geri qayıt (Yetərincə çəkməyibsə)
+      card.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
       card.style.transform = 'translateY(0) scale(1) rotate(0)';
     }
     currentX = 0;
   };
+
   card.addEventListener('mousedown', onStart); document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onEnd);
   card.addEventListener('touchstart', onStart); document.addEventListener('touchmove', onMove); document.addEventListener('touchend', onEnd);
 }
