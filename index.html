@@ -817,18 +817,29 @@ function renderCards() {
 
    // Inside renderCards():
 card.innerHTML = `
-  <div class="card-image-box">
-     <div class="swipe-overlay overlay-like">BƏYƏNDİM</div>
-     <div class="swipe-overlay overlay-nope">KEÇ</div>
-     
-     ${badgesHtml}
-     
-     <img src="${fixImageLink(p.image)}" alt="${p.name}" draggable="false">
-  </div>
-  
-  <div class="card-info">
-    </div>
-`;
+      <div class="card-image-box">
+         <div class="swipe-overlay overlay-like">BƏYƏNDİM</div>
+         <div class="swipe-overlay overlay-nope">KEÇ</div>
+         ${badgesHtml}
+         <img src="${fixImageLink(p.image)}" alt="${p.name}" draggable="false">
+      </div>
+      
+      <div class="card-info">
+        <h3>${p.name}</h3>
+        <p class="card-desc-preview">${p.description || 'Ətraflı məlumat...'}</p>
+        
+        <div class="card-footer">
+          <div>
+            <span class="price-tag">${p.price}</span>
+            <span class="price-currency">AZN</span>
+          </div>
+          
+          <div class="swipe-hint" style="font-size:12px; width:auto; padding:0 10px; border-radius:20px;">
+             👈 Keç / Al 👉
+          </div>
+        </div>
+      </div>
+    `;
     if (index === 0) initSwipe(card, p);
     container.appendChild(card);
   });
