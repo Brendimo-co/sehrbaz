@@ -509,7 +509,53 @@ body {
   border-radius: 12px;
   margin-top: 20px;
 }
-  
+
+/* --- DISCOUNT PRICING STYLES --- */
+.price-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.current-price-styled {
+  color: #c21a1a;
+  font-weight: 800;
+  font-size: 24px;
+}
+
+.discount-badge-small {
+  background: #ffebee;
+  color: #c21a1a;
+  border: 1px solid #ffcdd2;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Specific adjustments for Grid View */
+.grid-price-box {
+    display: flex;
+    flex-direction: column;
+}
+.grid-old-price {
+    font-size: 11px;
+    text-decoration: line-through;
+    color: #bbb;
+}
+.grid-new-price {
+    color: #c21a1a;
+    font-weight: 700;
+    font-size: 14px;
+}
 </style>
 <script>
 !function(f,b,e,v,n,t,s)
@@ -861,7 +907,24 @@ async function fetchProducts() {
     
     clearInterval(textInterval);
 
-    state.products = shuffleArray(prodData.products || []);
+    // 1. Shuffle
+    let rawProducts = shuffleArray(prodData.products || []);
+
+    // 2. ASSIGN RANDOM DISCOUNTS (20% - 35%)
+    state.products = rawProducts.map(p => {
+        // Random integer between 20 and 35
+        const randomDisc = Math.floor(Math.random() * (35 - 20 + 1)) + 20; 
+        
+        // Calculate Old Price: Price / (1 - discount%)
+        const oldPriceVal = (parseFloat(p.price) / (1 - (randomDisc / 100))).toFixed(0);
+
+        return {
+            ...p,
+            discountPercent: randomDisc, // Store the random %
+            oldPrice: oldPriceVal        // Store the calculated fake price
+        };
+    });
+
     state.orders = orderData.orders || [];
 
     applyBadges(state.products);
@@ -894,11 +957,11 @@ function processMatches() {
 
   state.cardStack = candidates.map(p => {
     let score = 0;
-    if (match(p.target, state.who)) score += 40; 
+    if (match(p.target, state.who)) score += 50; 
     if (match(p.occasion, state.occasion)) score += 20;
     if (match(p.mood, state.mood)) score += 15;
     if (match(p.style, state.style)) score += 15;
-    if (!checkBudget(p.price, state.budget)) score -= 30;
+    if (!checkBudget(p.price, state.budget)) score -= 40;
     p.score = Math.min(100, Math.max(0, score));
     return p;
   }).sort((a, b) => b.score - a.score);
@@ -943,14 +1006,7 @@ function renderCards() {
     if (p.isBestSeller) badgesHtml += `<div class="badge-bestseller">🏆 Best Seller</div>`;
     if (p.isLowStock) badgesHtml += `<div class="badge-lowstock">⚠️ Cəmi 4 ədəd qaldı</div>`;
 
-    // YENİ: Swipe Göstəriciləri
-    const indicatorsHtml = `
-      <div class="swipe-overlay overlay-like">BƏYƏNDİM</div>
-      <div class="swipe-overlay overlay-nope">KEÇ</div>
-    `;
-
-   // Inside renderCards():
-card.innerHTML = `
+    card.innerHTML = `
       <div class="card-image-box">
          <div class="swipe-overlay overlay-like">BƏYƏNDİM</div>
          <div class="swipe-overlay overlay-nope">KEÇ</div>
@@ -963,9 +1019,12 @@ card.innerHTML = `
         <p class="card-desc-preview">${p.description || 'Ətraflı məlumat...'}</p>
         
         <div class="card-footer">
-          <div>
-            <span class="price-tag">${p.price}</span>
-            <span class="price-currency">AZN</span>
+          <div class="price-container">
+            <span class="old-price">${p.oldPrice}₼</span>
+            <div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1;">
+                <span class="current-price-styled">${p.price} AZN</span>
+                <span class="discount-badge-small">🔥 -${p.discountPercent}% Endirim</span>
+            </div>
           </div>
           
           <div class="swipe-hint" style="font-size:12px; width:auto; padding:0 10px; border-radius:20px;">
@@ -1207,7 +1266,10 @@ function renderGrid() {
         <img src="${fixImageLink(p.image)}" loading="lazy">
         <div class="grid-info">
             <div class="grid-title">${p.name}</div>
-            <div class="grid-price">${p.price} AZN</div>
+            <div class="grid-price-box">
+                <span class="grid-old-price">${p.oldPrice} AZN</span>
+                <span class="grid-new-price">${p.price} AZN <span style="color:#2ecc71; font-size:10px;">(-${p.discountPercent}%)</span></span>
+            </div>
         </div>`;
     container.appendChild(el);
   });
@@ -1218,11 +1280,21 @@ function loadMoreGrid() { gridLimit += 6; renderGrid(); logUserAction('LoadMoreP
 // --- MODAL & WHATSAPP ---
 function openModal(p) {
   logUserAction('ViewDetails', p.name);
-  activateGlobalDiscount(); // Ensure timer is running
+  activateGlobalDiscount(); 
 
   document.getElementById('modal-img').src = fixImageLink(p.image);
   document.getElementById('modal-title').textContent = p.name;
-  document.getElementById('modal-price').textContent = p.price + ' AZN';
+  
+  // --- MODAL PRICE UPDATE ---
+  // Use innerHTML instead of textContent to render styles
+  const priceHTML = `
+    <span style="text-decoration:line-through; color:#999; font-size:20px; margin-right:10px;">${p.oldPrice}₼</span>
+    <span style="color:#c21a1a; font-weight:800; font-size:28px;">${p.price} AZN</span>
+    <span class="discount-badge-small" style="font-size:14px; padding:4px 8px; vertical-align:middle;">-${p.discountPercent}%</span>
+  `;
+  document.getElementById('modal-price').innerHTML = priceHTML;
+  // --------------------------
+
   document.getElementById('modal-desc').textContent = p.description;
   
   updateDiscountTextUI();
@@ -1240,9 +1312,10 @@ function redirectToWhatsApp(p) {
   const finalPrice = Math.max(0, p.price - globalDiscount).toFixed(2);
   const discountVal = globalDiscount.toFixed(2);
   
+  // Calculate price description for WhatsApp message
   let priceText = `${p.price} AZN`;
   if (globalDiscount > 0) {
-    priceText = `${p.price} AZN\n🔥 Aktiv Endirim: -${discountVal} AZN\n✅ YEKUN: ${finalPrice} AZN`;
+    priceText = `${p.price} AZN (Endirimlə: ${p.oldPrice} ₼ yox)\n🔥 Əlavə Bonus Endirim: -${discountVal} AZN\n✅ YEKUN: ${finalPrice} AZN`;
   }
   
   const text = `Salam Brendimo! 🎁\n\nBu məhsulu bəyəndim:\n*${p.name}*\n${priceText}\n\nLink:\n${fixImageLink(p.image)}\n\nSifariş etmək istəyirəm.`;
@@ -1404,7 +1477,7 @@ const storiesData = [
 
 let activeStoryIndex = -1;
 let storyTimer = null;
-const STORY_DURATION = 4000; // 4 saniyə
+const STORY_DURATION = 5000; // 4 saniyə
 
 // 2. RENDER STORIES
 function initStories() {
