@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Brendimo VIP Club | Qazan və Əylən</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* --- CORE & VARIABLES --- */
+:root {
+  --bg: #09090b; --card: #18181b; --border: #27272a;
+  --gold: #FFD700; --gold-dim: #C5A000;
+  --accent: #E11D48; --green: #10B981; --blue: #3B82F6;
+  --text: #F4F4F5; --text-muted: #A1A1AA;
+  --gradient: linear-gradient(135deg, #FFD700, #F59E0B);
+}
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; -webkit-tap-highlight-color:transparent; user-select:none; }
+body { background: var(--bg); color: var(--text); overflow-x:hidden; min-height:100vh; padding-bottom:90px; }
+.hidden { display:none !important; }
+canvas { touch-action: none; }
+
+/* --- ANIMATIONS --- */
+@keyframes float { 0% { transform:translateY(0px); } 50% { transform:translateY(-10px); } 100% { transform:translateY(0px); } }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); } }
+@keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+.fade-in { animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+/* --- AUTH SCREEN --- */
+.auth-wrap {
+  position:fixed; top:0; left:0; width:100%; height:100%; z-index:999;
+  background: radial-gradient(circle at center, #27272a 0%, #000 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px;
+}
+.auth-input {
+  width:100%; max-width:320px; background:#111; border:1px solid #333;
+  color:white; padding:15px; border-radius:12px; margin-bottom:12px; outline:none; transition: 0.3s;
+}
+.auth-input:focus { border-color: var(--gold); }
+.btn-main {
+  width:100%; max-width:320px; background:var(--gradient); color:black;
+  border:none; padding:16px; border-radius:12px; font-weight:800; font-size:16px;
+  cursor:pointer; box-shadow:0 4px 15px rgba(255,215,0,0.2); transition: 0.2s;
+}
+.btn-main:active { transform:scale(0.95); }
+.btn-disabled { background: #333; color: #666; pointer-events: none; box-shadow: none; }
+
+/* --- DASHBOARD UI --- */
+.container { max-width:500px; margin:0 auto; padding:20px; position:relative; z-index:2; }
+
+/* Header Card */
+.user-card {
+  background: linear-gradient(160deg, #27272a, #09090b); border:1px solid var(--border);
+  border-radius:24px; padding:24px; position:relative; overflow:hidden; margin-bottom:20px;
+}
+.level-badge {
+  position:absolute; top:20px; right:20px; background:#000; border:1px solid var(--gold);
+  color:var(--gold); padding:4px 12px; border-radius:20px; font-size:10px; font-weight:800;
+}
+.coin-box { display:flex; align-items:flex-end; gap:8px; margin-top:10px; }
+.coin-val { font-size:42px; font-weight:800; color:white; line-height:1; }
+.xp-bar { width:100%; height:6px; background:#333; border-radius:3px; margin-top:16px; overflow:hidden; }
+.xp-fill { height:100%; background:var(--gold); width:0%; transition:width 0.5s; }
+
+/* Tabs */
+.tabs { display:flex; gap:10px; margin-bottom:20px; overflow-x:auto; padding-bottom:5px; scrollbar-width:none; }
+.tab-btn {
+  padding:8px 16px; background:var(--card); border:1px solid var(--border);
+  border-radius:20px; color:var(--text-muted); font-size:12px; font-weight:600; white-space:nowrap; cursor:pointer;
+}
+.tab-btn.active { background:var(--gold); color:black; border-color:var(--gold); }
+
+/* Grids & Cards */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.game-card {
+  background:var(--card); border:1px solid var(--border); border-radius:16px;
+  padding:16px; text-align:center; position:relative; overflow:hidden; transition:0.2s;
+}
+.game-card:active { border-color:var(--gold); transform:scale(0.98); }
+.game-tag {
+  position:absolute; top:0; left:0; background:var(--accent); color:white;
+  font-size:9px; padding:3px 8px; border-bottom-right-radius:8px; font-weight:700;
+}
+.game-icon { font-size:32px; margin-bottom:8px; display:block; }
+
+/* CONTENT / BLOG CARDS */
+.blog-card {
+  background:var(--card); border-radius:12px; padding:15px; margin-bottom:12px; border:1px solid var(--border);
+}
+.blog-title { font-weight:700; margin-bottom:8px; font-size:15px; color: #fff; }
+/* PRE-WRAP IS CRITICAL FOR GOOGLE SHEET FORMATTING */
+.blog-snippet { 
+    font-size:13px; color:#aaa; margin-bottom:15px; line-height:1.6; 
+    white-space: pre-wrap; /* Keeps newlines from sheets */
+    max-height: 80px; overflow: hidden; position: relative;
+}
+.blog-snippet.expanded { max-height: none; }
+.read-btn { background:#333; color:white; border:none; padding:8px 16px; border-radius:8px; font-size:11px; cursor:pointer; font-weight: 700; }
+.read-btn.reading { background:var(--gold); color:black; animation:pulse 2s infinite; }
+
+/* MODALS */
+.modal-overlay {
+  position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95);
+  z-index:1000; display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition:0.3s; backdrop-filter:blur(5px);
+}
+.modal-overlay.open { opacity:1; pointer-events:all; }
+.modal-content {
+  width:90%; max-width:380px; background:#111; border:1px solid var(--gold-dim);
+  border-radius:24px; padding:24px; text-align:center; position:relative;
+}
+.close-btn { position:absolute; top:15px; right:15px; color:#666; font-size:24px; cursor:pointer; padding: 5px; }
+
+/* GAMES SPECIFIC */
+/* Scratch */
+#scratch-canvas { width:250px; height:150px; border-radius:12px; margin:20px auto; background:transparent; cursor:crosshair; touch-action: none; border: 1px dashed #333; }
+.scratch-container { position:relative; width:250px; height:150px; margin:0 auto; overflow: hidden; border-radius: 12px; }
+.scratch-prize { position:absolute; top:0; left:0; width:100%; height:100%; display: flex; align-items: center; justify-content: center; font-weight:800; color:var(--gold); font-size:28px; background: #222; z-index: 1; }
+/* Wheel */
+.wheel-wrapper { position: relative; width: 260px; height: 260px; margin: 0 auto 20px auto; }
+.wheel-container { width:100%; height:100%; border-radius:50%; border:5px solid var(--gold); position:relative; overflow:hidden; transition: transform 4s cubic-bezier(0.1, 0.99, 0.1, 0.99); }
+.wheel-arrow { position:absolute; top:-15px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:20px solid transparent; border-right:20px solid transparent; border-top:30px solid white; z-index:10; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5)); }
+/* Wordle */
+.word-grid { display:grid; grid-template-columns:repeat(5, 1fr); gap:6px; margin:20px auto; max-width:280px; }
+.word-cell { aspect-ratio:1; border:2px solid #333; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:20px; text-transform:uppercase; color: white; border-radius: 6px; }
+.word-cell.correct { background:var(--green); border-color:var(--green); }
+.word-cell.present { background:var(--gold-dim); border-color:var(--gold-dim); }
+.word-cell.absent { background:#333; border-color:#333; color: #777; }
+/* Miner */
+.miner-rock { font-size: 80px; margin: 30px auto; display: inline-block; transition: transform 0.1s; cursor: pointer; user-select: none; }
+.miner-rock:active { transform: scale(0.9) rotate(5deg); }
+.floating-text { position: absolute; color: var(--gold); font-weight: bold; font-size: 18px; pointer-events: none; animation: floatUp 1s ease-out forwards; }
+@keyframes floatUp { to { transform: translateY(-50px); opacity: 0; } }
+
+/* Nav */
+.nav-bar {
+  position:fixed; bottom:0; left:0; width:100%; height:70px; background:#111;
+  border-top:1px solid #222; display:flex; justify-content:space-around; align-items:center; z-index:500;
+}
+.nav-item { display:flex; flex-direction:column; align-items:center; color:#555; font-size:10px; gap:4px; font-weight:600; padding: 10px; }
+.nav-item.active { color:var(--gold); }
+.nav-item svg { width:24px; height:24px; fill:currentColor; }
+
+#particles { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; opacity:0.3; }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<div id="view-auth" class="auth-wrap">
+  <div style="font-size:60px; margin-bottom:10px; animation:float 3s infinite;">👑</div>
+  <h2 style="color:white; margin-bottom:5px;">Brendimo VIP</h2>
+  <p style="color:#666; margin-bottom:30px; font-size: 12px;">Eksklüziv hədiyyələr dünyası</p>
+  
+  <input type="text" id="reg-name" class="auth-input" placeholder="Adınız">
+  <input type="email" id="reg-email" class="auth-input" placeholder="Email">
+  <input type="text" id="reg-lic" class="auth-input" placeholder="Dəvət Kodu (İstənilən)" style="text-transform:uppercase;">
+  
+  <button class="btn-main" id="btn-register" onclick="app.register()">GİRİŞ</button>
+  <p id="auth-status" style="margin-top:10px; color: var(--gold); font-size: 12px;"></p>
+</div>
+
+<div id="view-app" class="container hidden fade-in">
+  
+  <div class="user-card">
+    <div class="level-badge">LVL <span id="ui-level">1</span></div>
+    <div style="display:flex; gap:15px; align-items:center;">
+      <div style="width:50px; height:50px; background:#333; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:24px;">👤</div>
+      <div>
+        <h3 id="ui-name" style="font-size:18px;">User</h3>
+        <p style="font-size:11px; color:var(--text-muted);">ID: <span id="ui-ref" style="color:white; font-weight:700;">...</span></p>
+      </div>
+    </div>
+    <div class="coin-box">
+      <span class="coin-val" id="ui-coins">0</span>
+      <span style="font-size:14px; color:var(--gold); font-weight:bold; margin-bottom:8px;">COINS</span>
+    </div>
+    <div class="xp-bar"><div class="xp-fill" id="ui-xp"></div></div>
+    <div style="display:flex; justify-content:space-between; margin-top:5px;">
+        <span style="font-size:10px; color:#666;">Next Lvl Reward: 100 Coin</span>
+        <span id="ui-xp-txt" style="font-size:10px; color:#666;">0/100 XP</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab-btn active" onclick="app.switchTab('home')">🏠 Əsas</div>
+    <div class="tab-btn" onclick="app.switchTab('games')">🕹️ Oyunlar</div>
+    <div class="tab-btn" onclick="app.switchTab('learn')">📚 Öyrən (SEO)</div>
+    <div class="tab-btn" onclick="app.switchTab('community')">💬 Rəylər</div>
+    <div class="tab-btn" onclick="app.switchTab('shop')">🛍️ Mağaza</div>
+  </div>
+
+  <div id="tab-home" class="tab-content">
+    <h3 style="margin-bottom:15px;">Gündəlik</h3>
+    <div class="blog-card" style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-weight:700;">Giriş Bonusu</div>
+        <div style="font-size:10px; color:#888;">24 saatda bir dəfə</div>
+      </div>
+      <button class="read-btn" onclick="app.claimDaily()">GÖTÜR (+20)</button>
+    </div>
+
+    <h3 style="margin:20px 0 10px 0;">Oyunlar</h3>
+    <div class="grid-2">
+      <div class="game-card" onclick="app.openModal('miner')">
+        <div class="game-tag">CLICKER</div>
+        <span class="game-icon">⛏️</span>
+        <div style="font-size:13px; font-weight:700;">Tap Miner</div>
+      </div>
+      <div class="game-card" onclick="app.openModal('word')">
+        <div class="game-tag">DAILY</div>
+        <span class="game-icon">🔤</span>
+        <div style="font-size:13px; font-weight:700;">Word Guess</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-games" class="tab-content hidden">
+    <div class="grid-2">
+      <div class="game-card" onclick="app.openModal('scratch')">
+        <div class="game-tag">50 COIN</div>
+        <span class="game-icon">🎫</span>
+        <div style="font-weight:700;">Poz-Qazan</div>
+        <div style="font-size:10px; color:var(--text-muted);">Qiymət: 20 Coin</div>
+      </div>
+      <div class="game-card" onclick="app.openModal('wheel')">
+        <div class="game-tag">JACKPOT</div>
+        <span class="game-icon">🎡</span>
+        <div style="font-weight:700;">Çarxı Fırlat</div>
+        <div style="font-size:10px; color:var(--text-muted);">Pulsuz (Günlük)</div>
+      </div>
+      <div class="game-card" onclick="app.openModal('miner')">
+        <div class="game-tag">FARM</div>
+        <span class="game-icon">🪙</span>
+        <div style="font-weight:700;">Coin Farm</div>
+      </div>
+      <div class="game-card" onclick="app.openModal('word')">
+        <div class="game-tag">IQ</div>
+        <span class="game-icon">🧩</span>
+        <div style="font-weight:700;">Sözü Tap</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-learn" class="tab-content hidden">
+    <h3 style="margin-bottom:10px;">Oxu və Qazan 📚</h3>
+    <p style="font-size:11px; color:#888; margin-bottom:15px;">Məqalələri 10 saniyə oxuyaraq XP qazanın.</p>
+    <div id="articles-container">
+        <p style="text-align:center; padding:20px;">Yüklənir...</p>
+    </div>
+  </div>
+
+  <div id="tab-community" class="tab-content hidden">
+    <div class="blog-card">
+        <h3>Bizə Rəy Bildirin</h3>
+        <p style="font-size:12px; color:#aaa; margin-bottom:10px;">Fikirləriniz Google Sheets-ə yazılır.</p>
+        <div style="margin-bottom:10px; font-size:24px;">
+            <span class="star-input" onclick="app.setRating(1)">★</span>
+            <span class="star-input" onclick="app.setRating(2)">★</span>
+            <span class="star-input" onclick="app.setRating(3)">★</span>
+            <span class="star-input" onclick="app.setRating(4)">★</span>
+            <span class="star-input" onclick="app.setRating(5)">★</span>
+        </div>
+        <textarea id="review-text" style="width:100%; background:#222; border:1px solid #444; color:white; padding:10px; border-radius:8px; height:80px;" placeholder="Rəyiniz..."></textarea>
+        <button class="btn-main" style="margin-top:10px; width:100%;" onclick="app.submitReview()">GÖNDƏR (+50 COIN)</button>
+    </div>
+  </div>
+
+  <div id="tab-shop" class="tab-content hidden">
+     <h3>Kuponlar</h3>
+     <div class="blog-card" style="display:flex; justify-content:space-between;">
+       <div><b>5 AZN Endirim</b><br><small style="color:gold">500 Coin</small></div>
+       <button class="read-btn" onclick="alert('Balansınız çatmır!')">AL</button>
+     </div>
+  </div>
+
+</div>
+
+<div id="modal-word" class="modal-overlay">
+  <div class="modal-content">
+    <div class="close-btn" onclick="app.closeModal('word')">✕</div>
+    <h3>Günün Sözü 🔤</h3>
+    <p style="font-size:11px; color:#888; margin-bottom:10px;">5 Hərfli sözü tapın.</p>
+    <div class="word-grid" id="word-grid"></div>
+    <input type="text" id="word-input" maxlength="5" style="text-transform:uppercase; padding:12px; width:80%; margin-bottom:15px; text-align:center; border-radius:8px; border:none; font-weight:800; letter-spacing:2px;" placeholder="BRAND">
+    <button class="btn-main" onclick="games.guessWord()">YOXLA</button>
+  </div>
+</div>
+
+<div id="modal-scratch" class="modal-overlay">
+  <div class="modal-content">
+    <div class="close-btn" onclick="app.closeModal('scratch')">✕</div>
+    <h3>Poz Qazan</h3>
+    <p style="font-size:11px; color:#888;">Ən azı 40% silin</p>
+    
+    <div class="scratch-container">
+        <div class="scratch-prize" id="scratch-val">50</div>
+        <canvas id="scratch-canvas" width="250" height="150" style="position:relative; z-index:2;"></canvas>
+    </div>
+    
+    <div style="margin-top:15px;">
+        <button class="btn-main" id="btn-buy-scratch" onclick="games.initScratch()">BİLET AL (20 🟡)</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-wheel" class="modal-overlay">
+  <div class="modal-content">
+    <div class="close-btn" onclick="app.closeModal('wheel')">✕</div>
+    <h3>Çarxı Fırlat</h3>
+    <div class="wheel-wrapper">
+        <div class="wheel-arrow"></div>
+        <div class="wheel-container" id="wheel-el">
+            <div style="width:100%; height:100%; background: conic-gradient(
+                #ef4444 0deg 60deg, 
+                #eab308 60deg 120deg, 
+                #22c55e 120deg 180deg, 
+                #3b82f6 180deg 240deg, 
+                #a855f7 240deg 300deg, 
+                #ec4899 300deg 360deg
+            );"></div>
+            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-weight:800; text-shadow:0 1px 2px black;">🎁</div>
+        </div>
+    </div>
+    <button class="btn-main" id="btn-spin" onclick="games.spinWheel()">FIRLAT</button>
+  </div>
+</div>
+
+<div id="modal-miner" class="modal-overlay">
+  <div class="modal-content">
+    <div class="close-btn" onclick="app.closeModal('miner')">✕</div>
+    <h3>Tap Miner</h3>
+    <div class="miner-rock" id="miner-btn" onclick="games.tapMine(event)">🪨</div>
+    <div>Toplanan: <span id="miner-score" style="color:var(--gold); font-weight:800;">0</span></div>
+    <p style="font-size:10px; color:#666; margin-top:5px;">Hər 10 klik = 1 Coin</p>
+  </div>
+</div>
+
+<nav class="nav-bar">
+  <div class="nav-item active" onclick="app.switchTab('home')"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Əsas</div>
+  <div class="nav-item" onclick="app.switchTab('games')"><svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Oyun</div>
+  <div class="nav-item" onclick="app.switchTab('learn')"><svg viewBox="0 0 24 24"><path d="M12 11.55C9.64 9.35 6.48 8 3 8v11c3.48 0 6.64 1.35 9 3.55 2.36-2.19 5.52-3.55 9-3.55V8c-3.48 0-6.64 1.35-9 3.55zM12 8c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"/></svg>Oxu</div>
+  <div class="nav-item" onclick="window.location.href='index.html'"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 12l-5-5h10l-5 5z"/></svg>Sehrbaz</div>
+</nav>
+
+<script>
+/* PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+*/
+const API_URL = "https://script.google.com/macros/s/AKfycbw9cFICZk3NmJzr5dsq3NVHGzNPQJU77d1j100087lug8HUT_pNreKuOTHt99TiUiJo/exec"; 
+const STORAGE_KEY = "brendimo_vip_v2";
+
+/* --- APP LOGIC --- */
+const app = {
+  data: { user: null, coins: 0, level: 1, xp: 0, inventory: [], lastDaily: null, rating: 0 },
+
+  async init() {
+    this.bgParticles();
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved) {
+      this.data = JSON.parse(saved);
+      document.getElementById('view-auth').classList.add('hidden');
+      document.getElementById('view-app').classList.remove('hidden');
+      this.renderUI();
+      // Optimistic sync
+      this.syncData();
+    }
+  },
+
+  /* --- AUTH & SYNC --- */
+  async register() {
+    const btn = document.getElementById('btn-register');
+    const name = document.getElementById('reg-name').value;
+    const email = document.getElementById('reg-email').value;
+    const lic = document.getElementById('reg-lic').value;
+    const status = document.getElementById('auth-status');
+
+    if(!name || !email) return alert("Zəhmət olmasa məlumatları doldurun.");
+    
+    btn.innerText = "Gözləyin...";
+    btn.classList.add('btn-disabled');
+
+    try {
+      await fetch(API_URL, {
+        method: 'POST',
+        // 'no-cors' REMOVED so we can get response if needed in future, 
+        // but simple text/plain post usually works best with GAS redirect
+        body: JSON.stringify({ type: 'register', name, email, license: lic })
+      });
+      
+      this.data.user = { name, email };
+      this.data.coins = 100; // Welcome Bonus
+      this.data.refCode = name.substring(0,3).toUpperCase() + Math.floor(Math.random()*999);
+      this.save();
+      location.reload();
+      
+    } catch(e) {
+      console.error(e);
+      // Allow entry even if offline
+      this.data.user = { name, email };
+      this.save();
+      location.reload();
+    }
+  },
+
+  async syncData() {
+    if(!this.data.user) return;
+    try {
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ 
+          type: 'sync', 
+          email: this.data.user.email, 
+          coins: this.data.coins, 
+          level: this.data.level, 
+          xp: this.data.xp 
+        })
+      });
+    } catch(e) { console.log("Sync skipped"); }
+  },
+
+  save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
+    this.renderUI();
+  },
+
+  /* --- UI UPDATES --- */
+  renderUI() {
+    document.getElementById('ui-name').innerText = this.data.user.name;
+    document.getElementById('ui-ref').innerText = this.data.refCode;
+    document.getElementById('ui-coins').innerText = this.data.coins;
+    document.getElementById('ui-level').innerText = this.data.level;
+    
+    const reqXP = this.data.level * 100;
+    const percent = Math.min(100, (this.data.xp / reqXP) * 100);
+    document.getElementById('ui-xp').style.width = percent + "%";
+    document.getElementById('ui-xp-txt').innerText = `${this.data.xp}/${reqXP} XP`;
+  },
+
+  addReward(coins, xp) {
+    this.data.coins += coins;
+    this.data.xp += xp;
+    if(this.data.xp >= this.data.level * 100) {
+      this.data.level++;
+      this.data.xp = 0;
+      this.data.coins += 100; // Level up bonus
+      alert("🎉 LEVEL UP! +100 Coins");
+    }
+    this.save();
+    this.syncData();
+  },
+
+  switchTab(t) {
+    document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
+    document.getElementById(`tab-${t}`).classList.remove('hidden');
+    document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+    // Highlight nav
+    // This part is simplified
+    
+    if(t === 'learn') this.fetchArticles();
+  },
+
+  openModal(id) { document.getElementById(`modal-${id}`).classList.add('open'); },
+  closeModal(id) { document.getElementById(`modal-${id}`).classList.remove('open'); },
+
+  /* --- FEATURES --- */
+  claimDaily() {
+    const today = new Date().toDateString();
+    if(this.data.lastDaily === today) return alert("Bu gün artıq götürmüsünüz. Sabah gəlin!");
+    this.data.lastDaily = today;
+    this.addReward(20, 10);
+    alert("Daily Bonus: +20 Coins!");
+  },
+
+  async fetchArticles() {
+    const container = document.getElementById('articles-container');
+    // If already loaded, don't refetch
+    if(container.children.length > 1) return; 
+
+    try {
+      // STANDARD FETCH (CORS is enabled in GAS)
+      const res = await fetch(`${API_URL}?action=getArticles`);
+      const json = await res.json();
+      
+      if(json.articles) {
+        container.innerHTML = "";
+        json.articles.forEach(art => {
+            const div = document.createElement('div');
+            div.className = 'blog-card';
+            div.innerHTML = `
+                <div class="blog-title">${art.title}</div>
+                <div class="blog-snippet">${art.content}</div>
+                <button class="read-btn" onclick="app.readArticle(this, 10, ${art.xp || 10})">OXU (+${art.xp || 10} XP)</button>
+            `;
+            container.appendChild(div);
+        });
+      }
+    } catch(e) {
+      container.innerHTML = `<p style="text-align:center">İnternet xətası. Yeniləyin.</p>`;
+    }
+  },
+
+  readArticle(btn, seconds, xpReward) {
+    if(btn.classList.contains('reading')) return;
+    btn.classList.add('reading');
+    let left = seconds;
+    
+    // Expand text
+    const snippet = btn.previousElementSibling;
+    snippet.classList.add('expanded');
+
+    const interval = setInterval(() => {
+        left--;
+        btn.innerText = `Oxuyun... ${left}`;
+        if(left <= 0) {
+            clearInterval(interval);
+            btn.classList.remove('reading');
+            btn.innerText = "OXUNDU ✅";
+            btn.disabled = true;
+            btn.style.background = "#222";
+            this.addReward(0, xpReward);
+        }
+    }, 1000);
+  },
+
+  setRating(n) {
+      this.data.rating = n;
+      document.querySelectorAll('.star-input').forEach((s,i) => {
+          s.style.color = i < n ? "gold" : "#444";
+      });
+  },
+
+  async submitReview() {
+      if(this.data.rating === 0) return alert("Ulduz seçin");
+      const text = document.getElementById('review-text').value;
+      
+      await fetch(API_URL, {
+        method:'POST', 
+        body: JSON.stringify({ type:'review', name:this.data.user.name, rating:this.data.rating, text })
+      });
+      
+      this.addReward(50, 0);
+      document.getElementById('review-text').value = "";
+      alert("Təşəkkürlər! +50 Coins");
+  },
+
+  bgParticles() {
+    const c = document.getElementById('particles'), x = c.getContext('2d');
+    c.width=window.innerWidth; c.height=window.innerHeight;
+    const p = Array(30).fill().map(()=>({x:Math.random()*c.width, y:Math.random()*c.height, s:Math.random()*2, d:Math.random()}));
+    function draw(){ x.clearRect(0,0,c.width,c.height); x.fillStyle="#FFD700"; p.forEach(e=>{e.y-=e.d;if(e.y<0)e.y=c.height;x.beginPath();x.arc(e.x,e.y,e.s,0,6.28);x.fill()});requestAnimationFrame(draw)}
+    draw();
+  }
+};
+
+/* --- GAMES LOGIC --- */
+const games = {
+  /* 1. WHEEL */
+  spinWheel() {
+    const btn = document.getElementById('btn-spin');
+    const wheel = document.getElementById('wheel-el');
+    btn.disabled = true;
+    
+    // Calculate random degrees (at least 3 spins)
+    const spins = 1080 + Math.random() * 360; 
+    wheel.style.transform = `rotate(${spins}deg)`;
+    
+    setTimeout(() => {
+        btn.disabled = false;
+        // Simplified win logic
+        const win = [10, 50, 5, 100, 20, 0];
+        const randomWin = win[Math.floor(Math.random()*win.length)];
+        if(randomWin > 0) {
+            app.addReward(randomWin, 5);
+            alert(`Təbriklər! ${randomWin} Coin qazandınız!`);
+        } else {
+            alert("Bəxtiniz gətirmədi :(");
+        }
+    }, 4100);
+  },
+
+  /* 2. SCRATCH */
+  scratchActive: false,
+  initScratch() {
+    if(app.data.coins < 20) return alert("Balansda 20 Coin yoxdur!");
+    
+    app.data.coins -= 20;
+    app.renderUI();
+    document.getElementById('btn-buy-scratch').style.display = 'none';
+    
+    // Randomize Prize
+    const prizes = [10, 20, 50, 100, 200];
+    const prize = prizes[Math.floor(Math.random() * prizes.length)];
+    document.getElementById('scratch-val').innerText = prize + " 🪙";
+    document.getElementById('scratch-val').setAttribute('data-val', prize);
+
+    const canvas = document.getElementById('scratch-canvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    
+    // Fill Silver
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = '#C0C0C0';
+    ctx.fillRect(0, 0, 250, 150);
+    
+    // Text overlay
+    ctx.fillStyle = "#666";
+    ctx.font = "20px Arial";
+    ctx.fillText("POZ QAZAN", 70, 80);
+
+    this.scratchActive = true;
+    let isDrawing = false;
+
+    const getPos = (e) => {
+        const r = canvas.getBoundingClientRect();
+        return { 
+            x: (e.touches ? e.touches[0].clientX : e.clientX) - r.left,
+            y: (e.touches ? e.touches[0].clientY : e.clientY) - r.top 
+        };
+    };
+
+    const scratch = (e) => {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, 15, 0, Math.PI * 2);
+        ctx.fill();
+        checkPercent();
+    };
+
+    const checkPercent = () => {
+        // Optimization: check every 10th call or throttle
+        if(Math.random() > 0.1) return;
+        
+        const imageData = ctx.getImageData(0, 0, 250, 150);
+        let transparent = 0;
+        for (let i = 3; i < imageData.data.length; i += 4) {
+            if (imageData.data[i] === 0) transparent++;
+        }
+        if (transparent > (250 * 150 * 0.4)) { // 40% cleared
+            finishGame();
+        }
+    };
+
+    const finishGame = () => {
+        if(!this.scratchActive) return;
+        this.scratchActive = false;
+        canvas.onmousemove = null;
+        canvas.ontouchmove = null;
+        const val = parseInt(document.getElementById('scratch-val').getAttribute('data-val'));
+        app.addReward(val, 10);
+        alert(`Təbriklər! ${val} Coin qazandınız!`);
+        app.closeModal('scratch');
+        // Reset UI
+        setTimeout(() => {
+            document.getElementById('btn-buy-scratch').style.display = 'inline-block';
+            ctx.clearRect(0,0,250,150);
+        }, 1000);
+    };
+
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    canvas.addEventListener('touchstart', () => isDrawing = true);
+    window.addEventListener('mouseup', () => isDrawing = false);
+    window.addEventListener('touchend', () => isDrawing = false);
+    canvas.addEventListener('mousemove', scratch);
+    canvas.addEventListener('touchmove', scratch);
+  },
+
+  /* 3. WORD GUESS */
+  targetWord: "BRAND",
+  guessWord() {
+    const input = document.getElementById('word-input');
+    const guess = input.value.toUpperCase();
+    if(guess.length !== 5) return alert("5 hərfli söz daxil edin!");
+
+    const grid = document.getElementById('word-grid');
+    grid.innerHTML = "";
+    
+    // Correct Word Logic (Simplified)
+    const words = ["HEDIY", "SEHIR", "BREND", "ALMAQ", "QUTU", "BAZAR"];
+    // Set random word if first try
+    if(this.targetWord === "BRAND") this.targetWord = words[Math.floor(Math.random()*words.length)];
+
+    for(let i=0; i<5; i++) {
+        const cell = document.createElement('div');
+        cell.className = "word-cell";
+        cell.innerText = guess[i];
+        
+        if(guess[i] === this.targetWord[i]) {
+            cell.classList.add('correct');
+        } else if(this.targetWord.includes(guess[i])) {
+            cell.classList.add('present');
+        } else {
+            cell.classList.add('absent');
+        }
+        grid.appendChild(cell);
+    }
+
+    if(guess === this.targetWord) {
+        app.addReward(50, 20);
+        alert("TAPDINIZ! +50 Coin");
+        this.targetWord = "BRAND"; // Reset
+        input.value = "";
+    } else {
+        input.value = "";
+        input.placeholder = "Yenidən yoxla...";
+    }
+  },
+
+  /* 4. MINER */
+  minerClicks: 0,
+  tapMine(e) {
+      this.minerClicks++;
+      const score = document.getElementById('miner-score');
+      score.innerText = parseInt(score.innerText) + 1;
+      
+      // Visual Float
+      const float = document.createElement('div');
+      float.className = 'floating-text';
+      float.innerText = "+1";
+      float.style.left = e.clientX + "px";
+      float.style.top = e.clientY + "px";
+      document.body.appendChild(float);
+      setTimeout(() => float.remove(), 1000);
+
+      // Reward every 10 clicks
+      if(this.minerClicks % 10 === 0) {
+          app.addReward(1, 0); // Silent add
+      }
+      
+      // Animation
+      const rock = document.getElementById('miner-btn');
+      rock.style.transform = "scale(0.9) rotate(" + (Math.random()*10 - 5) + "deg)";
+      setTimeout(() => rock.style.transform = "scale(1)", 50);
+  }
+};
+
+// Start
+app.init();
+</script>
+</body>
+</html>
