@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="az">
 <head>
@@ -16,7 +15,11 @@
 
 /* RESET & BASE */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; display: flex; flex-direction: column; }
+body { 
+  background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; display: flex; flex-direction: column; 
+  /* Padding for Bottom Nav */
+  padding-bottom: 70px; 
+}
 
 /* LAYOUT */
 .wizard-wrapper {
@@ -29,6 +32,52 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
 .back-btn { font-size: 14px; color: #777; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; }
 .logo { font-size: 20px; font-weight: 800; color: #c21a1a; letter-spacing: -0.5px; cursor: pointer; }
 .step-indicator { font-size: 12px; color: #999; font-weight: 600; background: #eee; padding: 4px 8px; border-radius: 12px; }
+
+/* --- BOTTOM NAVIGATION --- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 65px;
+  background: white;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 150; /* Above cards, below modals */
+  padding-bottom: 5px; /* iOS Safe Area adjustment */
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 20%;
+  height: 100%;
+  cursor: pointer;
+  color: #999;
+  transition: all 0.2s ease;
+}
+
+.nav-item.active {
+  color: #c21a1a;
+}
+
+.nav-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+  fill: currentColor;
+}
+
+.nav-text {
+  font-size: 10px;
+  font-weight: 600;
+}
+
 
 /* --- STORIES SECTION --- */
 .stories-wrapper {
@@ -321,11 +370,12 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
 .notif-desc { font-size: 13px; font-weight: 700; color: #333; }
 
 /* MODAL */
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; padding: 24px; overflow-y: auto; display: none; }
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; padding: 24px; overflow-y: auto; display: none; padding-bottom: 80px; }
 .modal.active { display: block; animation: slideUp 0.3s ease; }
 
 /* ALL PRODUCTS GRID */
-.all-products-view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fafafa; z-index: 100; overflow-y: auto; padding: 20px; display: none; }
+/* Adjusted z-index to sit below navbar but above content */
+.all-products-view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fafafa; z-index: 100; overflow-y: auto; padding: 20px; padding-bottom: 80px; display: none; }
 .all-products-view.active { display: block; animation: slideUp 0.3s ease; }
 .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 40px; }
 .grid-item { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; }
@@ -423,42 +473,42 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; d
   100% { transform: translate(20px, -40px) scale(1.05); }
 }
 
-//
-/* --- SWIPE INDICATORS (Tinder Style) --- */
-/* --- SWIPE INDICATORS (FIXED) --- */
-.swipe-overlay {
-  position: absolute;
-  top: 40px; /* Moved down slightly to avoid corner cutting */
-  padding: 8px 15px;
-  border: 4px solid;
-  border-radius: 8px;
-  font-size: 22px; /* Reduced from 28px to fit better */
-  font-weight: 800;
-  text-transform: uppercase;
-  opacity: 0;
-  z-index: 20; /* Higher than everything else */
-  letter-spacing: 1px;
-  background: rgba(255, 255, 255, 0.7); /* More visible background */
-  backdrop-filter: blur(4px);
-  white-space: nowrap; /* Prevents "BƏYƏNDİM" from breaking lines */
-  pointer-events: none; /* Crucial: Allows swiping 'through' the text */
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+/* --- ABOUT / FOOTER STYLES --- */
+.home-footer {
+  margin-top: 30px;
+  text-align: center;
+  padding-bottom: 20px;
 }
 
-.overlay-like {
-  left: 20px;
-  color: #25D366; /* WhatsApp Green */
-  border-color: #25D366;
-  transform: rotate(-15deg);
+.about-trigger {
+  font-size: 13px;
+  color: #999;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 10px;
 }
 
-.overlay-nope {
-  right: 20px;
-  color: #c21a1a; /* Brendimo Red */
-  border-color: #c21a1a;
-  transform: rotate(15deg);
+.about-content h3 {
+  color: #c21a1a;
+  font-size: 20px;
+  margin-bottom: 10px;
+  margin-top: 20px;
 }
- 
+
+.about-content p {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 15px;
+}
+
+.mission-box {
+  background: #fffcf0;
+  border: 1px solid #FFD700;
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 20px;
+}
   
 </style>
 <script>
@@ -531,6 +581,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
       <div class="option-card" data-val="Həmkar"><span class="option-icon">💼</span><span class="option-text">Həmkar</span></div>
     </div>
   </div>
+  
 
   <div class="step-content" id="step-1">
     <h2 class="title">Hansı özəl gün üçün?</h2>
@@ -547,7 +598,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
     <div class="options-grid" onclick="handleOptionClick(event, 'mood')">
       <div class="option-card" data-val="Aksesuar"><span class="option-icon">👝</span><span class="option-text">Aksesuar</span></div>
       <div class="option-card" data-val="Giftset"><span class="option-icon">🛍</span><span class="option-text">Hədiyyə seti</span></div>
-      <div class="option-card" data-val="Texnoloji"><span class="option-icon">🕶️</span><span class="option-text">Dəb, gözəllik, özünə qulluq</span></div>
+      <div class="option-card" data-val="Gözəllik"><span class="option-icon">🕶️</span><span class="option-text">Gözəllik/Özünə qulluq</span></div>
       <div class="option-card" data-val="Qarışıq"><span class="option-icon">🔮</span><span class="option-text">Sehrbaz uyğunlaşdırsın!</span></div>
     </div>
   </div>
@@ -602,11 +653,57 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
     <h2 class="title" style="font-size: 20px; margin-bottom: 10px;">Onu xoşbəxt edəcək seçimlər ✨</h2>
     <div id="cards-wrapper"></div>
   </div>
+  
+  <div class="home-footer">
+      <div class="about-trigger" onclick="openAboutModal()">
+          Biz kimik? Haqqımızda oxu
+      </div>
+  </div>
+</div>
+  
+<div id="about-modal" class="modal">
+  <div class="header">
+    <div class="back-btn" onclick="closeAboutModal()">✕ Bağla</div>
+  </div>
+
+  <div class="about-content" style="padding-bottom: 50px;">
+    <div style="text-align: center; margin-bottom: 20px;">
+      <span style="font-size: 40px;">🎁</span>
+      <h2 style="font-size: 24px; font-weight: 800; margin-top: 10px;">Brendimo</h2>
+      <p style="color: #888; font-size: 14px;">Hədiyyə Sehrbazı</p>
+    </div>
+
+    <h3>Biz Kimik?</h3>
+    <p>
+      Brendimo, hədiyyə axtarışını stressdən azad edib, əyləncəli bir təcrübəyə çevirən innovativ bir platformadır. Biz standart onlayn mağaza deyilik; biz sizin şəxsi hədiyyə köməkçinizik.
+    </p>
+
+    <h3>Nə Etməyə Çalışırıq?</h3>
+    <div class="mission-box">
+      <p style="margin-bottom: 0; font-weight: 600; color: #555;">
+        🎯 Missiyamız:
+      </p>
+      <p style="margin-bottom: 0;">
+        "Nə alım?" sualını aradan qaldırmaq. Süni intellekt alqoritmlərimizlə, sevdiyiniz insan üçün ən ideal, ən uyğun və ən yaddaqalan hədiyyəni saniyələr içində tapmağınıza kömək edirik.
+      </p>
+    </div>
+
+    <h3>Dəyərlərimiz</h3>
+    <ul style="padding-left: 20px; line-height: 1.8; color: #444;">
+      <li>✨ <b>Kreativlik:</b> Sıradan olmayan seçimlər.</li>
+      <li>🚀 <b>Sürət:</b> Vaxtınıza qənaət.</li>
+      <li>❤️ <b>Emosiya:</b> Sadəcə əşya yox, hiss bəxş etmək.</li>
+    </ul>
+
+    <div style="margin-top: 30px; text-align: center;">
+      <p style="font-size: 12px; color: #aaa;">Brendimo © 2025. Bütün hüquqlar qorunur.</p>
+    </div>
+  </div>
 </div>
 
 <div id="all-products-view" class="all-products-view">
-  <div style="position:sticky; top:0; z-index:2; display:flex; justify-content:flex-end; padding-bottom:10px;">
-    <button onclick="closeAllProducts()" style="background:#eee; border:none; padding:8px 16px; border-radius:20px; font-weight:700;">✕ Bağla</button>
+  <div id="all-products-close" style="position:sticky; top:0; z-index:2; display:flex; justify-content:flex-end; padding-bottom:10px;">
+    <button onclick="handleNavClick('wizard')" style="background:#eee; border:none; padding:8px 16px; border-radius:20px; font-weight:700;">✕ Bağla</button>
   </div>
   <h2 class="title" style="font-size:20px;">Bütün Məhsullar</h2>
   <div class="grid-container" id="all-products-grid"></div>
@@ -638,6 +735,43 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
     WhatsApp ilə Sifariş Et
   </button>
 </div>
+
+<nav class="bottom-nav">
+  <div class="nav-item active" onclick="handleNavClick('wizard')" id="nav-wizard">
+    <svg class="nav-icon" viewBox="0 0 24 24">
+      <path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5 9.5 9.75 12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/>
+    </svg>
+    <span class="nav-text">Sehrbaz</span>
+  </div>
+  
+  <div class="nav-item" onclick="handleNavClick('mall')" id="nav-mall">
+    <svg class="nav-icon" viewBox="0 0 24 24">
+      <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 15H5V8h14v10z"/>
+    </svg>
+    <span class="nav-text">SehrMall</span>
+  </div>
+
+  <div class="nav-item" onclick="handleNavClick('chat')" id="nav-chat">
+    <svg class="nav-icon" viewBox="0 0 24 24">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+    </svg>
+    <span class="nav-text">SehrChat</span>
+  </div>
+
+  <div class="nav-item" onclick="handleNavClick('wheel')" id="nav-wheel">
+    <svg class="nav-icon" viewBox="0 0 24 24">
+       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v4h-2zm0 6h2v4h-2z"/>
+    </svg>
+    <span class="nav-text">SehrÇarx</span>
+  </div>
+  
+  <div class="nav-item" onclick="handleNavClick('vip')" id="nav-vip">
+    <svg class="nav-icon" viewBox="0 0 24 24">
+       <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .55-.45 1-1 1H6c-.55 0-1-.45-1-1v-1h14v1z"/>
+    </svg>
+    <span class="nav-text">VIP</span>
+  </div>
+</nav>
 
 <script>
 // --- CONFIGURATION ---
@@ -971,11 +1105,11 @@ function startOrderNotifications() {
 }
 
 // --- GLOBAL DISCOUNT LOGIC (THE FEAR FACTOR) ---
-let globalDiscount = 6.00;     
-const discountStep = 0.50;     
-const stepDuration = 30;       
-let secondsLeftInStep = 30;    
-let isTimerActive = false;     
+let globalDiscount = 6.00;      
+const discountStep = 0.50;      
+const stepDuration = 30;        
+let secondsLeftInStep = 30;     
+let isTimerActive = false;      
 let globalTimerInterval = null;
 
 function activateGlobalDiscount() {
@@ -1037,6 +1171,9 @@ function triggerDropEffect() {
 // --- ALL PRODUCTS ---
 async function openAllProducts() {
   document.getElementById('all-products-view').classList.add('active');
+  // Hide close button when triggered via Navbar, but nice to have in general. 
+  // We will handle logic in handleNavClick
+  
   logUserAction('ViewAllProducts');
   if (state.products.length > 0) { renderGrid(); return; }
   
@@ -1138,6 +1275,54 @@ function fixImageLink(url) {
 function restartApp() {
   state.who = null; state.occasion = null; state.mood = null; state.style = null; state.budget = null;
   currentStep = 0; updateUI(); closeAllProducts(); closeModal();
+  // Ensure Navbar reflects Home
+  handleNavClick('wizard');
+}
+
+// --- NAVIGATION HANDLER ---
+function handleNavClick(tab) {
+  // Update Active Class on UI
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const navItem = document.getElementById(`nav-${tab}`);
+  if(navItem) navItem.classList.add('active');
+
+  // Logic
+  if (tab === 'wizard') {
+    closeAllProducts();
+    // Ensure wrapper is visible
+  } 
+  else if (tab === 'mall') {
+    openAllProducts();
+    // Hide the Close button inside All Products view when used via Nav
+    document.getElementById('all-products-close').style.display = 'none';
+  } 
+  else if (tab === 'chat') {
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank');
+    // Revert visual active state to Wizard or previous after click
+    setTimeout(() => {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        if(document.getElementById('all-products-view').classList.contains('active')) {
+            document.getElementById('nav-mall').classList.add('active');
+        } else {
+            document.getElementById('nav-wizard').classList.add('active');
+        }
+    }, 500);
+  } 
+  else if (tab === 'wheel') {
+    window.open('https://brendimo-co.github.io/sanscarxi/', '_blank');
+    // Revert visual active state
+    setTimeout(() => {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        if(document.getElementById('all-products-view').classList.contains('active')) {
+            document.getElementById('nav-mall').classList.add('active');
+        } else {
+            document.getElementById('nav-wizard').classList.add('active');
+        }
+    }, 500);
+  }
+  else if (tab === 'vip') {
+    window.location.href = 'vipaccount.html';
+  }
 }
 
 // TRACKING
@@ -1150,9 +1335,19 @@ async function initTracking() {
   } catch (err) { userIP = "Hidden/Error"; }
   logUserAction('SessionStart', navigator.userAgent);
 }
+// --- ABOUT MODAL FUNCTIONS ---
+function openAboutModal() {
+  document.getElementById('about-modal').classList.add('active');
+  logUserAction('ViewAboutUs');
+}
+
+function closeAboutModal() {
+  document.getElementById('about-modal').classList.remove('active');
+}
+
 // --- STORIES LOGIC ---
 
-// 1. DATA (Buradakı linkləri öz şəkillərinizlə dəyişin)
+// 1. DATA (UPDATED: INCLUDES BIZ KIMIK)
 const storiesData = [
   {
     id: 1,
@@ -1161,6 +1356,15 @@ const storiesData = [
     content: 'https://github.com/Brendimo-co/sehrbaz/blob/main/memnun.png?raw=true&fit=crop',
     type: 'story'
   },
+  // --- ADDED BIZ KIMIK HERE ---
+  {
+    id: 'about',
+    title: 'Biz Kimik?',
+    thumb: 'https://cdn-icons-png.flaticon.com/512/189/189664.png', 
+    type: 'action',
+    action: openAboutModal 
+  },
+  // -----------------------------
   {
     id: 2,
     title: 'Qablaşdırma',
@@ -1182,20 +1386,6 @@ const storiesData = [
     content: 'https://github.com/Brendimo-co/sehrbaz/blob/main/catdirilma.png?raw=true&fit=crop',
     type: 'story'
   },
- {
-    id: 'all_prod',
-    title: '🛍️ Məhsullar',
-    thumb: 'https://cdn-icons-png.flaticon.com/512/3081/3081559.png', // Səbət iconu
-    type: 'action',
-    action: openAllProducts
-  },
-  {
-    id: 'wheel',
-    title: '🎁 Çarx',
-    thumb: 'https://cdn-icons-png.flaticon.com/512/12405/12405527.png', // Çarx iconu
-    type: 'link',
-    url: 'https://brendimo-co.github.io/sanscarxi/'
-  },
   {
     id: 5,
     title: 'Komanda',
@@ -1203,7 +1393,6 @@ const storiesData = [
     content: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=1000&fit=crop',
     type: 'story'
   },
- 
   {
     id: 6,
     title: 'Brendimo',
