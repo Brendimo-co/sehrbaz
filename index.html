@@ -757,29 +757,35 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 </div>
 
 <div id="product-modal" class="modal">
-  <div class="header"><div class="back-btn" onclick="closeModal()">✕ Bağla</div></div>
+  <div class="header"><div class="back-btn" onclick="closeModal()">← Geri</div></div>
   
-  <img id="modal-img" src="" style="width:100%; border-radius:12px; margin-bottom:15px;">
-  
-  <h2 id="modal-title" style="margin-bottom:5px;"></h2>
+  <div id="modal-content-container">
+      <img id="modal-img" src="" style="width:100%; border-radius:12px; margin-bottom:15px; min-height:300px; object-fit:cover;">
+      
+      <h2 id="modal-title" style="margin-bottom:5px;"></h2>
 
-  <div id="fear-bar-modal" class="fear-bar-wrapper" style="margin-bottom: 15px; padding: 10px;">
-      <div class="fear-header">
-          <span class="fear-title" style="font-size: 11px;">⚠️ QAÇIRMA!</span>
-          <span id="modal-fear-amount" class="fear-amount" style="font-size: 18px;">-6.00 ₼</span>
+      <div id="fear-bar-modal" class="fear-bar-wrapper" style="margin-bottom: 15px; padding: 10px;">
+          <div class="fear-header">
+              <span class="fear-title" style="font-size: 11px;">⚠️ QAÇIRMA!</span>
+              <span id="modal-fear-amount" class="fear-amount" style="font-size: 18px;">-6.00 ₼</span>
+          </div>
+          <div class="timer-track" style="height: 4px;">
+              <div id="modal-timer-fill" class="timer-fill"></div>
+          </div>
       </div>
-      <div class="timer-track" style="height: 4px;">
-          <div id="modal-timer-fill" class="timer-fill"></div>
-      </div>
+      
+      <h3 id="modal-price" style="color:#c21a1a; margin-bottom:20px; font-size:28px;"></h3>
+      
+      <p id="modal-desc" style="line-height:1.6; color:#444; margin-bottom:30px; white-space: pre-line;"></p>
+      
+      <button id="modal-whatsapp-btn" class="float-btn" style="width:100%; padding:16px; border-radius:12px; border:none; font-weight:700; font-size:16px; background:#25D366; color:white; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);">
+        WhatsApp ilə Sifariş Et
+      </button>
+
+      <button onclick="closeModal()" style="width:100%; padding:14px; margin-top:12px; border-radius:12px; border:none; font-weight:600; font-size:15px; background:#f0f0f0; color:#555;">
+        Bağla
+      </button>
   </div>
-  
-  <h3 id="modal-price" style="color:#c21a1a; margin-bottom:20px; font-size:28px;"></h3>
-  
-  <p id="modal-desc" style="line-height:1.6; color:#444; margin-bottom:30px; white-space: pre-line;"></p>
-  
-  <button id="modal-whatsapp-btn" class="float-btn" style="width:100%; padding:16px; border-radius:12px; border:none; font-weight:700; font-size:16px; background:#25D366; color:white;">
-    WhatsApp ilə Sifariş Et
-  </button>
 </div>
 
 <nav class="bottom-nav">
@@ -829,7 +835,9 @@ let currentStep = 0;
 const totalSteps = 5;
 const state = { who: null, occasion: null, mood: null, style: null, budget: null, products: [], cardStack: [], orders: [] };
 let gridLimit = 6; 
-
+// ... existing state ...
+let currentModalIndex = -1;
+let currentModalSource = []; // To know if we are in Wizard list or Mall list
 // --- NAVIGATION ---
 function updateUI() {
   document.getElementById('step-count').textContent = (currentStep < totalSteps) ? `ADDIM ${currentStep + 1}/${totalSteps}` : 'NƏTİCƏ';
@@ -1090,16 +1098,16 @@ function initSwipe(card, product) {
 
     // 1. CLICK / TAP DETECTION (Small movement)
     if (Math.abs(currentX) < 10 && Math.abs(currentY) < 10) { 
-        openModal(product); 
-        resetCard();
+openModal(product, state.cardStack, state.cardStack.indexOf(product));
+      resetCard();
         return; 
     }
 
     // 2. SWIPE UP LOGIC (New Feature)
     // If they swipe UP significantly (more than 80px) and more Vertical than Horizontal
     if (currentY < -80 && Math.abs(currentY) > Math.abs(currentX)) {
-        openModal(product); // Treat Swipe Up as "Show Details"
-        resetCard(); // Snap card back to center after opening modal
+openModal(product, state.cardStack, state.cardStack.indexOf(product));
+      resetCard(); // Snap card back to center after opening modal
         return;
     }
 
@@ -1146,6 +1154,82 @@ function initSwipe(card, product) {
   document.addEventListener('touchend', onEnd);
 }
 
+// --- MODAL SWIPE LOGIC ---
+let modalTouchStartX = 0;
+let modalTouchEndX = 0;
+
+function initModalSwipe() {
+    const modalImg = document.getElementById('modal-img');
+    
+    // Remove old listeners to prevent duplicates if opened multiple times
+    modalImg.ontouchstart = null;
+    modalImg.ontouchend = null;
+
+    modalImg.addEventListener('touchstart', (e) => {
+        modalTouchStartX = e.changedTouches[0].screenX;
+    }, {passive: true});
+
+    modalImg.addEventListener('touchend', (e) => {
+        modalTouchEndX = e.changedTouches[0].screenX;
+        handleModalSwipeGesture();
+    }, {passive: true});
+}
+
+function handleModalSwipeGesture() {
+    const swipeThreshold = 50; // Minimum distance to count as swipe
+    
+    // Swipe LEFT (Move Finger from Right to Left) -> Show Next
+    if (modalTouchStartX - modalTouchEndX > swipeThreshold) {
+        showNextModalProduct();
+    }
+    
+    // Optional: Swipe RIGHT -> Show Previous
+    if (modalTouchEndX - modalTouchStartX > swipeThreshold) {
+        showPrevModalProduct();
+    }
+}
+
+function showNextModalProduct() {
+    if (currentModalIndex < currentModalSource.length - 1) {
+        // Add a slide-out effect
+        const imgEl = document.getElementById('modal-img');
+        imgEl.style.transform = 'translateX(-20px)';
+        imgEl.style.opacity = '0';
+        
+        setTimeout(() => {
+            currentModalIndex++;
+            const nextProduct = currentModalSource[currentModalIndex];
+            openModal(nextProduct, currentModalSource, currentModalIndex);
+            
+            // Reset position for new image
+            imgEl.style.transform = 'translateX(0)';
+            imgEl.style.transition = 'all 0.2s ease';
+        }, 200);
+    } else {
+        // Visual feedback (bounce) if no more products
+        const content = document.getElementById('modal-content-container');
+        content.style.transform = 'translateX(-10px)';
+        setTimeout(() => content.style.transform = 'translateX(0)', 100);
+    }
+}
+
+function showPrevModalProduct() {
+    if (currentModalIndex > 0) {
+        const imgEl = document.getElementById('modal-img');
+        imgEl.style.transform = 'translateX(20px)';
+        imgEl.style.opacity = '0';
+        
+        setTimeout(() => {
+            currentModalIndex--;
+            const prevProduct = currentModalSource[currentModalIndex];
+            openModal(prevProduct, currentModalSource, currentModalIndex);
+             
+            imgEl.style.transform = 'translateX(0)';
+            imgEl.style.transition = 'all 0.2s ease';
+        }, 200);
+    }
+}  
+  
 // --- ORDER NOTIFICATIONS ---
 function startOrderNotifications() {
     if (state.orders.length === 0) return;
@@ -1255,7 +1339,7 @@ function renderGrid() {
   state.products.slice(0, gridLimit).forEach(p => {
     const el = document.createElement('div');
     el.className = 'grid-item';
-    el.onclick = () => openModal(p);
+el.onclick = () => openModal(p, state.products, state.products.indexOf(p));
     
     let badge = "";
     if (p.isBestSeller) badge = `<div class="badge-bestseller" style="top:5px; left:5px; font-size:10px;">🏆 Best Seller</div>`;
@@ -1278,23 +1362,31 @@ function renderGrid() {
 function loadMoreGrid() { gridLimit += 6; renderGrid(); logUserAction('LoadMoreProducts'); }
 
 // --- MODAL & WHATSAPP ---
-function openModal(p) {
+// Updated openModal to accept source list and index
+function openModal(p, sourceList = [], index = -1) {
   logUserAction('ViewDetails', p.name);
   activateGlobalDiscount(); 
 
-  document.getElementById('modal-img').src = fixImageLink(p.image);
+  // Store context for Swipe functionality
+  currentModalSource = sourceList.length ? sourceList : state.products;
+  currentModalIndex = index !== -1 ? index : currentModalSource.indexOf(p);
+
+  const imgEl = document.getElementById('modal-img');
+  imgEl.style.opacity = '0'; // Reset for fade in
+  imgEl.src = fixImageLink(p.image);
+  
+  // Simple Fade In Animation
+  setTimeout(() => imgEl.style.opacity = '1', 50);
+
   document.getElementById('modal-title').textContent = p.name;
   
-  // --- MODAL PRICE UPDATE ---
-  // Use innerHTML instead of textContent to render styles
+  // Price Logic
   const priceHTML = `
     <span style="text-decoration:line-through; color:#999; font-size:20px; margin-right:10px;">${p.oldPrice}₼</span>
     <span style="color:#c21a1a; font-weight:800; font-size:28px;">${p.price} AZN</span>
     <span class="discount-badge-small" style="font-size:14px; padding:4px 8px; vertical-align:middle;">-${p.discountPercent}%</span>
   `;
   document.getElementById('modal-price').innerHTML = priceHTML;
-  // --------------------------
-
   document.getElementById('modal-desc').textContent = p.description;
   
   updateDiscountTextUI();
@@ -1302,7 +1394,11 @@ function openModal(p) {
 
   const btn = document.getElementById('modal-whatsapp-btn');
   btn.onclick = () => redirectToWhatsApp(p);
+  
   document.getElementById('product-modal').classList.add('active');
+  
+  // Initialize Swipe Listener for the Modal Image
+  initModalSwipe();
 }
 function closeModal() { document.getElementById('product-modal').classList.remove('active'); }
 
