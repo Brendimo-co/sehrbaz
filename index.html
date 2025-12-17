@@ -910,15 +910,14 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
           
           <div class="swipe-instruction modal-hint">
              <div class="hint-text">
-                <span>Digərləri</span>
+                <span>Çevir</span>
              </div>
              <div class="hand-icon">👆</div>
           </div>
       </div>
       <h2 id="modal-title" style="margin-bottom:5px; line-height:1.3;"></h2>
-      ```
-      
-      <h2 id="modal-title" style="margin-bottom:5px; line-height:1.3;"></h2>
+
+    
       
       <div id="fear-bar-modal" class="fear-bar-wrapper" style="margin-bottom: 15px; padding: 10px; display:none;">
           <div class="fear-header">
@@ -1124,8 +1123,13 @@ async function fetchProducts() {
 }
 
 function applyBadges(products) {
+    if (!products || products.length === 0) return; // Safety check
     products.forEach(p => { delete p.isBestSeller; });
-    if(products[2]) products[2].isBestSeller = true;
+    
+    // Check if the 3rd item exists before assigning
+    if(products.length > 2 && products[2]) {
+        products[2].isBestSeller = true;
+    }
 }
 
 function processMatches() {
@@ -1185,11 +1189,13 @@ function renderCards() {
     if (p.isLowStock) badgesHtml += `<div class="badge-lowstock-fixed">⚠️ ${p.stockCount} ədəd qaldı</div>`;
 
   // Inside renderCards()...
-    card.innerHTML = `
-      <div class="card-image-box">
-         <div class="swipe-overlay overlay-like">💚</div> <div class="swipe-overlay overlay-nope">✖️</div>  ${badgesHtml}
-         <img src="${fixImageLink(p.image)}" alt="${p.name}" draggable="false">
-      </div>
+    // Düzgün variant
+card.innerHTML = `
+  <div class="card-image-box">
+      <div class="swipe-overlay overlay-like">💚</div> 
+      <div class="swipe-overlay overlay-nope">✖️</div>  
+      ${badgesHtml} <img src="${fixImageLink(p.image)}" alt="${p.name}" draggable="false">
+  </div>
       
       <div class="card-info">
         <h3>${p.name}</h3>
@@ -1412,8 +1418,8 @@ function openModal(p, sourceList = [], index = -1) {
   currentModalIndex = index !== -1 ? index : currentModalSource.indexOf(p);
 
   document.getElementById('modal-img').src = fixImageLink(p.image);
-  document.getElementById('modal-title').textContent = p.name;
-  
+  document.getElementById('modal-title').textContent = p.name || "Premium Eksklüziv";
+  document.getElementById('modal-desc').textContent = p.description || "Bəzən ən yaxşı seçim, gözlənilməz olandır.!";
   // POINT 7: Show Match %
   document.getElementById('modal-match-score').textContent = (p.score || "90") + "% UYĞUNLUQ";
 
@@ -1493,8 +1499,16 @@ function renderReviews(reviews) {
 }
 
 function toggleReviewForm() {
-    document.getElementById('review-form').classList.toggle('active');
-    // Init star click
+    const form = document.getElementById('review-form');
+    form.classList.toggle('active');
+    
+    // Auto scroll to form if opening
+    if (form.classList.contains('active')) {
+        setTimeout(() => {
+            form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+    }
+
     document.querySelectorAll('.star-opt').forEach(s => {
         s.onclick = function() {
             currentReviewRating = this.getAttribute('data-v');
@@ -1748,7 +1762,10 @@ function logUserAction(action, details = '') {
 
 function restartApp() {
     // 1. Reset the step counter to the beginning
-    currentStep = 0;
+  if (globalTimerInterval) clearInterval(globalTimerInterval);
+    isTimerActive = false;
+  
+  currentStep = 0;
 
     // 2. Clear the user's previous selections
     state.who = null;
@@ -1911,9 +1928,17 @@ function resetBars(currentIndex) {
 
 function nextStory() {
   let nextIndex = activeStoryIndex + 1;
-  while (nextIndex < storiesData.length && storiesData[nextIndex].type !== 'story') { nextIndex++; }
-  if (nextIndex < storiesData.length) { loadStoryContent(nextIndex); activeStoryIndex = nextIndex; } 
-  else { closeStory(); }
+  // Ensure we don't go past the array length
+  while (nextIndex < storiesData.length && storiesData[nextIndex].type !== 'story') { 
+      nextIndex++; 
+  }
+  
+  if (nextIndex < storiesData.length) { 
+      loadStoryContent(nextIndex); 
+      activeStoryIndex = nextIndex; 
+  } else { 
+      closeStory(); 
+  }
 }
 
 function prevStory() {
