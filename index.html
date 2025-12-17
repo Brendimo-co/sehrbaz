@@ -694,6 +694,12 @@ body {
   transform: scale(0.98); /* Slight click effect */
   color: #333;
 }
+
+.swipe-instruction {
+  /* Digər kodlar qalır... */
+  pointer-events: none; /* Bunu əlavə edin */
+}
+  
   
 </style>
 <script>
@@ -1217,6 +1223,7 @@ function renderCards() {
 }
 
 // --- CARD SWIPE LOGIC (FIXED POINT 8 + HELPER FUNCTIONS) ---
+// --- CARD SWIPE LOGIC (FIXED) ---
 function initCardSwipe(card, product) {
   let startX = 0, startY = 0;
   let currentX = 0, currentY = 0;
@@ -1229,6 +1236,11 @@ function initCardSwipe(card, product) {
     isDragging = true;
     startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+    
+    // ✅ FIX: Hər yeni toxunuşda köhnə koordinatları sıfırlayırıq
+    currentX = 0;
+    currentY = 0;
+
     card.style.transition = 'none';
     addDocumentListeners();
   };
@@ -1241,29 +1253,23 @@ function initCardSwipe(card, product) {
     currentX = x - startX;
     currentY = y - startY;
 
-    // POINT 8: Ignore vertical swipes for Card Logic (let natural scroll happen)
-    // We only animate horizontal movement strongly.
-    
-  // Inside onMove...
+    // Şaquli (yuxarı-aşağı) hərəkət çoxdursa, kartı tərpətmə (Scroll-a icazə ver)
     if (Math.abs(currentX) > Math.abs(currentY)) {
         if(e.cancelable && e.type === 'touchmove') e.preventDefault(); 
         card.style.transform = `translate(${currentX}px, ${currentY / 5}px) rotate(${currentX / 15}deg)`;
         
-        // LOGIC UPDATE: Use simple opacity, no rotation needed for the icons themselves
         const opacity = Math.min(1, Math.abs(currentX) / 80);
         
         if (currentX > 0) { 
-            // Swiping Right (Like)
             if(likeInd) {
                 likeInd.style.opacity = opacity; 
-                likeInd.style.transform = `translateY(-50%) scale(${0.5 + (opacity * 0.5)})`; // Grow effect
+                likeInd.style.transform = `translateY(-50%) scale(${0.5 + (opacity * 0.5)})`;
             }
             if(nopeInd) nopeInd.style.opacity = 0; 
         } else { 
-            // Swiping Left (Nope)
             if(nopeInd) {
                 nopeInd.style.opacity = opacity;
-                nopeInd.style.transform = `translateY(-50%) scale(${0.5 + (opacity * 0.5)})`; // Grow effect
+                nopeInd.style.transform = `translateY(-50%) scale(${0.5 + (opacity * 0.5)})`;
             }
             if(likeInd) likeInd.style.opacity = 0; 
         }
@@ -1279,6 +1285,7 @@ function initCardSwipe(card, product) {
     if(nopeInd) nopeInd.style.opacity = 0;
 
     // CLICK (Tap) -> Open Modal
+    // Kiçik tərpənişləri də (məs: 5-10px) klik kimi qəbul et
     if (Math.abs(currentX) < 10 && Math.abs(currentY) < 10) { 
       openModal(product, state.cardStack, state.cardStack.indexOf(product));
       resetCard(); 
@@ -1305,6 +1312,9 @@ function initCardSwipe(card, product) {
   function resetCard() {
       card.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
       card.style.transform = 'translate(0px, 0px) rotate(0deg)';
+      // ✅ FIX: Vizual reset zamanı dəyişənləri də sıfırlayırıq (ehtiyat üçün)
+      currentX = 0; 
+      currentY = 0;
   }
 
   function addDocumentListeners() {
