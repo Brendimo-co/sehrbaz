@@ -989,29 +989,73 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 
 <script>
 // --- CONFIGURATION ---
-const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxhsdv49KE1aHqKXNnmCllhTOAxUPg9joVW__iOolcTNZX4cYDgUrUvyI4xkdDhdn36sw/exec"; 
+const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzMLzwp2qpBlUT1tZkKuKh0rzE7I7BRTCxdMZv8gvK2c8u9SNlFrFfBCO6HiR5nJjVpEw/exec"; 
 const WHATSAPP_NUMBER = "994556742535";
 
 // --- STATE ---
 let currentStep = 0;
 const totalSteps = 5;
-const state = { 
-    who: null, occasion: null, mood: null, style: null, budget: null, 
-    products: [], cardStack: [], orders: [], viewedProductCount: 0 
-};
+const state = { who: null, occasion: null, mood: null, style: null, budget: null, products: [], cardStack: [], orders: [], viewedProductCount: 0 };
 let gridLimit = 6; 
 let currentModalIndex = -1;
 let currentModalSource = []; 
 let currentReviewRating = 0;
-let reviewsCache = {}; // Cache for reviews
+let reviewsCache = {};
+
+// --- ANALYTICS DATA ---
+let userIP = "Fetching...";
+let sessionID = Math.random().toString(36).substring(2, 15);
+let deviceName = getDeviceType();
 
 // --- INITIALIZATION ---
 function init() {
+    fetchIP(); // Get IP immediately
     initStories();
-    initTracking();
+    initTracking(); // Logs "App Open"
     initGlobalSwipe(); 
     initNotificationSwipe(); 
     updateUI();
+}
+
+// --- ANALYTICS FUNCTIONS (NEW) ---
+function getDeviceType() {
+    const ua = navigator.userAgent;
+    if (/Android/i.test(ua)) return "Android Mobile";
+    if (/iPhone|iPad|iPod/i.test(ua)) return "iPhone/iOS";
+    if (/Windows/i.test(ua)) return "Windows PC";
+    if (/Mac/i.test(ua)) return "Macbook/iMac";
+    return "Other/Mobile";
+}
+
+async function fetchIP() {
+    try {
+        const res = await fetch('https://api.ipify.org?format=json');
+        const data = await res.json();
+        userIP = data.ip;
+    } catch (e) {
+        userIP = "Hidden/Error";
+    }
+}
+
+// Enhanced Logger
+function logUserAction(action, label = "-", value = "-") {
+    // Sends structured data to the backend columns
+    const payload = {
+        type: 'log',
+        sessionId: sessionID,
+        ip: userIP,
+        device: deviceName,
+        action: action,
+        label: label,   // e.g., "Product Name" or "Step Name"
+        value: value,   // e.g., "50 AZN" or "For Him"
+        screen: `${window.innerWidth}x${window.innerHeight}`
+    };
+
+    fetch(SHEETS_ENDPOINT, {
+        method: 'POST', mode: 'no-cors', keepalive: true,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    }).catch(e => console.log("Log error"));
 }
 
 // --- NAVIGATION ---
@@ -1024,21 +1068,34 @@ function updateUI() {
   
   if (currentStep < totalSteps) {
     document.getElementById(`step-${currentStep}`).classList.add('active');
+    // Log which step the user is on
+    logUserAction("StepView", `Step ${currentStep+1}`);
   } else if (currentStep === totalSteps) {
     document.getElementById('step-loading').classList.add('active');
     fetchProducts();
   } else {
     document.getElementById('step-results').classList.add('active');
+    logUserAction("ResultsView", "Showing Cards");
   }
 }
 
-function goBack() { if (currentStep > 0) { currentStep--; updateUI(); } }
+function goBack() { 
+    if (currentStep > 0) { 
+        currentStep--; 
+        logUserAction("Nav", "Back Button");
+        updateUI(); 
+    } 
+}
 
 function handleOptionClick(e, key) {
   const card = e.target.closest('.option-card');
   if (!card) return;
-  state[key] = card.getAttribute('data-val');
-  logUserAction('StepCompleted', `${key}: ${state[key]}`);
+  const val = card.getAttribute('data-val');
+  state[key] = val;
+  
+  // LOGGING: Variable Name (key) and Selection (val)
+  logUserAction("StepCompleted", key, val);
+  
   currentStep++;
   updateUI();
 }
@@ -1054,14 +1111,7 @@ function shuffleArray(array) {
 
 async function fetchProducts() {
   const statusTextEl = document.getElementById('magic-status-text');
-  const messages = [
-   "Sehrli axtarış işə düşdü... 🪄",
-   "Standart hədiyyələr dərhal silinir...",
-   "Ona özünü dəyərli hiss etdirəcək... ✨",
-   "Bəyənməmək riski aradan qaldırılır... 🛡️",
-   "Sizin üçün xüsusi Endirim əlavə olunur 🪄",
-   "Və... İdeal seçim tapıldı! 🎯"
-  ];
+  const messages = ["Sehrli axtarış işə düşdü... 🪄", "Standart hədiyyələr dərhal silinir...", "Ona özünü dəyərli hiss etdirəcək... ✨", "Bəyənməmək riski aradan qaldırılır... 🛡️", "Sizin üçün xüsusi Endirim əlavə olunur 🪄", "Və... İdeal seçim tapıldı! 🎯"];
   let msgIndex = 0;
   statusTextEl.textContent = messages[0];
 
@@ -1086,29 +1136,17 @@ async function fetchProducts() {
     const orderData = await orderRes.json();
     clearInterval(textInterval);
 
-    // POINT 2: RANDOM LOW STOCK LOGIC & DISCOUNTS
     let rawProducts = shuffleArray(prodData.products || []);
     state.products = rawProducts.map(p => {
-        // Random discount 20-35%
         const randomDisc = Math.floor(Math.random() * (35 - 20 + 1)) + 20; 
         const oldPriceVal = (parseFloat(p.price) / (1 - (randomDisc / 100))).toFixed(0);
-        
-        // Random Stock Logic (30% chance)
         const isStockLow = Math.random() < 0.3;
         const stockCount = isStockLow ? Math.floor(Math.random() * 5) + 1 : null;
-
-        return {
-            ...p,
-            discountPercent: randomDisc,
-            oldPrice: oldPriceVal,
-            isLowStock: isStockLow,
-            stockCount: stockCount
-        };
+        return { ...p, discountPercent: randomDisc, oldPrice: oldPriceVal, isLowStock: isStockLow, stockCount: stockCount };
     });
 
     state.orders = orderData.orders || [];
     applyBadges(state.products);
-
     processMatches();
     currentStep++;
     updateUI();
@@ -1123,13 +1161,9 @@ async function fetchProducts() {
 }
 
 function applyBadges(products) {
-    if (!products || products.length === 0) return; // Safety check
+    if (!products || products.length === 0) return;
     products.forEach(p => { delete p.isBestSeller; });
-    
-    // Check if the 3rd item exists before assigning
-    if(products.length > 2 && products[2]) {
-        products[2].isBestSeller = true;
-    }
+    if(products.length > 2 && products[2]) { products[2].isBestSeller = true; }
 }
 
 function processMatches() {
@@ -1167,12 +1201,10 @@ function checkBudget(price, budgetStr) {
 function renderCards() {
   const container = document.getElementById('cards-wrapper');
   container.innerHTML = '';
-  
   if (state.cardStack.length === 0) {
     container.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#888;"><p>Başqa seçim qalmadı.</p><button onclick="restartApp()" style="margin-top:10px; padding:10px 20px; background:#333; color:white; border:none; border-radius:8px;">Yenidən Başla</button></div>';
     return;
   }
-
   state.cardStack.slice(0, 3).forEach((p, index) => {
     const card = document.createElement('div');
     card.className = 'card';
@@ -1183,24 +1215,19 @@ function renderCards() {
     if (index !== 0) card.style.opacity = '0.5';
     else card.style.boxShadow = "0 20px 50px -12px rgba(0,0,0,0.15)";
 
-    // Point 1 & 2: Badges on Image
     let badgesHtml = `<div class="match-badge">${p.score}% Uyğunluq</div>`;
     if (p.isBestSeller) badgesHtml += `<div class="badge-bestseller">🏆 Best Seller</div>`;
     if (p.isLowStock) badgesHtml += `<div class="badge-lowstock-fixed">⚠️ ${p.stockCount} ədəd qaldı</div>`;
 
-  // Inside renderCards()...
-    // Düzgün variant
-card.innerHTML = `
-  <div class="card-image-box">
-      <div class="swipe-overlay overlay-like">💚</div> 
-      <div class="swipe-overlay overlay-nope">✖️</div>  
-      ${badgesHtml} <img src="${fixImageLink(p.image)}" alt="${p.name}" draggable="false">
-  </div>
-      
+    card.innerHTML = `
+      <div class="card-image-box">
+          <div class="swipe-overlay overlay-like">💚</div> 
+          <div class="swipe-overlay overlay-nope">✖️</div>  
+          ${badgesHtml} <img src="${fixImageLink(p.image)}" alt="${p.name}" draggable="false">
+      </div>
       <div class="card-info">
         <h3>${p.name}</h3>
         <p class="card-desc-preview">${p.description || 'Ətraflı məlumat...'}</p>
-        
         <div class="card-footer">
           <div class="price-container">
             <span class="old-price">${p.oldPrice}₼</span>
@@ -1209,32 +1236,20 @@ card.innerHTML = `
                 <span class="discount-badge-small">🔥 -${p.discountPercent}% Endirim</span>
             </div>
           </div>
-
           <div class="swipe-instruction">
-             <div class="hint-text">
-                <span>Sağa: <b>AL</b></span>
-                <span>Sola: <b>KEÇ</b></span>
-             </div>
+             <div class="hint-text"><span>Sağa: <b>AL</b></span><span>Sola: <b>KEÇ</b></span></div>
              <div class="hand-icon">👆</div>
           </div>
-
         </div>
-      </div>
-    `;
-
-
+      </div>`;
     if (index === 0) initCardSwipe(card, p);
     container.appendChild(card);
   });
 }
 
-// --- CARD SWIPE LOGIC (FIXED POINT 8 + HELPER FUNCTIONS) ---
-// --- CARD SWIPE LOGIC (FIXED) ---
+// --- CARD SWIPE ---
 function initCardSwipe(card, product) {
-  let startX = 0, startY = 0;
-  let currentX = 0, currentY = 0;
-  let isDragging = false;
-  
+  let startX = 0, startY = 0, currentX = 0, currentY = 0, isDragging = false;
   const likeInd = card.querySelector('.overlay-like');
   const nopeInd = card.querySelector('.overlay-nope');
 
@@ -1242,11 +1257,7 @@ function initCardSwipe(card, product) {
     isDragging = true;
     startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-    
-    // ✅ FIX: Hər yeni toxunuşda köhnə koordinatları sıfırlayırıq
-    currentX = 0;
-    currentY = 0;
-
+    currentX = 0; currentY = 0;
     card.style.transition = 'none';
     addDocumentListeners();
   };
@@ -1255,28 +1266,17 @@ function initCardSwipe(card, product) {
     if (!isDragging) return;
     const x = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     const y = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-    
-    currentX = x - startX;
-    currentY = y - startY;
+    currentX = x - startX; currentY = y - startY;
 
-    // Şaquli (yuxarı-aşağı) hərəkət çoxdursa, kartı tərpətmə (Scroll-a icazə ver)
     if (Math.abs(currentX) > Math.abs(currentY)) {
         if(e.cancelable && e.type === 'touchmove') e.preventDefault(); 
         card.style.transform = `translate(${currentX}px, ${currentY / 5}px) rotate(${currentX / 15}deg)`;
-        
         const opacity = Math.min(1, Math.abs(currentX) / 80);
-        
         if (currentX > 0) { 
-            if(likeInd) {
-                likeInd.style.opacity = opacity; 
-                likeInd.style.transform = `translateY(-50%) scale(${0.5 + (opacity * 0.5)})`;
-            }
+            if(likeInd) { likeInd.style.opacity = opacity; likeInd.style.transform = `translateY(-50%) scale(${0.5 + (opacity * 0.5)})`; }
             if(nopeInd) nopeInd.style.opacity = 0; 
         } else { 
-            if(nopeInd) {
-                nopeInd.style.opacity = opacity;
-                nopeInd.style.transform = `translateY(-50%) scale(${0.5 + (opacity * 0.5)})`;
-            }
+            if(nopeInd) { nopeInd.style.opacity = opacity; nopeInd.style.transform = `translateY(-50%) scale(${0.5 + (opacity * 0.5)})`; }
             if(likeInd) likeInd.style.opacity = 0; 
         }
     }
@@ -1286,24 +1286,25 @@ function initCardSwipe(card, product) {
     if (!isDragging) return;
     isDragging = false;
     removeDocumentListeners();
-
     if(likeInd) likeInd.style.opacity = 0;
     if(nopeInd) nopeInd.style.opacity = 0;
 
-    // CLICK (Tap) -> Open Modal
-    // Kiçik tərpənişləri də (məs: 5-10px) klik kimi qəbul et
     if (Math.abs(currentX) < 10 && Math.abs(currentY) < 10) { 
       openModal(product, state.cardStack, state.cardStack.indexOf(product));
-      resetCard(); 
-      return; 
+      // LOG: Clicked Card
+      logUserAction("CardClick", product.name);
+      resetCard(); return; 
     }
 
-    // HORIZONTAL SWIPE
     if (Math.abs(currentX) > 100) {
       const dir = currentX > 0 ? 1 : -1;
       card.style.transition = 'transform 0.4s ease';
       card.style.transform = `translate(${dir * window.innerWidth * 1.5}px, 0px) rotate(${dir * 30}deg)`;
       
+      // LOG: Swiped Card
+      const action = dir === 1 ? "SwipeRight (Like)" : "SwipeLeft (Nope)";
+      logUserAction(action, product.name);
+
       setTimeout(() => {
         card.remove();
         state.cardStack.shift();
@@ -1315,103 +1316,54 @@ function initCardSwipe(card, product) {
     }
   };
 
-  function resetCard() {
-      card.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
-      card.style.transform = 'translate(0px, 0px) rotate(0deg)';
-      // ✅ FIX: Vizual reset zamanı dəyişənləri də sıfırlayırıq (ehtiyat üçün)
-      currentX = 0; 
-      currentY = 0;
-  }
-
-  function addDocumentListeners() {
-    document.addEventListener('mousemove', onMove); 
-    document.addEventListener('mouseup', onEnd);
-    document.addEventListener('touchmove', onMove, {passive: false}); 
-    document.addEventListener('touchend', onEnd);
-  }
-
-  function removeDocumentListeners() {
-    document.removeEventListener('mousemove', onMove); 
-    document.removeEventListener('mouseup', onEnd);
-    document.removeEventListener('touchmove', onMove); 
-    document.removeEventListener('touchend', onEnd);
-  }
+  function resetCard() { card.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)'; card.style.transform = 'translate(0px, 0px) rotate(0deg)'; currentX = 0; currentY = 0; }
+  function addDocumentListeners() { document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onEnd); document.addEventListener('touchmove', onMove, {passive: false}); document.addEventListener('touchend', onEnd); }
+  function removeDocumentListeners() { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onEnd); document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onEnd); }
 
   card.addEventListener('mousedown', onStart); 
   card.addEventListener('touchstart', onStart, {passive: false}); 
 }
 
-// --- GLOBAL BACK SWIPE (POINT 3) ---
+// --- GLOBAL BACK SWIPE ---
 function initGlobalSwipe() {
     let startX = 0;
-    document.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
-    }, {passive: true});
-
+    document.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, {passive: true});
     document.addEventListener('touchend', (e) => {
         const endX = e.changedTouches[0].clientX;
         if (startX < 30 && (endX - startX > 100)) {
             const modal = document.querySelector('.modal.active');
-            if (modal) {
-                if(modal.id === 'product-modal') closeModal();
-                else closeAboutModal();
-            } else {
-                goBack();
-            }
+            if (modal) { if(modal.id === 'product-modal') closeModal(); else closeAboutModal(); } 
+            else { goBack(); }
         }
     }, {passive: true});
 }
 
-// --- NOTIFICATION SWIPE (POINT 4) ---
 function initNotificationSwipe() {
     const toast = document.getElementById('notif-toast');
     let startY = 0;
     toast.addEventListener('touchstart', (e) => startY = e.touches[0].clientY, {passive: true});
-    toast.addEventListener('touchend', (e) => {
-        if (startY - e.changedTouches[0].clientY > 30) { 
-            toast.classList.remove('show');
-        }
-    }, {passive: true});
+    toast.addEventListener('touchend', (e) => { if (startY - e.changedTouches[0].clientY > 30) { toast.classList.remove('show'); } }, {passive: true});
 }
 
-// --- FULL MODAL SWIPE (POINT 5) ---
 function initModalSwipe() {
     const modal = document.getElementById('product-modal');
     let startX = 0, startY = 0;
-
-    modal.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-    }, {passive: true});
-
+    modal.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; }, {passive: true});
     modal.addEventListener('touchend', (e) => {
-        const endX = e.changedTouches[0].clientX;
-        const endY = e.changedTouches[0].clientY;
-        const diffX = startX - endX;
-        const diffY = startY - endY;
-
+        const endX = e.changedTouches[0].clientX; const endY = e.changedTouches[0].clientY;
+        const diffX = startX - endX; const diffY = startY - endY;
         if (Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY)) {
-            if (diffX > 0) showNextModalProduct(); 
-            else showPrevModalProduct(); 
+            if (diffX > 0) showNextModalProduct(); else showPrevModalProduct(); 
         }
     }, {passive: true});
 }
 
-function showNextModalProduct() {
-    if (currentModalIndex < currentModalSource.length - 1) {
-        openModal(currentModalSource[currentModalIndex + 1], currentModalSource, currentModalIndex + 1);
-    }
-}
-function showPrevModalProduct() {
-    if (currentModalIndex > 0) {
-        openModal(currentModalSource[currentModalIndex - 1], currentModalSource, currentModalIndex - 1);
-    }
-}
+function showNextModalProduct() { if (currentModalIndex < currentModalSource.length - 1) { openModal(currentModalSource[currentModalIndex + 1], currentModalSource, currentModalIndex + 1); } }
+function showPrevModalProduct() { if (currentModalIndex > 0) { openModal(currentModalSource[currentModalIndex - 1], currentModalSource, currentModalIndex - 1); } }
 
 // --- MODAL & REVIEWS ---
 function openModal(p, sourceList = [], index = -1) {
   state.viewedProductCount++;
-  // POINT 6: Delayed Discount
   if (state.viewedProductCount >= 3) activateGlobalDiscount();
 
   currentModalSource = sourceList.length ? sourceList : state.products;
@@ -1420,10 +1372,8 @@ function openModal(p, sourceList = [], index = -1) {
   document.getElementById('modal-img').src = fixImageLink(p.image);
   document.getElementById('modal-title').textContent = p.name || "Premium Eksklüziv";
   document.getElementById('modal-desc').textContent = p.description || "Bəzən ən yaxşı seçim, gözlənilməz olandır.!";
-  // POINT 7: Show Match %
   document.getElementById('modal-match-score').textContent = (p.score || "90") + "% UYĞUNLUQ";
 
-  // Price
   document.getElementById('modal-price').innerHTML = `
     <span style="text-decoration:line-through;color:#999;font-size:18px;margin-right:10px;">${p.oldPrice}₼</span>
     <span style="color:#c21a1a;font-weight:800;font-size:26px;">${p.price} AZN</span>
@@ -1431,56 +1381,34 @@ function openModal(p, sourceList = [], index = -1) {
   `;
   document.getElementById('modal-desc').textContent = p.description;
   
-  // Show fear bar in modal if active
-  if(state.viewedProductCount >= 3) {
-      document.getElementById('fear-bar-modal').style.display = 'block';
-  }
-
-  // REVIEWS: Fix -> Only fetch for THIS product name
+  if(state.viewedProductCount >= 3) { document.getElementById('fear-bar-modal').style.display = 'block'; }
   fetchReviews(p.name);
-
   document.getElementById('modal-whatsapp-btn').onclick = () => redirectToWhatsApp(p);
   document.getElementById('product-modal').classList.add('active');
   
+  logUserAction("OpenModal", p.name, `${p.price} AZN`); // LOG
   initModalSwipe(); 
 }
 
 function closeModal() { document.getElementById('product-modal').classList.remove('active'); }
 
-// --- REVIEW SYSTEM (POINT 10 & 11) ---
 async function fetchReviews(productName) {
     const list = document.getElementById('reviews-list');
     list.innerHTML = '<p style="color:#999;font-size:12px;">Rəylər yüklənir...</p>';
-
-    // IMPORTANT: Clear previous reviews first to avoid mixing
-    
-    if (reviewsCache[productName]) {
-        renderReviews(reviewsCache[productName]);
-        return;
-    }
-
+    if (reviewsCache[productName]) { renderReviews(reviewsCache[productName]); return; }
     try {
-        // Sends request to backend. Make sure your GAS handles 'action=getReviews'
         const res = await fetch(`${SHEETS_ENDPOINT}?action=getReviews&product=${encodeURIComponent(productName)}`);
         const data = await res.json();
-        
-        // Filter reviews just in case backend sends all
         const filteredReviews = (data.reviews || []).filter(r => r.product === productName);
-        
         reviewsCache[productName] = filteredReviews;
         renderReviews(filteredReviews);
-    } catch(e) {
-        list.innerHTML = '<p style="color:#999;font-size:12px;">Rəy yoxdur.</p>'; 
-    }
+    } catch(e) { list.innerHTML = '<p style="color:#999;font-size:12px;">Rəy yoxdur.</p>'; }
 }
 
 function renderReviews(reviews) {
     const list = document.getElementById('reviews-list');
-    list.innerHTML = ''; // Clear loading text
-    if(reviews.length === 0) {
-        list.innerHTML = '<p style="color:#999;font-size:12px;">Hələ ki rəy yoxdur. İlk rəyi sən yaz! 👇</p>';
-        return;
-    }
+    list.innerHTML = ''; 
+    if(reviews.length === 0) { list.innerHTML = '<p style="color:#999;font-size:12px;">Hələ ki rəy yoxdur. İlk rəyi sən yaz! 👇</p>'; return; }
     reviews.forEach(r => {
         const el = document.createElement('div');
         el.className = 'comment-box';
@@ -1492,8 +1420,7 @@ function renderReviews(reviews) {
                     <span class="u-name">${r.name} <span style="color:#FFD700;font-size:10px;">${stars}</span></span>
                     <p class="u-comment">${r.comment}</p>
                 </div>
-            </div>
-        `;
+            </div>`;
         list.appendChild(el);
     });
 }
@@ -1501,56 +1428,32 @@ function renderReviews(reviews) {
 function toggleReviewForm() {
     const form = document.getElementById('review-form');
     form.classList.toggle('active');
-    
-    // Auto scroll to form if opening
-    if (form.classList.contains('active')) {
-        setTimeout(() => {
-            form.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
-    }
-
+    if (form.classList.contains('active')) { setTimeout(() => { form.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }
     document.querySelectorAll('.star-opt').forEach(s => {
-        s.onclick = function() {
-            currentReviewRating = this.getAttribute('data-v');
-            updateStars(currentReviewRating);
-        }
+        s.onclick = function() { currentReviewRating = this.getAttribute('data-v'); updateStars(currentReviewRating); }
     });
 }
 
-function updateStars(val) {
-    document.querySelectorAll('.star-opt').forEach(s => {
-        s.classList.toggle('selected', s.getAttribute('data-v') <= val);
-    });
-}
+function updateStars(val) { document.querySelectorAll('.star-opt').forEach(s => { s.classList.toggle('selected', s.getAttribute('data-v') <= val); }); }
 
 function submitReview() {
     const name = document.getElementById('rev-name').value;
     const msg = document.getElementById('rev-msg').value;
     const pName = document.getElementById('modal-title').textContent;
-
-    if(!name || !msg || currentReviewRating == 0) {
-        alert("Zəhmət olmasa bütün xanaları doldurun və ulduz seçin.");
-        return;
-    }
-
-    // Optimistic Update
+    if(!name || !msg || currentReviewRating == 0) { alert("Zəhmət olmasa bütün xanaları doldurun."); return; }
     const newRev = { name: name, comment: msg, rating: currentReviewRating, product: pName };
     if(!reviewsCache[pName]) reviewsCache[pName] = [];
     reviewsCache[pName].unshift(newRev);
     renderReviews(reviewsCache[pName]);
     toggleReviewForm();
+    
+    // LOG: Written Review
+    logUserAction("Review", pName, `${currentReviewRating} Stars`);
 
-    // Send to Sheet (Ensures sheet='Review' handling in backend)
     fetch(SHEETS_ENDPOINT, {
         method: 'POST', mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            type: 'review',
-            product: pName,
-            name: name,
-            comment: msg,
-            rating: currentReviewRating
-        })
+        body: JSON.stringify({ type: 'review', product: pName, name: name, comment: msg, rating: currentReviewRating })
     });
 }
 
@@ -1565,20 +1468,16 @@ function activateGlobalDiscount() {
     if (isTimerActive) return; 
     isTimerActive = true;
     document.getElementById('fear-bar-main').classList.remove('hidden');
-    
     globalTimerInterval = setInterval(() => {
         secondsLeftInStep--;
         updateDiscountProgressUI();
-
         if (secondsLeftInStep <= 0) {
             secondsLeftInStep = 30; 
             if (globalDiscount > 0) {
                 globalDiscount = Math.max(0, globalDiscount - discountStep);
                 globalDiscount = Math.round(globalDiscount * 100) / 100;
                 triggerDropEffect(); 
-            } else {
-                 clearInterval(globalTimerInterval);
-            }
+            } else { clearInterval(globalTimerInterval); }
         }
         updateDiscountTextUI();
     }, 1000);
@@ -1588,7 +1487,6 @@ function updateDiscountTextUI() {
     const formattedPrice = `-${globalDiscount.toFixed(2)} ₼`;
     const gsAmount = document.getElementById('gs-amount');
     const msAmount = document.getElementById('modal-fear-amount');
-    
     if(gsAmount) gsAmount.textContent = formattedPrice;
     if(msAmount) msAmount.textContent = formattedPrice;
 }
@@ -1597,19 +1495,13 @@ function updateDiscountProgressUI() {
     const percent = (secondsLeftInStep / 30) * 100;
     const gsFill = document.getElementById('gs-timer-fill');
     const msFill = document.getElementById('modal-timer-fill');
-    
     if(gsFill) gsFill.style.width = `${percent}%`;
     if(msFill) msFill.style.width = `${percent}%`;
 }
 
 function triggerDropEffect() {
     const els = [document.getElementById('gs-amount'), document.getElementById('modal-fear-amount')];
-    els.forEach(el => {
-        if(el) {
-            el.classList.add('shake-it');
-            setTimeout(() => el.classList.remove('shake-it'), 500);
-        }
-    });
+    els.forEach(el => { if(el) { el.classList.add('shake-it'); setTimeout(() => el.classList.remove('shake-it'), 500); } });
 }
 
 // --- ORDER NOTIFICATIONS ---
@@ -1619,11 +1511,9 @@ function startOrderNotifications() {
         const order = state.orders[Math.floor(Math.random() * state.orders.length)];
         const phone = order.phone || "555555555";
         const maskedPhone = `*******${phone.slice(-2)}`;
-        
         const toast = document.getElementById('notif-toast');
         document.getElementById('notif-user').textContent = `${maskedPhone} nömrəsi indicə aldı:`;
         document.getElementById('notif-product').textContent = order.product;
-        
         toast.classList.add('show');
         setTimeout(() => { toast.classList.remove('show'); }, 9000);
     }, 40000); 
@@ -1632,66 +1522,30 @@ function startOrderNotifications() {
 // --- ALL PRODUCTS GRID ---
 async function openAllProducts() {
   document.getElementById('all-products-view').classList.add('active');
-  logUserAction('ViewAllProducts');
+  logUserAction('ViewAllProducts', 'Mall Tab'); // LOG
 
-  // Case 1: Data is already loaded (User finished wizard or visited Mall before)
-  if (state.products.length > 0) { 
-    renderGrid(); 
-    return; 
-  }
-
-  // Case 2: Data is empty. Show loading and Fetch data now!
+  if (state.products.length > 0) { renderGrid(); return; }
   const container = document.getElementById('all-products-grid');
-  container.innerHTML = `
-    <div style="grid-column: span 2; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px; color: #888;">
-        <div style="font-size: 40px; margin-bottom: 10px; animation: pulseGlow 1.5s infinite;">🪄</div>
-        <p>Məhsullar yüklənir...</p>
-    </div>
-  `;
+  container.innerHTML = `<div style="grid-column: span 2; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px; color: #888;"><div style="font-size: 40px; margin-bottom: 10px; animation: pulseGlow 1.5s infinite;">🪄</div><p>Məhsullar yüklənir...</p></div>`;
 
   try {
-    // 1. Fetch Data
-    const [prodRes, orderRes] = await Promise.all([
-      fetch(`${SHEETS_ENDPOINT}?action=getProducts`),
-      fetch(`${SHEETS_ENDPOINT}?action=getOrders`)
-    ]);
-
+    const [prodRes, orderRes] = await Promise.all([ fetch(`${SHEETS_ENDPOINT}?action=getProducts`), fetch(`${SHEETS_ENDPOINT}?action=getOrders`) ]);
     const prodData = await prodRes.json();
     const orderData = await orderRes.json();
 
-    // 2. Process Data (Same logic as in fetchProducts)
     let rawProducts = shuffleArray(prodData.products || []);
-    
     state.products = rawProducts.map(p => {
-        // Apply random discounts and stock logic
         const randomDisc = Math.floor(Math.random() * (35 - 20 + 1)) + 20; 
         const oldPriceVal = (parseFloat(p.price) / (1 - (randomDisc / 100))).toFixed(0);
-        
         const isStockLow = Math.random() < 0.3;
         const stockCount = isStockLow ? Math.floor(Math.random() * 5) + 1 : null;
-
-        return {
-            ...p,
-            discountPercent: randomDisc,
-            oldPrice: oldPriceVal,
-            isLowStock: isStockLow,
-            stockCount: stockCount
-        };
+        return { ...p, discountPercent: randomDisc, oldPrice: oldPriceVal, isLowStock: isStockLow, stockCount: stockCount };
     });
-
     state.orders = orderData.orders || [];
-    
-    // 3. Apply Badges and Start Notifications
     applyBadges(state.products);
     startOrderNotifications();
-
-    // 4. Finally Render
     renderGrid();
-
-  } catch (error) {
-    console.error(error);
-    container.innerHTML = '<div style="grid-column: span 2; text-align:center; padding:20px;">Xəta: İnternet əlaqəsini yoxlayın.</div>';
-  }
+  } catch (error) { console.error(error); container.innerHTML = '<div style="grid-column: span 2; text-align:center; padding:20px;">Xəta: İnternet əlaqəsini yoxlayın.</div>'; }
 }
   
 function renderGrid() {
@@ -1700,139 +1554,87 @@ function renderGrid() {
   state.products.slice(0, gridLimit).forEach(p => {
     const el = document.createElement('div');
     el.className = 'grid-item';
-    el.onclick = () => openModal(p, state.products, state.products.indexOf(p));
+    el.onclick = () => {
+        openModal(p, state.products, state.products.indexOf(p));
+        logUserAction("GridClick", p.name); // LOG
+    };
     
-    // Grid Badges
     let badge = "";
     if (p.isBestSeller) badge = `<div class="badge-bestseller" style="top:5px; left:5px; font-size:10px;">🏆 Best</div>`;
-    // Point 1: Fixed Low Stock in Grid (on image)
     else if (p.isLowStock) badge = `<div class="badge-lowstock-fixed" style="bottom:5px; left:5px; font-size:10px;">⚠️ ${p.stockCount} qaldı</div>`;
 
-    el.innerHTML = `
-        ${badge}
-        <img src="${fixImageLink(p.image)}" loading="lazy">
-        <div class="grid-info">
-            <div class="grid-title">${p.name}</div>
-            <div class="grid-price-box">
-                <span class="grid-old-price">${p.oldPrice} AZN</span>
-                <span class="grid-new-price">${p.price} AZN <span style="color:#2ecc71; font-size:10px;">(-${p.discountPercent}%)</span></span>
-            </div>
-        </div>`;
+    el.innerHTML = `${badge}<img src="${fixImageLink(p.image)}" loading="lazy"><div class="grid-info"><div class="grid-title">${p.name}</div><div class="grid-price-box"><span class="grid-old-price">${p.oldPrice} AZN</span><span class="grid-new-price">${p.price} AZN <span style="color:#2ecc71; font-size:10px;">(-${p.discountPercent}%)</span></span></div></div>`;
     container.appendChild(el);
   });
   document.getElementById('load-more-btn').style.display = (gridLimit >= state.products.length) ? 'none' : 'block';
 }
-function loadMoreGrid() { gridLimit += 6; renderGrid(); logUserAction('LoadMoreProducts'); }
+function loadMoreGrid() { 
+    gridLimit += 6; 
+    renderGrid(); 
+    logUserAction('LoadMoreProducts'); 
+}
 
 // --- UTILS ---
 function fixImageLink(url) {
   if (!url) return 'https://via.placeholder.com/300?text=No+Image';
-  if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
-    const idMatch = url.match(/[-\w]{25,}/);
-    if (idMatch) return `https://googleusercontent.com/profile/picture/0${idMatch[0]}`;
-  }
-  if (url.includes('github.com') && url.includes('/blob/')) {
-    return url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
-  }
+  if (url.includes('drive.google.com') || url.includes('docs.google.com')) { const idMatch = url.match(/[-\w]{25,}/); if (idMatch) return `https://googleusercontent.com/profile/picture/0${idMatch[0]}`; }
+  if (url.includes('github.com') && url.includes('/blob/')) { return url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/'); }
   return url;
 }
 
 function redirectToWhatsApp(p) {
-  logUserAction('Buy_WhatsApp', p.name);
+  // LOG: Purchase Intent
+  logUserAction('Buy_WhatsApp', p.name, `${p.price} AZN`);
+  
   const finalPrice = Math.max(0, p.price - globalDiscount).toFixed(2);
   const discountVal = globalDiscount.toFixed(2);
-  
   let priceText = `${p.price} AZN`;
-  if (globalDiscount > 0) {
-    priceText = `${p.price} AZN (Endirimlə: ${p.oldPrice} ₼ yox)\n🔥 Əlavə Bonus Endirim: -${discountVal} AZN\n✅ YEKUN: ${finalPrice} AZN`;
-  }
+  if (globalDiscount > 0) { priceText = `${p.price} AZN (Endirimlə: ${p.oldPrice} ₼ yox)\n🔥 Əlavə Bonus Endirim: -${discountVal} AZN\n✅ YEKUN: ${finalPrice} AZN`; }
   
   const text = `Salam Brendimo! 🎁\n\nBu məhsulu bəyəndim:\n*${p.name}*\n${priceText}\n\nLink:\n${fixImageLink(p.image)}\n\nSifariş etmək istəyirəm.`;
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
   setTimeout(() => window.location.href = url, 100); 
 }
 
-function logUserAction(action, details = '') {
-  fetch(SHEETS_ENDPOINT, {
-    method: 'POST', mode: 'no-cors', keepalive: true,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'log', action: action, details: details })
-  }).catch(e => console.log(e));
-}
+function initTracking() { logUserAction('AppOpen'); }
 
 function restartApp() {
-    // 1. Reset the step counter to the beginning
   if (globalTimerInterval) clearInterval(globalTimerInterval);
-    isTimerActive = false;
-  
+  isTimerActive = false;
   currentStep = 0;
-
-    // 2. Clear the user's previous selections
-    state.who = null;
-    state.occasion = null;
-    state.mood = null;
-    state.style = null;
-    state.budget = null;
-    state.cardStack = []; // Clear the stack so it regenerates next time
-
-    // 3. Close any open modals or views (just in case)
-    closeModal();
-    closeAboutModal();
-    document.getElementById('all-products-view').classList.remove('active');
-    
-    // 4. Force the UI to update to Step 0
-    updateUI();
+  state.who = null; state.occasion = null; state.mood = null; state.style = null; state.budget = null; state.cardStack = [];
+  closeModal(); closeAboutModal();
+  document.getElementById('all-products-view').classList.remove('active');
+  logUserAction("Restart");
+  updateUI();
 }
 
 function handleNavClick(tab) {
-  // 1. Update the visual active state of the buttons
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.getElementById(`nav-${tab}`).classList.add('active');
+  
+  logUserAction("NavClick", tab); // LOG
 
-  // 2. Handle specific tab logic
   if (tab === 'wizard') {
-    // Close the "All Products" view if it's open
     document.getElementById('all-products-view').classList.remove('active');
-    
-    // RESET TO STEP 0
     restartApp(); 
   } 
   else if (tab === 'mall') {
     openAllProducts();
-    // Hide the close button inside the mall since we are using the nav bar to switch
     const closeBtn = document.getElementById('all-products-close');
     if(closeBtn) closeBtn.style.display = 'none';
   } 
   else if (tab === 'chat') {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank');
-    // Snap back to the previous tab after a delay so 'Chat' doesn't stay highlighted
-    setTimeout(() => {
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        if(document.getElementById('all-products-view').classList.contains('active')) {
-            document.getElementById('nav-mall').classList.add('active');
-        } else {
-            document.getElementById('nav-wizard').classList.add('active');
-        }
-    }, 500);
+    setTimeout(() => { document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); if(document.getElementById('all-products-view').classList.contains('active')) { document.getElementById('nav-mall').classList.add('active'); } else { document.getElementById('nav-wizard').classList.add('active'); } }, 500);
   } 
   else if (tab === 'wheel') {
     window.open('https://brendimo-co.github.io/sanscarxi/', '_blank');
-    // Snap back logic
-    setTimeout(() => {
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        if(document.getElementById('all-products-view').classList.contains('active')) {
-            document.getElementById('nav-mall').classList.add('active');
-        } else {
-            document.getElementById('nav-wizard').classList.add('active');
-        }
-    }, 500);
+    setTimeout(() => { document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); if(document.getElementById('all-products-view').classList.contains('active')) { document.getElementById('nav-mall').classList.add('active'); } else { document.getElementById('nav-wizard').classList.add('active'); } }, 500);
   }
-  else if (tab === 'vip') {
-    window.location.href = 'vipaccount.html';
-  }
+  else if (tab === 'vip') { window.location.href = 'vipaccount.html'; }
 }
 
-// STORIES DATA - FULL RESTORED LIST
 const storiesData = [
   { id: 1, title: 'Müştərilər', thumb: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop', content: 'https://github.com/Brendimo-co/sehrbaz/blob/main/memnun.png?raw=true&fit=crop', type: 'story' },
   { id: 'about', title: 'Biz Kimik?', thumb: 'https://cdn-icons-png.flaticon.com/512/189/189664.png', type: 'action', action: openAboutModal },
@@ -1861,6 +1663,7 @@ function handleStoryClick(index) {
   if (story.type === 'action') story.action();
   else if (story.type === 'link') window.open(story.url, '_blank');
   else openStoryViewer(index);
+  logUserAction("StoryView", story.title);
 }
 
 let activeStoryIndex = -1; let storyTimer = null; const STORY_DURATION = 5000;
@@ -1887,11 +1690,9 @@ function renderProgressBars() {
 function loadStoryContent(index) {
   const story = storiesData[index];
   if (!story || story.type !== 'story') { closeStory(); return; }
-
   document.getElementById('sv-image').src = story.content;
   document.getElementById('sv-name').textContent = story.title;
   document.getElementById('sv-avatar').src = story.thumb;
-
   resetBars(index);
   startProgressBar(story.id);
 }
@@ -1900,14 +1701,9 @@ function startProgressBar(storyId) {
   if (storyTimer) clearInterval(storyTimer);
   const fill = document.getElementById(`prog-${storyId}`);
   if(!fill) return;
-
   fill.style.transition = 'none';
   fill.style.width = '0%';
-  setTimeout(() => {
-    fill.style.transition = `width ${STORY_DURATION}ms linear`;
-    fill.style.width = '100%';
-  }, 50);
-
+  setTimeout(() => { fill.style.transition = `width ${STORY_DURATION}ms linear`; fill.style.width = '100%'; }, 50);
   storyTimer = setTimeout(() => { nextStory(); }, STORY_DURATION);
 }
 
@@ -1915,30 +1711,16 @@ function resetBars(currentIndex) {
   const storyItems = storiesData.filter(s => s.type === 'story');
   const currentStoryObj = storiesData[currentIndex];
   const relativeIndex = storyItems.findIndex(s => s.id === currentStoryObj.id);
-
   storyItems.forEach((s, i) => {
     const fill = document.getElementById(`prog-${s.id}`);
-    if (fill) {
-      fill.style.transition = 'none';
-      if (i < relativeIndex) fill.style.width = '100%'; 
-      else fill.style.width = '0%'; 
-    }
+    if (fill) { fill.style.transition = 'none'; if (i < relativeIndex) fill.style.width = '100%'; else fill.style.width = '0%'; }
   });
 }
 
 function nextStory() {
   let nextIndex = activeStoryIndex + 1;
-  // Ensure we don't go past the array length
-  while (nextIndex < storiesData.length && storiesData[nextIndex].type !== 'story') { 
-      nextIndex++; 
-  }
-  
-  if (nextIndex < storiesData.length) { 
-      loadStoryContent(nextIndex); 
-      activeStoryIndex = nextIndex; 
-  } else { 
-      closeStory(); 
-  }
+  while (nextIndex < storiesData.length && storiesData[nextIndex].type !== 'story') { nextIndex++; }
+  if (nextIndex < storiesData.length) { loadStoryContent(nextIndex); activeStoryIndex = nextIndex; } else { closeStory(); }
 }
 
 function prevStory() {
@@ -1953,9 +1735,7 @@ function closeStory() {
   if (storyTimer) clearInterval(storyTimer);
 }
 
-// --- TRACKING ---
-function initTracking() { logUserAction('Start'); }
-function openAboutModal() { document.getElementById('about-modal').classList.add('active'); }
+function openAboutModal() { document.getElementById('about-modal').classList.add('active'); logUserAction("AboutModal"); }
 function closeAboutModal() { document.getElementById('about-modal').classList.remove('active'); }
 
 init();
