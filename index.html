@@ -9,7 +9,7 @@
 <meta property="og:description" content="Hədiyyə axtarışından yorulmusan? 30 saniyəyə ideal hədiyyəni tap!">
 <meta property="og:image" content="https://github.com/Brendimo-co/sehrbaz/blob/main/Gemini_Generated_Image_hzsbephzsbephzsb.png?raw=true">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* --- CSS STYLES --- */
 
@@ -19,6 +19,7 @@ body {
   background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; display: flex; flex-direction: column; 
   /* Padding for Bottom Nav */
   padding-bottom: 70px; 
+  overscroll-behavior-y: none; /* Prevent pull-to-refresh */
 }
 
 /* LAYOUT */
@@ -29,7 +30,7 @@ body {
 
 /* HEADER */
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; height: 40px; }
-.back-btn { font-size: 14px; color: #777; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; }
+.back-btn { font-size: 14px; color: #777; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; z-index: 50; }
 .logo { font-size: 20px; font-weight: 800; color: #c21a1a; letter-spacing: -0.5px; cursor: pointer; }
 .step-indicator { font-size: 12px; color: #999; font-weight: 600; background: #eee; padding: 4px 8px; border-radius: 12px; }
 
@@ -40,14 +41,15 @@ body {
   left: 0;
   width: 100%;
   height: 65px;
-  background: white;
+  background: rgba(255, 255, 255, 0.95); /* Blur effect */
+  backdrop-filter: blur(10px);
   border-top: 1px solid #f0f0f0;
   display: flex;
   justify-content: space-around;
   align-items: center;
   z-index: 150; /* Above cards, below modals */
   padding-bottom: 5px; /* iOS Safe Area adjustment */
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.02);
 }
 
 .nav-item {
@@ -64,6 +66,7 @@ body {
 
 .nav-item.active {
   color: #c21a1a;
+  transform: translateY(-2px);
 }
 
 .nav-icon {
@@ -190,27 +193,42 @@ body {
 .step-content.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.title { font-size: 24px; font-weight: 700; margin-bottom: 24px; text-align: center; line-height: 1.3; }
+.title { font-size: 22px; font-weight: 800; margin-bottom: 24px; text-align: center; line-height: 1.3; color: #111; letter-spacing: -0.5px; }
 
-/* OPTIONS GRID */
-.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+/* OPTIONS GRID - NEW PREMIUM STYLE */
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .option-card {
-  background: white; border: 2px solid #f0f0f0; border-radius: 16px; padding: 20px 10px;
-  text-align: center; cursor: pointer; transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  background: white; 
+  border: 1px solid #eaeaea; 
+  border-radius: 20px; 
+  padding: 24px 15px;
+  text-align: center; 
+  cursor: pointer; 
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  position: relative;
+  overflow: hidden;
 }
-.option-card:active { transform: scale(0.96); border-color: #c21a1a; background: #fffcfc; }
-.option-icon { font-size: 32px; margin-bottom: 8px; display: block; }
-.option-text { font-size: 15px; font-weight: 600; color: #333; }
+/* Gradient overlay on hover/active for premium feel */
+.option-card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(194, 26, 26, 0.05) 100%);
+    opacity: 0; transition: opacity 0.3s;
+}
+.option-card:active { transform: scale(0.96); border-color: #c21a1a; box-shadow: 0 2px 8px rgba(194, 26, 26, 0.1); }
+.option-card:active::before { opacity: 1; }
+
+.option-icon { font-size: 36px; margin-bottom: 12px; display: block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+.option-text { font-size: 14px; font-weight: 700; color: #333; line-height: 1.4; }
 
 /* CARDS STACK */
 /* Update #cards-wrapper */
 #cards-wrapper { 
   position: relative; 
   width: 100%; 
-  height: 65vh; 
-  max-height: 600px; 
-  min-height: 450px;
+  height: 60vh; 
+  max-height: 580px; 
+  min-height: 420px;
   margin-top: 10px; 
   perspective: 1000px; 
   /* Prevent scrolling on the wrapper area */
@@ -222,7 +240,7 @@ body {
 .card {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
   background: #ffffff; border-radius: 28px; 
-  box-shadow: 0 20px 50px -12px rgba(0,0,0,0.1);
+  box-shadow: 0 15px 40px -10px rgba(0,0,0,0.12);
   overflow: hidden; 
   transform-origin: 50% 100%; 
   will-change: transform; 
@@ -247,6 +265,7 @@ body {
   height: 100%; 
   object-fit: cover; 
   display: block;
+  pointer-events: none; /* Prevent drag issues */
 }
 
 /* 2. The Stamps (Floating Labels) */
@@ -271,8 +290,8 @@ body {
 /* 3. Specific Styles for Like (Green) */
 .overlay-like {
   left: 40px;
-  color: #4CAF50;
-  border-color: #4CAF50;
+  color: #2ecc71;
+  border-color: #2ecc71;
   transform: rotate(-20deg);
 }
 
@@ -284,21 +303,22 @@ body {
   transform: rotate(20deg);
 }
 
-/* BADGES */
+/* BADGES - FIXED (Point 1 & 2) */
 .match-badge {
-  position: absolute; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.9);
+  position: absolute; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.95);
   color: #c21a1a; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 800;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08); backdrop-filter: blur(4px); z-index: 2;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); backdrop-filter: blur(4px); z-index: 2;
 }
 .badge-bestseller {
   position: absolute; top: 12px; left: 12px; background: #FFD700; color: #000;
   padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 800;
   box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 3; display: flex; align-items: center; gap: 4px;
 }
-.badge-lowstock {
-  position: absolute; bottom: 12px; left: 12px; background: #c21a1a; color: white;
-  padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 700;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15); z-index: 3;
+/* New Fixed Low Stock Badge - On Image */
+.badge-lowstock-fixed {
+  position: absolute; bottom: 12px; left: 12px; background: rgba(194, 26, 26, 0.9); color: white;
+  padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 3; backdrop-filter: blur(2px);
 }
 
 .card-info { flex: 1; padding: 16px 8px 8px 8px; display: flex; flex-direction: column; justify-content: flex-end; }
@@ -311,12 +331,10 @@ body {
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
-.price-tag { font-size: 26px; font-weight: 800; color: #1a1a1a; letter-spacing: -1px; }
-.price-currency { font-size: 16px; font-weight: 600; color: #999; margin-left: 4px; }
 .swipe-hint {
   width: 40px; height: 40px; background: #1a1a1a; border-radius: 50%;
   display: flex; align-items: center; justify-content: center; color: white;
-  font-size: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  font-size: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer;
 }
 
 /* --- THE COOL FEAR-INDUCING DISCOUNT BAR --- */
@@ -354,14 +372,14 @@ body {
     40%, 60% { transform: translate3d(4px, 0, 0); }
 }
 
-/* NOTIFICATION TOAST */
+/* NOTIFICATION TOAST (SWIPEABLE) */
 .notif-toast {
-    position: fixed; top: 15px; left: 50%; transform: translateX(-50%) translateY(-100px);
+    position: fixed; top: 15px; left: 50%; transform: translateX(-50%) translateY(-150px);
     background: white; border-radius: 30px; padding: 8px 16px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15); z-index: 999;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 999;
     display: flex; align-items: center; gap: 10px; min-width: 280px;
     transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 1px solid #eee;
+    border: 1px solid #eee; touch-action: none; /* For swipe up to dismiss */
 }
 .notif-toast.show { transform: translateX(-50%) translateY(0); }
 .notif-icon { width: 32px; height: 32px; background: #e0f2fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
@@ -369,20 +387,43 @@ body {
 .notif-title { font-size: 11px; color: #888; font-weight: 600; }
 .notif-desc { font-size: 13px; font-weight: 700; color: #333; }
 
-/* MODAL */
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; padding: 24px; overflow-y: auto; display: none; padding-bottom: 80px; }
+/* MODAL & REVIEWS (INSTAGRAM STYLE) */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; display: none; padding-bottom: 0; }
 .modal.active { display: block; animation: slideUp 0.3s ease; }
+.modal-content-scroll { height: 100%; overflow-y: auto; padding: 20px 20px 100px 20px; overscroll-behavior-y: contain; }
+
+.review-section { margin-top: 30px; border-top: 1px solid #f0f0f0; padding-top: 20px; }
+.review-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.review-stats { display: flex; align-items: center; gap: 5px; }
+.star-icon { color: #FFD700; font-size: 14px; }
+.comment-box { background: #f9f9f9; border-radius: 12px; padding: 12px; margin-bottom: 15px; }
+.comment-user { display: flex; gap: 10px; margin-bottom: 8px; }
+.user-avatar { width: 30px; height: 30px; border-radius: 50%; background: #ddd; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #555; }
+.user-text { flex: 1; }
+.u-name { font-size: 12px; font-weight: 700; display: block; }
+.u-comment { font-size: 13px; color: #333; line-height: 1.4; }
+.add-review-btn { color: #c21a1a; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+/* INPUT FORM FOR REVIEW */
+.review-form { display: none; margin-top: 10px; background: #fff; border: 1px solid #eee; padding: 15px; border-radius: 12px; }
+.review-form.active { display: block; }
+.form-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; font-size: 14px; }
+.star-select { display: flex; gap: 5px; margin-bottom: 10px; cursor: pointer; }
+.star-opt { font-size: 20px; color: #ddd; }
+.star-opt.selected { color: #FFD700; }
 
 /* ALL PRODUCTS GRID */
 /* Adjusted z-index to sit below navbar but above content */
 .all-products-view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fafafa; z-index: 100; overflow-y: auto; padding: 20px; padding-bottom: 80px; display: none; }
 .all-products-view.active { display: block; animation: slideUp 0.3s ease; }
 .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 40px; }
-.grid-item { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; }
-.grid-item img { width: 100%; height: 140px; object-fit: cover; }
-.grid-info { padding: 10px; }
-.grid-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.grid-price { font-size: 14px; color: #c21a1a; font-weight: 700; }
+.grid-item { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; cursor: pointer; }
+.grid-item img { width: 100%; height: 150px; object-fit: cover; }
+.grid-info { padding: 12px; }
+.grid-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.grid-price-box { display: flex; flex-direction: column; }
+.grid-old-price { font-size: 11px; text-decoration: line-through; color: #bbb; }
+.grid-new-price { color: #c21a1a; font-weight: 800; font-size: 15px; }
 
 /* MAGIC LOADER */
 .magic-loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; position: relative; }
@@ -541,21 +582,6 @@ body {
   font-weight: 700;
 }
 
-/* Specific adjustments for Grid View */
-.grid-price-box {
-    display: flex;
-    flex-direction: column;
-}
-.grid-old-price {
-    font-size: 11px;
-    text-decoration: line-through;
-    color: #bbb;
-}
-.grid-new-price {
-    color: #c21a1a;
-    font-weight: 700;
-    font-size: 14px;
-}
 </style>
 <script>
 !function(f,b,e,v,n,t,s)
@@ -580,6 +606,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
   <div class="blob blob-3"></div>
   <div class="noise-overlay"></div>
 </div>
+
 <div id="notif-toast" class="notif-toast">
     <div class="notif-icon">📦</div>
     <div class="notif-content">
@@ -595,22 +622,17 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
     <div class="step-indicator" id="step-count">1/5</div>
 </div>
 
- <div class="stories-wrapper" id="stories-container">
-    </div>
+ <div class="stories-wrapper" id="stories-container"></div>
 
-  <div class="story-viewer" id="story-viewer">
+ <div class="story-viewer" id="story-viewer">
     <div class="story-progress-container" id="story-progress-bars"></div>
-    
     <div class="story-header">
       <img src="https://via.placeholder.com/50" class="story-avatar" id="sv-avatar">
       <span class="story-username" id="sv-name">Brendimo</span>
     </div>
-    
     <div class="story-close" onclick="closeStory()">✕</div>
-    
     <div class="story-nav-left" onclick="prevStory()"></div>
     <div class="story-nav-right" onclick="nextStory()"></div>
-
     <img src="" class="story-content" id="sv-image">
   </div>
 
@@ -628,7 +650,6 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
     </div>
   </div>
   
-
   <div class="step-content" id="step-1">
     <h2 class="title">Hansı özəl gün üçün?</h2>
     <div class="options-grid" onclick="handleOptionClick(event, 'occasion')">
@@ -706,7 +727,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
       </div>
   </div>
 </div>
-  
+
 <div id="about-modal" class="modal">
   <div class="header">
     <div class="back-btn" onclick="closeAboutModal()">✕ Bağla</div>
@@ -757,14 +778,17 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 </div>
 
 <div id="product-modal" class="modal">
-  <div class="header"><div class="back-btn" onclick="closeModal()">← Geri</div></div>
+  <div class="header" style="padding:15px; position:absolute; top:0; left:0; width:100%; z-index:10; background:rgba(255,255,255,0.8); backdrop-filter:blur(5px);">
+      <div class="back-btn" onclick="closeModal()">← Geri</div>
+      <div id="modal-match-score" style="font-size:12px; font-weight:800; color:#c21a1a;"></div>
+  </div>
   
-  <div id="modal-content-container">
-      <img id="modal-img" src="" style="width:100%; border-radius:12px; margin-bottom:15px; min-height:300px; object-fit:cover;">
+  <div class="modal-content-scroll" style="padding-top:60px;">
+      <img id="modal-img" src="" style="width:100%; border-radius:20px; margin-bottom:15px; min-height:300px; object-fit:cover; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
       
-      <h2 id="modal-title" style="margin-bottom:5px;"></h2>
-
-      <div id="fear-bar-modal" class="fear-bar-wrapper" style="margin-bottom: 15px; padding: 10px;">
+      <h2 id="modal-title" style="margin-bottom:5px; line-height:1.3;"></h2>
+      
+      <div id="fear-bar-modal" class="fear-bar-wrapper" style="margin-bottom: 15px; padding: 10px; display:none;">
           <div class="fear-header">
               <span class="fear-title" style="font-size: 11px;">⚠️ QAÇIRMA!</span>
               <span id="modal-fear-amount" class="fear-amount" style="font-size: 18px;">-6.00 ₼</span>
@@ -774,70 +798,87 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
           </div>
       </div>
       
-      <h3 id="modal-price" style="color:#c21a1a; margin-bottom:20px; font-size:28px;"></h3>
-      
+      <div id="modal-price" style="margin-bottom:20px;"></div>
       <p id="modal-desc" style="line-height:1.6; color:#444; margin-bottom:30px; white-space: pre-line;"></p>
       
-      <button id="modal-whatsapp-btn" class="float-btn" style="width:100%; padding:16px; border-radius:12px; border:none; font-weight:700; font-size:16px; background:#25D366; color:white; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);">
+      <button id="modal-whatsapp-btn" style="width:100%; padding:16px; border-radius:12px; border:none; font-weight:700; font-size:16px; background:#25D366; color:white; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); margin-bottom:30px;">
         WhatsApp ilə Sifariş Et
       </button>
 
-      <button onclick="closeModal()" style="width:100%; padding:14px; margin-top:12px; border-radius:12px; border:none; font-weight:600; font-size:15px; background:#f0f0f0; color:#555;">
-        Bağla
-      </button>
+      <div class="review-section">
+          <div class="review-header">
+              <h3 style="font-size:16px;">Rəylər</h3>
+              <div class="add-review-btn" onclick="toggleReviewForm()">+ Rəy Yaz</div>
+          </div>
+          
+          <div id="review-form" class="review-form">
+              <div class="star-select" id="star-select">
+                  <span class="star-opt" data-v="1">★</span>
+                  <span class="star-opt" data-v="2">★</span>
+                  <span class="star-opt" data-v="3">★</span>
+                  <span class="star-opt" data-v="4">★</span>
+                  <span class="star-opt" data-v="5">★</span>
+              </div>
+              <input type="text" id="rev-name" placeholder="Adınız" class="form-input">
+              <textarea id="rev-msg" placeholder="Rəyiniz..." class="form-input" rows="2"></textarea>
+              <button onclick="submitReview()" style="background:#333; color:white; border:none; padding:8px 15px; border-radius:8px; width:100%;">Göndər</button>
+          </div>
+
+          <div id="reviews-list"></div>
+      </div>
   </div>
 </div>
 
 <nav class="bottom-nav">
   <div class="nav-item active" onclick="handleNavClick('wizard')" id="nav-wizard">
-    <svg class="nav-icon" viewBox="0 0 24 24">
-      <path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5 9.5 9.75 12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/>
-    </svg>
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5 9.5 9.75 12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/></svg>
     <span class="nav-text">Sehrbaz</span>
   </div>
-  
   <div class="nav-item" onclick="handleNavClick('mall')" id="nav-mall">
-    <svg class="nav-icon" viewBox="0 0 24 24">
-      <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 15H5V8h14v10z"/>
-    </svg>
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 15H5V8h14v10z"/></svg>
     <span class="nav-text">SehrMall</span>
   </div>
-
   <div class="nav-item" onclick="handleNavClick('chat')" id="nav-chat">
-    <svg class="nav-icon" viewBox="0 0 24 24">
-      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
-    </svg>
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
     <span class="nav-text">SehrChat</span>
   </div>
-
   <div class="nav-item" onclick="handleNavClick('wheel')" id="nav-wheel">
-    <svg class="nav-icon" viewBox="0 0 24 24">
-       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v4h-2zm0 6h2v4h-2z"/>
-    </svg>
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v4h-2zm0 6h2v4h-2z"/></svg>
     <span class="nav-text">SehrÇarx</span>
   </div>
-  
   <div class="nav-item" onclick="handleNavClick('vip')" id="nav-vip">
-    <svg class="nav-icon" viewBox="0 0 24 24">
-       <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .55-.45 1-1 1H6c-.55 0-1-.45-1-1v-1h14v1z"/>
-    </svg>
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .55-.45 1-1 1H6c-.55 0-1-.45-1-1v-1h14v1z"/></svg>
     <span class="nav-text">VIP</span>
   </div>
 </nav>
 
 <script>
 // --- CONFIGURATION ---
-const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwnQvncFk983Q0zEO7WLoug87JKEvXoH1VgKTC9wxHCyIgWVGQMYvrV0KnsJDs4LncR/exec"; 
+const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxhsdv49KE1aHqKXNnmCllhTOAxUPg9joVW__iOolcTNZX4cYDgUrUvyI4xkdDhdn36sw/exec"; 
 const WHATSAPP_NUMBER = "994556742535";
 
 // --- STATE ---
 let currentStep = 0;
 const totalSteps = 5;
-const state = { who: null, occasion: null, mood: null, style: null, budget: null, products: [], cardStack: [], orders: [] };
+const state = { 
+    who: null, occasion: null, mood: null, style: null, budget: null, 
+    products: [], cardStack: [], orders: [], viewedProductCount: 0 
+};
 let gridLimit = 6; 
-// ... existing state ...
 let currentModalIndex = -1;
-let currentModalSource = []; // To know if we are in Wizard list or Mall list
+let currentModalSource = []; 
+let currentReviewRating = 0;
+let reviewsCache = {}; // Cache for reviews
+
+// --- INITIALIZATION ---
+function init() {
+    initStories();
+    initTracking();
+    initGlobalSwipe(); 
+    initNotificationSwipe(); 
+    updateUI();
+}
+
 // --- NAVIGATION ---
 function updateUI() {
   document.getElementById('step-count').textContent = (currentStep < totalSteps) ? `ADDIM ${currentStep + 1}/${totalSteps}` : 'NƏTİCƏ';
@@ -853,7 +894,6 @@ function updateUI() {
     fetchProducts();
   } else {
     document.getElementById('step-results').classList.add('active');
-    activateGlobalDiscount(); // START THE FEAR!
   }
 }
 
@@ -868,7 +908,7 @@ function handleOptionClick(e, key) {
   updateUI();
 }
   
-// --- DATA FETCHING & MAGIC TEXT ---
+// --- DATA FETCHING ---
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -879,17 +919,14 @@ function shuffleArray(array) {
 
 async function fetchProducts() {
   const statusTextEl = document.getElementById('magic-status-text');
-  
-  // 10 TEXT OPTIONS - FEAR REMOVAL DURING LOADING
   const messages = [
    "Sehrli axtarış işə düşdü... 🪄",
-    "Standart hədiyyələr dərhal silinir...",
-    "Ona özünü dəyərli hiss etdirəcək... ✨",
-    "Bəyənməmək riski aradan qaldırılır... 🛡️",
+   "Standart hədiyyələr dərhal silinir...",
+   "Ona özünü dəyərli hiss etdirəcək... ✨",
+   "Bəyənməmək riski aradan qaldırılır... 🛡️",
    "Sizin üçün xüsusi Endirim əlavə olunur 🪄",
-    "Və... İdeal seçim tapıldı! 🎯"
+   "Və... İdeal seçim tapıldı! 🎯"
   ];
-  
   let msgIndex = 0;
   statusTextEl.textContent = messages[0];
 
@@ -904,7 +941,7 @@ async function fetchProducts() {
   }, 800); 
 
   try {
-    const [prodRes, orderRes, _] = await Promise.all([
+    const [prodRes, orderRes] = await Promise.all([
       fetch(`${SHEETS_ENDPOINT}?action=getProducts`),
       fetch(`${SHEETS_ENDPOINT}?action=getOrders`),
       new Promise(resolve => setTimeout(resolve, 4800)) 
@@ -912,31 +949,31 @@ async function fetchProducts() {
 
     const prodData = await prodRes.json();
     const orderData = await orderRes.json();
-    
     clearInterval(textInterval);
 
-    // 1. Shuffle
+    // POINT 2: RANDOM LOW STOCK LOGIC & DISCOUNTS
     let rawProducts = shuffleArray(prodData.products || []);
-
-    // 2. ASSIGN RANDOM DISCOUNTS (20% - 35%)
     state.products = rawProducts.map(p => {
-        // Random integer between 20 and 35
+        // Random discount 20-35%
         const randomDisc = Math.floor(Math.random() * (35 - 20 + 1)) + 20; 
-        
-        // Calculate Old Price: Price / (1 - discount%)
         const oldPriceVal = (parseFloat(p.price) / (1 - (randomDisc / 100))).toFixed(0);
+        
+        // Random Stock Logic (30% chance)
+        const isStockLow = Math.random() < 0.3;
+        const stockCount = isStockLow ? Math.floor(Math.random() * 5) + 1 : null;
 
         return {
             ...p,
-            discountPercent: randomDisc, // Store the random %
-            oldPrice: oldPriceVal        // Store the calculated fake price
+            discountPercent: randomDisc,
+            oldPrice: oldPriceVal,
+            isLowStock: isStockLow,
+            stockCount: stockCount
         };
     });
 
     state.orders = orderData.orders || [];
-
     applyBadges(state.products);
-    
+
     processMatches();
     currentStep++;
     updateUI();
@@ -946,19 +983,15 @@ async function fetchProducts() {
   } catch (error) {
     clearInterval(textInterval);
     console.error(error);
-    document.getElementById('step-loading').innerHTML = "<p style='text-align:center; margin-top:50px;'>Xəta baş verdi. İnternet əlaqəsini yoxlayın.</p>";
+    document.getElementById('step-loading').innerHTML = "<p>Xəta baş verdi. Zəhmət olmasa yeniləyin.</p>";
   }
 }
 
 function applyBadges(products) {
-    products.forEach(p => { delete p.isBestSeller; delete p.isLowStock; });
+    products.forEach(p => { delete p.isBestSeller; });
     if(products[2]) products[2].isBestSeller = true;
-    const lowStockIndices = [1, 4, 9, 16, 23];
-    lowStockIndices.forEach(idx => {
-        if(products[idx]) products[idx].isLowStock = true;
-    });
 }
-  
+
 function processMatches() {
   let candidates = shuffleArray([...state.products]);
   if (state.who) candidates = candidates.filter(p => match(p.target, state.who));
@@ -1010,9 +1043,10 @@ function renderCards() {
     if (index !== 0) card.style.opacity = '0.5';
     else card.style.boxShadow = "0 20px 50px -12px rgba(0,0,0,0.15)";
 
+    // Point 1 & 2: Badges on Image
     let badgesHtml = `<div class="match-badge">${p.score}% Uyğunluq</div>`;
     if (p.isBestSeller) badgesHtml += `<div class="badge-bestseller">🏆 Best Seller</div>`;
-    if (p.isLowStock) badgesHtml += `<div class="badge-lowstock">⚠️ Cəmi 4 ədəd qaldı</div>`;
+    if (p.isLowStock) badgesHtml += `<div class="badge-lowstock-fixed">⚠️ ${p.stockCount} ədəd qaldı</div>`;
 
     card.innerHTML = `
       <div class="card-image-box">
@@ -1034,19 +1068,17 @@ function renderCards() {
                 <span class="discount-badge-small">🔥 -${p.discountPercent}% Endirim</span>
             </div>
           </div>
-          
-          <div class="swipe-hint" style="font-size:12px; width:auto; padding:0 10px; border-radius:20px;">
-             👈 Keç / Al 👉
-          </div>
+          <div class="swipe-hint">👈 Keç / Al 👉</div>
         </div>
       </div>
     `;
-    if (index === 0) initSwipe(card, p);
+    if (index === 0) initCardSwipe(card, p);
     container.appendChild(card);
   });
 }
 
-function initSwipe(card, product) {
+// --- CARD SWIPE LOGIC (FIXED POINT 8 + HELPER FUNCTIONS) ---
+function initCardSwipe(card, product) {
   let startX = 0, startY = 0;
   let currentX = 0, currentY = 0;
   let isDragging = false;
@@ -1059,78 +1091,65 @@ function initSwipe(card, product) {
     startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
     card.style.transition = 'none';
-
-    // ADD LISTENERS HERE
     addDocumentListeners();
   };
 
   const onMove = (e) => {
     if (!isDragging) return;
-    if(e.cancelable && e.type === 'touchmove') e.preventDefault(); 
-
     const x = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     const y = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
     
     currentX = x - startX;
     currentY = y - startY;
-    
-    card.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${currentX / 15}deg)`;
 
-    const opacity = Math.min(1, Math.abs(currentX) / 80);
-    if (currentX > 0) {
-      if(likeInd) likeInd.style.opacity = opacity;
-      if(nopeInd) nopeInd.style.opacity = 0;
-    } else {
-      if(nopeInd) nopeInd.style.opacity = opacity;
-      if(likeInd) likeInd.style.opacity = 0;
+    // POINT 8: Ignore vertical swipes for Card Logic (let natural scroll happen)
+    // We only animate horizontal movement strongly.
+    
+    if (Math.abs(currentX) > Math.abs(currentY)) {
+        if(e.cancelable && e.type === 'touchmove') e.preventDefault(); 
+        card.style.transform = `translate(${currentX}px, ${currentY / 5}px) rotate(${currentX / 15}deg)`;
+        
+        const opacity = Math.min(1, Math.abs(currentX) / 80);
+        if (currentX > 0) { 
+            if(likeInd) likeInd.style.opacity = opacity; 
+            if(nopeInd) nopeInd.style.opacity = 0; 
+        } else { 
+            if(nopeInd) nopeInd.style.opacity = opacity; 
+            if(likeInd) likeInd.style.opacity = 0; 
+        }
     }
   };
 
   const onEnd = () => {
     if (!isDragging) return;
     isDragging = false;
-    
-    // REMOVE LISTENERS HERE (CRITICAL FIX)
     removeDocumentListeners();
 
     if(likeInd) likeInd.style.opacity = 0;
     if(nopeInd) nopeInd.style.opacity = 0;
 
-    // 1. CLICK / TAP
+    // CLICK (Tap) -> Open Modal
     if (Math.abs(currentX) < 10 && Math.abs(currentY) < 10) { 
       openModal(product, state.cardStack, state.cardStack.indexOf(product));
-      resetCard();
+      resetCard(); 
       return; 
     }
 
-    // 2. SWIPE UP
-    if (currentY < -80 && Math.abs(currentY) > Math.abs(currentX)) {
-      openModal(product, state.cardStack, state.cardStack.indexOf(product));
-      resetCard(); 
-      return;
-    }
-
-    // 3. HORIZONTAL SWIPE
+    // HORIZONTAL SWIPE
     if (Math.abs(currentX) > 100) {
       const dir = currentX > 0 ? 1 : -1;
       card.style.transition = 'transform 0.4s ease';
-      card.style.transform = `translate(${dir * window.innerWidth * 1.5}px, ${currentY}px) rotate(${dir * 30}deg)`;
+      card.style.transform = `translate(${dir * window.innerWidth * 1.5}px, 0px) rotate(${dir * 30}deg)`;
       
       setTimeout(() => {
         card.remove();
         state.cardStack.shift();
-        if (dir === 1) {
-            redirectToWhatsApp(product);
-        } else {
-            logUserAction('Skipped', product.name);
-            renderCards();
-        }
+        if (dir === 1) redirectToWhatsApp(product);
+        else renderCards();
       }, 300);
     } else {
       resetCard();
     }
-    
-    currentX = 0; currentY = 0;
   };
 
   function resetCard() {
@@ -1138,7 +1157,6 @@ function initSwipe(card, product) {
       card.style.transform = 'translate(0px, 0px) rotate(0deg)';
   }
 
-  // Helper functions to manage listeners cleanly
   function addDocumentListeners() {
     document.addEventListener('mousemove', onMove); 
     document.addEventListener('mouseup', onEnd);
@@ -1157,108 +1175,214 @@ function initSwipe(card, product) {
   card.addEventListener('touchstart', onStart, {passive: false}); 
 }
 
-// --- MODAL SWIPE LOGIC ---
-let modalTouchStartX = 0;
-let modalTouchEndX = 0;
+// --- GLOBAL BACK SWIPE (POINT 3) ---
+function initGlobalSwipe() {
+    let startX = 0;
+    document.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+    }, {passive: true});
 
-// Define handlers outside so they can be referenced for removal
-function handleModalTouchStart(e) {
-    modalTouchStartX = e.changedTouches[0].screenX;
+    document.addEventListener('touchend', (e) => {
+        const endX = e.changedTouches[0].clientX;
+        if (startX < 30 && (endX - startX > 100)) {
+            const modal = document.querySelector('.modal.active');
+            if (modal) {
+                if(modal.id === 'product-modal') closeModal();
+                else closeAboutModal();
+            } else {
+                goBack();
+            }
+        }
+    }, {passive: true});
 }
 
-function handleModalTouchEnd(e) {
-    modalTouchEndX = e.changedTouches[0].screenX;
-    handleModalSwipeGesture();
+// --- NOTIFICATION SWIPE (POINT 4) ---
+function initNotificationSwipe() {
+    const toast = document.getElementById('notif-toast');
+    let startY = 0;
+    toast.addEventListener('touchstart', (e) => startY = e.touches[0].clientY, {passive: true});
+    toast.addEventListener('touchend', (e) => {
+        if (startY - e.changedTouches[0].clientY > 30) { 
+            toast.classList.remove('show');
+        }
+    }, {passive: true});
 }
 
+// --- FULL MODAL SWIPE (POINT 5) ---
 function initModalSwipe() {
-    const modalImg = document.getElementById('modal-img');
-    
-    // Clean up before adding new ones
-    modalImg.removeEventListener('touchstart', handleModalTouchStart);
-    modalImg.removeEventListener('touchend', handleModalTouchEnd);
+    const modal = document.getElementById('product-modal');
+    let startX = 0, startY = 0;
 
-    // Add fresh listeners
-    modalImg.addEventListener('touchstart', handleModalTouchStart, {passive: true});
-    modalImg.addEventListener('touchend', handleModalTouchEnd, {passive: true});
-}
+    modal.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    }, {passive: true});
 
-function handleModalSwipeGesture() {
-    const swipeThreshold = 50; // Minimum distance to count as swipe
-    
-    // Swipe LEFT (Move Finger from Right to Left) -> Show Next
-    if (modalTouchStartX - modalTouchEndX > swipeThreshold) {
-        showNextModalProduct();
-    }
-    
-    // Optional: Swipe RIGHT -> Show Previous
-    if (modalTouchEndX - modalTouchStartX > swipeThreshold) {
-        showPrevModalProduct();
-    }
+    modal.addEventListener('touchend', (e) => {
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+        const diffX = startX - endX;
+        const diffY = startY - endY;
+
+        if (Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY)) {
+            if (diffX > 0) showNextModalProduct(); 
+            else showPrevModalProduct(); 
+        }
+    }, {passive: true});
 }
 
 function showNextModalProduct() {
     if (currentModalIndex < currentModalSource.length - 1) {
-        // Add a slide-out effect
-        const imgEl = document.getElementById('modal-img');
-        imgEl.style.transform = 'translateX(-20px)';
-        imgEl.style.opacity = '0';
-        
-        setTimeout(() => {
-            currentModalIndex++;
-            const nextProduct = currentModalSource[currentModalIndex];
-            openModal(nextProduct, currentModalSource, currentModalIndex);
-            
-            // Reset position for new image
-            imgEl.style.transform = 'translateX(0)';
-            imgEl.style.transition = 'all 0.2s ease';
-        }, 200);
-    } else {
-        // Visual feedback (bounce) if no more products
-        const content = document.getElementById('modal-content-container');
-        content.style.transform = 'translateX(-10px)';
-        setTimeout(() => content.style.transform = 'translateX(0)', 100);
+        openModal(currentModalSource[currentModalIndex + 1], currentModalSource, currentModalIndex + 1);
     }
 }
-
 function showPrevModalProduct() {
     if (currentModalIndex > 0) {
-        const imgEl = document.getElementById('modal-img');
-        imgEl.style.transform = 'translateX(20px)';
-        imgEl.style.opacity = '0';
-        
-        setTimeout(() => {
-            currentModalIndex--;
-            const prevProduct = currentModalSource[currentModalIndex];
-            openModal(prevProduct, currentModalSource, currentModalIndex);
-             
-            imgEl.style.transform = 'translateX(0)';
-            imgEl.style.transition = 'all 0.2s ease';
-        }, 200);
+        openModal(currentModalSource[currentModalIndex - 1], currentModalSource, currentModalIndex - 1);
     }
-}  
-  
-// --- ORDER NOTIFICATIONS ---
-function startOrderNotifications() {
-    if (state.orders.length === 0) return;
-    setInterval(() => {
-        const order = state.orders[Math.floor(Math.random() * state.orders.length)];
-        const phone = order.phone || "555555555";
-        const maskedPhone = `*******${phone.slice(-2)}`;
-        
-        const toast = document.getElementById('notif-toast');
-        document.getElementById('notif-user').textContent = `${maskedPhone} nömrəsi indicə aldı:`;
-        document.getElementById('notif-product').textContent = order.product;
-        
-        toast.classList.add('show');
-        setTimeout(() => { toast.classList.remove('show'); }, 9000);
-    }, 40000); 
 }
 
-// --- GLOBAL DISCOUNT LOGIC (THE FEAR FACTOR) ---
+// --- MODAL & REVIEWS ---
+function openModal(p, sourceList = [], index = -1) {
+  state.viewedProductCount++;
+  // POINT 6: Delayed Discount
+  if (state.viewedProductCount >= 3) activateGlobalDiscount();
+
+  currentModalSource = sourceList.length ? sourceList : state.products;
+  currentModalIndex = index !== -1 ? index : currentModalSource.indexOf(p);
+
+  document.getElementById('modal-img').src = fixImageLink(p.image);
+  document.getElementById('modal-title').textContent = p.name;
+  
+  // POINT 7: Show Match %
+  document.getElementById('modal-match-score').textContent = (p.score || "90") + "% UYĞUNLUQ";
+
+  // Price
+  document.getElementById('modal-price').innerHTML = `
+    <span style="text-decoration:line-through;color:#999;font-size:18px;margin-right:10px;">${p.oldPrice}₼</span>
+    <span style="color:#c21a1a;font-weight:800;font-size:26px;">${p.price} AZN</span>
+    <span class="discount-badge-small" style="font-size:14px; padding:4px 8px; vertical-align:middle;">-${p.discountPercent}%</span>
+  `;
+  document.getElementById('modal-desc').textContent = p.description;
+  
+  // Show fear bar in modal if active
+  if(state.viewedProductCount >= 3) {
+      document.getElementById('fear-bar-modal').style.display = 'block';
+  }
+
+  // REVIEWS: Fix -> Only fetch for THIS product name
+  fetchReviews(p.name);
+
+  document.getElementById('modal-whatsapp-btn').onclick = () => redirectToWhatsApp(p);
+  document.getElementById('product-modal').classList.add('active');
+  
+  initModalSwipe(); 
+}
+
+function closeModal() { document.getElementById('product-modal').classList.remove('active'); }
+
+// --- REVIEW SYSTEM (POINT 10 & 11) ---
+async function fetchReviews(productName) {
+    const list = document.getElementById('reviews-list');
+    list.innerHTML = '<p style="color:#999;font-size:12px;">Rəylər yüklənir...</p>';
+
+    // IMPORTANT: Clear previous reviews first to avoid mixing
+    
+    if (reviewsCache[productName]) {
+        renderReviews(reviewsCache[productName]);
+        return;
+    }
+
+    try {
+        // Sends request to backend. Make sure your GAS handles 'action=getReviews'
+        const res = await fetch(`${SHEETS_ENDPOINT}?action=getReviews&product=${encodeURIComponent(productName)}`);
+        const data = await res.json();
+        
+        // Filter reviews just in case backend sends all
+        const filteredReviews = (data.reviews || []).filter(r => r.product === productName);
+        
+        reviewsCache[productName] = filteredReviews;
+        renderReviews(filteredReviews);
+    } catch(e) {
+        list.innerHTML = '<p style="color:#999;font-size:12px;">Rəy yoxdur.</p>'; 
+    }
+}
+
+function renderReviews(reviews) {
+    const list = document.getElementById('reviews-list');
+    list.innerHTML = ''; // Clear loading text
+    if(reviews.length === 0) {
+        list.innerHTML = '<p style="color:#999;font-size:12px;">Hələ ki rəy yoxdur. İlk rəyi sən yaz! 👇</p>';
+        return;
+    }
+    reviews.forEach(r => {
+        const el = document.createElement('div');
+        el.className = 'comment-box';
+        const stars = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
+        el.innerHTML = `
+            <div class="comment-user">
+                <div class="user-avatar">${r.name.charAt(0)}</div>
+                <div class="user-text">
+                    <span class="u-name">${r.name} <span style="color:#FFD700;font-size:10px;">${stars}</span></span>
+                    <p class="u-comment">${r.comment}</p>
+                </div>
+            </div>
+        `;
+        list.appendChild(el);
+    });
+}
+
+function toggleReviewForm() {
+    document.getElementById('review-form').classList.toggle('active');
+    // Init star click
+    document.querySelectorAll('.star-opt').forEach(s => {
+        s.onclick = function() {
+            currentReviewRating = this.getAttribute('data-v');
+            updateStars(currentReviewRating);
+        }
+    });
+}
+
+function updateStars(val) {
+    document.querySelectorAll('.star-opt').forEach(s => {
+        s.classList.toggle('selected', s.getAttribute('data-v') <= val);
+    });
+}
+
+function submitReview() {
+    const name = document.getElementById('rev-name').value;
+    const msg = document.getElementById('rev-msg').value;
+    const pName = document.getElementById('modal-title').textContent;
+
+    if(!name || !msg || currentReviewRating == 0) {
+        alert("Zəhmət olmasa bütün xanaları doldurun və ulduz seçin.");
+        return;
+    }
+
+    // Optimistic Update
+    const newRev = { name: name, comment: msg, rating: currentReviewRating, product: pName };
+    if(!reviewsCache[pName]) reviewsCache[pName] = [];
+    reviewsCache[pName].unshift(newRev);
+    renderReviews(reviewsCache[pName]);
+    toggleReviewForm();
+
+    // Send to Sheet (Ensures sheet='Review' handling in backend)
+    fetch(SHEETS_ENDPOINT, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            type: 'review',
+            product: pName,
+            name: name,
+            comment: msg,
+            rating: currentReviewRating
+        })
+    });
+}
+
+// --- GLOBAL DISCOUNT LOGIC ---
 let globalDiscount = 6.00;      
 const discountStep = 0.50;      
-const stepDuration = 30;        
 let secondsLeftInStep = 30;     
 let isTimerActive = false;      
 let globalTimerInterval = null;
@@ -1266,25 +1390,20 @@ let globalTimerInterval = null;
 function activateGlobalDiscount() {
     if (isTimerActive) return; 
     isTimerActive = true;
-
-    // Show Main Bar
-    const mainBar = document.getElementById('fear-bar-main');
-    if(mainBar) mainBar.classList.remove('hidden');
-
+    document.getElementById('fear-bar-main').classList.remove('hidden');
+    
     globalTimerInterval = setInterval(() => {
         secondsLeftInStep--;
         updateDiscountProgressUI();
 
         if (secondsLeftInStep <= 0) {
-            secondsLeftInStep = stepDuration; 
-            
+            secondsLeftInStep = 30; 
             if (globalDiscount > 0) {
-                globalDiscount -= discountStep;
+                globalDiscount = Math.max(0, globalDiscount - discountStep);
                 globalDiscount = Math.round(globalDiscount * 100) / 100;
                 triggerDropEffect(); 
             } else {
-                globalDiscount = 0;
-                clearInterval(globalTimerInterval); 
+                 clearInterval(globalTimerInterval);
             }
         }
         updateDiscountTextUI();
@@ -1301,7 +1420,7 @@ function updateDiscountTextUI() {
 }
 
 function updateDiscountProgressUI() {
-    const percent = (secondsLeftInStep / stepDuration) * 100;
+    const percent = (secondsLeftInStep / 30) * 100;
     const gsFill = document.getElementById('gs-timer-fill');
     const msFill = document.getElementById('modal-timer-fill');
     
@@ -1319,39 +1438,43 @@ function triggerDropEffect() {
     });
 }
 
-// --- ALL PRODUCTS ---
-async function openAllProducts() {
-  document.getElementById('all-products-view').classList.add('active');
-  // Hide close button when triggered via Navbar, but nice to have in general. 
-  // We will handle logic in handleNavClick
-  
-  logUserAction('ViewAllProducts');
-  if (state.products.length > 0) { renderGrid(); return; }
-  
-  const container = document.getElementById('all-products-grid');
-  container.innerHTML = '<div style="grid-column:1/-1;text-align:center;">Yüklənir...</div>';
-  try {
-    const response = await fetch(`${SHEETS_ENDPOINT}?action=getProducts`);
-    const data = await response.json();
-    state.products = shuffleArray(data.products || []);
-    applyBadges(state.products); 
-    renderGrid();
-  } catch(e) { container.innerHTML = '<p style="text-align:center">Yüklənmə xətası.</p>'; }
+// --- ORDER NOTIFICATIONS ---
+function startOrderNotifications() {
+    if (state.orders.length === 0) return;
+    setInterval(() => {
+        const order = state.orders[Math.floor(Math.random() * state.orders.length)];
+        const phone = order.phone || "555555555";
+        const maskedPhone = `*******${phone.slice(-2)}`;
+        
+        const toast = document.getElementById('notif-toast');
+        document.getElementById('notif-user').textContent = `${maskedPhone} nömrəsi indicə aldı:`;
+        document.getElementById('notif-product').textContent = order.product;
+        
+        toast.classList.add('show');
+        setTimeout(() => { toast.classList.remove('show'); }, 9000);
+    }, 40000); 
 }
 
-function closeAllProducts() { document.getElementById('all-products-view').classList.remove('active'); }
-
+// --- ALL PRODUCTS GRID ---
+function openAllProducts() {
+  document.getElementById('all-products-view').classList.add('active');
+  logUserAction('ViewAllProducts');
+  if (state.products.length > 0) { renderGrid(); return; }
+  // Only re-fetch if empty
+}
 function renderGrid() {
   const container = document.getElementById('all-products-grid');
   container.innerHTML = '';
   state.products.slice(0, gridLimit).forEach(p => {
     const el = document.createElement('div');
     el.className = 'grid-item';
-el.onclick = () => openModal(p, state.products, state.products.indexOf(p));
+    el.onclick = () => openModal(p, state.products, state.products.indexOf(p));
     
+    // Grid Badges
     let badge = "";
-    if (p.isBestSeller) badge = `<div class="badge-bestseller" style="top:5px; left:5px; font-size:10px;">🏆 Best Seller</div>`;
-    else if (p.isLowStock) badge = `<div class="badge-lowstock" style="bottom:5px; left:5px; font-size:10px;">⚠️ 4 ədəd qaldı</div>`;
+    if (p.isBestSeller) badge = `<div class="badge-bestseller" style="top:5px; left:5px; font-size:10px;">🏆 Best</div>`;
+    // Point 1: Fixed Low Stock in Grid (on image)
+    else if (p.isLowStock) badge = `<div class="badge-lowstock-fixed" style="bottom:5px; left:5px; font-size:10px;">⚠️ ${p.stockCount} qaldı</div>`;
 
     el.innerHTML = `
         ${badge}
@@ -1369,74 +1492,7 @@ el.onclick = () => openModal(p, state.products, state.products.indexOf(p));
 }
 function loadMoreGrid() { gridLimit += 6; renderGrid(); logUserAction('LoadMoreProducts'); }
 
-// --- MODAL & WHATSAPP ---
-// Updated openModal to accept source list and index
-function openModal(p, sourceList = [], index = -1) {
-  logUserAction('ViewDetails', p.name);
-  activateGlobalDiscount(); 
-
-  // Store context for Swipe functionality
-  currentModalSource = sourceList.length ? sourceList : state.products;
-  currentModalIndex = index !== -1 ? index : currentModalSource.indexOf(p);
-
-  const imgEl = document.getElementById('modal-img');
-  imgEl.style.opacity = '0'; // Reset for fade in
-  imgEl.src = fixImageLink(p.image);
-  
-  // Simple Fade In Animation
-  setTimeout(() => imgEl.style.opacity = '1', 50);
-
-  document.getElementById('modal-title').textContent = p.name;
-  
-  // Price Logic
-  const priceHTML = `
-    <span style="text-decoration:line-through; color:#999; font-size:20px; margin-right:10px;">${p.oldPrice}₼</span>
-    <span style="color:#c21a1a; font-weight:800; font-size:28px;">${p.price} AZN</span>
-    <span class="discount-badge-small" style="font-size:14px; padding:4px 8px; vertical-align:middle;">-${p.discountPercent}%</span>
-  `;
-  document.getElementById('modal-price').innerHTML = priceHTML;
-  document.getElementById('modal-desc').textContent = p.description;
-  
-  updateDiscountTextUI();
-  updateDiscountProgressUI();
-
-  const btn = document.getElementById('modal-whatsapp-btn');
-  btn.onclick = () => redirectToWhatsApp(p);
-  
-  document.getElementById('product-modal').classList.add('active');
-  
-  // Initialize Swipe Listener for the Modal Image
-  initModalSwipe();
-}
-function closeModal() { document.getElementById('product-modal').classList.remove('active'); }
-
-function redirectToWhatsApp(p) {
-  logUserAction('Like_WhatsApp', p.name);
-  
-  const finalPrice = Math.max(0, p.price - globalDiscount).toFixed(2);
-  const discountVal = globalDiscount.toFixed(2);
-  
-  // Calculate price description for WhatsApp message
-  let priceText = `${p.price} AZN`;
-  if (globalDiscount > 0) {
-    priceText = `${p.price} AZN (Endirimlə: ${p.oldPrice} ₼ yox)\n🔥 Əlavə Bonus Endirim: -${discountVal} AZN\n✅ YEKUN: ${finalPrice} AZN`;
-  }
-  
-  const text = `Salam Brendimo! 🎁\n\nBu məhsulu bəyəndim:\n*${p.name}*\n${priceText}\n\nLink:\n${fixImageLink(p.image)}\n\nSifariş etmək istəyirəm.`;
-  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-  setTimeout(() => window.location.href = url, 100); 
-}
-
-// --- UTILS & LOGGING ---
-function logUserAction(action, details = '') {
-  const currentIP = typeof userIP !== 'undefined' ? userIP : 'Unknown';
-  fetch(SHEETS_ENDPOINT, {
-    method: 'POST', mode: 'no-cors', keepalive: true, 
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'log', action: action, details: `[IP: ${currentIP}] ${details}` })
-  }).catch(e => console.log(e));
-}
-
+// --- UTILS ---
 function fixImageLink(url) {
   if (!url) return 'https://via.placeholder.com/300?text=No+Image';
   if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
@@ -1449,33 +1505,46 @@ function fixImageLink(url) {
   return url;
 }
 
-function restartApp() {
-  state.who = null; state.occasion = null; state.mood = null; state.style = null; state.budget = null;
-  currentStep = 0; updateUI(); closeAllProducts(); closeModal();
-  // Ensure Navbar reflects Home
-  handleNavClick('wizard');
+function redirectToWhatsApp(p) {
+  logUserAction('Buy_WhatsApp', p.name);
+  const finalPrice = Math.max(0, p.price - globalDiscount).toFixed(2);
+  const discountVal = globalDiscount.toFixed(2);
+  
+  let priceText = `${p.price} AZN`;
+  if (globalDiscount > 0) {
+    priceText = `${p.price} AZN (Endirimlə: ${p.oldPrice} ₼ yox)\n🔥 Əlavə Bonus Endirim: -${discountVal} AZN\n✅ YEKUN: ${finalPrice} AZN`;
+  }
+  
+  const text = `Salam Brendimo! 🎁\n\nBu məhsulu bəyəndim:\n*${p.name}*\n${priceText}\n\nLink:\n${fixImageLink(p.image)}\n\nSifariş etmək istəyirəm.`;
+  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+  setTimeout(() => window.location.href = url, 100); 
 }
 
-// --- NAVIGATION HANDLER ---
-function handleNavClick(tab) {
-  // Update Active Class on UI
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  const navItem = document.getElementById(`nav-${tab}`);
-  if(navItem) navItem.classList.add('active');
+function logUserAction(action, details = '') {
+  fetch(SHEETS_ENDPOINT, {
+    method: 'POST', mode: 'no-cors', keepalive: true,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'log', action: action, details: details })
+  }).catch(e => console.log(e));
+}
 
-  // Logic
+function restartApp() {
+    window.location.reload();
+}
+
+function handleNavClick(tab) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById(`nav-${tab}`).classList.add('active');
+
   if (tab === 'wizard') {
     closeAllProducts();
-    // Ensure wrapper is visible
   } 
   else if (tab === 'mall') {
     openAllProducts();
-    // Hide the Close button inside All Products view when used via Nav
     document.getElementById('all-products-close').style.display = 'none';
   } 
   else if (tab === 'chat') {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank');
-    // Revert visual active state to Wizard or previous after click
     setTimeout(() => {
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         if(document.getElementById('all-products-view').classList.contains('active')) {
@@ -1487,7 +1556,6 @@ function handleNavClick(tab) {
   } 
   else if (tab === 'wheel') {
     window.open('https://brendimo-co.github.io/sanscarxi/', '_blank');
-    // Revert visual active state
     setTimeout(() => {
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         if(document.getElementById('all-products-view').classList.contains('active')) {
@@ -1502,146 +1570,51 @@ function handleNavClick(tab) {
   }
 }
 
-// TRACKING
-let userIP = "Fetching...";
-async function initTracking() {
-  try {
-    const response = await fetch('https://api.ipify.org?format=json');
-    const data = await response.json();
-    userIP = data.ip;
-  } catch (err) { userIP = "Hidden/Error"; }
-  logUserAction('SessionStart', navigator.userAgent);
-}
-// --- ABOUT MODAL FUNCTIONS ---
-function openAboutModal() {
-  document.getElementById('about-modal').classList.add('active');
-  logUserAction('ViewAboutUs');
-}
-
-function closeAboutModal() {
-  document.getElementById('about-modal').classList.remove('active');
-}
-
-// --- STORIES LOGIC ---
-
-// 1. DATA (UPDATED: INCLUDES BIZ KIMIK)
+// STORIES DATA - FULL RESTORED LIST
 const storiesData = [
-  {
-    id: 1,
-    title: 'Müştərilər',
-    thumb: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop',
-    content: 'https://github.com/Brendimo-co/sehrbaz/blob/main/memnun.png?raw=true&fit=crop',
-    type: 'story'
-  },
-  // --- ADDED BIZ KIMIK HERE ---
-  {
-    id: 'about',
-    title: 'Biz Kimik?',
-    thumb: 'https://cdn-icons-png.flaticon.com/512/189/189664.png', 
-    type: 'action',
-    action: openAboutModal 
-  },
-  // -----------------------------
-  {
-    id: 2,
-    title: 'Qablaşdırma',
-    thumb: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=150&h=150&fit=crop',
-    content: 'https://github.com/Brendimo-co/sehrbaz/blob/main/paket.png?raw=true&fit=crop',
-    type: 'story'
-  },
-  {
-    id: 3,
-    title: 'Endirimlər',
-    thumb: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=150&h=150&fit=crop',
-    content: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&h=1000&fit=crop',
-    type: 'story'
-  },
-   {
-    id: 4,
-    title: 'Çatdırılma',
-    thumb: 'https://images.unsplash.com/photo-1616401784845-180882ba9ba8?w=150&h=150&fit=crop',
-    content: 'https://github.com/Brendimo-co/sehrbaz/blob/main/catdirilma.png?raw=true&fit=crop',
-    type: 'story'
-  },
-  {
-    id: 5,
-    title: 'Komanda',
-    thumb: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=150&h=150&fit=crop',
-    content: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=1000&fit=crop',
-    type: 'story'
-  },
-  {
-    id: 6,
-    title: 'Brendimo',
-    thumb: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=150&h=150&fit=crop',
-    content: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=1000&fit=crop',
-    type: 'story'
-  }
+  { id: 1, title: 'Müştərilər', thumb: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop', content: 'https://github.com/Brendimo-co/sehrbaz/blob/main/memnun.png?raw=true&fit=crop', type: 'story' },
+  { id: 'about', title: 'Biz Kimik?', thumb: 'https://cdn-icons-png.flaticon.com/512/189/189664.png', type: 'action', action: openAboutModal },
+  { id: 2, title: 'Qablaşdırma', thumb: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=150&h=150&fit=crop', content: 'https://github.com/Brendimo-co/sehrbaz/blob/main/paket.png?raw=true&fit=crop', type: 'story' },
+  { id: 3, title: 'Endirimlər', thumb: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=150&h=150&fit=crop', content: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&h=1000&fit=crop', type: 'story' },
+  { id: 4, title: 'Çatdırılma', thumb: 'https://images.unsplash.com/photo-1616401784845-180882ba9ba8?w=150&h=150&fit=crop', content: 'https://github.com/Brendimo-co/sehrbaz/blob/main/catdirilma.png?raw=true&fit=crop', type: 'story' },
+  { id: 5, title: 'Komanda', thumb: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=150&h=150&fit=crop', content: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=1000&fit=crop', type: 'story' },
+  { id: 6, title: 'Brendimo', thumb: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=150&h=150&fit=crop', content: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=1000&fit=crop', type: 'story' }
 ];
 
-let activeStoryIndex = -1;
-let storyTimer = null;
-const STORY_DURATION = 5000; // 4 saniyə
-
-// 2. RENDER STORIES
 function initStories() {
   const container = document.getElementById('stories-container');
   container.innerHTML = '';
-
   storiesData.forEach((item, index) => {
     const el = document.createElement('div');
     el.className = 'story-item';
     el.setAttribute('data-type', item.type);
-    
-    // Klik hadisəsi
     el.onclick = () => handleStoryClick(index);
-
-    el.innerHTML = `
-      <div class="story-ring">
-        <img src="${item.thumb}" alt="${item.title}">
-      </div>
-      <span class="story-title">${item.title}</span>
-    `;
+    el.innerHTML = `<div class="story-ring"><img src="${item.thumb}" alt="${item.title}"></div><span class="story-title">${item.title}</span>`;
     container.appendChild(el);
   });
 }
 
 function handleStoryClick(index) {
   const story = storiesData[index];
-  
-  if (story.type === 'action') {
-    story.action(); // Məsələn: openAllProducts()
-  } 
-  else if (story.type === 'link') {
-    window.open(story.url, '_blank'); // Linkə get
-  } 
-  else {
-    // Story aç
-    openStoryViewer(index);
-  }
+  if (story.type === 'action') story.action();
+  else if (story.type === 'link') window.open(story.url, '_blank');
+  else openStoryViewer(index);
 }
 
-// 3. STORY VIEWER LOGIC
+let activeStoryIndex = -1; let storyTimer = null; const STORY_DURATION = 5000;
+
 function openStoryViewer(index) {
   activeStoryIndex = index;
-  const viewer = document.getElementById('story-viewer');
-  viewer.classList.add('active');
-  
-  // Progress barları yarat
+  document.getElementById('story-viewer').classList.add('active');
   renderProgressBars();
-  
-  // Story-ni yüklə
   loadStoryContent(index);
 }
 
 function renderProgressBars() {
   const container = document.getElementById('story-progress-bars');
   container.innerHTML = '';
-  
-  // Yalnız type='story' olanlar üçün bar yaradılır
   const storyItems = storiesData.filter(s => s.type === 'story');
-  
-  storyItems.forEach((s, i) => {
+  storyItems.forEach((s) => {
     const bar = document.createElement('div');
     bar.className = 'story-progress-bar';
     bar.innerHTML = `<div class="story-progress-fill" id="prog-${s.id}"></div>`;
@@ -1651,47 +1624,33 @@ function renderProgressBars() {
 
 function loadStoryContent(index) {
   const story = storiesData[index];
-  
-  // Əgər story bitibsə bağla
-  if (!story || story.type !== 'story') {
-    closeStory();
-    return;
-  }
+  if (!story || story.type !== 'story') { closeStory(); return; }
 
   document.getElementById('sv-image').src = story.content;
   document.getElementById('sv-name').textContent = story.title;
   document.getElementById('sv-avatar').src = story.thumb;
 
-  // Bütün barları sıfırla və ya doldur
   resetBars(index);
-  
-  // Cari barı başlat
   startProgressBar(story.id);
 }
 
 function startProgressBar(storyId) {
   if (storyTimer) clearInterval(storyTimer);
-  
   const fill = document.getElementById(`prog-${storyId}`);
   if(!fill) return;
 
   fill.style.transition = 'none';
   fill.style.width = '0%';
-  
   setTimeout(() => {
     fill.style.transition = `width ${STORY_DURATION}ms linear`;
     fill.style.width = '100%';
   }, 50);
 
-  storyTimer = setTimeout(() => {
-    nextStory();
-  }, STORY_DURATION);
+  storyTimer = setTimeout(() => { nextStory(); }, STORY_DURATION);
 }
 
 function resetBars(currentIndex) {
-  // Story tipində olanların hamısını tap
   const storyItems = storiesData.filter(s => s.type === 'story');
-  // Cari indexin "story" arrayindəki yerini tap
   const currentStoryObj = storiesData[currentIndex];
   const relativeIndex = storyItems.findIndex(s => s.id === currentStoryObj.id);
 
@@ -1699,41 +1658,24 @@ function resetBars(currentIndex) {
     const fill = document.getElementById(`prog-${s.id}`);
     if (fill) {
       fill.style.transition = 'none';
-      if (i < relativeIndex) fill.style.width = '100%'; // Keçilmişlər dolu
-      else fill.style.width = '0%'; // Gələcəklər boş
+      if (i < relativeIndex) fill.style.width = '100%'; 
+      else fill.style.width = '0%'; 
     }
   });
 }
 
 function nextStory() {
-  // Növbəti story-ni tap
   let nextIndex = activeStoryIndex + 1;
-  while (nextIndex < storiesData.length && storiesData[nextIndex].type !== 'story') {
-    nextIndex++;
-  }
-
-  if (nextIndex < storiesData.length) {
-    loadStoryContent(nextIndex);
-    activeStoryIndex = nextIndex;
-  } else {
-    closeStory();
-  }
+  while (nextIndex < storiesData.length && storiesData[nextIndex].type !== 'story') { nextIndex++; }
+  if (nextIndex < storiesData.length) { loadStoryContent(nextIndex); activeStoryIndex = nextIndex; } 
+  else { closeStory(); }
 }
 
 function prevStory() {
-  // Əvvəlki story-ni tap
   let prevIndex = activeStoryIndex - 1;
-  while (prevIndex >= 0 && storiesData[prevIndex].type !== 'story') {
-    prevIndex--;
-  }
-
-  if (prevIndex >= 0 && storiesData[prevIndex].type === 'story') {
-    loadStoryContent(prevIndex);
-    activeStoryIndex = prevIndex;
-  } else {
-    // İlk story-dəyiksə, barı yenidən başlat
-    loadStoryContent(activeStoryIndex);
-  }
+  while (prevIndex >= 0 && storiesData[prevIndex].type !== 'story') { prevIndex--; }
+  if (prevIndex >= 0 && storiesData[prevIndex].type === 'story') { loadStoryContent(prevIndex); activeStoryIndex = prevIndex; } 
+  else { loadStoryContent(activeStoryIndex); }
 }
 
 function closeStory() {
@@ -1741,10 +1683,12 @@ function closeStory() {
   if (storyTimer) clearInterval(storyTimer);
 }
 
-// App başlayanda Stories yüklənsin
-initStories();
-initTracking();
-updateUI();
+// --- TRACKING ---
+function initTracking() { logUserAction('Start'); }
+function openAboutModal() { document.getElementById('about-modal').classList.add('active'); }
+function closeAboutModal() { document.getElementById('about-modal').classList.remove('active'); }
+
+init();
 </script>
 </body>
 </html>
