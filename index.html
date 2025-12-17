@@ -1009,11 +1009,16 @@ let deviceName = getDeviceType();
 
 // --- INITIALIZATION ---
 function init() {
-    fetchIP(); // Get IP immediately
     initStories();
-    initTracking(); // Logs "App Open"
+    
+    // We call this first. It will fetch IP -> Then Log "AppOpen" automatically
+    fetchIP(); 
+    
+    // We REMOVED individual initTracking() from here to avoid duplicate/empty logs
+    
     initGlobalSwipe(); 
     initNotificationSwipe(); 
+  initModalSwipe();
     updateUI();
 }
 
@@ -1035,6 +1040,9 @@ async function fetchIP() {
     } catch (e) {
         userIP = "Hidden/Error";
     }
+    
+    // MOVED HERE: Now we only log "App Open" after we have the IP (or failed to get it)
+    initTracking();
 }
 
 // Enhanced Logger
@@ -1305,12 +1313,22 @@ function initCardSwipe(card, product) {
       const action = dir === 1 ? "SwipeRight (Like)" : "SwipeLeft (Nope)";
       logUserAction(action, product.name);
 
-      setTimeout(() => {
-        card.remove();
-        state.cardStack.shift();
-        if (dir === 1) redirectToWhatsApp(product);
-        else renderCards();
-      }, 300);
+      // Inside initCardSwipe -> onEnd function
+setTimeout(() => {
+  card.innerHTML = ''; // Clear content first to free memory immediately
+  card.remove();       // Then remove the element
+  state.cardStack.shift();
+  
+  // LOGIC CHANGE HERE:
+  // If we open WhatsApp in a new tab, we don't need to stop rendering.
+  // We just proceed to the next card.
+  if (dir === 1) {
+      redirectToWhatsApp(product);
+      renderCards(); // Ensure the next card is shown behind it
+  } else {
+      renderCards();
+  }
+}, 300);
     } else {
       resetCard();
     }
@@ -1386,7 +1404,7 @@ function openModal(p, sourceList = [], index = -1) {
   document.getElementById('modal-whatsapp-btn').onclick = () => redirectToWhatsApp(p);
   document.getElementById('product-modal').classList.add('active');
   
-  logUserAction("OpenModal", p.name, `${p.price} AZN`); // LOG
+  // LOG
   initModalSwipe(); 
 }
 
@@ -1593,7 +1611,9 @@ function redirectToWhatsApp(p) {
   
   const text = `Salam Brendimo! 🎁\n\nBu məhsulu bəyəndim:\n*${p.name}*\n${priceText}\n\nLink:\n${fixImageLink(p.image)}\n\nSifariş etmək istəyirəm.`;
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-  setTimeout(() => window.location.href = url, 100); 
+  setTimeout(() => {
+    window.open(url, '_blank'); 
+}, 100);
 }
 
 function initTracking() { logUserAction('AppOpen'); }
@@ -1738,6 +1758,30 @@ function closeStory() {
 function openAboutModal() { document.getElementById('about-modal').classList.add('active'); logUserAction("AboutModal"); }
 function closeAboutModal() { document.getElementById('about-modal').classList.remove('active'); }
 
+// --- PAGE VISIBILITY HANDLER (Prevents freezing) ---
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    // User switched tabs or went to WhatsApp -> PAUSE TIMERS
+    if (globalTimerInterval) {
+        clearInterval(globalTimerInterval);
+        globalTimerInterval = null;
+    }
+    // Note: We don't pause order notifications to keep the "feeling" alive, 
+    // but the discount timer is heavy, so we pause it.
+  } else {
+    // User came back -> RESUME TIMERS
+    if (document.getElementById('fear-bar-main') && !document.getElementById('fear-bar-main').classList.contains('hidden')) {
+        // Only restart if the bar was actually active
+        if (!globalTimerInterval && typeof activateGlobalDiscount === "function") {
+             // We restart the interval logic manually or just let it resume
+             // Simpler approach for your specific code:
+             isTimerActive = false; // Reset flag
+             activateGlobalDiscount(); // Restart the function
+        }
+    }
+  }
+});
+  
 init();
 </script>
 </body>
