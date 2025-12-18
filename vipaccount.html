@@ -392,21 +392,44 @@
 
     <script>
         // --- 1. STORE & STATE MANAGEMENT ---
-      const Store = {
-    // ... existing variables ...
-    apiUrl: 'https://script.google.com/macros/s/AKfycbzMmLCCzgcUb5yvJWOl_Z5xKfFMEux9L0Me_1yMPSxVmE98vs_sBxsbe0F1iK0NTagQ/exec', // <--- PASTE URL HERE
+   const Store = {
+    key: 'brendimo_vip_data_v1', // define key
+    apiUrl: 'https://script.google.com/macros/s/AKfycbzMmLCCzgcUb5yvJWOl_Z5xKfFMEux9L0Me_1yMPSxVmE98vs_sBxsbe0F1iK0NTagQ/exec', 
+    
+    // Define the default state here
+    data: {
+        name: 'User',
+        phone: '',
+        coins: 0,
+        lastDaily: 0,
+        inventory: [],
+        history: []
+    },
 
-    // Update the save function to sync with cloud
+    init() {
+        try {
+            const saved = localStorage.getItem(this.key);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                this.data = { ...this.data, ...parsed };
+            }
+        } catch(e) { console.error("Storage Error", e); }
+        return !!this.data.phone;
+    },
+
+    // This is the ONLY save function you need (combines Local + Cloud)
     save() {
-        // 1. Save locally (for speed)
-        localStorage.setItem(this.key, JSON.stringify(this.data));
-        UI.updateWalletDisplay();
+        // 1. Save locally
+        try {
+            localStorage.setItem(this.key, JSON.stringify(this.data));
+            if(typeof UI !== 'undefined') UI.updateWalletDisplay();
+        } catch(e) { console.error("Local Save Error", e); }
 
-        // 2. Save to cloud (Background sync)
-        if(this.data.phone && this.apiUrl) {
+        // 2. Save to cloud (Background)
+        if(this.data.phone && this.data.phone.length > 3 && this.apiUrl) {
             fetch(this.apiUrl, {
                 method: 'POST',
-                mode: 'no-cors', // standard for GAS
+                mode: 'no-cors',
                 body: JSON.stringify({
                     action: 'sync',
                     phone: this.data.phone,
@@ -417,64 +440,45 @@
             }).catch(err => console.log('Sync error:', err));
         }
     },
-    
-    // ... rest of your code ...
 
-            init() {
-                try {
-                    const saved = localStorage.getItem(this.key);
-                    if (saved) {
-                        const parsed = JSON.parse(saved);
-                        // Merge strategies for backward compatibility
-                        this.data = { ...this.data, ...parsed };
-                    }
-                } catch(e) { console.error("Storage Error", e); }
-                return !!this.data.phone; // Return true if logged in
-            },
+    addCoins(amount, source) {
+        this.data.coins += amount;
+        this.logTransaction(amount > 0 ? '+' : '', amount, source);
+        this.save();
+        if(amount > 0 && typeof UI !== 'undefined') {
+            UI.confetti();
+            UI.vibrate(100);
+        }
+    },
 
-            save() {
-                try {
-                    localStorage.setItem(this.key, JSON.stringify(this.data));
-                    UI.updateWalletDisplay();
-                } catch(e) { console.error("Storage Save Error", e); }
-            },
-
-            addCoins(amount, source) {
-                this.data.coins += amount;
-                this.logTransaction(amount > 0 ? '+' : '', amount, source);
-                this.save();
-                if(amount > 0) {
-                    UI.confetti();
-                    UI.vibrate(100);
-                }
-            },
-
-            deduct(amount, reason) {
-                if (this.data.coins < amount) {
-                    UI.shakeWallet();
-                    UI.vibrate([50, 50, 50]);
-                    return false;
-                }
-                this.data.coins -= amount;
-                this.logTransaction('-', amount, reason);
-                this.save();
-                return true;
-            },
-
-            addItem(item) {
-                this.data.inventory.unshift({ ...item, date: new Date().toLocaleDateString() });
-                this.save();
-            },
-
-            logTransaction(sign, amount, desc) {
-                this.data.history.unshift({ 
-                    date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), 
-                    amount: `${sign}${amount}`, 
-                    desc 
-                });
-                if(this.data.history.length > 30) this.data.history.pop();
+    deduct(amount, reason) {
+        if (this.data.coins < amount) {
+            if(typeof UI !== 'undefined') {
+                UI.shakeWallet();
+                UI.vibrate([50, 50, 50]);
             }
-        };
+            return false;
+        }
+        this.data.coins -= amount;
+        this.logTransaction('-', amount, reason);
+        this.save();
+        return true;
+    },
+
+    addItem(item) {
+        this.data.inventory.unshift({ ...item, date: new Date().toLocaleDateString() });
+        this.save();
+    },
+
+    logTransaction(sign, amount, desc) {
+        this.data.history.unshift({ 
+            date: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), 
+            amount: `${sign}${amount}`, 
+            desc 
+        });
+        if(this.data.history.length > 30) this.data.history.pop();
+    }
+};
 
         // --- 2. APP LOGIC ---
         const App = {
