@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Brendimo - Hədiyyəni Tap</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="🎁 Brendimo Hədiyyə Sehrbazı">
+<meta property="og:description" content="Nə alacağını bilmirsən? 30 saniyəyə tap!">
+<meta property="og:image" content="https://raw.githubusercontent.com/Brendimo-co/sehrbaz/main/Gemini_Generated_Image_hzsbephzsbephzsb.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="index1.html" as="document"> <style>
+    /* --- RESET & BASE --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { 
+        background: #fafafa; color: #1d1d1f; overflow: hidden; height: 100vh; 
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        position: relative;
+    }
+
+    /* --- AMBIENT BACKGROUND (Exact copy from Main App) --- */
+    .ambient-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; pointer-events: none; }
+    .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: floatBg 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1); }
+    .blob-1 { width: 500px; height: 500px; background: #ffe3e3; top: -10%; left: -10%; }
+    .blob-2 { width: 400px; height: 400px; background: #fff8d6; bottom: -10%; right: -10%; animation-delay: -5s; }
+    .noise-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.03; background-image: url("https://grainy-gradients.vercel.app/noise.svg"); }
+    
+    @keyframes floatBg {
+        0% { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(20px, -40px) scale(1.05); }
+    }
+
+    /* --- HERO CONTENT --- */
+    .container {
+        width: 100%; max-width: 400px; padding: 20px;
+        display: flex; flex-direction: column; align-items: center; text-align: center;
+        z-index: 10;
+    }
+
+    .logo-badge {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 8px 16px; border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+        animation: fadeInDown 0.8s ease;
+    }
+    .logo-text { font-weight: 800; color: #c21a1a; font-size: 14px; letter-spacing: -0.5px; }
+
+    /* Floating Questions Animation */
+    .bubble-container { position: relative; height: 120px; width: 100%; margin-bottom: 20px; }
+    .q-bubble {
+        position: absolute;
+        background: white;
+        padding: 10px 18px;
+        border-radius: 20px 20px 20px 4px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        font-weight: 600; color: #555; font-size: 14px;
+        opacity: 0;
+        animation: popInFloat 3s infinite;
+    }
+    .q1 { top: 0; left: 10%; animation-delay: 0s; transform: rotate(-5deg); }
+    .q2 { top: 40px; right: 10%; animation-delay: 1s; border-radius: 20px 20px 4px 20px; transform: rotate(3deg); }
+    .q3 { bottom: 0; left: 20%; animation-delay: 2s; transform: rotate(-2deg); }
+
+    @keyframes popInFloat {
+        0% { transform: translateY(10px) scale(0.8) rotate(var(--r, 0deg)); opacity: 0; }
+        10% { transform: translateY(0) scale(1) rotate(var(--r, 0deg)); opacity: 1; }
+        90% { transform: translateY(-5px) scale(1) rotate(var(--r, 0deg)); opacity: 1; }
+        100% { transform: translateY(-15px) scale(0.9) rotate(var(--r, 0deg)); opacity: 0; }
+    }
+
+    /* Main Typography */
+    .main-title {
+        font-size: 32px; font-weight: 800; color: #1d1d1f; margin-bottom: 12px;
+        line-height: 1.1; letter-spacing: -1px;
+        animation: fadeInUp 0.8s ease 0.2s backwards;
+    }
+    .sub-title {
+        font-size: 16px; color: #666; line-height: 1.5; margin-bottom: 40px;
+        max-width: 280px;
+        animation: fadeInUp 0.8s ease 0.4s backwards;
+    }
+
+    /* --- CTA BUTTON --- */
+    .cta-btn-wrapper {
+        position: relative; width: 100%;
+        animation: fadeInUp 0.8s ease 0.6s backwards;
+    }
+
+    .cta-btn {
+        width: 100%;
+        padding: 18px;
+        background: #c21a1a;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        font-size: 18px; font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 10px 25px rgba(194, 26, 26, 0.3);
+        position: relative; overflow: hidden;
+        transition: transform 0.2s, background 0.2s;
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    
+    .cta-btn:active { transform: scale(0.96); background: #a61515; }
+
+    /* Shine Effect on Button */
+    .cta-btn::after {
+        content: ''; position: absolute; top: 0; left: -100%;
+        width: 50%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        animation: shine 3s infinite;
+    }
+
+    .stats {
+        margin-top: 25px;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        font-size: 12px; color: #888; font-weight: 500;
+        animation: fadeIn 1s ease 1s backwards;
+    }
+    .avatars { display: flex; }
+    .av { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff; margin-left: -8px; background: #ddd; object-fit: cover; }
+    .av:first-child { margin-left: 0; }
+
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes shine { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+
+    /* Loading Spinner */
+    .spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+</style>
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '752296677155305');
+fbq('track', 'PageView');
+</script>
+</head>
+<body>
+
+    <div class="ambient-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="noise-overlay"></div>
+    </div>
+
+    <div class="container">
+        <div class="logo-badge">
+            <span class="logo-text">🎁 Brendimo AI</span>
+        </div>
+
+        <div class="bubble-container">
+            <div class="q-bubble q1" style="--r:-5deg">Nə alım? 🤷‍♂️</div>
+            <div class="q-bubble q2" style="--r:3deg">Vaxtım yoxdur! ⏰</div>
+            <div class="q-bubble q3" style="--r:-2deg">Büdcəm azdır... 💸</div>
+        </div>
+
+        <h1 class="main-title">Hədiyyə Seçmək Heç Bu Qədər Rahat Olmamışdı.</h1>
+        
+        <p class="sub-title">Süni intellekt köməkçimiz sizə 30 saniyəyə ideal hədiyyəni tapacaq.</p>
+
+        <div class="cta-btn-wrapper">
+            <button class="cta-btn" onclick="startWizard()">
+                <span id="btn-text">Sehrbazı Başlat 🪄</span>
+                <div id="btn-loader" class="spinner"></div>
+            </button>
+        </div>
+
+        <div class="stats">
+            <div class="avatars">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=64&h=64&fit=crop" class="av">
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=64&h=64&fit=crop" class="av">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=64&h=64&fit=crop" class="av">
+            </div>
+            <span>+1,200 nəfər bu gün istifadə etdi</span>
+        </div>
+    </div>
+
+<script>
+    function startWizard() {
+        // Visual Feedback
+        const btn = document.querySelector('.cta-btn');
+        const txt = document.getElementById('btn-text');
+        const loader = document.getElementById('btn-loader');
+
+        txt.style.display = 'none';
+        loader.style.display = 'block';
+        btn.style.transform = 'scale(0.95)';
+        btn.style.opacity = '0.9';
+
+        // Log to Pixel
+        if(typeof fbq === 'function') fbq('track', 'StartWizardClick');
+
+        // Short delay for "App Feel" then Redirect
+        setTimeout(() => {
+            // Instagram-Safe Navigation to your main file
+            window.location.href = 'index1.html';
+        }, 300);
+    }
+
+    // Prefetch the main app immediately
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = 'index1.html';
+    document.head.appendChild(link);
+</script>
+
+</body>
+</html>
