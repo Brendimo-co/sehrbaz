@@ -1310,10 +1310,21 @@ let currentStep = 0;
 const totalSteps = 5;
 // --- STATE (UPDATED) ---
 // This line ensures we load saved favorites from memory instead of starting empty!
+// SAFE MEMORY LOADER
+let savedLikes = [];
+try {
+    // Try to get data, but if Instagram blocks it, don't crash!
+    const localData = localStorage.getItem('brendimo_likes');
+    if (localData) savedLikes = JSON.parse(localData);
+} catch (e) {
+    console.log("Instagram DM Storage Restricted");
+    savedLikes = []; // Fallback to empty list
+}
+
 const state = { 
     who: null, occasion: null, mood: null, style: null, budget: null, 
     products: [], cardStack: [], orders: [], viewedProductCount: 0,
-    likedProducts: JSON.parse(localStorage.getItem('brendimo_likes')) || [] 
+    likedProducts: savedLikes
 };
 let gridLimit = 6; 
 let currentModalIndex = -1;
@@ -1456,12 +1467,14 @@ function addToFavorites(product) {
     // 2. If not in list, add it
     if (!exists) {
         state.likedProducts.push(product);
-        localStorage.setItem('brendimo_likes', JSON.stringify(state.likedProducts));
-        
-        // Optional: Show a mini toast
-        // showCustomPopup('popup-delivery'); // Or a custom "Added to Favs" toast
+      try {
+            localStorage.setItem('brendimo_likes', JSON.stringify(state.likedProducts));
+        } catch (e) {
+            console.log("Saving not supported in DM");
+        }
     }
-}
+
+    }
 
 function removeFromFavoritesGlobal(productName) {
     const index = state.likedProducts.findIndex(p => p.name === productName);
@@ -2155,7 +2168,7 @@ function redirectToWhatsApp(p) {
   // 1. We remove the setTimeout (Instagram hates delays)
   // 2. We use window.location.href (Forces navigation in the same tab)
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-  window.location.href = url; 
+window.top.location.href = url; // Forces the main window to change
 }
 
 function initTracking() { logUserAction('AppOpen'); }
