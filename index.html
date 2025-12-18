@@ -2,8 +2,8 @@
 <html lang="az">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Brendimo Hədiyyə Sehrbazı</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Brendimo Hədiyyə Sehrbazı</title>
 <meta property="og:type" content="website">
 <meta property="og:title" content="🎁 Brendimo Hədiyyə Sehrbazı">
 <meta property="og:description" content="Hədiyyə axtarışından yorulmusan? 30 saniyəyə ideal hədiyyəni tap!">
@@ -2410,6 +2410,19 @@ function trackInteraction() {
     }
 }
 init();
+  // Add this to the end of your script
+document.addEventListener('DOMContentLoaded', function() {
+    // Force re-initialization when the DOM is ready
+    init(); 
+    
+    // Fix for Instagram: Manually attach click events to critical buttons
+    // instead of relying on HTML onclick
+    const logo = document.querySelector('.logo');
+    if(logo) logo.addEventListener('click', restartApp);
+    
+    const backBtn = document.querySelector('.back-btn');
+    if(backBtn) backBtn.addEventListener('click', goBack);
+});
 </script>
 </body>
 </html>
