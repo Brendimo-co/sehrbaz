@@ -2150,10 +2150,12 @@ function redirectToWhatsApp(p) {
   if (globalDiscount > 0) { priceText = `${p.price} AZN (Endirimlə: ${p.oldPrice} ₼ yox)\n🔥 Əlavə Bonus Endirim: -${discountVal} AZN\n✅ YEKUN: ${finalPrice} AZN`; }
   
   const text = `Salam Brendimo! 🎁\n\nBu məhsulu bəyəndim:\n*${p.name}*\n${priceText}\n\nLink:\n${fixImageLink(p.image)}\n\nSifariş etmək istəyirəm.`;
+  
+  // --- THE FIX ---
+  // 1. We remove the setTimeout (Instagram hates delays)
+  // 2. We use window.location.href (Forces navigation in the same tab)
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-  setTimeout(() => {
-    window.open(url, '_blank'); 
-}, 100);
+  window.location.href = url; 
 }
 
 function initTracking() { logUserAction('AppOpen'); }
