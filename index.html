@@ -188,26 +188,119 @@ body {
 .progress-container { height: 4px; background: #eee; border-radius: 2px; margin-bottom: 30px; overflow: hidden; }
 .progress-fill { height: 100%; background: #c21a1a; width: 20%; transition: width 0.4s ease; }
 
-/* STEPS */
-.step-content { display: none; animation: fadeIn 0.4s ease; }
-.step-content.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* --- NEW PREMIUM STEPS ANIMATION --- */
+/* 1. Staggered Entrance Animation for Step Content */
+.step-content { 
+    display: none; 
+}
+.step-content.active { 
+    display: block; 
+}
 
-.title { font-size: 22px; font-weight: 800; margin-bottom: 24px; text-align: center; line-height: 1.3; color: #111; letter-spacing: -0.5px; }
+/* We animate the grid items instead of the container for a "waterfall" effect */
+.step-content.active .option-card {
+    opacity: 0;
+    animation: cardPopUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
 
-/* OPTIONS GRID - NEW PREMIUM STYLE */
-.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+/* Stagger delays for 4 items */
+.step-content.active .option-card:nth-child(1) { animation-delay: 0.1s; }
+.step-content.active .option-card:nth-child(2) { animation-delay: 0.2s; }
+.step-content.active .option-card:nth-child(3) { animation-delay: 0.3s; }
+.step-content.active .option-card:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes cardPopUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- PREMIUM OPTIONS GRID --- */
+.options-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 16px; 
+    padding: 5px; /* Space for shadows */
+}
+
 .option-card {
-  background: white; 
-  border: 1px solid #eaeaea; 
-  border-radius: 20px; 
-  padding: 24px 15px;
-  text-align: center; 
-  cursor: pointer; 
-  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-  position: relative;
-  overflow: hidden;
+    background: #ffffff;
+    /* Clean, soft shadow instead of border */
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08); 
+    border-radius: 24px; /* More rounded = more modern */
+    padding: 30px 15px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 2px solid transparent; /* Prepare for border change */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 160px; /* Taller cards look more expensive */
+}
+
+/* Floating Glow Background behind Icon */
+.option-card::before {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(194, 26, 26, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -80%);
+    border-radius: 50%;
+    z-index: 0;
+    transition: all 0.4s ease;
+}
+
+.option-icon { 
+    font-size: 42px; 
+    margin-bottom: 15px; 
+    display: block; 
+    position: relative;
+    z-index: 1;
+    /* Subtle drop shadow on the emoji itself for 3D feel */
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    transition: transform 0.3s ease;
+}
+
+.option-text { 
+    font-size: 15px; 
+    font-weight: 700; 
+    color: #333; 
+    line-height: 1.3; 
+    position: relative;
+    z-index: 1;
+    transition: color 0.3s;
+}
+
+/* --- HOVER & ACTIVE STATES --- */
+.option-card:active { 
+    transform: scale(0.95); 
+    box-shadow: 0 4px 10px rgba(194, 26, 26, 0.2);
+}
+
+/* Selected State (We will add this class via JS momentarily) */
+.option-card.selected {
+    border-color: #c21a1a;
+    background: #fffafa; /* Very light red tint */
+}
+
+.option-card.selected .option-icon {
+    transform: scale(1.15) rotate(-10deg);
+}
+
+.option-card.selected::before {
+    background: radial-gradient(circle, rgba(194, 26, 26, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+    transform: translate(-50%, -50%) scale(1.5);
+}
+
+.option-card.selected .option-text {
+    color: #c21a1a;
 }
 /* Gradient overlay on hover/active for premium feel */
 .option-card::before {
@@ -750,6 +843,7 @@ body {
 }
 
 /* --- 2. COOL FLOATING LIKE BUTTON --- */
+/* --- FIXED LIKE BUTTON --- */
 .modal-like-btn {
     position: absolute;
     top: 15px;
@@ -764,9 +858,14 @@ body {
     justify-content: center;
     font-size: 24px;
     cursor: pointer;
-    z-index: 20; /* Above image */
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 100; /* Increased to sit above everything */
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     color: #ccc; /* Default (Gray/Empty) */
+    
+    /* CRITICAL FIXES FOR MOBILE TOUCH */
+    touch-action: manipulation; 
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 .modal-like-btn.liked {
@@ -778,7 +877,92 @@ body {
 .modal-like-btn:active {
     transform: scale(0.9);
 }
-  
+ /* --- PROMO BUBBLE (MOVABLE) --- */
+.promo-bubble {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    width: 80px;
+    height: 80px;
+    background: rgba(194, 26, 26, 0.85); /* Brendimo Red Transparent */
+    backdrop-filter: blur(8px);
+    border-radius: 50%;
+    box-shadow: 0 8px 25px rgba(194, 26, 26, 0.4);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    touch-action: none; /* Critical for dragging */
+    transition: transform 0.1s;
+    animation: floatBubble 3s ease-in-out infinite;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.bubble-content { position: relative; z-index: 2; pointer-events: none; }
+.bubble-text { font-size: 9px; line-height: 1.2; display: block; }
+.bubble-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+
+.bubble-close {
+    position: absolute; top: -5px; right: -5px;
+    background: #333; color: white;
+    width: 20px; height: 20px;
+    border-radius: 50%; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 3;
+}
+
+/* Heart Impulse Animation */
+.bubble-pulse {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    border-radius: 50%; border: 2px solid #c21a1a;
+    animation: pulseRing 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    z-index: 1; pointer-events: none;
+}
+
+@keyframes pulseRing {
+    0% { transform: scale(0.95); opacity: 1; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+@keyframes floatBubble {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+/* --- CUSTOM POPUPS --- */
+.custom-popup {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 10000; display: none;
+    align-items: center; justify-content: center;
+}
+.custom-popup.active { display: flex; animation: fadeIn 0.3s forwards; }
+
+.popup-backdrop {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+}
+
+.popup-card {
+    background: white; width: 85%; max-width: 320px;
+    padding: 25px 20px; border-radius: 24px;
+    text-align: center; position: relative; z-index: 2;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    transform: scale(0.8); opacity: 0;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.popup-icon { font-size: 40px; margin-bottom: 10px; }
+.popup-card h3 { color: #c21a1a; font-size: 20px; margin-bottom: 10px; font-weight: 800; }
+.popup-card p { font-size: 15px; color: #444; line-height: 1.5; margin-bottom: 20px; }
+.popup-btn {
+    background: #c21a1a; color: white; border: none;
+    padding: 12px 30px; border-radius: 12px;
+    font-size: 16px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 15px rgba(194, 26, 26, 0.3);
+}
+
+@keyframes popIn { to { transform: scale(1); opacity: 1; } } 
 </style>
 <script>
 !function(f,b,e,v,n,t,s)
@@ -1021,7 +1205,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
       <div id="fear-bar-modal" class="fear-bar-wrapper" style="margin-bottom: 15px; padding: 10px; display:none;">
           <div class="fear-header">
               <span class="fear-title" style="font-size: 11px;">⚠️ QAÇIRMA!</span>
-              <span id="modal-fear-amount" class="fear-amount" style="font-size: 18px;">-6.00 ₼</span>
+              <span id="modal-fear-amount" class="fear-amount" style="font-size: 18px;">-4.00 ₼</span>
           </div>
           <div class="timer-track" style="height: 4px;">
               <div id="modal-timer-fill" class="timer-fill"></div>
@@ -1086,6 +1270,36 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
   </div>
 </nav>
 
+<div id="promo-bubble" class="promo-bubble">
+    <div class="bubble-close" onclick="closeBubble()">✕</div>
+    <div class="bubble-content">
+        <span class="bubble-icon">🔥</span>
+        <span class="bubble-text">3+ Sifariş<br><b>-15₼ Endirim</b></span>
+    </div>
+    <div class="bubble-pulse"></div>
+</div>
+
+<div id="popup-welcome" class="custom-popup">
+    <div class="popup-backdrop"></div>
+    <div class="popup-card">
+        <div class="popup-icon">🎉</div>
+        <h3>Möhtəşəm Xəbər!</h3>
+        <p>Bütün məhsullarda <b>5 Günlük Özəl Endirim</b> başladı!</p>
+        <p style="font-size: 13px; color: #666; margin-top: 8px;">Bəyəndiyiniz məhsulları toplayın, səbət böyüdükcə endirim artacaq.</p>
+        <button onclick="closeCustomPopup('popup-welcome')" class="popup-btn">Başla 🚀</button>
+    </div>
+</div>
+
+<div id="popup-delivery" class="custom-popup">
+    <div class="popup-backdrop"></div>
+    <div class="popup-card">
+        <div class="popup-icon">🚚</div>
+        <h3>Çatdırılma Hədiyyə!</h3>
+        <p>Əla gedirsən! Əgər <b>2 və daha çox</b> məhsul sifariş etsən, çatdırılma bizdən olacaq.</p>
+        <button onclick="closeCustomPopup('popup-delivery')" class="popup-btn">Super! 😍</button>
+    </div>
+</div>
+  
 <script>
 // --- CONFIGURATION ---
 const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzMLzwp2qpBlUT1tZkKuKh0rzE7I7BRTCxdMZv8gvK2c8u9SNlFrFfBCO6HiR5nJjVpEw/exec"; 
@@ -1122,7 +1336,8 @@ function init() {
     initGlobalSwipe(); 
     initNotificationSwipe(); 
   initModalSwipe();
-    updateUI();
+  initBubbleDrag(); // <--- ADD THIS 
+  updateUI();
 }
 function preloadStories() {
   // Loops through all stories and forces the browser to download them now
@@ -1207,16 +1422,53 @@ function goBack() {
 }
 
 function handleOptionClick(e, key) {
+  // 1. Find the card
   const card = e.target.closest('.option-card');
   if (!card) return;
+
+  // 2. Visual Feedback: Add 'selected' class
+  // Remove 'selected' from siblings first (just in case)
+  const siblings = card.parentElement.querySelectorAll('.option-card');
+  siblings.forEach(s => s.classList.remove('selected'));
+  
+  card.classList.add('selected');
+
+  // 3. Store the value
   const val = card.getAttribute('data-val');
   state[key] = val;
-  
-  // LOGGING: Variable Name (key) and Selection (val)
+
+  // LOGGING
   logUserAction("StepCompleted", key, val);
-  
-  currentStep++;
-  updateUI();
+
+  // 4. Slight Delay before moving (Premium Feel)
+  // This allows the user to see the red border/animation confirmation
+  setTimeout(() => {
+    currentStep++;
+    updateUI();
+  }, 350); // 350ms delay
+}
+
+// --- NEW HELPER: CENTRAL FAVORITE LOGIC ---
+function addToFavorites(product) {
+    // 1. Check if it already exists to prevent duplicates
+    const exists = state.likedProducts.some(p => p.name === product.name);
+    
+    // 2. If not in list, add it
+    if (!exists) {
+        state.likedProducts.push(product);
+        localStorage.setItem('brendimo_likes', JSON.stringify(state.likedProducts));
+        
+        // Optional: Show a mini toast
+        // showCustomPopup('popup-delivery'); // Or a custom "Added to Favs" toast
+    }
+}
+
+function removeFromFavoritesGlobal(productName) {
+    const index = state.likedProducts.findIndex(p => p.name === productName);
+    if (index > -1) {
+        state.likedProducts.splice(index, 1);
+        localStorage.setItem('brendimo_likes', JSON.stringify(state.likedProducts));
+    }
 }
   
 // --- DATA FETCHING ---
@@ -1270,8 +1522,15 @@ async function fetchProducts() {
     currentStep++;
     updateUI();
     renderCards();
-    startOrderNotifications();
     
+    // Start notifications INSIDE the try block
+    startOrderNotifications(); 
+
+    // Show popup 2 seconds later
+    setTimeout(() => {
+          showCustomPopup('popup-welcome');
+    }, 2000); 
+
   } catch (error) {
     clearInterval(textInterval);
     console.error(error);
@@ -1416,6 +1675,7 @@ function initCardSwipe(card, product) {
     }
 
     if (Math.abs(currentX) > 100) {
+     trackInteraction(); // <--- ADD THIS
       const dir = currentX > 0 ? 1 : -1;
       card.style.transition = 'transform 0.4s ease';
       card.style.transform = `translate(${dir * window.innerWidth * 1.5}px, 0px) rotate(${dir * 30}deg)`;
@@ -1499,6 +1759,7 @@ function showPrevModalProduct() { if (currentModalIndex > 0) { openModal(current
 
 
 function openModal(p, sourceList = [], index = -1) {
+ trackInteraction(); // <--- ADD THIS AT THE TOP
   state.viewedProductCount++;
   if (state.viewedProductCount >= 3) activateGlobalDiscount();
 
@@ -1510,24 +1771,46 @@ function openModal(p, sourceList = [], index = -1) {
   document.getElementById('modal-match-score').textContent = (p.score || "90") + "% UYĞUNLUQ";
 
   // --- LIKE BUTTON LOGIC STARTS ---
+// --- LIKE BUTTON LOGIC STARTS (FIXED) ---
   const imgWrapper = document.querySelector('.modal-image-wrapper');
   
   // 1. Remove old button to prevent duplicates
   const oldBtn = imgWrapper.querySelector('.modal-like-btn');
   if(oldBtn) oldBtn.remove();
 
-  // 2. Check if already liked
+  // 2. Check current state
   const isLiked = state.likedProducts.some(item => item.name === p.name);
 
   // 3. Create the button
   const btn = document.createElement('div');
-  btn.className = `modal-like-btn ${isLiked ? 'liked' : ''}`; // Add 'liked' class if true
+  btn.className = `modal-like-btn ${isLiked ? 'liked' : ''}`; 
+  // We use a specific heart symbol that responds better to CSS colors than the standard emoji
   btn.innerHTML = '❤'; 
+  
+  // 4. Robust Click Handler
   btn.onclick = (e) => {
-      e.stopPropagation();
-      toggleLikeFromModal(p, btn);
+      e.stopPropagation(); // Stop modal from closing or swiping
+      e.preventDefault();  // Stop ghost clicks on mobile
+
+      // Check fresh state (in case it changed since modal opened)
+      const currentlyLiked = state.likedProducts.some(item => item.name === p.name);
+
+      if (currentlyLiked) {
+          // Remove
+          removeFromFavoritesGlobal(p.name);
+          btn.classList.remove('liked');
+      } else {
+          // Add
+          addToFavorites(p);
+          btn.classList.add('liked');
+          
+          // Tiny vibration for feedback (Android only usually)
+          if (navigator.vibrate) navigator.vibrate(50);
+      }
   };
+  
   imgWrapper.appendChild(btn);
+  // --- LIKE BUTTON LOGIC ENDS ---
   // --- LIKE BUTTON LOGIC ENDS ---
 
   document.getElementById('modal-price').innerHTML = `
@@ -1547,24 +1830,31 @@ function openModal(p, sourceList = [], index = -1) {
 }
 
 // HELPER FUNCTION: Handles the click on the heart
+// HELPER FUNCTION: Handles the click on the heart
 function toggleLikeFromModal(product, btnElement) {
-    const index = state.likedProducts.findIndex(item => item.name === product.name);
+    const isLiked = state.likedProducts.some(item => item.name === product.name);
     
-    if (index === -1) {
+    if (!isLiked) {
         // Not in list -> Add it
-        state.likedProducts.push(product);
+        addToFavorites(product);
         btnElement.classList.add('liked'); // Make it Red
     } else {
         // Already in list -> Remove it
-        state.likedProducts.splice(index, 1);
+        removeFromFavoritesGlobal(product.name);
         btnElement.classList.remove('liked'); // Make it Gray
     }
-    
-    // Save immediately
-    localStorage.setItem('brendimo_likes', JSON.stringify(state.likedProducts));
 }
 
-function closeModal() { document.getElementById('product-modal').classList.remove('active'); }
+// UPDATE: When closing modal, refresh the Favorites grid if it is open!
+function closeModal() { 
+    document.getElementById('product-modal').classList.remove('active'); 
+    
+    // Check if the user is currently on the Favorites Page
+    const favView = document.getElementById('favorites-view');
+    if (favView.classList.contains('active')) {
+        renderFavorites(); // RE-RENDER the grid to remove unliked items immediately
+    }
+}
 
 async function fetchReviews(productName) {
     const list = document.getElementById('reviews-list');
@@ -2052,7 +2342,71 @@ document.addEventListener("visibilitychange", () => {
     }
   }
 });
-  
+  // --- NEW PROMO LOGIC ---
+let interactionCount = 0; // Tracks swipes and views
+
+// 1. Draggable Logic for Bubble
+function initBubbleDrag() {
+    const bubble = document.getElementById('promo-bubble');
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
+
+    bubble.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        const rect = bubble.getBoundingClientRect();
+        // We set fixed positions to allow movement
+        bubble.style.right = 'auto'; 
+        bubble.style.bottom = 'auto';
+        bubble.style.left = rect.left + 'px';
+        bubble.style.top = rect.top + 'px';
+        bubble.style.animation = 'none'; // Stop floating while dragging
+    }, {passive: false});
+
+    document.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault(); // Prevent scrolling while dragging bubble
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const dx = currentX - startX;
+        const dy = currentY - startY;
+        
+        bubble.style.left = (parseFloat(bubble.style.left) + dx) + 'px';
+        bubble.style.top = (parseFloat(bubble.style.top) + dy) + 'px';
+        
+        startX = currentX;
+        startY = currentY;
+    }, {passive: false});
+
+    document.addEventListener('touchend', () => {
+        isDragging = false;
+        bubble.style.animation = 'floatBubble 3s ease-in-out infinite';
+    });
+}
+
+function closeBubble() {
+    document.getElementById('promo-bubble').style.display = 'none';
+    logUserAction('BubbleClosed');
+}
+
+// 2. Popup Helpers
+function showCustomPopup(id) {
+    document.getElementById(id).classList.add('active');
+    logUserAction('PopupShown', id);
+}
+function closeCustomPopup(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+// 3. Interaction Tracker
+function trackInteraction() {
+    interactionCount++;
+    // Trigger "Free Delivery" popup on 5th interaction
+    if (interactionCount === 5) {
+        showCustomPopup('popup-delivery');
+    }
+}
 init();
 </script>
 </body>
