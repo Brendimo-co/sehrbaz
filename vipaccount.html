@@ -690,11 +690,11 @@
                 cost: 50,
                 currentRotation: 0, // Keeps track of rotation to prevent snapping
                 prizes: [
-                    { label: "0", val: 0, color: '#222', weight: 40 },
-                    { label: "50", val: 50, color: '#444', weight: 30 },
-                    { label: "20", val: 20, color: '#222', weight: 15 },
-                    { label: "100", val: 100, color: '#444', weight: 10 },
-                    { label: "200", val: 200, color: 'var(--gold-primary)', weight: 5 }
+                    { label: "0", val: 0, color: '#222', weight: 35 },
+                    { label: "50", val: 50, color: '#444', weight: 35 },
+                    { label: "20", val: 20, color: '#222', weight: 25 },
+                    { label: "100", val: 100, color: '#444', weight: 4 },
+                    { label: "200", val: 200, color: 'var(--gold-primary)', weight: 1 }
                 ],
                 
                 init() {
@@ -919,10 +919,10 @@ flip(chosenIndex) {
                 let userResult;
 
                 // 1. Determine the result for the card the user CLICKED
-                if (rand < 15) {
+                if (rand < 5) {
                     userResult = { val: 300, icon: '💎', type: 'win' };
                 } else if (rand < 65) { // 15 + 50 = 65
-                    userResult = { val: 50, icon: '🔄', type: 'safe' };
+                    userResult = { val: 30, icon: '🔄', type: 'safe' };
                 } else {
                     userResult = { val: 0, icon: '💣', type: 'lose' };
                 }
