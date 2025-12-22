@@ -394,7 +394,7 @@
         // --- 1. STORE & STATE MANAGEMENT ---
    const Store = {
     key: 'brendimo_vip_data_v1', // define key
-    apiUrl: 'https://script.google.com/macros/s/AKfycbzMmLCCzgcUb5yvJWOl_Z5xKfFMEux9L0Me_1yMPSxVmE98vs_sBxsbe0F1iK0NTagQ/exec', 
+    apiUrl: 'https://script.google.com/macros/s/AKfycbzwraCrEnx0_F_AcC8MTrWFOaxy-O4aWAvoWpL1O4G8SUatt2YbiV3LkvgedRaQ6Ohk/exec', 
     
     // Define the default state here
     data: {
@@ -424,22 +424,22 @@
             localStorage.setItem(this.key, JSON.stringify(this.data));
             if(typeof UI !== 'undefined') UI.updateWalletDisplay();
         } catch(e) { console.error("Local Save Error", e); }
-
-        // 2. Save to cloud (Background)
-        if(this.data.phone && this.data.phone.length > 3 && this.apiUrl) {
-            fetch(this.apiUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({
-                    action: 'sync',
-                    phone: this.data.phone,
-                    coins: this.data.coins,
-                    inventory: this.data.inventory,
-                    history: this.data.history
-                })
-            }).catch(err => console.log('Sync error:', err));
-        }
-    },
+// Cloud Save
+    if(this.data.phone && this.data.phone.length > 3 && this.apiUrl) {
+        fetch(this.apiUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({
+                action: 'sync',
+                phone: this.data.phone,
+                name: this.data.name,  // Added Name so it updates in sheet
+                coins: this.data.coins,
+                inventory: this.data.inventory,
+                history: this.data.history
+            })
+        }).catch(err => console.log('Sync error:', err));
+    }
+},
 
     addCoins(amount, source) {
         this.data.coins += amount;
@@ -801,7 +801,7 @@
                             </div>
                             <canvas id="scratch-cvs" width="240" height="120" style="position:absolute; inset:0; z-index:2; cursor:crosshair;"></canvas>
                         </div>
-                        <p style="font-size:12px; color:#888;">Gümüş sahəni pozun</p>
+                        <p style="font-size:12px; color:#888;">Gümüş sahənin yarısından çoxunu pozun</p>
                     `);
 
                     this.setupCanvas(win);
@@ -815,7 +815,7 @@
                     ctx.fillRect(0, 0, 240, 120);
                     ctx.fillStyle = '#A9A9A9';
                     ctx.font = "20px Arial";
-                    ctx.fillText("Brendimo", 80, 65);
+                    ctx.fillText("Hədiyyə Sehrbazı", 45, 65);
 
                     let isDrawing = false;
                     let finished = false;
@@ -922,7 +922,7 @@ flip(chosenIndex) {
                 if (rand < 5) {
                     userResult = { val: 300, icon: '💎', type: 'win' };
                 } else if (rand < 65) { // 15 + 50 = 65
-                    userResult = { val: 30, icon: '🔄', type: 'safe' };
+                    userResult = { val: 50, icon: '🔄', type: 'safe' };
                 } else {
                     userResult = { val: 0, icon: '💣', type: 'lose' };
                 }
@@ -968,10 +968,10 @@ flip(chosenIndex) {
                             UI.vibrate(300);
                             alert("💣 Partladı! -50 Coin");
                     } else if(res.val === 50) { 
-                        alert("Safe! Pullar qayıtdı."); 
+                        alert("İtirmədin! Pullar qayıtdı. Yenidən sına!"); 
                         Store.addCoins(50, 'Refund: Cards'); 
                     } else { 
-                        alert("💎 JACKPOT! +300 Coin"); 
+                        alert("💎 CekPot! +300 Coin"); 
                         Store.addCoins(300, 'Win: Cards'); 
                     }
                     UI.closeModal();
