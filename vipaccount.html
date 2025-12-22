@@ -318,26 +318,11 @@
             </div>
 
             <div class="glass-panel">
-                <div style="font-size:12px; color:#666; margin-bottom:10px; text-transform:uppercase;">Social Tasks</div>
-                
-                <div class="shop-item" onclick="Tasks.doSocial('insta', 100)">
-                    <div style="font-size:24px; width:40px; text-align:center;">📸</div>
-                    <div style="flex:1;">
-                        <div style="font-weight:600;">Instagram'da İzlə</div>
-                        <div style="font-size:11px; color:var(--success);">+100 Coin</div>
-                    </div>
-                    <div style="opacity:0.5;">&rsaquo;</div>
-                </div>
-
-                <div class="shop-item" onclick="Tasks.shareWhatsApp()">
-                    <div style="font-size:24px; width:40px; text-align:center;">💬</div>
-                    <div style="flex:1;">
-                        <div style="font-weight:600;">Dostunu Dəvət Et</div>
-                        <div style="font-size:11px; color:var(--success);">+200 Coin</div>
-                    </div>
-                    <div style="opacity:0.5;">&rsaquo;</div>
-                </div>
-            </div>
+    <div style="font-size:12px; color:#666; margin-bottom:10px; text-transform:uppercase;">Social Tasks</div>
+    
+    <div id="mission-list"></div>
+</div>
+               
         </div>
 
         <div id="view-shop" class="view-section hidden">
@@ -397,14 +382,15 @@
     apiUrl: 'https://script.google.com/macros/s/AKfycbzwraCrEnx0_F_AcC8MTrWFOaxy-O4aWAvoWpL1O4G8SUatt2YbiV3LkvgedRaQ6Ohk/exec', 
     
     // Define the default state here
-    data: {
-        name: 'User',
-        phone: '',
-        coins: 0,
-        lastDaily: 0,
-        inventory: [],
-        history: []
-    },
+ data: {
+    name: 'User',
+    phone: '',
+    coins: 0,
+    lastDaily: 0,
+    inventory: [],
+    history: [],
+    completedTasks: [] // <--- ADD THIS LINE
+},
 
     init() {
         try {
@@ -435,7 +421,8 @@
                 name: this.data.name,  // Added Name so it updates in sheet
                 coins: this.data.coins,
                 inventory: this.data.inventory,
-                history: this.data.history
+                history: this.data.history,
+                completedTasks: this.data.completedTasks // <--- ADD THIS LINE
             })
         }).catch(err => console.log('Sync error:', err));
     }
@@ -642,45 +629,131 @@
         };
 
         // --- 4. TASK SYSTEM ---
-        const Tasks = {
-            checkDaily() {
-                const now = Date.now();
-                const oneDay = 24 * 60 * 60 * 1000;
-                const btn = document.getElementById('btn-claim-daily');
-                
-                if (now - Store.data.lastDaily > oneDay) {
-                    btn.classList.remove('btn-disabled');
-                    btn.innerText = "Götür (+50)";
-                    btn.onclick = () => this.claimDaily();
-                } else {
-                    btn.classList.add('btn-disabled');
-                    const left = Math.ceil(((Store.data.lastDaily + oneDay) - now) / (1000 * 60 * 60));
-                    btn.innerText = `${left} saat sonra`;
+    const Tasks = {
+    // 1. DEFINING THE MISSIONS (Add more here easily!)
+    missionData: [
+        { 
+            id: 'insta_1', 
+            title: "Instagram'da İzlə", 
+            reward: 100, 
+            icon: '📸', 
+            url: 'https://instagram.com/brendimo.az' 
+        },
+        { 
+            id: 'tiktok_1', 
+            title: "TikTok'da İzlə", 
+            reward: 100, 
+            icon: '🎵', 
+            url: 'https://tiktok.com/@brendimo' 
+        },
+        { 
+            id: 'tele_1', 
+            title: "Telegram Kanalı", 
+            reward: 150, 
+            icon: '✈️', 
+            url: 'https://t.me/brendimo' 
+        },
+        { 
+            id: 'wp_invite', 
+            title: "Dostunu Dəvət Et", 
+            reward: 200, 
+            icon: '💬', 
+            type: 'share' // Special type for WhatsApp
+        }
+    ],
+
+    checkDaily() {
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+        const btn = document.getElementById('btn-claim-daily');
+        
+        if (now - Store.data.lastDaily > oneDay) {
+            btn.classList.remove('btn-disabled');
+            btn.innerText = "Götür (+50)";
+            btn.onclick = () => this.claimDaily();
+        } else {
+            btn.classList.add('btn-disabled');
+            const left = Math.ceil(((Store.data.lastDaily + oneDay) - now) / (1000 * 60 * 60));
+            btn.innerText = `${left} saat sonra`;
+        }
+        
+        // Render the mission list whenever we check daily
+        this.renderMissions(); 
+    },
+
+    claimDaily() {
+        Store.addCoins(50, 'Daily Bonus');
+        Store.data.lastDaily = Date.now();
+        Store.save();
+        this.checkDaily();
+    },
+
+    // 2. RENDER THE LIST AUTOMATICALLY
+    renderMissions() {
+        const container = document.getElementById('mission-list');
+        if(!container) return;
+
+        // Ensure completedTasks exists (for old users)
+        if(!Store.data.completedTasks) Store.data.completedTasks = [];
+
+        container.innerHTML = this.missionData.map(task => {
+            const isDone = Store.data.completedTasks.includes(task.id);
+            
+            // If done, change style to look "finished"
+            const opacity = isDone ? '0.5' : '1';
+            const icon = isDone ? '✅' : '&rsaquo;';
+            const clickAction = isDone ? '' : `onclick="Tasks.execute('${task.id}')"`;
+            const rewardColor = isDone ? '#666' : 'var(--success)';
+
+            return `
+            <div class="shop-item" ${clickAction} style="opacity: ${opacity}">
+                <div style="font-size:24px; width:40px; text-align:center;">${task.icon}</div>
+                <div style="flex:1;">
+                    <div style="font-weight:600;">${task.title}</div>
+                    <div style="font-size:11px; color:${rewardColor};">${isDone ? 'Tamamlandı' : '+' + task.reward + ' Coin'}</div>
+                </div>
+                <div style="opacity:0.5;">${icon}</div>
+            </div>
+            `;
+        }).join('');
+    },
+
+    // 3. HANDLE EXECUTION
+    execute(id) {
+        const task = this.missionData.find(m => m.id === id);
+        if(!task) return;
+
+        // WhatsApp Share Logic
+        if(task.type === 'share') {
+            const text = `Hədiyyə axtarırsansa, Hədiyyə Sehrbazının Endirim Festivalında müxtəlif endirimlər və 5 AZN kupon qazana bilərsən! Sifariş edəndə bu nömrəni kupon kimi bildirərsən: ${Store.data.phone} Sayta keçid - www.sehrbaz.com`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
+            // We usually don't limit sharing, but if you want to limit it:
+            // this.completeTask(id, task.reward); 
+            return;
+        }
+
+        // Standard Social Logic
+        if(confirm(`${task.title} və ${task.reward} Coin qazan!`)) {
+            window.open(task.url, '_blank');
+            
+            // Wait 5 seconds to simulate checking
+            setTimeout(() => {
+                if(confirm("Tapşırığı yerinə yetirdiniz?")) {
+                    this.completeTask(id, task.reward);
                 }
-            },
+            }, 5000);
+        }
+    },
 
-            claimDaily() {
-                Store.addCoins(50, 'Daily Bonus');
-                Store.data.lastDaily = Date.now();
-                Store.save();
-                this.checkDaily();
-            },
-
-            doSocial(type, reward) {
-                if(confirm("Instagram səhifəmizi izlə və Coin qazan!")) {
-                    // In production, use real links
-                    window.open('https://instagram.com/brendimo_az', '_blank'); 
-                    setTimeout(() => {
-                         if(confirm("İzlədiniz?")) Store.addCoins(reward, 'Task: Social');
-                    }, 5000);
-                }
-            },
-
-            shareWhatsApp() {
-                const text = `Brendimo VIP Festivalına qoşul! Mənim kodum: ${Store.data.phone}`;
-                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`);
-            }
-        };
+    completeTask(id, reward) {
+        Store.addCoins(reward, 'Task: ' + id);
+        Store.data.completedTasks.push(id); // Save ID to memory
+        Store.save(); // Save to LocalStorage/Cloud
+        UI.vibrate([50, 50]);
+        alert("🎉 Əla! Coinlər əlavə olundu.");
+        this.renderMissions(); // Re-draw list to show checkmark
+    }
+};
 
         // --- 5. GAME ENGINES ---
         const Games = {
