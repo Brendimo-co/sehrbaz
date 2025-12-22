@@ -305,7 +305,8 @@ window.onload = function() {
 // --- CORE FUNCTIONS ---
 
 async function initCustomerMode(affId, itemsEncoded) {
-    loadProductsFromCache();
+    // 1. Try to load from cache AND filter immediately
+    loadProductsFromCache(itemsEncoded);
 
     try {
         const [affRes, prodRes] = await Promise.all([
@@ -325,20 +326,28 @@ async function initCustomerMode(affId, itemsEncoded) {
         }
 
         if (prodData.products) {
-            allProducts = prodData.products;
-            saveProductsToCache(allProducts);
+            const rawData = prodData.products;
             
+            // Save the FULL list to cache for next time
+            saveProductsToCache(rawData);
+            
+            // Apply Filter BEFORE rendering the fresh data
             if (itemsEncoded) {
                 const indexes = itemsEncoded.split(',').map(n => parseInt(n));
-                const filtered = allProducts.filter((_, i) => indexes.includes(i));
-                if(filtered.length > 0) allProducts = filtered;
+                // Only keep selected items
+                allProducts = rawData.filter((_, i) => indexes.includes(i));
+            } else {
+                allProducts = rawData;
             }
+            
             renderGrid();
         }
     } catch (e) {
+        // If internet fails, we rely on what loadProductsFromCache already rendered
         if(allProducts.length === 0) showError("İnternet bağlantısını yoxlayın.");
     }
 
+    // Ensure UI is visible
     document.getElementById('skeleton-grid').style.display = 'none';
     document.getElementById('shop-container').style.display = 'block';
     document.getElementById('intro-text').style.display = 'block';
@@ -365,7 +374,7 @@ async function handleLogin() {
             isBuilderMode = true;
             
             allProducts = prodData.products || [];
-            saveProductsToCache(allProducts);
+            saveProductsToCache(allProducts); // Save full list for builder
 
             setupShopUI(affData);
             
@@ -403,6 +412,11 @@ function renderGrid() {
     const container = document.getElementById('product-grid');
     container.innerHTML = '';
 
+    if (allProducts.length === 0) {
+        container.innerHTML = "<p style='text-align:center; grid-column:span 3; padding:20px; color:#888;'>Məhsul tapılmadı.</p>";
+        return;
+    }
+
     allProducts.forEach((p, index) => {
         const el = document.createElement('div');
         let imgUrl = fixImageLink(p.image);
@@ -416,11 +430,12 @@ function renderGrid() {
             // BUILDER: Selection
             selectHtml = `<div class="select-check">✔</div>`;
             actionContent = `<span style="font-size:11px; color:#888;">Seçmək üçün toxunun</span>`;
+            // Note: In builder mode, 'index' maps correctly to the full list
             el.onclick = () => toggleSelection(index, el.querySelector('.product-card'));
         } else {
             // CUSTOMER: View Details
             actionContent = `<span class="view-btn">Ətraflı Bax →</span>`;
-            el.onclick = () => openProductModal(p); // Opens the new modal
+            el.onclick = () => openProductModal(p); 
         }
 
         el.innerHTML = `
@@ -475,7 +490,6 @@ function closeProductModal() {
 function buyItem(prodName, price, imgUrl) {
     const phone = affiliateData.phone;
     
-    // --- UPDATED WHATSAPP MESSAGE LOGIC ---
     const text = `Salam ${affiliateData.storeName}! 👋\n\n` +
                  `Mən bu məhsulu sifariş etmək istəyirəm:\n` +
                  `🛍 *${prodName}*\n` +
@@ -527,11 +541,24 @@ function closeShareModal() {
 
 // --- UTILS ---
 
-function loadProductsFromCache() {
+// MODIFIED: Now accepts itemsEncoded to filter immediately
+function loadProductsFromCache(itemsEncoded) {
     const cached = localStorage.getItem('brendimo_products');
     const time = localStorage.getItem('brendimo_cache_time');
-    if (cached && time && (Date.now() - time < 1800000)) {
-        allProducts = JSON.parse(cached);
+    
+    if (cached && time && (Date.now() - time < 1800000)) { // 30 mins cache
+        let products = JSON.parse(cached);
+        
+        // CRITICAL FIX: Filter BEFORE rendering
+        if (itemsEncoded) {
+            const indexes = itemsEncoded.split(',').map(n => parseInt(n));
+            // Only keep selected items
+            products = products.filter((_, i) => indexes.includes(i));
+        }
+
+        allProducts = products;
+        
+        // Hide loader and show grid immediately with CORRECT items
         document.getElementById('skeleton-grid').style.display = 'none';
         document.getElementById('shop-container').style.display = 'block';
         document.getElementById('intro-text').style.display = 'block';
