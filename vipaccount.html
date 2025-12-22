@@ -379,7 +379,7 @@
         // --- 1. STORE & STATE MANAGEMENT ---
    const Store = {
     key: 'brendimo_vip_data_v1', // define key
-    apiUrl: 'https://script.google.com/macros/s/AKfycbzwraCrEnx0_F_AcC8MTrWFOaxy-O4aWAvoWpL1O4G8SUatt2YbiV3LkvgedRaQ6Ohk/exec', 
+    apiUrl: 'https://script.google.com/macros/s/AKfycbyMKaOT--mep8fwaiS_S-5Tty7R71bBOD4IBFtdYwG_sh0a8hIM6sopHipZBCcCtcoq/exec', 
     
     // Define the default state here
  data: {
@@ -404,25 +404,29 @@
     },
 
     // This is the ONLY save function you need (combines Local + Cloud)
-    save() {
-        // 1. Save locally
-        try {
-            localStorage.setItem(this.key, JSON.stringify(this.data));
-            if(typeof UI !== 'undefined') UI.updateWalletDisplay();
-        } catch(e) { console.error("Local Save Error", e); }
-// Cloud Save
+   save() {
+    // 1. Save locally
+    try {
+        localStorage.setItem(this.key, JSON.stringify(this.data));
+        if(typeof UI !== 'undefined') UI.updateWalletDisplay();
+    } catch(e) { console.error("Local Save Error", e); }
+
+    // 2. Cloud Save
     if(this.data.phone && this.data.phone.length > 3 && this.apiUrl) {
+        // Clean phone before sending to ensure match in backend
+        const cleanPhone = this.data.phone.replace(/[^0-9]/g, ""); 
+
         fetch(this.apiUrl, {
             method: 'POST',
             mode: 'no-cors',
             body: JSON.stringify({
                 action: 'sync',
-                phone: this.data.phone,
-                name: this.data.name,  // Added Name so it updates in sheet
+                phone: cleanPhone, // Send clean phone number
+                name: this.data.name,
                 coins: this.data.coins,
                 inventory: this.data.inventory,
                 history: this.data.history,
-                completedTasks: this.data.completedTasks // <--- ADD THIS LINE
+                completedTasks: this.data.completedTasks
             })
         }).catch(err => console.log('Sync error:', err));
     }
