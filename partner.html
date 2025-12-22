@@ -7,7 +7,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* --- CORE STYLES (MATCHING MAIN APP) --- */
+/* --- CORE STYLES --- */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent; }
 body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; min-height: 100vh; padding-bottom: 40px; }
 
@@ -23,9 +23,15 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; min-height: 100v
 .logo { font-size: 20px; font-weight: 800; color: #c21a1a; letter-spacing: -0.5px; }
 .store-badge { font-size: 11px; background: #FFD700; color: #000; padding: 4px 8px; border-radius: 12px; font-weight: 700; display: none; }
 
+/* --- CRITICAL FIX: Hide sections by default to prevent overlap --- */
+#login-section, #shop-container, #builder-controls, #intro-text {
+    display: none; 
+}
+
 /* LOGIN SCREEN */
 .login-wrapper {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    /* Flex is applied via JS when needed */
+    flex-direction: column; align-items: center; justify-content: center;
     height: 80vh; padding: 20px; text-align: center;
 }
 .login-card {
@@ -48,7 +54,7 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; min-height: 100v
 /* GRID SYSTEM */
 .grid-container {
     display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    padding: 20px; max-width: 600px; margin: 0 auto; display: none; /* Hidden by default */
+    padding: 20px; max-width: 600px; margin: 0 auto;
 }
 .grid-item {
     background: white; border-radius: 16px; overflow: hidden;
@@ -72,12 +78,12 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; min-height: 100v
 .grid-title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .grid-price { color: #c21a1a; font-weight: 800; font-size: 15px; margin-top: 4px; display: block;}
 
-/* DASHBOARD CONTROLS (Floating Bottom) */
+/* DASHBOARD CONTROLS */
 .dashboard-controls {
     position: fixed; bottom: 0; left: 0; width: 100%;
     background: white; padding: 20px;
     box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
-    z-index: 200; display: none;
+    z-index: 200; 
     flex-direction: column; gap: 10px;
     border-top-left-radius: 20px; border-top-right-radius: 20px;
 }
@@ -112,7 +118,7 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; min-height: 100v
     cursor: pointer;
 }
 
-.intro-text { padding: 20px; text-align: center; display: none;}
+.intro-text { padding: 20px; text-align: center;}
 .intro-text h1 { font-size: 24px; margin-bottom: 5px; color: #111; }
 .intro-text p { color: #666; font-size: 14px; }
 
@@ -156,45 +162,52 @@ body { background: #fafafa; color: #1d1d1f; overflow-x: hidden; min-height: 100v
 <div id="share-modal" class="modal-overlay">
     <div class="share-card">
         <h3>🎉 Link Hazırdır!</h3>
-        <p style="font-size: 13px; color: #666; margin-top: 5px;">Bu linki müştərilərinizə göndərin. Sifarişlər birbaşa sizin WhatsApp-a gələcək.</p>
-        
+        <p style="font-size: 13px; color: #666; margin-top: 5px;">Bu linki müştərilərinizə göndərin.</p>
         <div class="link-box" id="final-link">...</div>
-        
         <button onclick="copyLink()" class="btn-primary" style="margin-bottom: 10px;">Kopyala</button>
         <button onclick="closeModal()" style="background: transparent; border: none; color: #777; font-weight: 600;">Bağla</button>
     </div>
 </div>
 
-  
 <script>
 // --- CONFIGURATION ---
-const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbze1YWZVrxz-4EDvB8_lcxDYB-7hqP9XzyN2_kU6wVoEfmMa1erSJvSgGGZIhjQNq04bA/exec"; // YOUR DEPLOYED URL
+const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbze1YWZVrxz-4EDvB8_lcxDYB-7hqP9XzyN2_kU6wVoEfmMa1erSJvSgGGZIhjQNq04bA/exec"; 
 
 // --- STATE ---
 let allProducts = [];
 let selectedProducts = new Set();
-let affiliateData = null; // { id, storeName, phone }
+let affiliateData = null; 
 let isBuilderMode = false;
 
 // --- INIT ---
 window.onload = function() {
     const urlParams = new URLSearchParams(window.location.search);
-    const affId = urlParams.get('ref'); // Affiliate ID from URL
-    const items = urlParams.get('items'); // Selected Items (comma separated indexes)
+    const affId = urlParams.get('ref'); 
+    const items = urlParams.get('items'); 
 
+    // ƏN VACİB HİSSƏ: Görünüşü dəqiq ayırırıq
     if (affId) {
-        // SCENARIO A: CUSTOMER VIEW (Visiting a shop)
+        // --- SENARİ A: MÜŞTƏRİ GƏLDİ ---
+        // 1. Logini qəti şəkildə gizlət
+        document.getElementById('login-section').style.display = 'none'; 
+        
+        // 2. Mağaza yüklə
         loadCustomerShop(affId, items);
     } else {
-        // SCENARIO B: PARTNER VIEW (Login screen)
+        // --- SENARİ B: PARTNYOR GİRİŞİ ---
+        // 1. Mağazanı gizlət
+        document.getElementById('shop-container').style.display = 'none';
+        document.getElementById('intro-text').style.display = 'none';
+        
+        // 2. Logini aç (Flex olaraq)
         document.getElementById('login-section').style.display = 'flex';
     }
 };
 
-// --- LOGIC: BUILDER (PARTNER) ---
+// --- LOGIC: PARTNER LOGIN ---
 async function loginAffiliate() {
     const id = document.getElementById('affiliate-id').value.trim();
-    if(!id) return;
+    if(!id) { alert("Zəhmət olmasa ID daxil edin"); return; }
 
     showLoader(true);
     try {
@@ -206,78 +219,72 @@ async function loginAffiliate() {
             isBuilderMode = true;
             enterBuilderMode();
         } else {
-            showError("ID tapılmadı və ya aktiv deyil.");
+            showError(data.error || "ID tapılmadı.");
         }
-    } catch(e) {
-        showError("İnternet xətası.");
-    }
+    } catch(e) { showError("İnternet xətası"); }
     showLoader(false);
 }
 
 async function enterBuilderMode() {
+    // Keçid anında ekranları dəyişirik
     document.getElementById('login-section').style.display = 'none';
+    
     document.getElementById('shop-container').style.display = 'block';
     document.getElementById('builder-controls').style.display = 'flex';
     document.getElementById('product-grid').style.display = 'grid';
     document.getElementById('intro-text').style.display = 'block';
     
-    // Set Header Info
     document.getElementById('page-title').textContent = `Salam, ${affiliateData.storeName}! 👋`;
     document.getElementById('page-subtitle').textContent = "Satmaq istədiyiniz məhsulları seçin.";
     document.querySelector('.store-badge').style.display = 'block';
 
-    // Fetch Products
     await fetchProducts();
     renderGrid();
 }
 
-// --- LOGIC: CUSTOMER (SHOP) ---
+// --- LOGIC: CUSTOMER VIEW ---
 async function loadCustomerShop(affId, itemsEncoded) {
     showLoader(true);
     try {
-        // 1. Get Affiliate Details (Phone number is crucial)
         const res = await fetch(`${SHEETS_ENDPOINT}?action=getAffiliateData&id=${affId}`);
         const data = await res.json();
 
         if (data.success) {
             affiliateData = data;
+            
             document.title = data.storeName + " | Brendimo";
             document.getElementById('page-title').textContent = data.storeName;
             document.querySelector('.logo').textContent = "🎁 " + data.storeName;
             
+            // Mağazanı göstər (Login artıq gizlidir)
             document.getElementById('shop-container').style.display = 'block';
-            document.getElementById('product-grid').style.display = 'grid';
             document.getElementById('intro-text').style.display = 'block';
+            document.getElementById('product-grid').style.display = 'grid';
 
-            // 2. Load Products
             await fetchProducts();
             
-            // 3. Filter Products based on URL
             if (itemsEncoded) {
-                // Decode names (Base64) or use indexes. 
-                // Simple implementation: String split by comma of indexes
-                const indexes = itemsEncoded.split(',').map(Number);
+                const indexes = itemsEncoded.split(',').map(item => parseInt(item.trim()));
                 const filtered = allProducts.filter((_, i) => indexes.includes(i));
-                allProducts = filtered; // Replace main list with filtered list
+                if(filtered.length > 0) allProducts = filtered;
             }
-            
             renderGrid();
         } else {
-            alert("Mağaza tapılmadı.");
-            window.location.href = "index.html"; // Redirect to main site
+            document.body.innerHTML = `<div style="text-align:center; padding:50px;"><h3>Mağaza tapılmadı</h3></div>`;
         }
     } catch(e) { console.log(e); }
     showLoader(false);
 }
 
-// --- DATA ---
+// --- SHARED DATA & RENDER ---
 async function fetchProducts() {
-    const res = await fetch(`${SHEETS_ENDPOINT}?action=getProducts`);
-    const data = await res.json();
-    allProducts = data.products;
+    try {
+        const res = await fetch(`${SHEETS_ENDPOINT}?action=getProducts`);
+        const data = await res.json();
+        allProducts = data.products || [];
+    } catch (e) { console.error("Error loading products"); }
 }
 
-// --- RENDER ---
 function renderGrid() {
     const container = document.getElementById('product-grid');
     container.innerHTML = '';
@@ -286,98 +293,70 @@ function renderGrid() {
         const el = document.createElement('div');
         el.className = 'grid-item';
         
-        // Image Fixer
-        let imgUrl = p.image;
+        let imgUrl = p.image || "";
         if (imgUrl.includes('drive.google.com')) { 
             const idMatch = imgUrl.match(/[-\w]{25,}/); 
             if (idMatch) imgUrl = `https://googleusercontent.com/profile/picture/0${idMatch[0]}`; 
         }
 
-        // BUILDER MODE: Selection Logic
         if (isBuilderMode) {
             el.onclick = () => toggleSelection(index, el);
             el.innerHTML = `
                 <div class="select-overlay"></div>
                 <img src="${imgUrl}">
-                <div class="grid-info">
-                    <div class="grid-title">${p.name}</div>
-                    <span class="grid-price">${p.price} AZN</span>
-                </div>
+                <div class="grid-info"><div class="grid-title">${p.name}</div><span class="grid-price">${p.price} AZN</span></div>
             `;
-        } 
-        // CUSTOMER MODE: Buy Logic
-        else {
+        } else {
             el.innerHTML = `
                 <img src="${imgUrl}">
                 <div class="grid-info">
                     <div class="grid-title">${p.name}</div>
                     <span class="grid-price">${p.price} AZN</span>
                     <button class="buy-now-btn" onclick="buyItem('${p.name}', '${p.price}')">
-                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                        WhatsApp
+                        Sifariş Et 
+                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24" style="margin-left:5px;"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                     </button>
                 </div>
             `;
         }
-        
         container.appendChild(el);
     });
 }
 
-// --- BUILDER FUNCTIONS ---
+// --- UTILS ---
 function toggleSelection(index, el) {
-    if (selectedProducts.has(index)) {
-        selectedProducts.delete(index);
-        el.classList.remove('selected');
-    } else {
-        selectedProducts.add(index);
-        el.classList.add('selected');
-    }
+    if (selectedProducts.has(index)) { selectedProducts.delete(index); el.classList.remove('selected'); } 
+    else { selectedProducts.add(index); el.classList.add('selected'); }
     document.getElementById('sel-count').textContent = `${selectedProducts.size} məhsul seçilib`;
 }
 
 function generateLink() {
     if(selectedProducts.size === 0) { alert("Ən azı 1 məhsul seçin!"); return; }
-
-    // Convert Set to sorted Array, then join with commas
     const indexes = Array.from(selectedProducts).sort((a,b)=>a-b).join(',');
-    
-    // Create base URL (Current page + params)
-    const baseUrl = window.location.href.split('?')[0];
-    const finalUrl = `${baseUrl}?ref=${affiliateData.id}&items=${indexes}`;
-    
+    const origin = window.location.origin;
+    const pathname = window.location.pathname;
+    const finalUrl = `${origin}${pathname}?ref=${affiliateData.id}&items=${indexes}`;
     document.getElementById('final-link').textContent = finalUrl;
     document.getElementById('share-modal').style.display = 'flex';
 }
 
 function copyLink() {
-    const text = document.getElementById('final-link').textContent;
-    navigator.clipboard.writeText(text).then(() => {
-        alert("Link kopyalandı!");
-    });
+    navigator.clipboard.writeText(document.getElementById('final-link').textContent)
+        .then(() => alert("Link kopyalandı!"))
+        .catch(() => alert("Kopyalanma alınmadı."));
 }
 
-function closeModal() {
-    document.getElementById('share-modal').style.display = 'none';
-}
+function closeModal() { document.getElementById('share-modal').style.display = 'none'; }
 
-// --- BUY FUNCTION (Dynamic WhatsApp) ---
 function buyItem(prodName, price) {
-    // Uses the Affiliate's Phone Number fetched from Sheets
     const phone = affiliateData.phone; 
-    const text = `Salam ${affiliateData.storeName}! 🎁\n\nMən bu məhsulu sifariş etmək istəyirəm:\n*${prodName}* - ${price} AZN`;
-    
+    const text = `Salam ${affiliateData.storeName}! 🎁\n\nSifariş:\n*${prodName}* - ${price} AZN`;
     const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
 }
 
-// --- UTILS ---
 function showLoader(show) { document.getElementById('loader').style.display = show ? 'block' : 'none'; }
-function showError(msg) { 
-    const el = document.getElementById('error-msg');
-    el.textContent = msg; el.style.display = 'block';
-}
-
+function showError(msg) { document.getElementById('error-msg').textContent = msg; document.getElementById('error-msg').style.display = 'block'; }
 </script>
 </body>
 </html>
