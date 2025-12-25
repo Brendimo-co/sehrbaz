@@ -13,7 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* --- CSS STYLES --- */
-
+<link rel="preconnect" href="https://images.unsplash.com">
 /* RESET & BASE */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent; }
 body { 
@@ -1815,6 +1815,111 @@ body {
     pointer-events: none;
     z-index: 10;
 }
+
+/* --- NEW CREATIVE CATEGORY SLIDER --- */
+.cat-slider-track {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 15px 25px 15px; /* Bottom padding for shadows */
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.cat-slider-track::-webkit-scrollbar { display: none; }
+
+.cat-creative-card {
+    /* 3 cards visible at once (roughly 30% width each + gaps) */
+    flex: 0 0 31%; 
+    height: 140px; /* Taller card */
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    scroll-snap-align: start;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.cat-creative-card:active {
+    transform: scale(0.95);
+}
+
+/* Background Image */
+.cat-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+/* Gradient Overlay - Essential for text readability */
+.cat-overlay {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 70%;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 100%);
+    z-index: 1;
+}
+
+/* Text Content */
+.cat-text-box {
+    position: absolute;
+    bottom: 10px;
+    left: 8px;
+    right: 8px;
+    z-index: 2;
+    text-align: center;
+}
+
+.cat-card-title {
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    /* Limit to 2 lines */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Specific Border Colors based on ID (Optional nice touch) */
+.cat-creative-card:nth-child(odd) { border-bottom: 3px solid #c21a1a; }
+.cat-creative-card:nth-child(even) { border-bottom: 3px solid #FFD700; }
+
+
+/* Dynamic Modal Headers */
+.cat-modal-header.header-red {
+    background: linear-gradient(135deg, #e60023 0%, #ff4d4d 100%);
+    color: white !important;
+    border-radius: 0 0 20px 20px;
+    margin: -20px -20px 20px -20px; /* Stretch to edges */
+    padding: 30px 20px;
+}
+.cat-modal-header.header-purple {
+    background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+    color: white !important;
+    border-radius: 0 0 20px 20px;
+    margin: -20px -20px 20px -20px;
+    padding: 30px 20px;
+}
+.cat-modal-header.header-orange {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white !important;
+    border-radius: 0 0 20px 20px;
+    margin: -20px -20px 20px -20px;
+    padding: 30px 20px;
+}
+
+/* Fix text colors inside styled header */
+.cat-modal-header.colored-header h2, 
+.cat-modal-header.colored-header p,
+.cat-modal-header.colored-header .cat-icon-large {
+    color: white !important;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
   
 </style>
 <script>
@@ -2013,32 +2118,29 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 <div id="categories-grid" class="horizontal-pills-track">
 </div>
 </div>
-   <div class="banner-wrapper">
-    <div class="banner-track" id="banner-track">
+ <div class="banner-wrapper"> <div class="banner-track" id="banner-track">
         
         <div class="banner-slide">
-            <div class="hero-card visual-red">
+            <div class="hero-card visual-red" onclick="openBannerModal('banner_sale')">
                 <div class="banner-text-content">
                     <div class="b-subtitle">MÖVSÜMƏ ÖZƏL</div>
                     <div class="b-title">ENDİRİM<br>FÜRSƏTLƏRİ!</div>
-                    <button class="b-btn" onclick="openAllProducts()">Kəşf et</button>
+                    <button class="b-btn">Kəşf et</button>
                 </div>
-                
                 <div class="banner-visuals">
                     <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=150&h=150&fit=crop" class="b-img b-img-1">
                     <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=150&h=150&fit=crop" class="b-img b-img-2">
-                    <img src="https://images.unsplash.com/photo-1541643600914-78b084683601?w=150&h=150&fit=crop" class="b-img b-img-3">
                     <div class="b-heart">🧡</div>
                 </div>
             </div>
         </div>
 
         <div class="banner-slide">
-            <div class="hero-card visual-purple">
+            <div class="hero-card visual-purple" onclick="openBannerModal('banner_winter')">
                 <div class="banner-text-content">
                     <div class="b-subtitle">YENİ KOLLEKSİYA</div>
                     <div class="b-title">QIŞ DƏBİ<br>VƏ TƏRZ</div>
-                    <button class="b-btn" onclick="openAllProducts()">Bax</button>
+                    <button class="b-btn">Bax</button>
                 </div>
                 <div class="banner-visuals">
                     <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=150&h=150&fit=crop" class="b-img b-img-1">
@@ -2048,21 +2150,19 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
         </div>
 
         <div class="banner-slide">
-            <div class="hero-card visual-orange">
+            <div class="hero-card visual-orange" onclick="openBannerModal('banner_tech')">
                 <div class="banner-text-content">
                     <div class="b-subtitle">TEXNOLOGİYA</div>
                     <div class="b-title">SMART<br>HƏDİYYƏLƏR</div>
-                    <button class="b-btn" onclick="openAllProducts()">Seç</button>
+                    <button class="b-btn">Seç</button>
                 </div>
                 <div class="banner-visuals">
-                     <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=150&h=150&fit=crop" class="b-img b-img-1">
+                    <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=150&h=150&fit=crop" class="b-img b-img-1">
                 </div>
             </div>
         </div>
 
-    </div>
-    
-    <div class="banner-counter" id="banner-counter">1/3</div>
+    </div> <div class="banner-counter" id="banner-counter">1/3</div>
 </div>
   
 <div class="ai-card-wrapper">
@@ -2126,8 +2226,34 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
                 </div>
         </div>
     </div>
-  
 </div>
+
+  <div class="section-container" style="background: linear-gradient(to bottom, #1a0b2e, #2d1b4e); color: white; padding-bottom: 40px; border-top: 4px solid #FFD700;">
+    <div class="section-header">
+        <h2 class="sec-title" style="color: #FFD700; border-color: #FFD700;">🔮 Ulduzlar Nə Deyir?</h2>
+        <p style="font-size: 12px; color: #bca0dc; margin-top: 5px;">Hədiyyə seçərkən onun bürcünə qulaq as...</p>
+    </div>
+    
+    <div class="horizontal-scroll" id="zodiac-track" style="padding-top: 10px;">
+        </div>
+</div>
+
+<div id="zodiac-modal" class="modal">
+    <div class="header" style="background: #1a0b2e; border-bottom: 1px solid #444;">
+        <div class="back-btn" onclick="closeZodiacModal()" style="color: white;">← Geri</div>
+        <div class="logo" style="color: #FFD700;">Astro-Hədiyyə</div>
+    </div>
+    
+    <div class="modal-content-scroll" style="background: #120621; color: white;">
+        <div id="zm-content"></div>
+        
+        <div class="shop-suggestions" style="margin-top: 30px;">
+            <h3 style="color: #FFD700; border-bottom: 1px solid #444; padding-bottom: 10px;">🌟 Ona Uyğun Seçimlər:</h3>
+            <div id="zm-products-grid" class="grid-container" style="padding-bottom:0;"></div>
+        </div>
+    </div>
+</div>
+  
     <div class="section-container" style="background:white">
         <div class="section-header"><h2 class="sec-title">🆕 Yeni Gələnlər</h2></div>
         <div class="horizontal-scroll" id="new-container">
@@ -2158,31 +2284,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
     </div>
 </div>
 
-<div class="section-container" style="background: linear-gradient(to bottom, #1a0b2e, #2d1b4e); color: white; padding-bottom: 40px; border-top: 4px solid #FFD700;">
-    <div class="section-header">
-        <h2 class="sec-title" style="color: #FFD700; border-color: #FFD700;">🔮 Ulduzlar Nə Deyir?</h2>
-        <p style="font-size: 12px; color: #bca0dc; margin-top: 5px;">Hədiyyə seçərkən onun bürcünə qulaq as...</p>
-    </div>
-    
-    <div class="horizontal-scroll" id="zodiac-track" style="padding-top: 10px;">
-        </div>
-</div>
 
-<div id="zodiac-modal" class="modal">
-    <div class="header" style="background: #1a0b2e; border-bottom: 1px solid #444;">
-        <div class="back-btn" onclick="closeZodiacModal()" style="color: white;">← Geri</div>
-        <div class="logo" style="color: #FFD700;">Astro-Hədiyyə</div>
-    </div>
-    
-    <div class="modal-content-scroll" style="background: #120621; color: white;">
-        <div id="zm-content"></div>
-        
-        <div class="shop-suggestions" style="margin-top: 30px;">
-            <h3 style="color: #FFD700; border-bottom: 1px solid #444; padding-bottom: 10px;">🌟 Ona Uyğun Seçimlər:</h3>
-            <div id="zm-products-grid" class="grid-container" style="padding-bottom:0;"></div>
-        </div>
-    </div>
-</div>
 
 <div class="section-container" style="background: #202020; border-top: 4px solid #ff0055; padding-bottom: 50px;">
     <div class="section-header" style="text-align: center; display: block;">
@@ -3001,48 +3103,253 @@ function initFeaturedReviews() {
   
 // --- 20 CATEGORIES DATA ---
 const categoriesData = [
-  // Ailə
-  { id: 1, icon: "👩‍🍳", tag: "cat_ana", title: "Fədakar Ana", desc: "Ömrünü mətbəx və uşaqları arasında keçirən müqəddəs varlıq.", ideas: ["Blender dəsti (Bosch/Tefal)", "Gündəlik gümüş sırğa", "Ortopedik mətbəx xalçası", "Naxışlı plov sinisi", "Qranit qazan dəsti"] },
-  { id: 2, icon: "👨‍💼", tag: "cat_ata", title: "Zəhmli Ata", desc: "Hisslərini bəlli etməyən, amma ailəsi üçün yaşayan dağ kimi insan.", ideas: ["Dəri kəmər və pulqabı", "Klassik qol saatı (Casio)", "Avtomobil bel yastığı", "Taxta Nərd", "Dəri ev tərliyi"] },
-  { id: 3, icon: "👰", tag: "cat_gelin", title: "Təzə Gəlin", desc: "Cehizini və evini bəzəməyə həvəsli, estetikaya önəm verən xanım.", ideas: ["Zirkon qaşlı gümüş dəst", "Mücrü (Zinət qutusu)", "Dekorativ Abajur", "Şıq kiçik çanta", "Dekorativ güldan"] },
-  { id: 4, icon: "🛠️", tag: "cat_bey", title: "Həyat Yoldaşı (Bəy)", desc: "Evin texniki problemlərini həll edən, praktikliyi sevən kişi.", ideas: ["Trimmer (Philips OneBlade)", "Gündəlik Ətir", "Alət çantası (Drel)", "Rahat Svitşot (Hudi)", "Video-qeydiyyatçı"] },
-  { id: 5, icon: "❤️", tag: "cat_xanim", title: "Həyat Yoldaşı (Xanım)", desc: "Diqqət və sevgi gözləyən, evin zərif tərəfi.", ideas: ["Pandora stili qolbaq", "Saç düzləşdirici/Fen", "SPA/Masaj kuponu", "Adlı boyunbağı", "Ziyafət çantası"] },
-  
-  // Gənclər
-  { id: 6, icon: "🎧", tag: "cat_telebe", title: "Tələbə Gənc", desc: "Dərs və metro arasında qalan, musiqisiz yaşamayan.", ideas: ["Power Bank (20k mAh)", "Simsiz Qulaqlıq", "Oversize Hudi", "Fast Food Kuponu", "BakıKart balansı"] },
-  { id: 7, icon: "💄", tag: "cat_baci", title: "Dəb Aşiqi Bacı", desc: "Pinterest və TikTok dünyasında yaşayan estetik qız.", ideas: ["Üz qulluq dəsti", "Pambıq Pijama", "Crossbody çanta", "Makiyaj fırçaları", "İşıqlı güzgü"] },
-  { id: 8, icon: "🎮", tag: "cat_qardas", title: "Arxa-dayaq Qardaş", desc: "Sadəliyi sevən, oyun və dostları ilə vaxt keçirən oğlan.", ideas: ["Geyminq Maus/Qulaqlıq", "Sadə T-shirt dəsti", "Noutbuk Çantası", "Steam Kartı", "Ev şalvarı"] },
-  { id: 9, icon: "🎖️", tag: "cat_esger", title: "Əsgər", desc: "Vətən keşiyində duran, istiliyə ehtiyacı olan gənc.", ideas: ["Elektron Saat (Casio)", "Termal İçlik", "Gigiyena çantası", "Danışıq konturu", "Yun corablar"] },
-  { id: 10, icon: "⚽", tag: "cat_usaq", title: "Dəcəl Uşaq", desc: "Enerjisi bitməyən aktiv məktəbli.", ideas: ["Lego (Kiçik)", "Rəsm Çemodanı", "Futbol topu", "Ağıllı Saat", "Personajlı Lançboks"] },
+  // --- AİLƏ (FAMILY) ---
+  { 
+    id: 1, 
+    tag: "cat_ana", 
+    title: "Fədakar Ana", 
+    // Image: Warm kitchen atmosphere, cooking baking
+    img: "https://images.unsplash.com/photo-1556910103-1c02745a30bf?auto=format&fit=crop&q=80&w=400", 
+    desc: "Səhərdən axşama qədər bizim rahatlığımız üçün çalışan, mətbəxdə möcüzələr yaradan müqəddəs varlıq. Ona yorğunluğunu unudacaq bir hədiyyə seç.", 
+    ideas: ["Elektrikli Mətbəx Alətləri", "Gümüş Sırğa", "Ortopedik Mətbəx Xalçası", "Milli Plov Sinisi", "Qranit Qazan dəsti"] 
+  },
+  { 
+    id: 2, 
+    tag: "cat_ata", 
+    title: "Zəhmli Ata", 
+    // Image: Classic watch, leather, masculine style
+    img: "https://images.unsplash.com/photo-1617317376997-8748e6862c01?auto=format&fit=crop&q=80&w=400", 
+    desc: "Ailənin dirəyi, hisslərini çox bəlli etməsə də hər zaman bizi düşünən dağ kimi insan. Ona keyfiyyətli və statusunu vurğulayan əşyalar yaraşır.", 
+    ideas: ["Dəri Kəmər və Pulqabı", "Klassik Qol Saatı", "Avtomobil Bel Yastığı", "Taxta Nərd", "Dəri Ev Tərliyi"] 
+  },
+  { 
+    id: 3, 
+    tag: "cat_gelin", 
+    title: "Təzə Gəlin", 
+    // Image: Elegant jewelry, white tones, wedding vibe
+    img: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&q=80&w=400", 
+    desc: "Yeni həyata qədəm qoyan, evini və cehizini bəzəməyə həvəsli zərif xanım. Onun evi və ya özü üçün şıq bir aksesuar seç.", 
+    ideas: ["Zirkon Gümüş Dəst", "Şüşə Mücrü (Qutu)", "Dekorativ Abajur", "Klaç Çanta", "Dekorativ Güldan"] 
+  },
+  { 
+    id: 4, 
+    tag: "cat_bey", 
+    title: "Həyat Yoldaşı (Bəy)", 
+    // Image: Grooming kit, stylish man accessories
+    img: "https://images.unsplash.com/photo-1621609764180-2ca554a9d6f2?auto=format&fit=crop&q=80&w=400", 
+    desc: "Evin həm texniki problemlərini həll edən, həm də sənin ən yaxın dostun. Ona işinə yarayacaq, amma stilini tamamlayan praktik hədiyyə lazımdır.", 
+    ideas: ["Saç/Saqqal Trimmeri", "Təravətli Ətir", "Alət Çantası", "Qalın Hudi", "Video-qeydiyyatçı"] 
+  },
+  { 
+    id: 5, 
+    tag: "cat_xanim", 
+    title: "Həyat Yoldaşı (Xanım)", 
+    // Image: Gift box, red ribbon, romantic mood
+    img: "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&q=80&w=400", 
+    desc: "Səndən sadəcə hədiyyə yox, diqqət və sevgi gözləyən evin ürəyi. Onu özəl hiss etdirəcək romantik və baxımlı seçimlərə yönəl.", 
+    ideas: ["Pandora stili Qolbaq", "Saç Feni/Düzləşdirici", "SPA Kuponu", "Adlı Boyunbağı", "Ziyafət Çantası"] 
+  },
 
-  // Qohumlar
-  { id: 11, icon: "👵", tag: "cat_nene", title: "Nənə", desc: "Süfrəsi bərəkətli, nəvələrini gözləyən nurani insan.", ideas: ["Elektrikli Çaydan", "Yumşaq Namazlıq", "Kəlağayı/Şal", "Çay Dəsgahı", "Tonometr"] },
-  { id: 12, icon: "🏠", tag: "cat_yeni_ev", title: "Yeni Ev Sahibi", desc: "Evin hər küncünü doldurmağa çalışan ailə.", ideas: ["Büllur Meyvə Qabı", "Tort qabı", "Stəkan dəsti", "Yataq Dəsti", "Elektrikli Doğrayıcı"] },
-  { id: 13, icon: "👶", tag: "cat_korpe", title: "Körpə", desc: "Gözaydınlığına gedilən yeni doğulmuş.", ideas: ["Gümüş sancaq", "Hamam Dəsti", "Plyuş Ədyal", "Mağaza Kartı", "Nəmər (Pul)"] },
-  { id: 14, icon: "📚", tag: "cat_muellim", title: "Müəllim", desc: "Zəhmətkeş, diqqəti sevən ziyalı.", ideas: ["Market Kartı", "Frenç-Press və Kofe", "Büllur Vaza", "Şokolad qutusu", "Kosmetika kartı"] },
-  { id: 15, icon: "🩺", tag: "cat_hekim", title: "Həkim", desc: "Minnətdarlıq edilən peşəkar.", ideas: ["Premium Şokolad", "Yarpaq Çay (Dəmir qutu)", "Masaüstü Suvenir", "Meyvə Səbəti", "Premium Kofe"] },
+  // --- GƏNCLƏR (YOUTH) ---
+  { 
+    id: 6, 
+    tag: "cat_telebe", 
+    title: "Tələbə Gənc", 
+    // Image: Chill vibe, headphones, street style
+    img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400", 
+    desc: "Həyatı universitet, metro və dostları arasında keçən gənc. Ona trend olan, praktik və texnoloji hədiyyələr lazımdır.", 
+    ideas: ["Güclü Power Bank", "Simsiz Qulaqlıq", "Oversize Hudi", "Fast Food Kuponu", "Dizaynlı Termos"] 
+  },
+  { 
+    id: 7, 
+    tag: "cat_baci", 
+    title: "Dəb Aşiqi Bacı", 
+    // Image: Pink aesthetics, makeup brushes, mirror
+    img: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=400", 
+    desc: "Pinterest və TikTok dünyasında yaşayan, estetik görünüşə önəm verən zövqlü xanım. Onun üçün hər şey 'Instagramlıq' olmalıdır.", 
+    ideas: ["Kosmetika Dəsti", "İpək Pijama", "Crossbody Çanta", "Makiyaj Fırçaları", "İşıqlı Güzgü"] 
+  },
+  { 
+    id: 8, 
+    tag: "cat_qardas", 
+    title: "Geymer Qardaş", 
+    // Image: Neon lights, keyboard, gaming setup
+    img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=400", 
+    desc: "Boş vaxtını oyunlarla keçirən, sadəliyi sevən 'kruq' uşağı. Ona parıltılı yox, əyləncəli və funksional şeylər al.", 
+    ideas: ["Geyminq Maus", "Basic T-shirt dəsti", "Noutbuk Çantası", "Steam Kartı", "Rahat Ev Şalvarı"] 
+  },
+  { 
+    id: 9, 
+    tag: "cat_esger", 
+    title: "Əsgər", 
+    // Image: Tactical watch, dark gear, sturdy
+    img: "https://images.unsplash.com/photo-1595801264359-86644f0b001a?auto=format&fit=crop&q=80&w=400", 
+    desc: "Vətən keşiyində duran, evdən uzaqda olan gənc. Ona göndərəcəyin hədiyyə dözümlü olmalı və ehtiyaclarını qarşılamalıdır.", 
+    ideas: ["Elektron Saat (G-Shock)", "Termal İçlik", "Gigiyena çantası", "Danışıq Konturu", "Yun Corablar"] 
+  },
+  { 
+    id: 10, 
+    tag: "cat_usaq", 
+    title: "Dəcəl Uşaq", 
+    // Image: Colorful toys, legos, happy vibe
+    img: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&q=80&w=400", 
+    desc: "Yerində dura bilməyən, rəngli dünyası olan balaca. Ona inkişaf etdirici və ya enerjisini ata biləcəyi oyuncaqlar seç.", 
+    ideas: ["Lego Konstruktor", "Rəsm Çemodanı", "Futbol Topu", "Ağıllı Saat", "Personajlı Lançboks"] 
+  },
 
-  // Dostlar
-  { id: 16, icon: "👯‍♀️", tag: "cat_refiqe", title: "Sirdaş Rəfiqə", desc: "Dərdini bölüşdüyün ən yaxın dost.", ideas: ["Ətirli Şam", "Kosmetika Orqanayzeri", "Şopper Çanta", "Fərdi Fincan", "Səyahət qutusu"] },
-  { id: 17, icon: "🚗", tag: "cat_dost_ogl", title: "Avtoş Dost", desc: "Maşınına canı kimi baxan oğlan.", ideas: ["Əl Tozsoranı", "Maqnitli Tutacaq", "Panel Təmizləyici", "Asma Ətir", "Logolu Açarlıq"] },
-  { id: 18, icon: "☕", tag: "cat_cay", title: "Çay Aşiqi", desc: "Çayın dadını rəngindən bilən insan.", ideas: ["Mürəbbə Dəsti", "Armudu Stəkan", "Farfor Dəm Çaydanı", "Çərəz Qutusu", "Mətbəx Dəsmalları"] },
-  { id: 19, icon: "🎄", tag: "cat_ofis", title: "Ofis Yoldaşı", desc: "Gizli Santa və ya həmkar.", ideas: ["Yeni İl Fincanı", "Masa Təqvimi", "Rəngli Corablar", "Bitki (Sukulent)", "Bloknot"] },
-  { id: 20, icon: "💼", tag: "cat_mudir", title: "Rəhbər (Müdir)", desc: "Rəsmiyyəti sevən ciddi şəxs.", ideas: ["Masaüstü Dəri Dəst", "Taxta Çay Qutusu", "Kabinet Gülü", "Bankir Lampası", "Kitab Albom"] }
+  // --- QOHUMLAR (RELATIVES) ---
+  { 
+    id: 11, 
+    tag: "cat_nene", 
+    title: "Nənə", 
+    // Image: Tea cup, knitting, cozy sweater texture
+    img: "https://images.unsplash.com/photo-1608651057406-03c0044d03da?auto=format&fit=crop&q=80&w=400", 
+    desc: "Süfrəsi bərəkətli, nəvələrinin yolunu gözləyən nurani insan. Ona rahatlıq və isti hiss etdirən hədiyyələr yaraşır.", 
+    ideas: ["Elektrikli Çaydan", "Yumşaq Namazlıq", "Kəlağayı/Şal", "Çay Dəsgahı", "Tonometr"] 
+  },
+  { 
+    id: 12, 
+    tag: "cat_yeni_ev", 
+    title: "Yeni Ev Sahibi", 
+    // Image: Home keys, cozy living room background
+    img: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=400", 
+    desc: "Yeni mənzilə köçən və evin hər küncünü zövqlə doldurmağa çalışan ailə. Onlara evin bəzəyi olacaq əşyalar al.", 
+    ideas: ["Meyvə Qabı", "Tort Qabı", "Stəkan Dəsti", "Yataq Dəsti", "Doğrayıcı"] 
+  },
+  { 
+    id: 13, 
+    tag: "cat_korpe", 
+    title: "Yeni Doğulmuş", 
+    // Image: Cute baby shoes, soft blanket
+    img: "https://images.unsplash.com/photo-1522337360705-2b1cc3d54176?auto=format&fit=crop&q=80&w=400", 
+    desc: "Dünyaya yeni gəlmiş mələk. Həm körpəyə, həm də ananın işinə yarayacaq təmiz və keyfiyyətli hədiyyələr.", 
+    ideas: ["Gümüş Sancaq", "Hamam Dəsti", "Plyuş Ədyal", "Mağaza Kartı", "Nəmər (Pul)"] 
+  },
+  { 
+    id: 14, 
+    tag: "cat_muellim", 
+    title: "Müəllim", 
+    // Image: Notebook, glasses, library
+    img: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=400", 
+    desc: "Biliyini bizimlə bölüşən zəhmətkeş ziyalı. Ona verəcəyin hədiyyə rəsmi, eyni zamanda istifadə edə biləcəyi zövqlü bir əşya olmalıdır.", 
+    ideas: ["Market Kartı", "Kofe Dəsti", "Büllur Vaza", "Şokolad Qutusu", "Bloknot"] 
+  },
+  { 
+    id: 15, 
+    tag: "cat_hekim", 
+    title: "Həkim", 
+    // Image: Stethoscope on clean desk
+    img: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=400", 
+    desc: "Sağlamlığımızın keşikçisi. Minnətdarlıq etmək istədiyin bu peşəkaranın masasında saxlaya biləcəyi bir jest et.", 
+    ideas: ["Premium Şokolad", "Yarpaq Çay", "Masaüstü Suvenir", "Meyvə Səbəti", "Kofe Dəsti"] 
+  },
+
+  // --- DOSTLAR (FRIENDS) ---
+  { 
+    id: 16, 
+    tag: "cat_refiqe", 
+    title: "Sirdaş Rəfiqə", 
+    // Image: Two girls laughing, coffee vibe
+    img: "https://images.unsplash.com/photo-1529139574466-a302d2052574?auto=format&fit=crop&q=80&w=400", 
+    desc: "Bütün sirrlərini bilən ən yaxın rəfiqən. Ona 'bunu görəndə səni xatırladım' deyə biləcəyin trend hədiyyələr al.", 
+    ideas: ["Ətirli Şam", "Orqanayzer", "Şopper Çanta", "Fərdi Fincan", "Səyahət Qutusu"] 
+  },
+  { 
+    id: 17, 
+    tag: "cat_dost_ogl", 
+    title: "Avtoş Dost", 
+    // Image: Steering wheel, luxury car interior
+    img: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=400", 
+    desc: "Maşınına canı kimi baxan oğlan. Onun üçün maşın aksesuarları ən dəyərli hədiyyədir.", 
+    ideas: ["Avtomobil Tozsoranı", "Telefon Tutacağı", "Panel Təmizləyici", "Asma Ətir", "Açarlıq"] 
+  },
+  { 
+    id: 18, 
+    tag: "cat_cay", 
+    title: "Çay Aşiqi", 
+    // Image: Tea pouring into glass, steam
+    img: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&q=80&w=400", 
+    desc: "Söhbəti çay süfrəsi arxasında edən insan. Ona çay mərasimini gözəlləşdirəcək aksesuarlar lazımdır.", 
+    ideas: ["Mürəbbə Dəsti", "Armudu Stəkan", "Dəm Çaydanı", "Çərəz Qutusu", "Mətbəx Dəsmalları"] 
+  },
+  { 
+    id: 19, 
+    tag: "cat_ofis", 
+    title: "Ofis Yoldaşı", 
+    // Image: Minimalist desk, laptop, plant
+    img: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=400", 
+    desc: "Hər gün işdə gördüyün həmkarın. Ona masasında istifadə edə biləcəyi, neytral amma maraqlı hədiyyə seç.", 
+    ideas: ["Fincan", "Təqvim", "Rəngli Corablar", "Bitki (Sukulent)", "Bloknot"] 
+  },
+  { 
+    id: 20, 
+    tag: "cat_mudir", 
+    title: "Rəhbər (Müdir)", 
+    // Image: Expensive fountain pen, leather notebook
+    img: "https://images.unsplash.com/photo-1518655048521-f130df041f66?auto=format&fit=crop&q=80&w=400", 
+    desc: "Ciddiyyəti sevən, işinə məsuliyyətli rəhbər. Ona keyfiyyətli və kabinetinə yaraşan ağırlıqda hədiyyə lazımdır.", 
+    ideas: ["Dəri Orqanayzer", "Hədiyyəlik Çay", "Kabinet Gülü", "Bankir Lampası", "Kitab-Albom"] 
+  }
 ];
 
+  
 // 1. RENDER BUTTONS
 function initCategories() {
     const grid = document.getElementById('categories-grid');
     if(!grid) return;
     
+    // Switch class for styling
+    grid.className = 'cat-slider-track';
     grid.innerHTML = '';
+    
     categoriesData.forEach(cat => {
-        const btn = document.createElement('div');
-        btn.className = 'cat-btn-card';
-        btn.innerHTML = `<div class="cat-btn-icon">${cat.icon}</div><div class="cat-btn-title">${cat.title}</div>`;
-        btn.onclick = () => openCategoryModal(cat.id);
-        grid.appendChild(btn);
+        const card = document.createElement('div');
+        card.className = 'cat-creative-card';
+        
+card.innerHTML = `
+    <img src="${cat.img}" class="cat-bg-img" loading="lazy" alt="${cat.title}">
+    <div class="cat-overlay"></div>
+    <div class="cat-text-box">
+        <div class="cat-card-title">${cat.title}</div>
+    </div>
+`;
+        
+        // Pass a dummy object for compatibility with your existing openCategoryModal logic
+        // or just pass the ID if your logic handles it
+        card.onclick = () => openCategoryModal(cat.id);
+        
+        grid.appendChild(card);
     });
+
+    // Start Auto Scroll
+    startCategoryAutoScroll();
+}
+
+function startCategoryAutoScroll() {
+    const track = document.getElementById('categories-grid');
+    if (!track) return;
+
+    let direction = 1;
+    let isPaused = false;
+    
+    // Pause on interaction
+    track.addEventListener('touchstart', () => isPaused = true, {passive: true});
+    track.addEventListener('touchend', () => setTimeout(() => isPaused = false, 2000), {passive: true});
+
+    setInterval(() => {
+        if (!isPaused && document.getElementById('all-products-view').classList.contains('active')) {
+            // Scroll by width of one card (approx 33% of screen width)
+            const scrollAmount = track.clientWidth * 0.33; 
+            
+            if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 10) {
+                direction = -1; // Go left
+            } else if (track.scrollLeft <= 0) {
+                direction = 1; // Go right
+            }
+            
+            track.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+    }, 3000); // Speed: Every 3 seconds
 }
 
 // 2. OPEN MODAL & FILTER PRODUCTS
@@ -3050,18 +3357,19 @@ function openCategoryModal(id) {
     const cat = categoriesData.find(c => c.id === id);
     if(!cat) return;
 
-    // A. Set Text Content
-    document.getElementById('cm-icon').textContent = cat.icon;
+    // A. Set Text Content (With Fallbacks)
+    document.getElementById('cm-icon').textContent = "🎁"; // Default icon
     document.getElementById('cm-title').textContent = cat.title;
-    document.getElementById('cm-desc').textContent = cat.desc;
+    document.getElementById('cm-desc').textContent = cat.desc || "Bu kateqoriya üçün ən ideal və xüsusi seçimlər."; // Default text
     
     const list = document.getElementById('cm-ideas-list');
     list.innerHTML = '';
-    cat.ideas.forEach(idea => {
+    
+    // Fallback ideas if not present
+    const ideas = cat.ideas || ["Möhtəşəm Hədiyyə Dəsti", "Xüsusi Qablaşdırma", "Orijinal Aksesuar"];
+    ideas.forEach(idea => {
         const li = document.createElement('li');
-        // Simple formatting to bold the first part
-        const parts = idea.split(':');
-        li.innerHTML = `<strong>${parts[0]}:</strong> ${parts[1] || ''}`;
+        li.innerHTML = `✨ ${idea}`;
         list.appendChild(li);
     });
 
@@ -4350,6 +4658,86 @@ document.addEventListener('DOMContentLoaded', function() {
     const backBtn = document.querySelector('.back-btn');
     if(backBtn) backBtn.addEventListener('click', goBack);
 });
+
+// --- BANNER DATA CONFIGURATION ---
+const bannerDetails = {
+    'banner_sale': {
+        title: "🔥 Böyük Endirim Fürsətləri",
+        desc: "Mövsümün ən çox endirim olunan məhsullarını sizin üçün seçdik. Bu qiymətlər uzun çəkməyəcək!",
+        icon: "🏷️",
+        theme: "header-red",
+        // This 'tag' must match the Google Sheet tag column
+        filterTag: "sale" 
+    },
+    'banner_winter': {
+        title: "❄️ Qış Dəbi və Tərz",
+        desc: "Soyuq havalarda həm isti saxlayan, həm də zövqlü görünən yeni kolleksiyamız.",
+        icon: "🧣",
+        theme: "header-purple",
+        filterTag: "winter" 
+    },
+    'banner_tech': {
+        title: "⚡ Smart Hədiyyələr",
+        desc: "Texnologiya həvəskarları üçün ən son model qadcetlər və ağıllı aksesuarlar.",
+        icon: "🎧",
+        theme: "header-orange",
+        filterTag: "tech" 
+    }
+};
+
+function openBannerModal(bannerId) {
+    const data = bannerDetails[bannerId];
+    if(!data) return;
+
+    // 1. Get Elements
+    const modal = document.getElementById('category-modal');
+    const header = modal.querySelector('.cat-modal-header');
+    const iconEl = document.getElementById('cm-icon');
+    const titleEl = document.getElementById('cm-title');
+    const descEl = document.getElementById('cm-desc');
+    const listEl = document.getElementById('cm-ideas-list');
+    const gridEl = document.getElementById('cm-products-grid');
+
+    // 2. Reset & Apply Styling
+    header.className = 'cat-modal-header colored-header ' + data.theme; // Apply color theme
+    
+    // 3. Set Content
+    iconEl.textContent = data.icon;
+    titleEl.textContent = data.title;
+    descEl.textContent = data.desc;
+
+    // 4. Hide the "Ideal Ideas" list for banners (optional, looks cleaner without)
+    document.querySelector('.idea-box').style.display = 'none';
+
+    // 5. Fetch & Render Products based on Tag
+    gridEl.innerHTML = '<div style="width:100%; text-align:center; padding:20px; color:#999;">Yüklənir...</div>';
+    
+    // Filter logic: Look for products where the Google Sheet tag column contains the filterTag
+    let matches = state.products.filter(p => p.tag && p.tag.toLowerCase().includes(data.filterTag));
+    
+    // FALLBACK: If you haven't tagged products in Excel yet, show random items so it doesn't look empty
+    if(matches.length === 0) {
+        matches = state.products.sort(() => 0.5 - Math.random()).slice(0, 6); // Show 6 random items
+    }
+
+    renderSectionCards(gridEl, matches, "SEÇİLDİ", "bg-black");
+
+    // 6. Show Modal
+    modal.classList.add('active');
+    logUserAction("BannerClick", data.title);
+}
+
+// Update existing close function to reset styles
+const originalCloseCatModal = closeCategoryModal;
+closeCategoryModal = function() {
+    originalCloseCatModal();
+    // Reset the header style back to white when closed, so normal categories look correct
+    setTimeout(() => {
+        const header = document.querySelector('.cat-modal-header');
+        if(header) header.className = 'cat-modal-header';
+        document.querySelector('.idea-box').style.display = 'block'; // Show ideas again
+    }, 300);
+}
   
 </script>
 </body>
