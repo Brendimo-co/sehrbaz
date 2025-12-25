@@ -992,6 +992,299 @@ body {
 }
 
 @keyframes popIn { to { transform: scale(1); opacity: 1; } } 
+
+/* --- NEW BANNER SLIDER STYLES --- */
+.banner-wrapper {
+    position: relative;
+    padding: 10px 0 20px 0; /* Space for dots */
+    margin-top: 15px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.banner-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch; /* Smooth iOS scroll */
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+    gap: 0; 
+    padding: 0 15px; /* Side padding so cards aren't flush to edge */
+}
+.banner-track::-webkit-scrollbar { display: none; }
+
+.banner-slide {
+    flex: 0 0 100%; /* Each slide takes full width */
+    scroll-snap-align: center;
+    padding: 0 5px; /* Slight gap between slides */
+    position: relative;
+}
+
+/* Update hero-card to fit inside slide properly */
+.banner-slide .hero-card {
+    width: 100%;
+    height: 220px; /* Fixed height for consistency */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+    padding: 25px;
+    position: relative;
+    /* Reuse existing shadow/radius */
+}
+
+.banner-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.banner-decor {
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 200px;
+    height: 200px;
+    filter: blur(80px);
+    opacity: 0.5;
+    z-index: 1;
+    border-radius: 50%;
+}
+
+/* DOTS NAVIGATION */
+.banner-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+.b-dot {
+    width: 8px;
+    height: 8px;
+    background: #ddd;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+.b-dot.active {
+    background: #c21a1a;
+    width: 24px;
+    border-radius: 4px;
+}
+/* --- AI POWER CARD STYLES --- */
+.ai-card-wrapper {
+    padding: 0 20px;
+    margin-bottom: 25px;
+    margin-top: 10px;
+}
+
+.ai-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.7); /* Semi-transparent white */
+    backdrop-filter: blur(10px); /* Frosted Glass Effect */
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    padding: 20px;
+}
+
+/* Background Glowing Blobs */
+.ai-blob {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    filter: blur(50px);
+    z-index: 0;
+    opacity: 0.4;
+    animation: pulseBlob 6s infinite alternate;
+}
+.ai-blob.red { background: #ffdede; top: -50px; right: -50px; }
+.ai-blob.blue { background: #e0f2fe; bottom: -50px; left: -50px; animation-delay: -3s; }
+
+@keyframes pulseBlob {
+    0% { transform: scale(1); opacity: 0.4; }
+    100% { transform: scale(1.2); opacity: 0.6; }
+}
+
+.ai-content-row {
+    position: relative;
+    z-index: 2; /* Sit on top of blobs */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Visual Icon Side */
+.ai-visual {
+    flex-shrink: 0;
+}
+.ai-icon-circle {
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    font-size: 32px;
+    border: 1px solid #f0f0f0;
+}
+
+/* Text Side */
+.ai-text-box {
+    flex: 1;
+}
+
+.ai-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1a1a1a;
+    line-height: 1.3;
+    margin-bottom: 6px;
+}
+
+.ai-desc {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+.ai-desc b { color: #c21a1a; }
+
+/* Small Tag Badges */
+.ai-tags {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+.ai-tags span {
+    font-size: 10px;
+    font-weight: 700;
+    background: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: #555;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    border: 1px solid #eee;
+}
+
+/* The Button */
+/* UPDATED: COOLER WIZARD BUTTON */
+.ai-btn {
+    position: relative;
+    width: 100%;
+    /* Gradient: Deep Red to Bright Red/Orange */
+    background: linear-gradient(92deg, #c21a1a 0%, #ff4d4d 100%);
+    color: white;
+    border: none;
+    padding: 14px; /* Slightly taller for better touch target */
+    border-radius: 14px; /* Softer corners matching the card */
+    font-size: 14px;
+    font-weight: 800; /* Extra bold text */
+    cursor: pointer;
+    overflow: hidden; /* Keeps the shimmer inside */
+    
+    /* 3D Shadow Effect */
+    box-shadow: 0 6px 20px rgba(194, 26, 26, 0.3), 
+                0 2px 0px rgba(150, 0, 0, 1); /* Bottom lip for 3D feel */
+    
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Space between text and icon */
+}
+
+/* THE SHIMMER ANIMATION (Light reflection moving across) */
+.ai-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    transform: skewX(-25deg);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    20% { left: 200%; } /* Fast pass */
+    100% { left: 200%; } /* Long pause */
+}
+
+/* ACTIVE STATE (Pressed) */
+.ai-btn:active {
+    transform: translateY(2px); /* Push down effect */
+    box-shadow: 0 2px 10px rgba(194, 26, 26, 0.2), 
+                0 0px 0px rgba(150, 0, 0, 1); /* Remove lip */
+}
+  /* --- CATEGORIES GRID --- */
+.cat-grid-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 Columns */
+    gap: 10px;
+    padding: 0 15px;
+}
+
+.cat-btn-card {
+    background: white;
+    padding: 15px;
+    border-radius: 16px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    border: 1px solid #f0f0f0;
+}
+
+.cat-btn-card:active { transform: scale(0.96); border-color: #c21a1a; }
+
+.cat-btn-icon { font-size: 28px; margin-bottom: 8px; }
+.cat-btn-title { font-size: 13px; font-weight: 700; color: #333; line-height: 1.3; }
+
+/* --- CATEGORY MODAL STYLES --- */
+.cat-modal-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+.cat-icon-large { font-size: 50px; margin-bottom: 10px; animation: bounce 2s infinite; }
+#cm-title { color: #c21a1a; margin-bottom: 10px; }
+#cm-desc { font-size: 14px; color: #666; font-style: italic; }
+
+.idea-box {
+    background: #fffcf0;
+    border: 1px dashed #FFD700;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+.idea-box h3 { font-size: 15px; margin-bottom: 10px; color: #333; }
+.idea-list { padding-left: 20px; }
+.idea-list li { font-size: 13px; color: #444; margin-bottom: 8px; line-height: 1.5; }
+.idea-list li strong { color: #c21a1a; }
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+    40% {transform: translateY(-10px);}
+    60% {transform: translateY(-5px);}
+}
 </style>
 <script>
 !function(f,b,e,v,n,t,s)
@@ -1183,23 +1476,124 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
         <button onclick="handleNavClick('wizard')" style="background:transparent; border:none; color:#777; font-weight:600;">✕ Bağla</button>
     </div>
 
-    <div class="hero-wrapper">
-        <div class="hero-card">
-            <h1 class="hero-title">Bayram Hədiyyən <br>Hazırdır?</h1>
-            <p class="hero-subtitle">Süni İntellektlə ideal hədiyyəni 30 saniyəyə tap.</p>
-            <button class="hero-btn" onclick="handleNavClick('wizard')">
-                <span>Sehrbazı Başlat 🪄</span>
-            </button>
+    <div class="banner-wrapper">
+    <div class="banner-track" id="banner-track">
+        
+        <div class="banner-slide">
+            <div class="hero-card" style="background: linear-gradient(135deg, #0f172a 0%, #000 100%);">
+                <div class="banner-content">
+                    <h1 class="hero-title">Bayram Hədiyyən <br>Hazırdır?</h1>
+                    <p class="hero-subtitle">Süni İntellektlə ideal hədiyyəni 30 saniyəyə tap.</p>
+                    <button class="hero-btn" onclick="handleNavClick('wizard')">
+                        <span>Sehrbazı Başlat 🪄</span>
+                    </button>
+                </div>
+                <div class="banner-decor" style="background:#c21a1a;"></div>
+            </div>
+        </div>
+
+        <div class="banner-slide">
+            <div class="hero-card" style="background: linear-gradient(135deg, #4a0000 0%, #2b0000 100%);">
+                <div class="banner-content">
+                    <h1 class="hero-title">Özəl Hədiyyə <br>Dəstləri 🎁</h1>
+                    <p class="hero-subtitle">Hazır qablaşdırılmış möhtəşəm setlər.</p>
+                    <button class="hero-btn" style="background:white; color:#c21a1a;" onclick="alert('Tezliklə!')">
+                        <span>Kəşf Et 👉</span>
+                    </button>
+                </div>
+                <div class="banner-decor" style="background:#FFD700; left:auto; right:-50px;"></div>
+            </div>
+        </div>
+
+        <div class="banner-slide">
+            <div class="hero-card" style="background: linear-gradient(135deg, #004d40 0%, #00251a 100%);">
+                <div class="banner-content">
+                    <h1 class="hero-title">Pulsuz <br>Çatdırılma 🚚</h1>
+                    <p class="hero-subtitle">2 və daha çox məhsul al, çatdırılma bizdən!</p>
+                    <button class="hero-btn" style="background:#2ecc71; color:white;" onclick="handleNavClick('wizard')">
+                        <span>Sifariş Ver 🚀</span>
+                    </button>
+                </div>
+                <div class="banner-decor" style="background:#2ecc71; top:auto; bottom:-50px;"></div>
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="banner-dots" id="banner-dots">
+        <div class="b-dot active"></div>
+        <div class="b-dot"></div>
+        <div class="b-dot"></div>
+    </div>
+</div>
+<div class="ai-card-wrapper">
+    <div class="ai-card">
+        <div class="ai-blob red"></div>
+        <div class="ai-blob blue"></div>
+
+        <div class="ai-content-row">
+            <div class="ai-visual">
+                <div class="ai-icon-circle">
+                    <span class="ai-emoji">✨</span>
+                </div>
+            </div>
+
+            <div class="ai-text-box">
+                <h3 class="ai-title">Hədiyyə Seçmək <br>Artıq Çətin Deyil!</h3>
+                <p class="ai-desc">
+                    Süni İntellektimiz (AI) minlərlə variantı analiz edir. Sadəcə 3 suala cavab ver, <b>"O"nun</b> üçün ən ideal hədiyyəni 1 dəqiqəyə tapaq.
+                </p>
+                
+                <div class="ai-tags">
+                    <span>⚡ 30 Saniyə</span>
+                    <span>🎯 100% Dəqiq</span>
+                </div>
+
+                <button class="ai-btn" onclick="handleNavClick('wizard')">
+                    Sehrbazı Sına 🪄
+                </button>
+            </div>
         </div>
     </div>
-
+</div>
     <div class="section-container">
         <div class="section-header"><h2 class="sec-title">🏆 Ən Çox Satılanlar</h2></div>
         <div class="horizontal-scroll" id="best-container">
             <div style="padding:10px; color:#999">Yüklənir...</div>
         </div>
     </div>
+<div class="section-container">
+    <div class="section-header">
+        <h2 class="sec-title">Kim üçün axtarırsınız? 🎯</h2>
+    </div>
+    <div id="categories-grid" class="cat-grid-wrapper">
+        </div>
+</div>
 
+<div id="category-modal" class="modal">
+    <div class="header">
+        <div class="back-btn" onclick="closeCategoryModal()">← Geri</div>
+        <div class="logo">Seçimlər</div>
+    </div>
+    <div class="modal-content-scroll">
+        <div class="cat-modal-header">
+            <div class="cat-icon-large" id="cm-icon">🎁</div>
+            <h2 id="cm-title">Category Name</h2>
+            <p id="cm-desc">Description goes here...</p>
+        </div>
+
+        <div class="idea-box">
+            <h3>💡 İdeal Hədiyyə Seçimləri:</h3>
+            <ul id="cm-ideas-list" class="idea-list"></ul>
+        </div>
+
+        <div class="shop-suggestions">
+            <h3>🛍️ Mağazamızdan Təkliflər:</h3>
+            <div id="cm-products-grid" class="grid-container" style="padding-bottom:0;">
+                </div>
+        </div>
+    </div>
+</div>
     <div class="section-container" style="background:white">
         <div class="section-header"><h2 class="sec-title">🆕 Yeni Gələnlər</h2></div>
         <div class="horizontal-scroll" id="new-container">
@@ -1405,17 +1799,20 @@ let deviceName = getDeviceType();
 // --- INITIALIZATION ---
 function init() {
     initStories();
-    preloadStories(); // Starts downloading story images immediately in background
-    // We call this first. It will fetch IP -> Then Log "AppOpen" automatically
+    preloadStories(); 
     fetchIP(); 
-     
     initGlobalSwipe(); 
     initNotificationSwipe(); 
-  initModalSwipe();
-  initBubbleDrag();// <--- ADD THIS 
-handleNavClick('mall');
-  updateUI();
+    initModalSwipe();
+    initBubbleDrag();
+    handleNavClick('mall');
+    
+    // ADD THIS LINE:
+    initBannerSlider(); 
+initCategories()
+    updateUI();
 }
+  
 function preloadStories() {
   // Loops through all stories and forces the browser to download them now
   storiesData.forEach(s => {
@@ -1425,7 +1822,164 @@ function preloadStories() {
     }
   });
 }
-// --- ANALYTICS FUNCTIONS (NEW) ---
+// --- 20 CATEGORIES DATA ---
+const categoriesData = [
+  // Ailə
+  { id: 1, icon: "👩‍🍳", tag: "cat_ana", title: "Fədakar Ana", desc: "Ömrünü mətbəx və uşaqları arasında keçirən müqəddəs varlıq.", ideas: ["Blender dəsti (Bosch/Tefal)", "Gündəlik gümüş sırğa", "Ortopedik mətbəx xalçası", "Naxışlı plov sinisi", "Qranit qazan dəsti"] },
+  { id: 2, icon: "👨‍💼", tag: "cat_ata", title: "Zəhmli Ata", desc: "Hisslərini bəlli etməyən, amma ailəsi üçün yaşayan dağ kimi insan.", ideas: ["Dəri kəmər və pulqabı", "Klassik qol saatı (Casio)", "Avtomobil bel yastığı", "Taxta Nərd", "Dəri ev tərliyi"] },
+  { id: 3, icon: "👰", tag: "cat_gelin", title: "Təzə Gəlin", desc: "Cehizini və evini bəzəməyə həvəsli, estetikaya önəm verən xanım.", ideas: ["Zirkon qaşlı gümüş dəst", "Mücrü (Zinət qutusu)", "Dekorativ Abajur", "Şıq kiçik çanta", "Dekorativ güldan"] },
+  { id: 4, icon: "🛠️", tag: "cat_bey", title: "Həyat Yoldaşı (Bəy)", desc: "Evin texniki problemlərini həll edən, praktikliyi sevən kişi.", ideas: ["Trimmer (Philips OneBlade)", "Gündəlik Ətir", "Alət çantası (Drel)", "Rahat Svitşot (Hudi)", "Video-qeydiyyatçı"] },
+  { id: 5, icon: "❤️", tag: "cat_xanim", title: "Həyat Yoldaşı (Xanım)", desc: "Diqqət və sevgi gözləyən, evin zərif tərəfi.", ideas: ["Pandora stili qolbaq", "Saç düzləşdirici/Fen", "SPA/Masaj kuponu", "Adlı boyunbağı", "Ziyafət çantası"] },
+  
+  // Gənclər
+  { id: 6, icon: "🎧", tag: "cat_telebe", title: "Tələbə Gənc", desc: "Dərs və metro arasında qalan, musiqisiz yaşamayan.", ideas: ["Power Bank (20k mAh)", "Simsiz Qulaqlıq", "Oversize Hudi", "Fast Food Kuponu", "BakıKart balansı"] },
+  { id: 7, icon: "💄", tag: "cat_baci", title: "Dəb Aşiqi Bacı", desc: "Pinterest və TikTok dünyasında yaşayan estetik qız.", ideas: ["Üz qulluq dəsti", "Pambıq Pijama", "Crossbody çanta", "Makiyaj fırçaları", "İşıqlı güzgü"] },
+  { id: 8, icon: "🎮", tag: "cat_qardas", title: "Arxa-dayaq Qardaş", desc: "Sadəliyi sevən, oyun və dostları ilə vaxt keçirən oğlan.", ideas: ["Geyminq Maus/Qulaqlıq", "Sadə T-shirt dəsti", "Noutbuk Çantası", "Steam Kartı", "Ev şalvarı"] },
+  { id: 9, icon: "🎖️", tag: "cat_esger", title: "Əsgər", desc: "Vətən keşiyində duran, istiliyə ehtiyacı olan gənc.", ideas: ["Elektron Saat (Casio)", "Termal İçlik", "Gigiyena çantası", "Danışıq konturu", "Yun corablar"] },
+  { id: 10, icon: "⚽", tag: "cat_usaq", title: "Dəcəl Uşaq", desc: "Enerjisi bitməyən aktiv məktəbli.", ideas: ["Lego (Kiçik)", "Rəsm Çemodanı", "Futbol topu", "Ağıllı Saat", "Personajlı Lançboks"] },
+
+  // Qohumlar
+  { id: 11, icon: "👵", tag: "cat_nene", title: "Nənə", desc: "Süfrəsi bərəkətli, nəvələrini gözləyən nurani insan.", ideas: ["Elektrikli Çaydan", "Yumşaq Namazlıq", "Kəlağayı/Şal", "Çay Dəsgahı", "Tonometr"] },
+  { id: 12, icon: "🏠", tag: "cat_yeni_ev", title: "Yeni Ev Sahibi", desc: "Evin hər küncünü doldurmağa çalışan ailə.", ideas: ["Büllur Meyvə Qabı", "Tort qabı", "Stəkan dəsti", "Yataq Dəsti", "Elektrikli Doğrayıcı"] },
+  { id: 13, icon: "👶", tag: "cat_korpe", title: "Körpə", desc: "Gözaydınlığına gedilən yeni doğulmuş.", ideas: ["Gümüş sancaq", "Hamam Dəsti", "Plyuş Ədyal", "Mağaza Kartı", "Nəmər (Pul)"] },
+  { id: 14, icon: "📚", tag: "cat_muellim", title: "Müəllim", desc: "Zəhmətkeş, diqqəti sevən ziyalı.", ideas: ["Market Kartı", "Frenç-Press və Kofe", "Büllur Vaza", "Şokolad qutusu", "Kosmetika kartı"] },
+  { id: 15, icon: "🩺", tag: "cat_hekim", title: "Həkim", desc: "Minnətdarlıq edilən peşəkar.", ideas: ["Premium Şokolad", "Yarpaq Çay (Dəmir qutu)", "Masaüstü Suvenir", "Meyvə Səbəti", "Premium Kofe"] },
+
+  // Dostlar
+  { id: 16, icon: "👯‍♀️", tag: "cat_refiqe", title: "Sirdaş Rəfiqə", desc: "Dərdini bölüşdüyün ən yaxın dost.", ideas: ["Ətirli Şam", "Kosmetika Orqanayzeri", "Şopper Çanta", "Fərdi Fincan", "Səyahət qutusu"] },
+  { id: 17, icon: "🚗", tag: "cat_dost_ogl", title: "Avtoş Dost", desc: "Maşınına canı kimi baxan oğlan.", ideas: ["Əl Tozsoranı", "Maqnitli Tutacaq", "Panel Təmizləyici", "Asma Ətir", "Logolu Açarlıq"] },
+  { id: 18, icon: "☕", tag: "cat_cay", title: "Çay Aşiqi", desc: "Çayın dadını rəngindən bilən insan.", ideas: ["Mürəbbə Dəsti", "Armudu Stəkan", "Farfor Dəm Çaydanı", "Çərəz Qutusu", "Mətbəx Dəsmalları"] },
+  { id: 19, icon: "🎄", tag: "cat_ofis", title: "Ofis Yoldaşı", desc: "Gizli Santa və ya həmkar.", ideas: ["Yeni İl Fincanı", "Masa Təqvimi", "Rəngli Corablar", "Bitki (Sukulent)", "Bloknot"] },
+  { id: 20, icon: "💼", tag: "cat_mudir", title: "Rəhbər (Müdir)", desc: "Rəsmiyyəti sevən ciddi şəxs.", ideas: ["Masaüstü Dəri Dəst", "Taxta Çay Qutusu", "Kabinet Gülü", "Bankir Lampası", "Kitab Albom"] }
+];
+
+// 1. RENDER BUTTONS
+function initCategories() {
+    const grid = document.getElementById('categories-grid');
+    if(!grid) return;
+    
+    grid.innerHTML = '';
+    categoriesData.forEach(cat => {
+        const btn = document.createElement('div');
+        btn.className = 'cat-btn-card';
+        btn.innerHTML = `<div class="cat-btn-icon">${cat.icon}</div><div class="cat-btn-title">${cat.title}</div>`;
+        btn.onclick = () => openCategoryModal(cat.id);
+        grid.appendChild(btn);
+    });
+}
+
+// 2. OPEN MODAL & FILTER PRODUCTS
+function openCategoryModal(id) {
+    const cat = categoriesData.find(c => c.id === id);
+    if(!cat) return;
+
+    // A. Set Text Content
+    document.getElementById('cm-icon').textContent = cat.icon;
+    document.getElementById('cm-title').textContent = cat.title;
+    document.getElementById('cm-desc').textContent = cat.desc;
+    
+    const list = document.getElementById('cm-ideas-list');
+    list.innerHTML = '';
+    cat.ideas.forEach(idea => {
+        const li = document.createElement('li');
+        // Simple formatting to bold the first part
+        const parts = idea.split(':');
+        li.innerHTML = `<strong>${parts[0]}:</strong> ${parts[1] || ''}`;
+        list.appendChild(li);
+    });
+
+    // B. FETCH & SHOW MATCHING PRODUCTS
+    const productGrid = document.getElementById('cm-products-grid');
+    productGrid.innerHTML = '<div style="width:100%; text-align:center; padding:20px; color:#999;">Yüklənir...</div>';
+    
+    // Filter from global state.products
+    // We look for the 'tag' inside the product's tag field in Google Sheets
+    // Column M should contain words like "cat_ana" or "cat_telebe"
+    const matches = state.products.filter(p => p.tag && p.tag.toLowerCase().includes(cat.tag));
+    
+    productGrid.innerHTML = '';
+    
+    if (matches.length > 0) {
+        // Show max 5 products
+        matches.slice(0, 5).forEach(p => {
+             const pIndex = state.products.indexOf(p);
+             const el = document.createElement('div');
+             el.className = 'grid-item';
+             el.onclick = () => openModal(p, matches, matches.indexOf(p)); // Opens the big product details modal
+             
+             el.innerHTML = `
+                <img src="${fixImageLink(p.image)}" loading="lazy">
+                <div class="grid-info">
+                    <div class="grid-title">${p.name}</div>
+                    <div class="grid-price-box">
+                        <span class="grid-new-price">${p.price} AZN</span>
+                    </div>
+                </div>`;
+             productGrid.appendChild(el);
+        });
+    } else {
+        productGrid.innerHTML = `
+            <div style="grid-column: span 2; text-align:center; color:#999; padding:20px; background:#f9f9f9; border-radius:10px;">
+                <span style="font-size:30px; display:block; margin-bottom:10px;">😕</span>
+                Bu kateqoriyaya uyğun məhsul hələ əlavə edilməyib. <br>
+                <small>(Excel-də "tag" sütununa <b>${cat.tag}</b> yazın)</small>
+            </div>`;
+    }
+
+    document.getElementById('category-modal').classList.add('active');
+    logUserAction("CategoryView", cat.title);
+}
+
+function closeCategoryModal() {
+    document.getElementById('category-modal').classList.remove('active');
+}
+  // --- BANNER SLIDER LOGIC ---
+function initBannerSlider() {
+    const track = document.getElementById('banner-track');
+    const dots = document.querySelectorAll('.b-dot');
+    if (!track) return;
+
+    let bannerIndex = 0;
+    const totalBanners = 3;
+    let isTouching = false;
+
+    // 1. Handle Scroll Event (Update Dots)
+    track.addEventListener('scroll', () => {
+        const width = track.offsetWidth;
+        const scrollLeft = track.scrollLeft;
+        // Calculate which slide is mostly visible
+        bannerIndex = Math.round(scrollLeft / width);
+        
+        // Update Dots
+        dots.forEach((dot, i) => {
+            if (i === bannerIndex) dot.classList.add('active');
+            else dot.classList.remove('active');
+        });
+    });
+
+    // 2. Pause auto-scroll on touch
+    track.addEventListener('touchstart', () => { isTouching = true; }, {passive: true});
+    track.addEventListener('touchend', () => { 
+        isTouching = false; 
+        // Restart timer delay
+    }, {passive: true});
+
+    // 3. Auto Scroll Interval (Every 4 seconds)
+    setInterval(() => {
+        if (!isTouching) {
+            bannerIndex++;
+            if (bannerIndex >= totalBanners) bannerIndex = 0;
+            
+            // Scroll to the next position
+            const width = track.querySelector('.banner-slide').offsetWidth; // Get width including padding
+            track.scrollTo({
+                left: bannerIndex * width,
+                behavior: 'smooth'
+            });
+        }
+    }, 4000);
+}
+  // --- ANALYTICS FUNCTIONS (NEW) ---
 function getDeviceType() {
     const ua = navigator.userAgent;
     if (/Android/i.test(ua)) return "Android Mobile";
