@@ -587,11 +587,11 @@ body {
 .hero-subtitle { font-size: 14px; color: #aaa; margin-bottom: 20px; }
 .hero-btn { background: linear-gradient(92deg, #c21a1a 0%, #ff4d4d 100%); color: white; border: none; width: 100%; padding: 14px; border-radius: 14px; font-size: 16px; font-weight: 800; box-shadow: 0 5px 20px rgba(194, 26, 26, 0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-.section-container { padding: 20px 0; }
+.section-container { padding: 5px 0; }
 .section-header { padding: 0 20px 15px; display: flex; justify-content: space-between; align-items: center; }
 .sec-title { font-size: 18px; font-weight: 800; color: #1d1d1f; position: relative; }
 .sec-title::after { content: ''; display: block; width: 40%; height: 3px; background: #c21a1a; border-radius: 2px; margin-top: 4px; }
-.horizontal-scroll { display: flex; gap: 15px; overflow-x: auto; padding: 0 20px 20px 20px; scrollbar-width: none; }
+.horizontal-scroll { display: flex; gap: 15px; overflow-x: auto; padding: 0 10px 10px 10px; scrollbar-width: none; }
 .horizontal-scroll::-webkit-scrollbar { display: none; }
 
 .prod-card { min-width: 160px; width: 160px; background: #fff; border-radius: 16px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); overflow: hidden; display: flex; flex-direction: column; position: relative; transition: transform 0.2s; }
@@ -996,8 +996,8 @@ body {
 /* --- NEW BANNER SLIDER STYLES --- */
 .banner-wrapper {
     position: relative;
-    padding: 10px 0 20px 0; /* Space for dots */
-    margin-top: 15px;
+    padding: 5px 0 10px 0; /* Space for dots */
+    margin-top: 5px;
     width: 100%;
     overflow: hidden;
 }
@@ -1075,8 +1075,8 @@ body {
 /* --- AI POWER CARD STYLES --- */
 .ai-card-wrapper {
     padding: 0 20px;
-    margin-bottom: 25px;
-    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-top: 0px;
 }
 
 .ai-card {
@@ -1230,32 +1230,70 @@ body {
     box-shadow: 0 2px 10px rgba(194, 26, 26, 0.2), 
                 0 0px 0px rgba(150, 0, 0, 1); /* Remove lip */
 }
-  /* --- CATEGORIES GRID --- */
-.cat-grid-wrapper {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 Columns */
-    gap: 10px;
-    padding: 0 15px;
-}
-
-.cat-btn-card {
-    background: white;
-    padding: 15px;
-    border-radius: 16px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+/* --- NEW HORIZONTAL PILLS CATEGORIES --- */
+.horizontal-pills-track {
     display: flex;
-    flex-direction: column;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 5px 15px 15px 15px; /* Padding for shadow breathing room */
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+}
+.horizontal-pills-track::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome/Safari */
+
+/* The Pill Button Styling */
+.cat-btn-card {
+    flex: 0 0 auto; /* Ensures buttons don't shrink */
+    display: flex;
+    flex-direction: row; /* Icon next to text */
     align-items: center;
-    text-align: center;
+    gap: 8px; /* Space between icon and text */
+    
+    background: white;
+    padding: 8px 16px; /* Shorter height, wider width padding */
+    border-radius: 30px; /* Makes them pill-shaped */
+    border: 1px solid #eee;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    
     cursor: pointer;
-    transition: transform 0.2s;
-    border: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+    scroll-snap-align: start;
 }
 
-.cat-btn-card:active { transform: scale(0.96); border-color: #c21a1a; }
+/* Active/Hover State */
+.cat-btn-card:active { 
+    transform: scale(0.95); 
+    background: #fff5f5; 
+    border-color: #c21a1a; 
+    color: #c21a1a;
+}
 
-.cat-btn-icon { font-size: 28px; margin-bottom: 8px; }
-.cat-btn-title { font-size: 13px; font-weight: 700; color: #333; line-height: 1.3; }
+/* Adjust Icon Size */
+.cat-btn-icon { 
+    font-size: 16px; /* Smaller icon to fit the pill */
+    margin-bottom: 0; /* Remove old margin */
+}
+
+/* Adjust Title Text */
+.cat-btn-title { 
+    font-size: 13px; 
+    font-weight: 600; 
+    color: #333; 
+    line-height: 1;
+    white-space: nowrap; /* Ensures text stays on one line */
+}
+
+/* Optional: Make the first item look "active" like the screenshot */
+/* Note: This is just visual for now, until clicked */
+.cat-btn-card:first-child {
+   background: #c21a1a;
+   border-color: #c21a1a;
+}
+.cat-btn-card:first-child .cat-btn-title,
+.cat-btn-card:first-child .cat-btn-icon {
+    color: white;
+}
 
 /* --- CATEGORY MODAL STYLES --- */
 .cat-modal-header {
@@ -1662,6 +1700,121 @@ body {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* --- TRENDY BANNER STYLES --- */
+.hero-card {
+    /* Reset old styles */
+    width: 100%;
+    height: 160px; /* Compact height like the image */
+    border-radius: 12px; /* Slightly squarer corners */
+    display: flex;
+    justify-content: space-between; /* Split text and images */
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    color: white;
+}
+
+/* Background Colors */
+.visual-red { background: #e60023; }   /* The Red from your image */
+.visual-purple { background: #8e44ad; }
+.visual-orange { background: #f39c12; }
+
+/* Text Side */
+.banner-text-content {
+    flex: 1;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.b-subtitle {
+    font-size: 10px;
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.b-title {
+    font-size: 18px;
+    font-weight: 900; /* Extra Bold */
+    line-height: 1.1;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.b-btn {
+    background: white;
+    color: black;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px; /* Pill shape */
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Image Collage Side */
+.banner-visuals {
+    flex: 1;
+    position: relative;
+    height: 100%;
+}
+
+/* Floating Images Styling */
+.b-img {
+    position: absolute;
+    border-radius: 8px;
+    border: 2px solid white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    object-fit: cover;
+}
+
+/* Image Positions (Scattered look) */
+.b-img-1 {
+    width: 70px; height: 70px;
+    top: 5px; right: 5px;
+    transform: rotate(5deg);
+    z-index: 1;
+}
+.b-img-2 {
+    width: 60px; height: 60px;
+    bottom: 5px; right: 60px;
+    transform: rotate(-10deg);
+    z-index: 2;
+}
+.b-img-3 {
+    width: 40px; height: 40px;
+    top: 40px; right: 90px;
+    transform: rotate(15deg);
+    z-index: 3;
+}
+.b-heart {
+    position: absolute;
+    bottom: 10px; right: 10px;
+    font-size: 18px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+/* Counter Badge (1/3) */
+.banner-counter {
+    position: absolute;
+    bottom: 30px; /* Positioned over the slider */
+    right: 25px;
+    background: rgba(0,0,0,0.4);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 10;
+}
   
 </style>
 <script>
@@ -1853,57 +2006,65 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
         <h2 class="title" style="font-size:20px; margin:0;">SehrMall 🛍️</h2>
         <button onclick="handleNavClick('wizard')" style="background:transparent; border:none; color:#777; font-weight:600;">✕ Bağla</button>
     </div>
-
-    <div class="banner-wrapper">
+<div class="section-container">
+    <div class="section-header">
+       
+    </div>
+<div id="categories-grid" class="horizontal-pills-track">
+</div>
+</div>
+   <div class="banner-wrapper">
     <div class="banner-track" id="banner-track">
         
         <div class="banner-slide">
-            <div class="hero-card" style="background: linear-gradient(135deg, #0f172a 0%, #000 100%);">
-                <div class="banner-content">
-                    <h1 class="hero-title">Bayram Hədiyyən <br>Hazırdır?</h1>
-                    <p class="hero-subtitle">Süni İntellektlə ideal hədiyyəni 30 saniyəyə tap.</p>
-                    <button class="hero-btn" onclick="handleNavClick('wizard')">
-                        <span>Sehrbazı Başlat 🪄</span>
-                    </button>
+            <div class="hero-card visual-red">
+                <div class="banner-text-content">
+                    <div class="b-subtitle">MÖVSÜMƏ ÖZƏL</div>
+                    <div class="b-title">ENDİRİM<br>FÜRSƏTLƏRİ!</div>
+                    <button class="b-btn" onclick="openAllProducts()">Kəşf et</button>
                 </div>
-                <div class="banner-decor" style="background:#c21a1a;"></div>
+                
+                <div class="banner-visuals">
+                    <img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=150&h=150&fit=crop" class="b-img b-img-1">
+                    <img src="https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=150&h=150&fit=crop" class="b-img b-img-2">
+                    <img src="https://images.unsplash.com/photo-1541643600914-78b084683601?w=150&h=150&fit=crop" class="b-img b-img-3">
+                    <div class="b-heart">🧡</div>
+                </div>
             </div>
         </div>
 
         <div class="banner-slide">
-            <div class="hero-card" style="background: linear-gradient(135deg, #4a0000 0%, #2b0000 100%);">
-                <div class="banner-content">
-                    <h1 class="hero-title">Özəl Hədiyyə <br>Dəstləri 🎁</h1>
-                    <p class="hero-subtitle">Hazır qablaşdırılmış möhtəşəm setlər.</p>
-                    <button class="hero-btn" style="background:white; color:#c21a1a;" onclick="alert('Tezliklə!')">
-                        <span>Kəşf Et 👉</span>
-                    </button>
+            <div class="hero-card visual-purple">
+                <div class="banner-text-content">
+                    <div class="b-subtitle">YENİ KOLLEKSİYA</div>
+                    <div class="b-title">QIŞ DƏBİ<br>VƏ TƏRZ</div>
+                    <button class="b-btn" onclick="openAllProducts()">Bax</button>
                 </div>
-                <div class="banner-decor" style="background:#FFD700; left:auto; right:-50px;"></div>
+                <div class="banner-visuals">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=150&h=150&fit=crop" class="b-img b-img-1">
+                    <img src="https://images.unsplash.com/photo-1515347619252-60a6bf4fffce?w=150&h=150&fit=crop" class="b-img b-img-2">
+                </div>
             </div>
         </div>
 
         <div class="banner-slide">
-            <div class="hero-card" style="background: linear-gradient(135deg, #004d40 0%, #00251a 100%);">
-                <div class="banner-content">
-                    <h1 class="hero-title">Pulsuz <br>Çatdırılma 🚚</h1>
-                    <p class="hero-subtitle">2 və daha çox məhsul al, çatdırılma bizdən!</p>
-                    <button class="hero-btn" style="background:#2ecc71; color:white;" onclick="handleNavClick('wizard')">
-                        <span>Sifariş Ver 🚀</span>
-                    </button>
+            <div class="hero-card visual-orange">
+                <div class="banner-text-content">
+                    <div class="b-subtitle">TEXNOLOGİYA</div>
+                    <div class="b-title">SMART<br>HƏDİYYƏLƏR</div>
+                    <button class="b-btn" onclick="openAllProducts()">Seç</button>
                 </div>
-                <div class="banner-decor" style="background:#2ecc71; top:auto; bottom:-50px;"></div>
+                <div class="banner-visuals">
+                     <img src="https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=150&h=150&fit=crop" class="b-img b-img-1">
+                </div>
             </div>
         </div>
 
     </div>
     
-    <div class="banner-dots" id="banner-dots">
-        <div class="b-dot active"></div>
-        <div class="b-dot"></div>
-        <div class="b-dot"></div>
-    </div>
+    <div class="banner-counter" id="banner-counter">1/3</div>
 </div>
+  
 <div class="ai-card-wrapper">
     <div class="ai-card">
         <div class="ai-blob red"></div>
@@ -1940,13 +2101,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
             <div style="padding:10px; color:#999">Yüklənir...</div>
         </div>
     </div>
-<div class="section-container">
-    <div class="section-header">
-        <h2 class="sec-title">Kim üçün axtarırsınız? 🎯</h2>
-    </div>
-    <div id="categories-grid" class="cat-grid-wrapper">
-        </div>
-</div>
+
 
 <div id="category-modal" class="modal">
     <div class="header">
@@ -2958,46 +3113,36 @@ function closeCategoryModal() {
   // --- BANNER SLIDER LOGIC ---
 function initBannerSlider() {
     const track = document.getElementById('banner-track');
-    const dots = document.querySelectorAll('.b-dot');
+    const counter = document.getElementById('banner-counter');
     if (!track) return;
 
     let bannerIndex = 0;
-    const totalBanners = 3;
+    const totalBanners = 3; // Total slides
     let isTouching = false;
 
-    // 1. Handle Scroll Event (Update Dots)
+    // 1. Handle Scroll (Update "1/3" Counter)
     track.addEventListener('scroll', () => {
         const width = track.offsetWidth;
-        const scrollLeft = track.scrollLeft;
-        // Calculate which slide is mostly visible
-        bannerIndex = Math.round(scrollLeft / width);
+        // Calculate index (0, 1, or 2)
+        const scrollIndex = Math.round(track.scrollLeft / width);
         
-        // Update Dots
-        dots.forEach((dot, i) => {
-            if (i === bannerIndex) dot.classList.add('active');
-            else dot.classList.remove('active');
-        });
+        // Update the badge text (e.g., "2/3")
+        if(counter) counter.textContent = `${scrollIndex + 1}/${totalBanners}`;
+        
+        bannerIndex = scrollIndex; // Sync for auto-scroll
     });
 
-    // 2. Pause auto-scroll on touch
+    // 2. Pause on Touch
     track.addEventListener('touchstart', () => { isTouching = true; }, {passive: true});
-    track.addEventListener('touchend', () => { 
-        isTouching = false; 
-        // Restart timer delay
-    }, {passive: true});
+    track.addEventListener('touchend', () => { isTouching = false; }, {passive: true});
 
-    // 3. Auto Scroll Interval (Every 4 seconds)
+    // 3. Auto Scroll (Every 4 seconds)
     setInterval(() => {
         if (!isTouching) {
             bannerIndex++;
             if (bannerIndex >= totalBanners) bannerIndex = 0;
-            
-            // Scroll to the next position
-            const width = track.querySelector('.banner-slide').offsetWidth; // Get width including padding
-            track.scrollTo({
-                left: bannerIndex * width,
-                behavior: 'smooth'
-            });
+            const width = track.querySelector('.banner-slide').offsetWidth;
+            track.scrollTo({ left: bannerIndex * width, behavior: 'smooth' });
         }
     }, 4000);
 }
