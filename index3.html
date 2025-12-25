@@ -1285,6 +1285,217 @@ body {
     40% {transform: translateY(-10px);}
     60% {transform: translateY(-5px);}
 }
+
+/* --- FEATURED REVIEWS SLIDER --- */
+.featured-reviews-track {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding: 10px 20px 30px 20px; /* Bottom padding for shadows */
+    scroll-snap-type: x mandatory; /* The "Banner Swipe" Magic */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.featured-reviews-track::-webkit-scrollbar { display: none; }
+
+.f-review-card {
+    min-width: 85%; /* Shows a little bit of the next card */
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
+    scroll-snap-align: center; /* Snaps to center */
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #f0f0f0;
+}
+
+/* Image Half */
+.fr-img-box {
+    width: 100%;
+    height: 180px;
+    background: #eee;
+    position: relative;
+}
+.fr-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.fr-quote-icon {
+    position: absolute;
+    bottom: -15px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: #c21a1a;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    border: 3px solid white;
+}
+
+/* Content Half */
+.fr-content {
+    padding: 20px 15px 15px 15px;
+}
+.fr-stars { color: #FFD700; margin-bottom: 8px; font-size: 14px; }
+.fr-text { 
+    font-size: 14px; 
+    line-height: 1.5; 
+    color: #333; 
+    font-style: italic; 
+    margin-bottom: 15px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.fr-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid #f5f5f5;
+    padding-top: 10px;
+}
+.fr-avatar {
+    width: 30px; 
+    height: 30px; 
+    background: #eee; 
+    border-radius: 50%; 
+    object-fit: cover;
+}
+.fr-name { font-size: 12px; font-weight: 700; color: #1a1a1a; }
+.fr-date { font-size: 10px; color: #999; }
+
+/* Add this with your other badge classes (bg-red, bg-black) */
+.bg-blue { background: #2563eb; }
+ /* Add with other bg- classes */
+.bg-purple { background: #8e44ad; }
+
+ /* --- FAQ STYLES --- */
+.faq-wrapper {
+    padding: 0 20px;
+}
+
+.faq-item {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+}
+
+.faq-question {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+.faq-icon {
+    font-size: 20px;
+    color: #c21a1a;
+    font-weight: 300;
+    transition: transform 0.3s ease;
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background: #fafafa;
+}
+
+.faq-answer p {
+    padding: 0 15px 15px 15px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #666;
+    margin: 0;
+}
+
+/* ACTIVE STATE */
+.faq-item.active {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border-color: #ffebee;
+}
+
+.faq-item.active .faq-icon {
+    transform: rotate(45deg); /* Turns + into x */
+}
+
+.faq-item.active .faq-answer {
+    max-height: 150px; /* Expands smoothly */
+} 
+  
+/* --- VALUES GRID STYLES --- */
+.values-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 Columns */
+    gap: 12px;
+    padding: 0 15px;
+}
+
+.value-card {
+    background: white;
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border: 1px solid #f5f5f5;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover/Active Animation */
+.value-card:active {
+    transform: scale(0.95);
+    border-color: #c21a1a;
+    background: #fff5f5;
+}
+
+.v-icon-box {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 10px;
+    transition: transform 0.3s;
+}
+
+.value-card:active .v-icon-box {
+    transform: rotate(15deg) scale(1.1);
+}
+
+.v-content h3 {
+    font-size: 13px;
+    font-weight: 800;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.v-content p {
+    font-size: 10px;
+    color: #888;
+    font-weight: 600;
+}
+  
 </style>
 <script>
 !function(f,b,e,v,n,t,s)
@@ -1601,19 +1812,203 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
         </div>
     </div>
 
+<div class="section-container" style="background: linear-gradient(to bottom, #ffffff, #fafafa);">
+    <div class="section-header">
+        <h2 class="sec-title">🌟 Müştərilərimiz Nə Deyir?</h2>
+    </div>
+    
+    <div class="featured-reviews-track" id="featured-reviews-track"></div>
+</div>
+  
     <div class="section-container" style="background:#fff5f5; border-top:1px solid #ffe3e3; border-bottom:1px solid #ffe3e3">
         <div class="section-header"><h2 class="sec-title" style="color:#c21a1a">🔥 Tükənmək Üzrə</h2></div>
         <div class="horizontal-scroll" id="limited-container">
             <div style="padding:10px; color:#999">Yüklənir...</div>
         </div>
     </div>
+<div class="section-container" style="background: #f0f7ff; border-top: 1px solid #dbeafe; border-bottom: 1px solid #dbeafe;">
+    <div class="section-header">
+        <h2 class="sec-title" style="color: #2563eb;">📉 60₼-dən Aşağı</h2>
+    </div>
+    <div class="horizontal-scroll" id="under60-container">
+        <div style="padding:10px; color:#999">Yüklənir...</div>
+    </div>
+</div>
 
-    <div class="section-container">
-        <div class="section-header"><h2 class="sec-title">💬 Müştəri Rəyləri</h2></div>
-        <div class="horizontal-scroll" id="reviews-carousel">
-            <div style="padding:10px; color:#999">Rəylər Yüklənir...</div>
+<div class="section-container" style="background: #fff5f5; border-top: 1px solid #ffe3e3; border-bottom: 1px solid #ffe3e3;">
+    <div class="section-header">
+        <h2 class="sec-title" style="color: #d63384;">⏳ Son Şans (Deals)</h2>
+    </div>
+    <div class="horizontal-scroll" id="lastminute-container">
+        <div style="padding:10px; color:#999">Yüklənir...</div>
+    </div>
+</div>
+
+<div class="section-container" style="padding-bottom: 40px;">
+    <div class="section-header">
+        <h2 class="sec-title">🏆 Bizi Fərqli Edən Dəyərlər</h2>
+    </div>
+    
+    <div class="values-grid">
+        <div class="value-card" onclick="triggerValueAction(this, 'Güvən', 'Bütün məhsullarımız 100% orijinaldır və zəmanətlidir.')">
+            <div class="v-icon-box" style="background: #e0f2fe; color: #0284c7;">
+                🛡️
+            </div>
+            <div class="v-content">
+                <h3>Tam Güvən</h3>
+                <p>100% Orijinal</p>
+            </div>
+        </div>
+
+        <div class="value-card" onclick="triggerValueAction(this, 'Sürət', 'Sifarişiniz 24 saat ərzində qapınızda olacaq.')">
+            <div class="v-icon-box" style="background: #f0fdf4; color: #16a34a;">
+                🚀
+            </div>
+            <div class="v-content">
+                <h3>Super Sürət</h3>
+                <p>24 Saatda Çatdırılma</p>
+            </div>
+        </div>
+
+        <div class="value-card" onclick="triggerValueAction(this, 'Dəstək', 'Sizə xidmət etmək üçün 7/24 xətdəyik.')">
+            <div class="v-icon-box" style="background: #fff1f2; color: #e11d48;">
+                ❤️
+            </div>
+            <div class="v-content">
+                <h3>Xüsusi Qayğı</h3>
+                <p>Müştəri Məmnuniyyəti</p>
+            </div>
+        </div>
+
+        <div class="value-card" onclick="triggerValueAction(this, 'Qablaşdırma', 'Hədiyyəniz xüsusi dizaynla paketlənir.')">
+            <div class="v-icon-box" style="background: #fffbeb; color: #d97706;">
+                🎀
+            </div>
+            <div class="v-content">
+                <h3>Premium Paket</h3>
+                <p>Hədiyyəlik Dizayn</p>
+            </div>
         </div>
     </div>
+</div>
+
+  <div class="section-container" style="padding-bottom: 100px;">
+    <div class="section-header">
+        <h2 class="sec-title">❓ Tez-tez Verilən Suallar</h2>
+    </div>
+
+    <div class="faq-wrapper">
+        
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                <span>Sifarişim nə vaxt çatdırılacaq?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Bakı daxili sifarişlər 24 saat ərzində çatdırılır. "Təcili" çatdırılma seçsəniz, 2-3 saat ərzində ünvanda olur.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                <span>Rayonlara çatdırılma var?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Bəli, Azərpoçt vasitəsilə bütün rayonlara göndəririk. Çatdırılma müddəti 2-3 iş günüdür.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                <span>Ödənişi necə edə bilərəm?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Ödənişi qapıda nağd, kartla (POS-terminal) və ya sayt üzərindən onlayn (BirKart/TamKart taksit imkanı ilə) edə bilərsiniz.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                <span>Hədiyyəni anonim göndərə bilərəm?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Əlbəttə! Sifariş zamanı qeyd etsəniz, sizin adınız alıcıya bildirilməyəcək. Tam məxfilik qorunur. 🕵️‍♂️</p>
+            </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                <span>Hədiyyə paketlənməsi ödənişlidir?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Xeyr, Brendimo-da standart hədiyyə paketlənməsi və üzərinə təbrik kartı yazılması tamamilə pulsuzdur! 🎀</p>
+            </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                <span>Məhsulu bəyənməsəm qaytara bilərəm?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Bəli, məhsul zədələnməyibsə və qutusu açılmayıbsa, 14 gün ərzində dəyişdirə və ya qaytara bilərsiniz.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                <span>Alıcı evdə olmasa nə edirsiniz?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Kuryerimiz çatdırılmadan öncə mütləq əlaqə saxlayır. Əgər sürprizdirsə, bunu bizə əvvəlcədən deyin, xüsusi ssenari ilə yanaşaq.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                <span>Məhsullarınız orijinaldır?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Bəli, Brendimo-da satılan bütün məhsullar 100% orijinaldır və keyfiyyət zəmanəti verilir.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                <span>Korporativ (topdan) sifariş mümkündür?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Bəli, şirkətlər üçün xüsusi endirim paketlərimiz var. WhatsApp vasitəsilə menecerlə əlaqə saxlaya bilərsiniz.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-question">
+                <span>İş saatlarınız necədir?</span>
+                <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+                <p>Onlayn sifarişlər 24/7 qəbul olunur. Müştəri xidmətləri hər gün 10:00-dan 22:00-a qədər fəaliyyət göstərir.</p>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <p style="font-size: 13px; color: #888; margin-bottom: 10px;">Sualınızı tapmadınız?</p>
+            <button onclick="handleNavClick('chat')" style="background: #eee; color: #333; border: none; padding: 10px 20px; border-radius: 20px; font-weight: 600; font-size: 13px;">
+                Canlı Dəstək (WhatsApp) 💬
+            </button>
+        </div>
+
+    </div>
+</div>
+  
 </div>
 
 <div id="favorites-view" class="all-products-view">
@@ -1809,7 +2204,8 @@ function init() {
     
     // ADD THIS LINE:
     initBannerSlider(); 
-initCategories()
+initCategories();
+  initFeaturedReviews();
     updateUI();
 }
   
@@ -1822,6 +2218,76 @@ function preloadStories() {
     }
   });
 }
+
+// --- FEATURED REVIEWS LOGIC ---
+function initFeaturedReviews() {
+    const track = document.getElementById('featured-reviews-track');
+    if (!track) return;
+
+    // 5 MANUAL REVIEWS DATA
+    const featuredData = [
+        {
+            name: "Aysel Məmmədova",
+            img: "https://images.unsplash.com/photo-1512909006721-3d6018887383?w=500&h=300&fit=crop", // Gift Box Image
+            userImg: "https://randomuser.me/api/portraits/women/44.jpg",
+            text: "Həyat yoldaşım üçün aldığım hədiyyə dəsti möhtəşəm idi! Qablaşdırması o qədər zövqlü idi ki, heç açmaq istəmirdik. Təşəkkürlər!",
+            date: "2 gün əvvəl"
+        },
+        {
+            name: "Kamran Əliyev",
+            img: "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=500&h=300&fit=crop", // Happy person/gift
+            userImg: "https://randomuser.me/api/portraits/men/32.jpg",
+            text: "Sifariş verdikdən cəmi 2 saat sonra çatdırdılar. Məhsulun keyfiyyəti şəkildəkindən də yaxşıdır. Brendimo komandasına halaldır.",
+            date: "1 həftə əvvəl"
+        },
+        {
+            name: "Nərgiz Quliyeva",
+            img: "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=500&h=300&fit=crop", // Gift unboxing
+            userImg: "https://randomuser.me/api/portraits/women/68.jpg",
+            text: "Anam üçün mətbəx dəsti aldım. İlk dəfə idi internetdən nəsə alırdım, çox qorxurdum amma hər şey super oldu. Anam çox bəyəndi.",
+            date: "3 gün əvvəl"
+        },
+        {
+            name: "Rəşad Həsənov",
+            img: "https://images.unsplash.com/photo-1521478706270-f2e33c203d95?w=500&h=300&fit=crop", // Guy holding box
+            userImg: "https://randomuser.me/api/portraits/men/85.jpg",
+            text: "Qiymətlər digər səhifələrə baxanda çox münasibdir. Endirim kampaniyasından yararlandım, 2 məhsul aldım, çatdırılma pulsuz oldu.",
+            date: "Dünən"
+        },
+        {
+            name: "Fidan Kərimli",
+            img: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=500&h=300&fit=crop", // Wedding/Ring vibe
+            userImg: "https://randomuser.me/api/portraits/women/12.jpg",
+            text: "Sırğalar çox zərifdir. Qutunun içindən çıxan kiçik şokolad hədiyyəsi isə lap yerinə düşdü. Belə xırda detallar sizi fərqləndirir ❤️",
+            date: "5 gün əvvəl"
+        }
+    ];
+
+    track.innerHTML = '';
+    featuredData.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'f-review-card';
+        card.innerHTML = `
+            <div class="fr-img-box">
+                <img src="${r.img}" class="fr-img" loading="lazy">
+                <div class="fr-quote-icon">❝</div>
+            </div>
+            <div class="fr-content">
+                <div class="fr-stars">★★★★★</div>
+                <p class="fr-text">"${r.text}"</p>
+                <div class="fr-user">
+                    <img src="${r.userImg}" class="fr-avatar">
+                    <div>
+                        <div class="fr-name">${r.name}</div>
+                        <div class="fr-date">${r.date}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        track.appendChild(card);
+    });
+}
+  
 // --- 20 CATEGORIES DATA ---
 const categoriesData = [
   // Ailə
@@ -2581,6 +3047,34 @@ function activateGlobalDiscount() {
     }, 1000);
 }
 
+// --- VALUES INTERACTION ---
+function triggerValueAction(card, title, desc) {
+    // 1. Vibration feedback (Android)
+    if(navigator.vibrate) navigator.vibrate(40);
+
+    // 2. Show Toast Notification (Reusing your existing toast HTML)
+    const toast = document.getElementById('notif-toast');
+    const tUser = document.getElementById('notif-user');
+    const tProd = document.getElementById('notif-product');
+    const tIcon = document.querySelector('.notif-icon');
+    
+    // Customize toast for Values
+    tIcon.textContent = card.querySelector('.v-icon-box').textContent; // Use the card's icon
+    tUser.textContent = `Brendimo Dəyərləri: ${title}`;
+    tUser.style.color = "#c21a1a"; // Make title red
+    tProd.textContent = desc;
+    
+    // Show it
+    toast.classList.add('show');
+    
+    // Hide after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        // Reset color text for next time regular orders use it
+        tUser.style.color = "#888"; 
+    }, 3000);
+}
+  
 function updateDiscountTextUI() {
     const formattedPrice = `-${globalDiscount.toFixed(2)} ₼`;
     const gsAmount = document.getElementById('gs-amount');
@@ -2602,6 +3096,20 @@ function triggerDropEffect() {
     els.forEach(el => { if(el) { el.classList.add('shake-it'); setTimeout(() => el.classList.remove('shake-it'), 500); } });
 }
 
+// --- FAQ INTERACTION ---
+function toggleFaq(element) {
+    // 1. Close all other open items (Optional: remove this block if you want multiple open at once)
+    const allFaqs = document.querySelectorAll('.faq-item');
+    allFaqs.forEach(item => {
+        if (item !== element) {
+            item.classList.remove('active');
+        }
+    });
+
+    // 2. Toggle the clicked item
+    element.classList.toggle('active');
+}
+  
 // --- ORDER NOTIFICATIONS ---
 function startOrderNotifications() {
     if (state.orders.length === 0) return;
@@ -2691,50 +3199,38 @@ function processAndRender(rawProds, rawOrders, rawReviews) {
   
 // NEW FUNCTION TO RENDER MALL SECTIONS
 function renderMallSections() {
-    // 1. Render Product Sections (Same as before)
+    // 1. Filter Lists based on Tags
     const best = state.products.filter(p => p.tag && p.tag.toLowerCase().includes('best'));
     const newly = state.products.filter(p => p.tag && (p.tag.toLowerCase().includes('last') || p.tag.toLowerCase().includes('new')));
     const limited = state.products.filter(p => p.tag && p.tag.toLowerCase().includes('limited'));
     
+    // Under 60 Logic
+    const under60 = state.products.filter(p => (p.tag && p.tag.toLowerCase().includes('under60')) || (parseFloat(p.price) <= 60));
+
+    // --- NEW: LAST MINUTE LOGIC ---
+    // Finds 'lastminute' tag OR High Discounts (>25%)
+    const lastMinute = state.products.filter(p => 
+        (p.tag && p.tag.toLowerCase().includes('lastminute')) || 
+        (p.discountPercent > 25)
+    );
+
+    // 2. Prepare Final Lists (with fallbacks)
     const listBest = best.length ? best : state.products.slice(0, 5);
     const listNew = newly.length ? newly : state.products.slice(5, 10);
     const listLimit = limited.length ? limited : state.products.slice(10, 15);
+    const listUnder60 = under60.slice(0, 10);
+    
+    // Last Minute List (Top 10)
+    const listLast = lastMinute.sort((a,b) => b.discountPercent - a.discountPercent).slice(0, 10);
 
+    // 3. Render to HTML Containers
     renderSectionCards(document.getElementById('best-container'), listBest, "TOP", "bg-black");
     renderSectionCards(document.getElementById('new-container'), listNew, "YENİ", "bg-green");
     renderSectionCards(document.getElementById('limited-container'), listLimit, "TÜKƏNİR", "bg-red");
-
-    // 2. RENDER REVIEWS (UPDATED part)
-    const revContainer = document.getElementById('reviews-carousel');
-    revContainer.innerHTML = ""; // Clear loading text
-
-    // If no reviews, show fallback
-    if (!state.reviews || state.reviews.length === 0) {
-        revContainer.innerHTML = '<div style="padding:15px; color:#999; font-size:13px;">Hələ ki rəy yoxdur. İlk rəyi sən yaz!</div>';
-        return;
-    }
-
-    // Take top 10 reviews
-    state.reviews.slice(0, 10).forEach(r => {
-        // Generate Star String (e.g., "★★★★★")
-        const rating = r.rating || 5; 
-        const stars = "★".repeat(rating) + "☆".repeat(5 - rating);
-        const initial = r.name ? r.name.charAt(0).toUpperCase() : "U";
-
-        const card = document.createElement('div');
-        // Identical styling to Index2
-        card.style.cssText = "min-width:260px; background:#fff; padding:15px; border-radius:12px; border:1px solid #eee; flex-shrink:0;";
-        
-        card.innerHTML = `
-             <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px">
-                <div class="user-avatar" style="width:24px; height:24px; background:#eee; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">${initial}</div>
-                <div style="font-weight:700; font-size:12px; color:#333;">${r.name}</div>
-                <div style="color:#FFD700; font-size:10px; margin-left:auto;">${stars}</div>
-             </div>
-             <div style="font-size:12px; color:#555; font-style:italic; line-height:1.4;">"${r.comment}"</div>
-        `;
-        revContainer.appendChild(card);
-    });
+    renderSectionCards(document.getElementById('under60-container'), listUnder60, "SƏRFƏLİ", "bg-blue");
+    
+    // Render New Section
+    renderSectionCards(document.getElementById('lastminute-container'), listLast, "TƏLƏS", "bg-purple");
 }
 
 function renderSectionCards(container, list, badgeTxt, badgeCls) {
