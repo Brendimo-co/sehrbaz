@@ -1495,6 +1495,173 @@ body {
     color: #888;
     font-weight: 600;
 }
+
+/* --- ZODIAC CARDS --- */
+.zodiac-card {
+    min-width: 140px;
+    height: 200px;
+    background: linear-gradient(135deg, #361a5c, #150629);
+    border: 1px solid #5a3d8a;
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-right: 12px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+/* Glow Effect */
+.zodiac-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+    animation: rotateGlow 10s linear infinite;
+}
+
+@keyframes rotateGlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.z-icon { font-size: 40px; margin-bottom: 10px; z-index: 2; filter: drop-shadow(0 0 10px rgba(255,215,0,0.5)); }
+.z-name { font-size: 16px; font-weight: 800; color: #fff; z-index: 2; margin-bottom: 4px; }
+.z-date { font-size: 10px; color: #bca0dc; z-index: 2; }
+.z-btn { 
+    margin-top: 10px; 
+    padding: 6px 12px; 
+    background: rgba(255,215,0,0.2); 
+    border: 1px solid #FFD700; 
+    color: #FFD700; 
+    border-radius: 20px; 
+    font-size: 10px; 
+    z-index: 2; 
+    font-weight: 700;
+}
+
+/* --- ZODIAC MODAL DETAILS --- */
+.zm-header { text-align: center; margin-bottom: 20px; }
+.zm-big-icon { font-size: 60px; margin-bottom: 10px; display: block; }
+.zm-title { font-size: 24px; font-weight: 800; color: #FFD700; }
+.zm-archetype { font-size: 14px; color: #bca0dc; font-style: italic; letter-spacing: 1px; margin-bottom: 20px; }
+
+.zm-box {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 3px solid #FFD700;
+}
+.zm-box h4 { color: #FFD700; margin-bottom: 8px; font-size: 15px; }
+.zm-box p { font-size: 13px; line-height: 1.6; color: #ddd; }
+
+/* --- SLOT MACHINE STYLES --- */
+.slot-machine-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.slot-window {
+    display: flex;
+    gap: 5px;
+    background: #000;
+    padding: 10px;
+    border-radius: 15px;
+    border: 3px solid #333;
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.slot-reel {
+    width: 80px;
+    height: 100px;
+    background: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 35px;
+    position: relative;
+    overflow: hidden; /* Hide sliding content */
+}
+
+/* The "Blur" animation for spinning */
+.reel-content.spinning {
+    animation: blurScroll 0.2s infinite linear;
+    filter: blur(2px);
+}
+
+@keyframes blurScroll {
+    0% { transform: translateY(-20px); opacity: 0.5; }
+    50% { transform: translateY(20px); opacity: 0.5; }
+    100% { transform: translateY(-20px); opacity: 0.5; }
+}
+
+/* Red line across the center */
+.slot-line {
+    position: absolute;
+    top: 50%; left: -5px; right: -5px;
+    height: 2px;
+    background: rgba(255, 0, 85, 0.6);
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Shadow inside reels */
+.slot-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent 30%, transparent 70%, rgba(0,0,0,0.6));
+    pointer-events: none;
+    z-index: 5;
+    border-radius: 12px;
+}
+
+.spin-button {
+    background: linear-gradient(135deg, #ff0055, #ff4d4d);
+    color: white;
+    border: none;
+    padding: 15px 50px;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 800;
+    box-shadow: 0 5px 20px rgba(255, 0, 85, 0.4);
+    cursor: pointer;
+    transition: transform 0.1s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.spin-button:active { transform: scale(0.95); }
+.spin-button:disabled { background: #555; cursor: not-allowed; box-shadow: none; }
+
+/* RESULT CARD */
+.mood-result-card {
+    display: none; /* Hidden by default */
+    background: #2a2a2a;
+    margin: 20px 20px 0 20px;
+    padding: 20px;
+    border-radius: 16px;
+    text-align: center;
+    border: 1px solid #444;
+    animation: slideUpFade 0.5s ease;
+}
+.mood-result-card.active { display: block; }
+
+#mr-title { color: #fff; font-size: 20px; margin-bottom: 8px; }
+#mr-desc { color: #ccc; font-size: 14px; margin-bottom: 20px; line-height: 1.5; font-style: italic; }
+
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
   
 </style>
 <script>
@@ -1804,6 +1971,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
                 </div>
         </div>
     </div>
+  
 </div>
     <div class="section-container" style="background:white">
         <div class="section-header"><h2 class="sec-title">🆕 Yeni Gələnlər</h2></div>
@@ -1835,6 +2003,62 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
     </div>
 </div>
 
+<div class="section-container" style="background: linear-gradient(to bottom, #1a0b2e, #2d1b4e); color: white; padding-bottom: 40px; border-top: 4px solid #FFD700;">
+    <div class="section-header">
+        <h2 class="sec-title" style="color: #FFD700; border-color: #FFD700;">🔮 Ulduzlar Nə Deyir?</h2>
+        <p style="font-size: 12px; color: #bca0dc; margin-top: 5px;">Hədiyyə seçərkən onun bürcünə qulaq as...</p>
+    </div>
+    
+    <div class="horizontal-scroll" id="zodiac-track" style="padding-top: 10px;">
+        </div>
+</div>
+
+<div id="zodiac-modal" class="modal">
+    <div class="header" style="background: #1a0b2e; border-bottom: 1px solid #444;">
+        <div class="back-btn" onclick="closeZodiacModal()" style="color: white;">← Geri</div>
+        <div class="logo" style="color: #FFD700;">Astro-Hədiyyə</div>
+    </div>
+    
+    <div class="modal-content-scroll" style="background: #120621; color: white;">
+        <div id="zm-content"></div>
+        
+        <div class="shop-suggestions" style="margin-top: 30px;">
+            <h3 style="color: #FFD700; border-bottom: 1px solid #444; padding-bottom: 10px;">🌟 Ona Uyğun Seçimlər:</h3>
+            <div id="zm-products-grid" class="grid-container" style="padding-bottom:0;"></div>
+        </div>
+    </div>
+</div>
+
+<div class="section-container" style="background: #202020; border-top: 4px solid #ff0055; padding-bottom: 50px;">
+    <div class="section-header" style="text-align: center; display: block;">
+        <h2 class="sec-title" style="color: #fff; border: none; font-size: 22px;">🎰 Bu gün necə hiss edirsən?</h2>
+        <p style="color: #aaa; font-size: 13px; margin-top: 5px;">Qərar verə bilmirsən? Bəxti fırlat, "Mood"unu tapaq!</p>
+    </div>
+
+    <div class="slot-machine-wrapper">
+        <div class="slot-window">
+            <div class="slot-reel" id="reel-1"><div class="reel-content">❓</div></div>
+            <div class="slot-reel" id="reel-2"><div class="reel-content">❓</div></div>
+            <div class="slot-reel" id="reel-3"><div class="reel-content">❓</div></div>
+            <div class="slot-overlay"></div> <div class="slot-line"></div> </div>
+        
+        <button id="spin-btn" class="spin-button" onclick="spinMood()">
+            FIRLAT! 🎲
+        </button>
+    </div>
+
+    <div id="mood-result" class="mood-result-card">
+        <h3 id="mr-title">✨ Nəticə</h3>
+        <p id="mr-desc">Diaqnoz qoyulur...</p>
+        
+        <div class="mood-products">
+            <h4 style="color: #ff0055; font-size: 14px; margin-bottom: 10px;">💊 Sənin "Dərmanın":</h4>
+            <div id="mr-grid" class="horizontal-scroll" style="padding: 0;">
+                </div>
+        </div>
+    </div>
+</div>
+  
 <div class="section-container" style="background: #fff5f5; border-top: 1px solid #ffe3e3; border-bottom: 1px solid #ffe3e3;">
     <div class="section-header">
         <h2 class="sec-title" style="color: #d63384;">⏳ Son Şans (Deals)</h2>
@@ -2206,6 +2430,7 @@ function init() {
     initBannerSlider(); 
 initCategories();
   initFeaturedReviews();
+  initZodiac();
     updateUI();
 }
   
@@ -2219,6 +2444,337 @@ function preloadStories() {
   });
 }
 
+
+  
+
+// --- ZODIAC DATA ---
+const zodiacData = [
+    {
+        id: "aries", name: "Qoç", date: "21 Mart - 19 Aprel", icon: "♈", tag: "cat_active",
+        archetype: "Enerjili Lider 🔥",
+        psycho: "Onlar gözləməyi sevmir. Həyatı sürətli, ehtiraslı və rəqabətli yaşayırlar. Hədiyyəni açanda 'Wow' deməsələr, bilin ki, bəyənməyiblər. Praktiklikdən çox, emosiya və hərəkət axtarırlar.",
+        strategy: "Ona elə bir şey al ki, dərhal istifadə edə bilsin. Darıxdırıcı suvenirlər yox, onun hobbisinə və ya enerjisinə uyğun texnologiya, idman və ya stil aksesuarları seç.",
+        dont: "❌ Qətiyyən ev üçün darıxdırıcı əşya (ütü, tozsoran) alma. Bu onları qıcıqlandırır."
+    },
+    {
+        id: "taurus", name: "Buğa", date: "20 Aprel - 20 May", icon: "♉", tag: "cat_luxury",
+        archetype: "Həzz və Rahatlıq Düşkünü 🛋️",
+        psycho: "Buğalar keyfiyyəti hər şeydən üstün tutur. Onlar ucuz görünən, keyfiyyətsiz materialdan olan heç nəyi sevmirlər. Toxunma, dadbilmə və görmə hissləri çox güclüdür.",
+        strategy: "Lüks və komfort. Yumşaq materiallar, dadlı şokolad qutuları, bahalı görünən aksesuarlar və ya evdə rahatlıq yaradan dekorlar. Kəmiyyət yox, keyfiyyət önəmlidir.",
+        dont: "❌ Ucuz imitasiyalar və ya tez xarab olan 'zarafat' hədiyyələri. Onlar bunu hörmətsizlik sayır."
+    },
+    {
+        id: "gemini", name: "Əkizlər", date: "21 May - 20 İyun", icon: "♊", tag: "cat_fun",
+        archetype: "Maraqlı və Dəyişkən 🗣️",
+        psycho: "Onların fikri tez-tez dəyişir, ona görə də tək bir böyük hədiyyə risklidir. Eyni anda bir neçə funksiyası olan və ya onları əyləndirən, təəccübləndirən şeyləri sevirlər.",
+        strategy: "Müxtəliflik. Bir neçə kiçik hədiyyədən ibarət 'Box' düzəltmək ən yaxşısıdır. Texnologiya, maraqlı kitab və ya qeyri-adi dizaynlı aksesuarlar.",
+        dont: "❌ Çox ənənəvi və ya sadəcə 'vitrin üçün' olan əşyalar. Onlar darıxacaqlar."
+    },
+    {
+        id: "cancer", name: "Xərçəng", date: "21 İyun - 22 İyul", icon: "♋", tag: "cat_home",
+        archetype: "Hissiyyatlı Qoruyucu 🌙",
+        psycho: "Onlar üçün hədiyyənin qiyməti yox, mənəvi dəyəri önəmlidir. 'Sən bunu xatırladın?' demələri ən böyük uğurdur. Evi və ailəni çox sevirlər.",
+        strategy: "Sentimental və Ev. Foto çərçivələr, ev üçün yumşaq tekstil, xatirə dolu albomlar və ya mətbəx üçün gözəl qablar. Onlara 'qayğı' hiss etdir.",
+        dont: "❌ Çox rəsmi və ya soyuq hədiyyələr (məs: Ofis ləvazimatı). Bu onları kədərləndirər."
+    },
+    {
+        id: "leo", name: "Şir", date: "23 İyul - 22 Avqust", icon: "♌", tag: "cat_glam",
+        archetype: "Səhnə Ulduzu 👑",
+        psycho: "Şirlər parıldamağı, diqqət mərkəzində olmağı sevirlər. Hədiyyəniz elə olmalıdır ki, onlar bunu başqalarına göstərə bilsinlər. Qablaşdırma mütləq şahona olmalıdır.",
+        strategy: "Status və Parıltı. Qızılı rənglər, brend ətirlər, diqqətçəkən zərgərlik və ya böyük hədiyyə qutuları. Onlara özlərini kral/kraliça kimi hiss etdir.",
+        dont: "❌ Adı bilinməyən, sadə və ya çox kiçik hədiyyələr. Onlar öz dəyərlərini hədiyyənin böyüklüyü ilə ölçə bilirlər."
+    },
+    {
+        id: "virgo", name: "Qız", date: "23 Avqust - 22 Sentyabr", icon: "♍", tag: "cat_useful",
+        archetype: "Perfeksionist Analitik 🧐",
+        psycho: "Onlar hər şeyin detallarına fikir verirlər. Mənasız, toz yığan suvenirlərə nifrət edirlər. Hədiyyə onların həyatını asanlaşdırmalı və ya sağlamlığına xeyir verməlidir.",
+        strategy: "Praktik və Səliqəli. Orqanayzerlər, keyfiyyətli dəri qeyd dəftərləri, təbii kosmetika və ya ağıllı ev alətləri. Hər şey səliqəli paketlənməlidir.",
+        dont: "❌ Xaos yaradan, keyfiyyətsiz və ya istifadə yeri bəlli olmayan 'artıq' əşyalar."
+    },
+    {
+        id: "libra", name: "Tərəzi", date: "23 Sentyabr - 22 Oktyabr", icon: "♎", tag: "cat_beauty",
+        archetype: "Estetika və Harmoniya 🎨",
+        psycho: "Gözəllik onların zəif nöqtəsidir. Onlar funksionallıqdan çox, əşyanın necə göründüyünə önəm verirlər. Kobud və zövqsüz şeylər onları dərhal itələyir.",
+        strategy: "Zəriflik. İncə ətirlər, ipək şallar, sənət əsəri kimi görünən dekorlar və ya romantik şam yeməyi dəstləri. Göz oxşayan hər şey.",
+        dont: "❌ Kobud alətlər, pul (zərf) və ya çox qışqıran rənglər. Onlar incəlik axtarır."
+    },
+    {
+        id: "scorpio", name: "Əqrəb", date: "23 Oktyabr - 21 Noyabr", icon: "♏", tag: "cat_mystery",
+        archetype: "Sirli və Dərin 🕵️",
+        psycho: "Onlar səthdə olanı yox, dərində olanı sevirlər. Hər kəsin aldığı standart hədiyyələr onları maraqlandırmır. Onlara özəl, sirli və ya bir az provokativ şeylər lazımdır.",
+        strategy: "Gizli və Özəl. Tünd rəngli aksesuarlar (eynək, cüzdan), psixoloji kitablar və ya yalnız ikinizin anlayacağı mənalı simvollar.",
+        dont: "❌ Çox şirin, uşaqvari (oyuncaq ayı) və ya hamıya alınan standart 'hədiyyə dəstləri'."
+    },
+    {
+        id: "sagittarius", name: "Oxatan", date: "22 Noyabr - 21 Dekabr", icon: "♐", tag: "cat_travel",
+        archetype: "Macəraçı Səyyah 🌍",
+        psycho: "Onlar bir yerdə durmağı sevmirlər. Yeni təcrübələr, gülüş və azadlıq onlar üçün hər şeydir. Hədiyyə onları yeni yerlərə və ya yeni biliklərə aparmalıdır.",
+        strategy: "Təcrübə və Səyahət. Səyahət çantaları, pasport qabları, powerbanklar (yolda lazım olur) və ya sadəcə çox gülməli, zarafatcıl hədiyyələr.",
+        dont: "❌ Onları evə bağlayan əşyalar və ya çox ciddi, məsuliyyət tələb edən (məs: qulluq istəyən bitki) hədiyyələr."
+    },
+    {
+        id: "capricorn", name: "Oğlaq", date: "22 Dekabr - 19 Yanvar", icon: "♑", tag: "cat_work",
+        archetype: "Ambissiyalı Karyerist 💼",
+        psycho: "Oğlaqlar statusa və zamana dəyər verir. Onlar üçün hədiyyə bir investisiyadır. Uzun illər istifadə edə biləcəkləri, klassik və ciddi şeyləri sevirlər.",
+        strategy: "Klassika və Status. Dəri portfel, brend qələm, bahalı saat və ya iş masası üçün statuslu aksesuarlar. Rənglər tünd və ciddi olmalıdır.",
+        dont: "❌ Ucuz zarafatlar, gərəksiz bəzək əşyaları və ya çox riskli, avanqard şeylər."
+    },
+    {
+        id: "aquarius", name: "Dolça", date: "20 Yanvar - 18 Fevral", icon: "♒", tag: "cat_tech",
+        archetype: "Gələcəyi Görən İnovator 👽",
+        psycho: "Onlar hamıdan fərqlidir. Ən yeni texnologiyanı və ya heç kimdə olmayan qəribə dizaynları sevirlər. Standart 'Sevgililər Günü' hədiyyələri onlara gülməli gəlir.",
+        strategy: "Orijinallıq və Texnologiya. Ən son model qadcetlər, qeyri-adi elektronika, kosmos temalı əşyalar və ya çox kreativ, əl işi olan modern sənət.",
+        dont: "❌ Qızıl-brilyant kimi ənənəvi zinət əşyaları və ya standart çiçək buketləri. Onlar üçün bu 'banal'dır."
+    },
+    {
+        id: "pisces", name: "Balıqlar", date: "19 Fevral - 20 Mart", icon: "♓", tag: "cat_art",
+        archetype: "Xəyalpərəst Romantik 🎨",
+        psycho: "Onlar real dünyadan qopmağı sevirlər. Musiqi, incəsənət və mistika onların dünyasıdır. Hədiyyə onlara ilham verməli və ya rahatlatmalıdır.",
+        strategy: "Ruhsal və İncə. Rəsm ləvazimatları, aromaterapiya şamları, yumşaq pledlər, spa dəstləri və ya sevdiyi musiqi ilə bağlı hər şey.",
+        dont: "❌ Kobud, sadəcə funksional olan mətbəx əşyaları və ya səs-küylü, aqressiv oyunlar."
+    }
+];
+
+function initZodiac() {
+    const track = document.getElementById('zodiac-track');
+    if(!track) return;
+    
+    track.innerHTML = '';
+    zodiacData.forEach(z => {
+        const card = document.createElement('div');
+        card.className = 'zodiac-card';
+        card.onclick = () => openZodiacModal(z.id);
+        card.innerHTML = `
+            <div class="z-icon">${z.icon}</div>
+            <div class="z-name">${z.name}</div>
+            <div class="z-date">${z.date}</div>
+            <div class="z-btn">Oxu & Seç 👉</div>
+        `;
+        track.appendChild(card);
+    });
+}
+
+function openZodiacModal(id) {
+    const data = zodiacData.find(z => z.id === id);
+    if (!data) return;
+
+    // 1. Fill Content
+    const content = document.getElementById('zm-content');
+    content.innerHTML = `
+        <div class="zm-header">
+            <span class="zm-big-icon">${data.icon}</span>
+            <div class="zm-title">${data.name}</div>
+            <div class="zm-archetype">"${data.archetype}"</div>
+        </div>
+
+        <div class="zm-box">
+            <h4>🧠 Necə Düşünürlər?</h4>
+            <p>${data.psycho}</p>
+        </div>
+
+        <div class="zm-box" style="border-left-color: #2ecc71;">
+            <h4 style="color:#2ecc71;">✅ Uğurlu Strategiya:</h4>
+            <p>${data.strategy}</p>
+        </div>
+
+        <div class="zm-box" style="border-left-color: #e74c3c;">
+            <h4 style="color:#e74c3c;">⚠️ Bunları Alma:</h4>
+            <p>${data.dont}</p>
+        </div>
+    `;
+  
+    // 2. Fetch Products
+    // NOTE: This uses the existing Google Sheet 'Tag' logic. 
+    // Ensure you add tags like 'cat_active' (Aries) or 'cat_luxury' (Taurus) to your sheet.
+    // Fallback: If no tag match, just show random items to ensure sales potential.
+    
+    const container = document.getElementById('zm-products-grid');
+    container.innerHTML = '<div style="color:#999; text-align:center;">Yüklənir...</div>';
+    
+    // Search for tag OR fallback to generic 'gift' if not found
+    let matches = state.products.filter(p => p.tag && p.tag.toLowerCase().includes(data.tag));
+    
+    // FALLBACK: If no specific zodiac products found, show Best Sellers or Expensive items (for Taurus/Leo/Cap)
+    if (matches.length < 3) {
+        matches = state.products.sort(() => 0.5 - Math.random()).slice(0, 4);
+    }
+
+    container.innerHTML = '';
+    matches.slice(0, 6).forEach(p => {
+         const pIndex = state.products.indexOf(p);
+         const el = document.createElement('div');
+         el.className = 'grid-item';
+         el.style.background = 'rgba(255,255,255,0.1)'; // Dark theme card
+         el.style.border = '1px solid rgba(255,255,255,0.2)';
+         
+         el.onclick = () => openModal(p, matches, matches.indexOf(p)); // Opens the standard buy modal
+         
+         el.innerHTML = `
+            <img src="${fixImageLink(p.image)}" loading="lazy" style="opacity:0.9;">
+            <div class="grid-info">
+                <div class="grid-title" style="color:white;">${p.name}</div>
+                <div class="grid-price-box">
+                    <span class="grid-new-price" style="color:#FFD700;">${p.price} AZN</span>
+                </div>
+            </div>`;
+         container.appendChild(el);
+    });
+
+    document.getElementById('zodiac-modal').classList.add('active');
+    logUserAction("ZodiacView", data.name);
+}
+
+function closeZodiacModal() {
+    document.getElementById('zodiac-modal').classList.remove('active');
+}
+
+
+// --- MOOD SLOT DATA (The Recipes) ---
+const moodRecipes = [
+    {
+        id: "stress",
+        reels: ["🤯", "Stress", "Relax"], 
+        title: "Diaqnoz: Gərginlik Pik Həddədir 🤯",
+        desc: "Beynin 'Error 404' verir. Sənə təcili olaraq hər şeyi söndürüb, bir az nəfəs almaq lazımdır. Özünə qulluq vaxtıdır.",
+        tag: "cat_beauty" // Suggest: Spa sets, candles
+    },
+    {
+        id: "bored",
+        reels: ["🥱", "Darıxıram", "Əyləncə"],
+        title: "Diaqnoz: Rutin Yorğunluğu 🥱",
+        desc: "Hər gün eyni şeyləri etməkdən bezmisən. Həyatına rəng və ya bir az oyun qatmaq lazımdır.",
+        tag: "cat_fun" // Suggest: Games, funny items
+    },
+    {
+        id: "romantic",
+        reels: ["🥰", "Sevgi", "Romantika"],
+        title: "Diaqnoz: Kəpənəklər Uçuşur 🥰",
+        desc: "Hava buram-buram sevgi qoxur. Bu anı özəlləşdirmək və yadda saxlamaq üçün zərif bir jest lazımdır.",
+        tag: "cat_xanim" // Suggest: Jewelry, flowers
+    },
+    {
+        id: "home",
+        reels: ["🏠", "Evquşu", "Rahatlıq"],
+        title: "Diaqnoz: Evdən Çıxmaq İstəmirəm 🏠",
+        desc: "Bu gün 'Netflix & Chill' günüdür. Çayını süz, pledini götür və sadəcə evdəki hüzurun dadını çıxar.",
+        tag: "cat_home" // Suggest: Mugs, blankets
+    },
+    {
+        id: "tech",
+        reels: ["🔋", "Enerji", "Yenilik"],
+        title: "Diaqnoz: Texnoloji Aclıq 🔋",
+        desc: "Həyatını sürətləndirmək və ya sadəcə yeni bir 'oyuncaq' qurcalamaq istəyirsən. Rəqəmsal detoks sənlik deyil.",
+        tag: "cat_tech" // Suggest: Gadgets
+    }
+];
+
+// --- SLOT LOGIC ---
+let isSpinning = false;
+
+function spinMood() {
+    if (isSpinning) return;
+    isSpinning = true;
+    
+    const btn = document.getElementById('spin-btn');
+    const resultCard = document.getElementById('mood-result');
+    const reels = [document.getElementById('reel-1'), document.getElementById('reel-2'), document.getElementById('reel-3')];
+    
+    // 1. UI Updates
+    btn.disabled = true;
+    btn.textContent = "FIRLANIR... 🎰";
+    resultCard.classList.remove('active'); // Hide previous result
+    
+    // 2. Start Animation (Blur effect)
+    reels.forEach(reel => {
+        reel.querySelector('.reel-content').classList.add('spinning');
+        reel.querySelector('.reel-content').textContent = "💨";
+    });
+
+    // 3. Pick a Winner Randomly
+    const winner = moodRecipes[Math.floor(Math.random() * moodRecipes.length)];
+
+    // 4. Vibration Feedback (Start)
+    if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
+
+    // 5. Stop Reels One by One (Simulate physics)
+    // Stop Reel 1 after 1000ms
+    setTimeout(() => stopReel(0, winner.reels[0]), 1000);
+    // Stop Reel 2 after 1500ms
+    setTimeout(() => stopReel(1, winner.reels[1]), 1500);
+    // Stop Reel 3 after 2000ms
+    setTimeout(() => {
+        stopReel(2, winner.reels[2]);
+        finishSpin(winner);
+    }, 2000);
+}
+
+function stopReel(index, content) {
+    const reel = document.getElementById(`reel-${index+1}`);
+    const inner = reel.querySelector('.reel-content');
+    
+    inner.classList.remove('spinning');
+    inner.textContent = content;
+    
+    // Impact vibration
+    if(navigator.vibrate) navigator.vibrate(50);
+    
+    // Visual "Pop" effect
+    reel.style.transform = "scale(1.2)";
+    setTimeout(() => reel.style.transform = "scale(1)", 200);
+}
+
+function finishSpin(winner) {
+    const btn = document.getElementById('spin-btn');
+    isSpinning = false;
+    btn.disabled = false;
+    btn.textContent = "YENİDƏN FIRLAT 🔄";
+
+    // Show Result Text
+    document.getElementById('mr-title').textContent = winner.title;
+    document.getElementById('mr-desc').textContent = winner.desc;
+    
+    // Fetch Products based on Tag
+    const grid = document.getElementById('mr-grid');
+    grid.innerHTML = '<div style="color:#aaa; padding:10px;">Məhsullar gəlir...</div>';
+    
+    // Filter logic (Same as categories)
+    let matches = state.products.filter(p => p.tag && p.tag.toLowerCase().includes(winner.tag));
+    
+    // Fallback if no tag matches
+    if (matches.length < 2) matches = state.products.sort(() => 0.5 - Math.random()).slice(0, 4);
+
+    grid.innerHTML = '';
+    matches.slice(0, 5).forEach(p => {
+         const el = document.createElement('div');
+         el.className = 'prod-card'; // Reuse existing card style
+         el.style.width = '140px';
+         el.style.marginRight = '10px';
+         el.onclick = () => openModal(p, matches, matches.indexOf(p));
+         
+         el.innerHTML = `
+            <div class="pc-img-box" style="height:120px;">
+               <img src="${fixImageLink(p.image)}" class="pc-img" loading="lazy">
+            </div>
+            <div class="pc-content" style="background:#fff;">
+               <div class="pc-title">${p.name}</div>
+               <div class="pc-prices">
+                   <span class="pc-price-new">${p.price} AZN</span>
+               </div>
+            </div>`;
+         grid.appendChild(el);
+    });
+
+    // Reveal Card
+    document.getElementById('mood-result').classList.add('active');
+    
+    // Log
+    logUserAction("MoodSpin", winner.id);
+    
+    // Scroll to result slightly
+    document.getElementById('mood-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+  
 // --- FEATURED REVIEWS LOGIC ---
 function initFeaturedReviews() {
     const track = document.getElementById('featured-reviews-track');
