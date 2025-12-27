@@ -1920,6 +1920,274 @@ body {
     color: white !important;
     text-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+
+/* FLASH SALE CARD STYLES */
+.flash-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.flash-img-box {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.flash-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.flash-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.flash-badge {
+    position: absolute;
+    top: 0; left: 0;
+    background: #c21a1a;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-bottom-right-radius: 10px;
+}
+
+.flash-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.flash-price-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.flash-new-price {
+    font-size: 20px;
+    font-weight: 900;
+    color: #c21a1a;
+}
+
+.flash-old-price {
+    font-size: 13px;
+    text-decoration: line-through;
+    color: #999;
+}
+
+.flash-btn {
+    margin-top: 8px;
+    background: #000;
+    color: #FFD700;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    width: 100%;
+    cursor: pointer;
+}
+
+/* Add this with your other bg- classes */
+.bg-gold { 
+    background: #FFD700; 
+    color: black; 
+}
+
+/* Optional: Make cards inside this purple banner look seamless */
+#giftsets-container .prod-card {
+    border: 1px solid rgba(255, 215, 0, 0.3); /* Gold border hint */
+}
+
+ /* Add this with your other bg- classes */
+.bg-teal { 
+    background: #134E5E; /* Dark Teal */
+    color: white; 
+} 
+
+/* Premium Badge Style */
+.bg-premium { 
+    background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%); /* Gold Gradient */
+    color: white; 
+    border: 1px solid #FFF8DC;
+    box-shadow: 0 2px 10px rgba(212, 175, 55, 0.4);
+}
+
+/* Optional: Make cards inside the premium section look darker/richer */
+#premium-container .prod-card {
+    background: #1a1a1a; /* Dark Card Background */
+    border: 1px solid #333;
+}
+#premium-container .pc-title {
+    color: #e0e0e0; /* Light text for dark mode */
+}
+#premium-container .pc-price-new {
+    color: #D4AF37; /* Gold price */
+}
+
+/* Live Pulse Animation */
+@keyframes livePulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(255, 0, 0, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
+
+/* Viewer Count Badge */
+.viewer-badge {
+    position: absolute;
+    bottom: 8px; /* At the bottom of image */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    backdrop-filter: blur(4px);
+    white-space: nowrap;
+    z-index: 5;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.eye-icon {
+    font-size: 12px;
+}
+
+/* FULL WIDTH BANNER STYLES */
+.full-banner {
+    width: 100%;
+    height: 140px; /* Taller height for impact */
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 8px 20px -5px rgba(0,0,0,0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.full-banner:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* 1. Game Banner Style (Vibrant Purple/Pink) */
+.fb-game {
+    background: linear-gradient(120deg, #8E2DE2 0%, #4A00E0 100%);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* 2. Corporate Banner Style (Professional Dark Blue) */
+.fb-corp {
+    background: linear-gradient(120deg, #141E30 0%, #243B55 100%);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Content Area */
+.fb-content {
+    flex: 1;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.fb-badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(255,255,255,0.2);
+    padding: 3px 8px;
+    border-radius: 6px;
+    align-self: flex-start;
+    margin-bottom: 8px;
+    backdrop-filter: blur(4px);
+}
+
+.fb-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 5px;
+    line-height: 1.2;
+}
+
+.fb-desc {
+    font-size: 12px;
+    opacity: 0.85;
+    margin-bottom: 12px;
+    line-height: 1.4;
+    max-width: 90%;
+}
+
+.fb-btn {
+    font-size: 12px;
+    font-weight: 700;
+    background: white;
+    color: #333;
+    padding: 8px 16px;
+    border-radius: 25px;
+    align-self: flex-start;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Visual Area (Right side icons) */
+.fb-visual {
+    position: relative;
+    width: 80px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fb-icon-main {
+    font-size: 60px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    z-index: 2;
+    transform: rotate(5deg);
+}
+
+.fb-icon-decor {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 80px;
+    opacity: 0.1;
+    z-index: 1;
+    transform: rotate(-15deg);
+}  
   
 </style>
 <script>
@@ -2108,16 +2376,12 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 
 <div id="all-products-view" class="all-products-view">
     <div style="position:sticky; top:0; z-index:20; display:flex; justify-content:space-between; padding:15px; align-items:center; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #eee;">
-        <h2 class="title" style="font-size:20px; margin:0;">SehrMall 🛍️</h2>
-        <button onclick="handleNavClick('wizard')" style="background:transparent; border:none; color:#777; font-weight:600;">✕ Bağla</button>
+        <h2 class="title" style="font-size:20px; margin:0;">Hədiyyə Sehrbazı 🛍️</h2>
     </div>
-<div class="section-container">
-    <div class="section-header">
-       
-    </div>
-<div id="categories-grid" class="horizontal-pills-track">
-</div>
-</div>
+
+ 
+
+  
  <div class="banner-wrapper"> <div class="banner-track" id="banner-track">
         
         <div class="banner-slide">
@@ -2164,9 +2428,26 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 
     </div> <div class="banner-counter" id="banner-counter">1/3</div>
 </div>
+
+
+ <div class="section-container">
+    <div class="section-header">
+       
+    </div>
+<div id="categories-grid" class="horizontal-pills-track">
+</div>
+</div>
   
-<div class="ai-card-wrapper">
-    <div class="ai-card">
+  
+<div class="ai-card-wrapper" style="background: linear-gradient(135deg, #5B247A 0%, #1bcedf 100%); padding: 30px 20px; position: relative; overflow: hidden; margin-top: 10px; margin-bottom: 20px; border-radius: 0;">
+    
+    <div style="position: absolute; top: -30px; right: -30px; font-size: 160px; opacity: 0.15; transform: rotate(15deg);">🪄</div>
+    <div style="position: absolute; bottom: 20px; left: 10px; font-size: 40px; opacity: 0.2; animation: sparkleFloat 3s infinite;">✨</div>
+    <div style="position: absolute; top: 10px; left: 50%; font-size: 20px; opacity: 0.2;">🔮</div>
+    
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.1; pointer-events: none;"></div>
+
+    <div class="ai-card" style="position: relative; z-index: 2; background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
         <div class="ai-blob red"></div>
         <div class="ai-blob blue"></div>
 
@@ -2180,7 +2461,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
             <div class="ai-text-box">
                 <h3 class="ai-title">Hədiyyə Seçmək <br>Artıq Çətin Deyil!</h3>
                 <p class="ai-desc">
-                    Süni İntellektimiz (AI) minlərlə variantı analiz edir. Sadəcə 3 suala cavab ver, <b>"O"nun</b> üçün ən ideal hədiyyəni 1 dəqiqəyə tapaq.
+                    Süni İntellektimiz (AI) minlərlə variantı analiz edir. Sadəcə 5 suala cavab ver, <b>"O"nun</b> üçün ən ideal hədiyyəni 1 dəqiqəyə tapaq.
                 </p>
                 
                 <div class="ai-tags">
@@ -2195,12 +2476,31 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
         </div>
     </div>
 </div>
-    <div class="section-container">
-        <div class="section-header"><h2 class="sec-title">🏆 Ən Çox Satılanlar</h2></div>
-        <div class="horizontal-scroll" id="best-container">
-            <div style="padding:10px; color:#999">Yüklənir...</div>
+  
+ <div class="section-container" style="background: linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%); padding: 25px 0 30px 0; position: relative; overflow: hidden; border-radius: 0; margin-bottom: 10px;">
+    
+    <div style="position: absolute; top: -10px; right: -20px; font-size: 100px; opacity: 0.15; transform: rotate(15deg);">🏆</div>
+    <div style="position: absolute; bottom: 10px; left: 10px; font-size: 30px; opacity: 0.2; animation: sparkleFloat 3s infinite;">✨</div>
+    <div style="position: absolute; top: 20px; left: 50%; width: 100%; height: 100%; background-image: radial-gradient(white 1px, transparent 1px); background-size: 20px 20px; opacity: 0.1; pointer-events: none;"></div>
+
+    <div class="section-header" style="padding: 0 20px 15px 20px; position: relative; z-index: 2;">
+        <div>
+            <h2 class="sec-title" style="color: white; border: none; font-size: 22px; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                🏆 Ən Çox Satılanlar
+            </h2>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.9); margin-top: 5px; font-weight: 500;">
+                Müştərilərimizin 1 nömrəli seçimləri
+            </p>
+        </div>
+        <div style="background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); padding: 5px 12px; border-radius: 15px; font-size: 11px; font-weight: 700; color: white; cursor: pointer;">
+            TOP 10 🔥
         </div>
     </div>
+
+    <div class="horizontal-scroll" id="best-container" style="padding: 0 20px; position: relative; z-index: 2;">
+        <div style="padding:10px; color: rgba(255,255,255,0.7);">Yüklənir...</div>
+    </div>
+</div>
 
 
 <div id="category-modal" class="modal">
@@ -2253,38 +2553,256 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
         </div>
     </div>
 </div>
-  
-    <div class="section-container" style="background:white">
-        <div class="section-header"><h2 class="sec-title">🆕 Yeni Gələnlər</h2></div>
-        <div class="horizontal-scroll" id="new-container">
-            <div style="padding:10px; color:#999">Yüklənir...</div>
-        </div>
-    </div>
 
-<div class="section-container" style="background: linear-gradient(to bottom, #ffffff, #fafafa);">
-    <div class="section-header">
-        <h2 class="sec-title">🌟 Müştərilərimiz Nə Deyir?</h2>
-    </div>
+
+<div class="section-container" onclick="window.location.href='vipaccount.html'" style="background: linear-gradient(135deg, #b2071d 0%, #eb1e32 100%); padding: 25px 20px; position: relative; overflow: hidden; margin-top: 10px; cursor: pointer;">
     
-    <div class="featured-reviews-track" id="featured-reviews-track"></div>
+    <div style="position: absolute; top: -20px; right: -20px; font-size: 110px; opacity: 0.15; transform: rotate(15deg);">🎰</div>
+    <div style="position: absolute; bottom: 20px; left: 20px; font-size: 24px; opacity: 0.3; animation: sparkleFloat 2s infinite;">✨</div>
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px); background-size: 15px 15px; opacity: 0.1;"></div>
+
+    <div style="position: relative; z-index: 2; color: white;">
+        <div style="background: rgba(0,0,0,0.2); backdrop-filter: blur(4px); display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; margin-bottom: 8px; text-transform: uppercase;">
+            🎁 Hər Gün Qazan
+        </div>
+        <h2 style="font-size: 24px; font-weight: 900; margin: 0 0 6px 0; line-height: 1.1; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+            Oyna və Qazanmaq şansı əldə et!
+        </h2>
+        <p style="font-size: 13px; opacity: 0.95; margin: 0 0 15px 0; max-width: 80%;">
+            Endirimlər və hədiyyələr qazanmaq şansı.
+        </p>
+        <button style="background: #FFD700; color: #000; border: none; padding: 10px 24px; border-radius: 30px; font-weight: 800; font-size: 13px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 6px;">
+            İndi Oyna 🎡
+        </button>
+    </div>
 </div>
+
+
+  <div class="section-container" onclick="window.location.href='partner.html'" style="background: linear-gradient(135deg, #141E30 0%, #243B55 100%); padding: 25px 20px; position: relative; overflow: hidden; margin-top: 5px; cursor: pointer;">
+    
+    <div style="position: absolute; bottom: -10px; right: -10px; font-size: 100px; opacity: 0.1; transform: rotate(-10deg);">🏢</div>
+    <div style="position: absolute; top: 20px; right: 20px; font-size: 40px; opacity: 0.1;">📈</div>
+
+    <div style="position: relative; z-index: 2; color: white;">
+        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.5px;">
+            💼 B2B ƏMƏKDAŞLIQ
+        </div>
+        <h2 style="font-size: 22px; font-weight: 800; margin: 0 0 6px 0; line-height: 1.2;">
+            Korporativ Satış
+        </h2>
+        <p style="font-size: 13px; color: #cfd8dc; margin: 0 0 15px 0; max-width: 85%;">
+            Şirkətlər üçün özəl təkliflər və hədiyyə paketləri.
+        </p>
+        <button style="background: white; color: #141E30; border: none; padding: 10px 24px; border-radius: 30px; font-weight: 700; font-size: 13px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 6px;">
+            Təklif Al 🤝
+        </button>
+    </div>
+</div>
+
+
   
-    <div class="section-container" style="background:#fff5f5; border-top:1px solid #ffe3e3; border-bottom:1px solid #ffe3e3">
-        <div class="section-header"><h2 class="sec-title" style="color:#c21a1a">🔥 Tükənmək Üzrə</h2></div>
-        <div class="horizontal-scroll" id="limited-container">
-            <div style="padding:10px; color:#999">Yüklənir...</div>
+<div class="section-container" style="background: linear-gradient(135deg, #0ba360 0%, #3cba92 100%); padding: 25px 0 30px 0; position: relative; overflow: hidden; border-radius: 0; margin-bottom: 10px;">
+    
+    <div style="position: absolute; top: -15px; right: -20px; font-size: 100px; opacity: 0.15; transform: rotate(15deg);">🆕</div>
+    <div style="position: absolute; bottom: 10px; left: 15px; font-size: 28px; opacity: 0.2; animation: pulseGlow 2s infinite;">✨</div>
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(rgba(255,255,255,0.3) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.1; pointer-events: none;"></div>
+
+    <div class="section-header" style="padding: 0 20px 15px 20px; position: relative; z-index: 2;">
+        <div>
+            <h2 class="sec-title" style="color: white; border: none; font-size: 22px; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.15);">
+                🆕 Yeni Gələnlər
+            </h2>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.9); margin-top: 5px; font-weight: 600;">
+                Vitrində təzə görünənlər
+            </p>
+        </div>
+        <div style="background: rgba(255,255,255,0.25); backdrop-filter: blur(5px); padding: 5px 12px; border-radius: 15px; font-size: 11px; font-weight: 800; color: white;">
+            FRESH ⚡
         </div>
     </div>
-<div class="section-container" style="background: #f0f7ff; border-top: 1px solid #dbeafe; border-bottom: 1px solid #dbeafe;">
-    <div class="section-header">
-        <h2 class="sec-title" style="color: #2563eb;">📉 60₼-dən Aşağı</h2>
-    </div>
-    <div class="horizontal-scroll" id="under60-container">
-        <div style="padding:10px; color:#999">Yüklənir...</div>
+
+    <div class="horizontal-scroll" id="new-container" style="padding: 0 20px; position: relative; z-index: 2;">
+        <div style="padding:10px; color: rgba(255,255,255,0.7);">Yüklənir...</div>
     </div>
 </div>
 
 
+  
+
+<div class="section-container" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px 0 30px 0; position: relative; overflow: hidden; border-radius: 0; margin-bottom: 10px;">
+    
+    <div style="position: absolute; top: -20px; right: 10px; font-size: 120px; opacity: 0.1; font-family: serif; color: white; transform: rotate(10deg); line-height: 1;">❝</div>
+    <div style="position: absolute; bottom: 20px; left: 20px; font-size: 24px; opacity: 0.2; animation: floatBubble 4s infinite;">💬</div>
+    <div style="position: absolute; top: 40px; left: 10px; font-size: 16px; opacity: 0.3;">⭐</div>
+
+    <div class="section-header" style="padding: 0 20px 15px 20px; position: relative; z-index: 2;">
+        <div>
+            <h2 class="sec-title" style="color: white; border: none; font-size: 20px; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                🌟 Müştərilər Danışır
+            </h2>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.9); margin-top: 5px; font-style: italic;">
+                Real insanların, real təcrübələri
+            </p>
+        </div>
+        <div style="text-align: right;">
+            <div style="background: rgba(255,255,255,0.2); backdrop-filter: blur(5px); padding: 5px 12px; border-radius: 12px; color: white; display: flex; flex-direction: column; align-items: center;">
+                <span style="font-weight: 800; font-size: 14px;">4.9</span>
+                <span style="font-size: 9px; opacity: 0.8;">⭐⭐⭐⭐⭐</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="featured-reviews-track" id="featured-reviews-track" style="position: relative; z-index: 2; padding-top: 5px;"></div>
+</div>
+
+
+  
+  
+ <div class="section-container" style="background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%); padding: 25px 0 30px 0; position: relative; overflow: hidden; border-radius: 0; margin-bottom: 10px;">
+    
+    <div style="position: absolute; top: -15px; right: -20px; font-size: 100px; opacity: 0.15; transform: rotate(10deg);">🔥</div>
+    <div style="position: absolute; bottom: 10px; left: 10px; font-size: 40px; opacity: 0.1;">⚠️</div>
+    
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px); pointer-events: none;"></div>
+
+    <div class="section-header" style="padding: 0 20px 15px 20px; position: relative; z-index: 2;">
+        <div>
+            <h2 class="sec-title" style="color: white; border: none; font-size: 22px; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                🔥 Tükənmək Üzrə
+            </h2>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.9); margin-top: 5px; font-weight: 600;">
+                Anbar boşalır, son şanslar
+            </p>
+        </div>
+        <div style="background: white; color: #c21a1a; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 800; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+            SON ƏDƏDLƏR 🏃‍♂️
+        </div>
+    </div>
+
+    <div class="horizontal-scroll" id="limited-container" style="padding: 0 20px; position: relative; z-index: 2;">
+        <div style="padding:10px; color: rgba(255,255,255,0.7);">Yüklənir...</div>
+    </div>
+</div>
+
+  
+
+
+<div class="section-container" style="background: linear-gradient(135deg, #232526 0%, #414345 100%); padding: 25px 0 30px 0; position: relative; overflow: hidden; border-radius: 0; margin-bottom: 10px;">
+    
+    <div style="position: absolute; top: -15px; right: -20px; font-size: 110px; opacity: 0.1; transform: rotate(10deg);">👁️</div>
+    <div style="position: absolute; bottom: 10px; left: 10px; font-size: 50px; opacity: 0.05; transform: rotate(-10deg);">📡</div>
+    <div style="position: absolute; top: 0; right: 0; width: 60%; height: 60%; background: radial-gradient(circle at top right, rgba(255, 59, 48, 0.15), transparent 70%); pointer-events: none;"></div>
+
+    <div class="section-header" style="padding: 0 20px 15px 20px; position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                <div style="width: 12px; height: 12px; background: #ff3b30; border-radius: 50%; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.7); animation: livePulse 1.5s infinite;"></div>
+                <h2 class="sec-title" style="color: white; border: none; font-size: 22px; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                    Canlı Baxılanlar
+                </h2>
+            </div>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin: 0; font-weight: 500;">
+                İndi digərləri nəyə baxır?
+            </p>
+        </div>
+        
+        <div style="background: rgba(255, 59, 48, 0.15); border: 1px solid rgba(255, 59, 48, 0.4); color: #ff3b30; padding: 5px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; display: flex; align-items: center; gap: 5px; backdrop-filter: blur(4px);">
+            <span>●</span> LIVE
+        </div>
+    </div>
+
+    <div class="horizontal-scroll" id="trending-container" style="padding: 0 20px; position: relative; z-index: 2;">
+        <div style="padding:10px; color: rgba(255,255,255,0.5);">Hesablanır...</div>
+    </div>
+</div>
+  
+
+<div class="section-container" style="background: linear-gradient(135deg, #1c1c1c 0%, #3a0000 100%); color: white; padding: 20px; border-radius: 0; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: #FFD700; filter: blur(60px); opacity: 0.2;"></div>
+
+    <div class="section-header" style="padding: 0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <div>
+            <h2 class="sec-title" style="color: #FFD700; border: none; font-size: 20px; margin: 0;">🌟 Günün Ulduzu</h2>
+            <p style="font-size: 11px; color: #ccc; margin-top: 4px;">24 saatlıq xüsusi endirim</p>
+        </div>
+        <div id="flash-timer" style="font-family: monospace; font-size: 16px; font-weight: 800; background: rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 8px; border: 1px solid #c21a1a; color: #ff4d4d;">
+            00:00:00
+        </div>
+    </div>
+
+    <div id="flash-container">
+        <div style="padding: 20px; text-align: center; color: #777;">Yüklənir...</div>
+    </div>
+</div>
+
+
+  
+<div class="section-container" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); padding: 25px 0 30px 0; position: relative; overflow: hidden; border-radius: 0; margin-bottom: 10px;">
+    
+    <div style="position: absolute; top: -15px; right: -20px; font-size: 100px; opacity: 0.2; transform: rotate(-10deg);">🏷️</div>
+    <div style="position: absolute; bottom: 10px; left: 20px; font-size: 40px; opacity: 0.15;">📉</div>
+    
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(rgba(255,255,255,0.3) 1px, transparent 1px); background-size: 15px 15px; opacity: 0.1; pointer-events: none;"></div>
+
+    <div class="section-header" style="padding: 0 20px 15px 20px; position: relative; z-index: 2;">
+        <div>
+            <h2 class="sec-title" style="color: white; border: none; font-size: 22px; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                📉 60₼-dən Aşağı
+            </h2>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.95); margin-top: 5px; font-weight: 600;">
+                Sərfəli və keyfiyyətli seçimlər
+            </p>
+        </div>
+        <div style="background: rgba(255,255,255,0.25); backdrop-filter: blur(5px); padding: 5px 12px; border-radius: 15px; font-size: 11px; font-weight: 800; color: white; border: 1px solid rgba(255,255,255,0.4);">
+            QƏNAƏT ✅
+        </div>
+    </div>
+
+    <div class="horizontal-scroll" id="under60-container" style="padding: 0 20px; position: relative; z-index: 2;">
+        <div style="padding:10px; color: rgba(255,255,255,0.7);">Yüklənir...</div>
+    </div>
+</div>
+
+  
+
+<div class="section-container" style="background: linear-gradient(145deg, #0f0f0f 0%, #232323 100%); color: white; padding: 25px 0 30px 0; border-top: 2px solid #D4AF37; border-bottom: 2px solid #D4AF37; position: relative; margin-top: 10px;">
+    
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.05; background-image: repeating-linear-gradient(45deg, #D4AF37 0, #D4AF37 1px, transparent 0, transparent 50%); background-size: 20px 20px;"></div>
+    
+    <div style="position: absolute; top: -10px; right: 10px; font-size: 60px; filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.4));">💎</div>
+    <div style="position: absolute; bottom: 10px; left: -10px; font-size: 80px; opacity: 0.1; color: #D4AF37;">♛</div>
+
+    <div class="section-header" style="padding: 0 20px 15px 20px; position: relative; z-index: 2;">
+        <div>
+            <h2 class="sec-title" style="color: transparent; background: linear-gradient(to right, #D4AF37, #F7EF8A, #D4AF37); -webkit-background-clip: text; background-clip: text; font-size: 22px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">⚜️ Premium Lounge</h2>
+            <p style="font-size: 11px; color: #aaa; margin-top: 6px; font-style: italic;">Yalnız seçilmişlər üçün eksklüziv hədiyyələr (100₼+)</p>
+        </div>
+    </div>
+
+    <div class="horizontal-scroll" id="premium-container" style="padding: 0 20px;">
+        <div style="padding:10px; color:#555">VIP Məhsullar Gətirilir...</div>
+    </div>
+</div>
+
+  
+<div class="section-container" style="background: linear-gradient(135deg, #2E1437 0%, #5B2C6F 100%); color: white; padding: 20px 0 25px 0; border-top: 4px solid #FFD700; position: relative;">
+    
+    <div style="position: absolute; top: 10px; right: 10px; font-size: 80px; opacity: 0.1; transform: rotate(15deg);">🎁</div>
+    <div style="position: absolute; bottom: 10px; left: 10px; font-size: 60px; opacity: 0.1; transform: rotate(-15deg);">🎀</div>
+
+    <div class="section-header" style="padding: 0 20px 15px 20px;">
+        <div>
+            <h2 class="sec-title" style="color: #FFD700; border: none; font-size: 20px; margin: 0;">🎁 Hazır Hədiyyə Qutuları</h2>
+            <p style="font-size: 12px; color: #dcdcdc; margin-top: 5px;">Sevdikləriniz üçün xüsusi hazırlanmış setlər</p>
+        </div>
+    </div>
+
+    <div class="horizontal-scroll" id="giftsets-container" style="padding: 0 20px;">
+        <div style="padding:10px; color:#ccc">Yüklənir...</div>
+    </div>
+</div>
+
+  
 
 <div class="section-container" style="background: #202020; border-top: 4px solid #ff0055; padding-bottom: 50px;">
     <div class="section-header" style="text-align: center; display: block;">
@@ -2316,22 +2834,75 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
     </div>
 </div>
   
-<div class="section-container" style="background: #fff5f5; border-top: 1px solid #ffe3e3; border-bottom: 1px solid #ffe3e3;">
-    <div class="section-header">
-        <h2 class="sec-title" style="color: #d63384;">⏳ Son Şans (Deals)</h2>
+
+
+<div class="section-container" style="background: linear-gradient(135deg, #DA22FF 0%, #9733EE 100%); padding: 25px 0 30px 0; position: relative; overflow: hidden; border-radius: 0; margin-bottom: 10px;">
+    
+    <div style="position: absolute; top: -15px; right: -20px; font-size: 100px; opacity: 0.15; transform: rotate(15deg);">⏳</div>
+    <div style="position: absolute; bottom: 10px; left: 10px; font-size: 60px; opacity: 0.1; font-weight: 800;">%</div>
+    <div style="position: absolute; top: 10px; left: 50%; font-size: 24px; opacity: 0.2; animation: pulseGlow 1.5s infinite;">⏰</div>
+
+    <div class="section-header" style="padding: 0 20px 15px 20px; position: relative; z-index: 2;">
+        <div>
+            <h2 class="sec-title" style="color: white; border: none; font-size: 22px; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                ⏳ Son Şans
+            </h2>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.9); margin-top: 5px; font-weight: 600;">
+                Vaxt bitir! Qaçırılmaz fürsətlər
+            </p>
+        </div>
+        <div style="background: white; color: #9733EE; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 800; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+            SUPER DEAL ⚡
+        </div>
     </div>
-    <div class="horizontal-scroll" id="lastminute-container">
-        <div style="padding:10px; color:#999">Yüklənir...</div>
+
+    <div class="horizontal-scroll" id="lastminute-container" style="padding: 0 20px; position: relative; z-index: 2;">
+        <div style="padding:10px; color: rgba(255,255,255,0.7);">Yüklənir...</div>
     </div>
 </div>
 
-<div class="section-container" style="padding-bottom: 40px;">
-    <div class="section-header">
-        <h2 class="sec-title">🏆 Bizi Fərqli Edən Dəyərlər</h2>
-    </div>
+  
+
+
+<div class="section-container" style="background: linear-gradient(135deg, #134E5E 0%, #71B280 100%); color: white; padding: 20px 0 25px 0; border-top: 4px solid #fff; position: relative;">
     
-    <div class="values-grid">
-        <div class="value-card" onclick="triggerValueAction(this, 'Güvən', 'Bütün məhsullarımız 100% orijinaldır və zəmanətlidir.')">
+    <div style="position: absolute; top: -20px; right: -20px; font-size: 100px; opacity: 0.15;">💸</div>
+    <div style="position: absolute; bottom: 10px; left: 10px; font-size: 20px; opacity: 0.3;">🪙</div>
+    <div style="position: absolute; bottom: 30px; left: 40px; font-size: 14px; opacity: 0.3;">🪙</div>
+
+    <div class="section-header" style="padding: 0 20px 15px 20px;">
+        <div>
+            <h2 class="sec-title" style="color: #fff; border: none; font-size: 20px; margin: 0;">📉 30₼-dən Aşağı</h2>
+            <p style="font-size: 12px; color: #e8f5e9; margin-top: 5px;">Kiçik büdcə ilə böyük xoşbəxtlik</p>
+        </div>
+    </div>
+
+    <div class="horizontal-scroll" id="under30-container" style="padding: 0 20px;">
+        <div style="padding:10px; color:#ccc">Yüklənir...</div>
+    </div>
+</div>
+  
+  
+<div class="section-container" style="background: linear-gradient(135deg, #36D1DC 0%, #5B86E5 100%); padding: 25px 0 40px 0; position: relative; overflow: hidden; border-radius: 0; margin-bottom: 20px;">
+    
+    <div style="position: absolute; top: -25px; right: -25px; font-size: 130px; opacity: 0.1; transform: rotate(15deg);">💎</div>
+    <div style="position: absolute; bottom: 20px; left: -10px; font-size: 60px; opacity: 0.1; transform: rotate(-15deg);">🛡️</div>
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.1; pointer-events: none;"></div>
+
+    <div class="section-header" style="padding: 0 20px 20px 20px; position: relative; z-index: 2;">
+        <div>
+            <h2 class="sec-title" style="color: white; border: none; font-size: 22px; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                🏆 Bizi Fərqli Edən Dəyərlər
+            </h2>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.9); margin-top: 5px; font-weight: 600;">
+                Sizin məmnuniyyətiniz, bizim hədəfimizdir
+            </p>
+        </div>
+    </div>
+
+    <div class="values-grid" style="position: relative; z-index: 2; padding: 0 20px;">
+        
+        <div class="value-card" onclick="triggerValueAction(this, 'Güvən', 'Bütün məhsullarımız 100% orijinaldır və zəmanətlidir.')" style="box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
             <div class="v-icon-box" style="background: #e0f2fe; color: #0284c7;">
                 🛡️
             </div>
@@ -2341,7 +2912,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
             </div>
         </div>
 
-        <div class="value-card" onclick="triggerValueAction(this, 'Sürət', 'Sifarişiniz 24 saat ərzində qapınızda olacaq.')">
+        <div class="value-card" onclick="triggerValueAction(this, 'Sürət', 'Sifarişiniz 24 saat ərzində qapınızda olacaq.')" style="box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
             <div class="v-icon-box" style="background: #f0fdf4; color: #16a34a;">
                 🚀
             </div>
@@ -2351,7 +2922,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
             </div>
         </div>
 
-        <div class="value-card" onclick="triggerValueAction(this, 'Dəstək', 'Sizə xidmət etmək üçün 7/24 xətdəyik.')">
+        <div class="value-card" onclick="triggerValueAction(this, 'Dəstək', 'Sizə xidmət etmək üçün 7/24 xətdəyik.')" style="box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
             <div class="v-icon-box" style="background: #fff1f2; color: #e11d48;">
                 ❤️
             </div>
@@ -2361,7 +2932,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
             </div>
         </div>
 
-        <div class="value-card" onclick="triggerValueAction(this, 'Qablaşdırma', 'Hədiyyəniz xüsusi dizaynla paketlənir.')">
+        <div class="value-card" onclick="triggerValueAction(this, 'Qablaşdırma', 'Hədiyyəniz xüsusi dizaynla paketlənir.')" style="box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
             <div class="v-icon-box" style="background: #fffbeb; color: #d97706;">
                 🎀
             </div>
@@ -2370,17 +2941,38 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
                 <p>Hədiyyəlik Dizayn</p>
             </div>
         </div>
+
     </div>
 </div>
 
-  <div class="section-container" style="padding-bottom: 100px;">
-    <div class="section-header">
-        <h2 class="sec-title">❓ Tez-tez Verilən Suallar</h2>
+
+  
+<div class="section-container" style="background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%); padding: 25px 0 50px 0; position: relative; overflow: hidden; border-radius: 0; padding-bottom: 120px;">
+    
+    <div style="position: absolute; top: -10px; right: -25px; font-size: 140px; opacity: 0.1; transform: rotate(15deg);">❓</div>
+    <div style="position: absolute; bottom: 80px; left: 10px; font-size: 60px; opacity: 0.1; transform: rotate(-20deg);">💡</div>
+    <div style="position: absolute; top: 50px; left: 50%; font-size: 30px; opacity: 0.15; animation: floatBubble 5s infinite;">💭</div>
+    
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px); background-size: 30px 30px; pointer-events: none;"></div>
+
+    <div class="section-header" style="padding: 0 20px 20px 20px; position: relative; z-index: 2;">
+        <div>
+            <h2 class="sec-title" style="color: white; border: none; font-size: 22px; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                ❓ Tez-tez Verilən Suallar
+            </h2>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.85); margin-top: 5px; font-weight: 500;">
+                Ağlınızdakı suallara cavab tapın
+            </p>
+        </div>
+        <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(5px); padding: 5px 12px; border-radius: 15px; color: white; display: flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.2);">
+            <span style="font-size: 14px;">🎧</span>
+            <span style="font-size: 10px; font-weight: 700;">24/7 DƏSTƏK</span>
+        </div>
     </div>
 
-    <div class="faq-wrapper">
+    <div class="faq-wrapper" style="position: relative; z-index: 2; padding: 0 20px;">
         
-        <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-item" onclick="toggleFaq(this)" style="box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: none;">
             <div class="faq-question">
                 <span>Sifarişim nə vaxt çatdırılacaq?</span>
                 <span class="faq-icon">+</span>
@@ -2390,7 +2982,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
             </div>
         </div>
 
-        <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-item" onclick="toggleFaq(this)" style="box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: none;">
             <div class="faq-question">
                 <span>Rayonlara çatdırılma var?</span>
                 <span class="faq-icon">+</span>
@@ -2400,7 +2992,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
             </div>
         </div>
 
-        <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-item" onclick="toggleFaq(this)" style="box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: none;">
             <div class="faq-question">
                 <span>Ödənişi necə edə bilərəm?</span>
                 <span class="faq-icon">+</span>
@@ -2410,7 +3002,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
             </div>
         </div>
 
-        <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-item" onclick="toggleFaq(this)" style="box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: none;">
             <div class="faq-question">
                 <span>Hədiyyəni anonim göndərə bilərəm?</span>
                 <span class="faq-icon">+</span>
@@ -2420,7 +3012,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
             </div>
         </div>
 
-        <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-item" onclick="toggleFaq(this)" style="box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: none;">
             <div class="faq-question">
                 <span>Hədiyyə paketlənməsi ödənişlidir?</span>
                 <span class="faq-icon">+</span>
@@ -2430,7 +3022,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
             </div>
         </div>
 
-        <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-item" onclick="toggleFaq(this)" style="box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: none;">
             <div class="faq-question">
                 <span>Məhsulu bəyənməsəm qaytara bilərəm?</span>
                 <span class="faq-icon">+</span>
@@ -2440,49 +3032,9 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
             </div>
         </div>
 
-        <div class="faq-item" onclick="toggleFaq(this)">
-            <div class="faq-question">
-                <span>Alıcı evdə olmasa nə edirsiniz?</span>
-                <span class="faq-icon">+</span>
-            </div>
-            <div class="faq-answer">
-                <p>Kuryerimiz çatdırılmadan öncə mütləq əlaqə saxlayır. Əgər sürprizdirsə, bunu bizə əvvəlcədən deyin, xüsusi ssenari ilə yanaşaq.</p>
-            </div>
-        </div>
-
-        <div class="faq-item" onclick="toggleFaq(this)">
-            <div class="faq-question">
-                <span>Məhsullarınız orijinaldır?</span>
-                <span class="faq-icon">+</span>
-            </div>
-            <div class="faq-answer">
-                <p>Bəli, Brendimo-da satılan bütün məhsullar 100% orijinaldır və keyfiyyət zəmanəti verilir.</p>
-            </div>
-        </div>
-
-        <div class="faq-item" onclick="toggleFaq(this)">
-            <div class="faq-question">
-                <span>Korporativ (topdan) sifariş mümkündür?</span>
-                <span class="faq-icon">+</span>
-            </div>
-            <div class="faq-answer">
-                <p>Bəli, şirkətlər üçün xüsusi endirim paketlərimiz var. WhatsApp vasitəsilə menecerlə əlaqə saxlaya bilərsiniz.</p>
-            </div>
-        </div>
-
-        <div class="faq-item" onclick="toggleFaq(this)">
-            <div class="faq-question">
-                <span>İş saatlarınız necədir?</span>
-                <span class="faq-icon">+</span>
-            </div>
-            <div class="faq-answer">
-                <p>Onlayn sifarişlər 24/7 qəbul olunur. Müştəri xidmətləri hər gün 10:00-dan 22:00-a qədər fəaliyyət göstərir.</p>
-            </div>
-        </div>
-
-        <div style="margin-top: 20px; text-align: center;">
-            <p style="font-size: 13px; color: #888; margin-bottom: 10px;">Sualınızı tapmadınız?</p>
-            <button onclick="handleNavClick('chat')" style="background: #eee; color: #333; border: none; padding: 10px 20px; border-radius: 20px; font-weight: 600; font-size: 13px;">
+        <div style="margin-top: 30px; text-align: center;">
+            <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 12px;">Sualınızı tapmadınız?</p>
+            <button onclick="handleNavClick('chat')" style="background: white; color: #182848; border: none; padding: 12px 25px; border-radius: 30px; font-weight: 700; font-size: 13px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); display: inline-flex; align-items: center; gap: 8px;">
                 Canlı Dəstək (WhatsApp) 💬
             </button>
         </div>
@@ -4207,39 +4759,192 @@ function processAndRender(rawProds, rawOrders, rawReviews) {
 } // <--- Function ends here cleanly
   
 // NEW FUNCTION TO RENDER MALL SECTIONS
+// --- UPDATED MALL RENDER FUNCTION ---
 function renderMallSections() {
-    // 1. Filter Lists based on Tags
-    const best = state.products.filter(p => p.tag && p.tag.toLowerCase().includes('best'));
-    const newly = state.products.filter(p => p.tag && (p.tag.toLowerCase().includes('last') || p.tag.toLowerCase().includes('new')));
-    const limited = state.products.filter(p => p.tag && p.tag.toLowerCase().includes('limited'));
-    
-    // Under 60 Logic
-    const under60 = state.products.filter(p => (p.tag && p.tag.toLowerCase().includes('under60')) || (parseFloat(p.price) <= 60));
+    // Safety check: if no products loaded, stop.
+    if (!state.products || state.products.length === 0) return;
 
-    // --- NEW: LAST MINUTE LOGIC ---
-    // Finds 'lastminute' tag OR High Discounts (>25%)
-    const lastMinute = state.products.filter(p => 
-        (p.tag && p.tag.toLowerCase().includes('lastminute')) || 
-        (p.discountPercent > 25)
-    );
+    console.log("Rendering Mall Sections with " + state.products.length + " products.");
 
-    // 2. Prepare Final Lists (with fallbacks)
-    const listBest = best.length ? best : state.products.slice(0, 5);
-    const listNew = newly.length ? newly : state.products.slice(5, 10);
-    const listLimit = limited.length ? limited : state.products.slice(10, 15);
-    const listUnder60 = under60.slice(0, 10);
-    
-    // Last Minute List (Top 10)
-    const listLast = lastMinute.sort((a,b) => b.discountPercent - a.discountPercent).slice(0, 10);
+    // --- 1. HELPER: Safe Tag Checker ---
+    const hasTag = (p, t) => p.tag && p.tag.toLowerCase().includes(t);
 
-    // 3. Render to HTML Containers
-    renderSectionCards(document.getElementById('best-container'), listBest, "TOP", "bg-black");
-    renderSectionCards(document.getElementById('new-container'), listNew, "YENİ", "bg-green");
-    renderSectionCards(document.getElementById('limited-container'), listLimit, "TÜKƏNİR", "bg-red");
-    renderSectionCards(document.getElementById('under60-container'), listUnder60, "SƏRFƏLİ", "bg-blue");
+    // --- 2. DATA FILTERING LOGIC ---
+
+    // A. Flash Sale (Priority: Tag 'flash' -> Highest Discount)
+    let flashProduct = state.products.find(p => hasTag(p, 'flash'));
+    if (!flashProduct) {
+        // Fallback: Pick the item with the highest discount percent
+        flashProduct = [...state.products].sort((a, b) => b.discountPercent - a.discountPercent)[0];
+    }
+
+    // B. Live Trending (Simulation)
+    const trendingTags = ['cat_tech', 'cat_beauty', 'cat_watch', 'cat_women', 'cat_men', 'trend'];
+    let liveList = state.products.filter(p => hasTag(p, 'trend') || trendingTags.some(t => hasTag(p, t)));
+    // Add fake viewer counts and sort
+    liveList = liveList.map(p => ({
+        ...p,
+        currentViewers: Math.floor(Math.random() * (50 - 15 + 1)) + 15 // Random viewers 15-50
+    })).sort((a, b) => b.currentViewers - a.currentViewers).slice(0, 10);
+
+    // C. Best Sellers (Tag 'best' -> OR top 6 items)
+    let bestSellers = state.products.filter(p => hasTag(p, 'best') || p.isBestSeller);
+    if (bestSellers.length < 4) bestSellers = state.products.slice(0, 6);
+
+    // D. New Arrivals (Tag 'new', 'fresh' -> OR items 6-12)
+    let newArrivals = state.products.filter(p => hasTag(p, 'new') || hasTag(p, 'fresh'));
+    if (newArrivals.length < 4) newArrivals = state.products.slice(6, 12);
+
+    // E. Limited Stock (Tag 'limited' -> OR Low Stock Flag -> OR items 12-18)
+    let limitedStock = state.products.filter(p => hasTag(p, 'limited') || p.isLowStock);
+    if (limitedStock.length < 4) limitedStock = state.products.slice(12, 18);
+
+    // F. Under 60 AZN (Price Check -> Tag 'under60')
+    let under60 = state.products.filter(p => (hasTag(p, 'under60') || (parseFloat(p.price) <= 60 && parseFloat(p.price) > 30)));
     
-    // Render New Section
-    renderSectionCards(document.getElementById('lastminute-container'), listLast, "TƏLƏS", "bg-purple");
+    // G. Premium (Price > 100 -> Tag 'premium', 'vip')
+    let premium = state.products.filter(p => hasTag(p, 'premium') || hasTag(p, 'vip') || parseFloat(p.price) >= 100);
+    // Sort premium by price high to low
+    premium.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+
+    // H. Gift Sets (Tag 'set', 'box' -> Name contains 'set')
+    let giftSets = state.products.filter(p => hasTag(p, 'set') || hasTag(p, 'box') || hasTag(p, 'bundle') || p.name.toLowerCase().includes('set'));
+    
+    // I. Last Minute / High Discount (Tag 'last' -> Discount > 30%)
+    let lastMinute = state.products.filter(p => hasTag(p, 'last') || p.discountPercent > 30);
+
+    // J. Under 30 AZN (Price Check -> Tag 'under30')
+    let under30 = state.products.filter(p => hasTag(p, 'under30') || parseFloat(p.price) <= 30);
+
+
+    // --- 3. RENDER EXECUTION ---
+
+    // 1. Render Flash Sale Card
+    if (flashProduct && typeof renderFlashCard === "function") {
+        renderFlashCard(flashProduct);
+        if (typeof startFlashTimer === "function") startFlashTimer();
+    }
+
+    // 2. Render Live Trending (Unique Card Style)
+    renderLiveCards(document.getElementById('trending-container'), liveList);
+
+    // 3. Render All Horizontal Scroll Sections
+    // Note: We check if element exists before rendering to avoid errors
+    
+    const sections = [
+        { id: 'best-container', data: bestSellers, badge: "TOP 🔥", color: "bg-black" },
+        { id: 'new-container', data: newArrivals, badge: "YENİ ⚡", color: "bg-green" },
+        { id: 'featured-reviews-track', data: [], badge: "", color: "" }, // Handled separately by initFeaturedReviews
+        { id: 'limited-container', data: limitedStock, badge: "AZ QALDI ⚠️", color: "bg-red" },
+        { id: 'under60-container', data: under60, badge: "SƏRFƏLİ ✅", color: "bg-blue" },
+        { id: 'premium-container', data: premium, badge: "VIP 💎", color: "bg-premium" },
+        { id: 'giftsets-container', data: giftSets, badge: "HƏDİYYƏ 🎁", color: "bg-gold" },
+        { id: 'lastminute-container', data: lastMinute, badge: "TƏLƏS ⏳", color: "bg-purple" },
+        { id: 'under30-container', data: under30, badge: "SUPER 🏷️", color: "bg-teal" }
+    ];
+
+    sections.forEach(sec => {
+        const container = document.getElementById(sec.id);
+        if (container && sec.data.length > 0) {
+            // If data list is empty (e.g. no premium items found), use a fallback random slice
+            // to ensure the app doesn't look broken.
+            const dataToRender = sec.data.length > 0 ? sec.data : state.products.slice(0, 6);
+            renderSectionCards(container, dataToRender, sec.badge, sec.color);
+        } else if (container) {
+            // Fallback for completely empty filters
+            renderSectionCards(container, state.products.slice(0, 5), sec.badge, sec.color);
+        }
+    });
+}
+
+// --- HELPER: RENDER LIVE CARDS ---
+function renderLiveCards(container, list) {
+    if(!container) return;
+    let html = "";
+    
+    list.forEach(p => {
+        // Find original index for modal
+        const pIndex = state.products.findIndex(orig => orig.name === p.name);
+        
+        html += `
+        <div class="prod-card" onclick="openModal(state.products[${pIndex}], state.products, ${pIndex})">
+            <div class="pc-img-box">
+               <img src="${fixImageLink(p.image)}" class="pc-img" loading="lazy">
+               <div class="viewer-badge">
+                   <span class="eye-icon">👀</span> ${p.currentViewers} nəfər
+               </div>
+            </div>
+            <div class="pc-content">
+               <div class="pc-title">${p.name}</div>
+               <div class="pc-prices">
+                    <span class="pc-price-new">${p.price}₼</span>
+               </div>
+            </div>
+        </div>`;
+    });
+    
+    container.innerHTML = html || '<div style="padding:10px; color:#999">Hələlik sakitlikdir...</div>';
+}
+
+// --- HELPER: RENDER THE FLASH CARD ---
+function renderFlashCard(p) {
+    const container = document.getElementById('flash-container');
+    if(!container || !p) return;
+
+    const pIndex = state.products.indexOf(p);
+    
+    container.innerHTML = `
+    <div class="flash-card" onclick="openModal(state.products[${pIndex}], state.products, ${pIndex})">
+        <div class="flash-img-box">
+            <img src="${fixImageLink(p.image)}" class="flash-img">
+            <div class="flash-badge">⚡ -${p.discountPercent}%</div>
+        </div>
+        <div class="flash-content">
+            <div class="flash-title">${p.name}</div>
+            <div class="flash-price-box">
+                <span class="flash-new-price">${p.price}₼</span>
+                <span class="flash-old-price">${p.oldPrice}₼</span>
+            </div>
+            <button class="flash-btn">İndi Al 👉</button>
+        </div>
+    </div>`;
+}
+
+// --- HELPER: FLASH TIMER (Counts down to Midnight) ---
+let flashInterval = null;
+function startFlashTimer() {
+    if(flashInterval) clearInterval(flashInterval);
+    
+    const timerEl = document.getElementById('flash-timer');
+    if(!timerEl) return;
+
+    function update() {
+        const now = new Date();
+        const end = new Date();
+        // Set end time to Tonight 23:59:59
+        end.setHours(23, 59, 59, 999);
+        
+        const diff = end - now;
+        
+        if (diff <= 0) {
+            timerEl.textContent = "00:00:00";
+            return;
+        }
+
+        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const m = Math.floor((diff / 1000 / 60) % 60);
+        const s = Math.floor((diff / 1000) % 60);
+
+        // Format to always show 05 instead of 5
+        const hStr = h < 10 ? "0" + h : h;
+        const mStr = m < 10 ? "0" + m : m;
+        const sStr = s < 10 ? "0" + s : s;
+
+        timerEl.textContent = `${hStr}:${mStr}:${sStr}`;
+    }
+
+    update(); // Run immediately
+    flashInterval = setInterval(update, 1000);
 }
 
 function renderSectionCards(container, list, badgeTxt, badgeCls) {
