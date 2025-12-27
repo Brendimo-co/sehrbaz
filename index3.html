@@ -13,7 +13,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* --- CSS STYLES --- */
-<link rel="preconnect" href="https://images.unsplash.com">
 /* RESET & BASE */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent; }
 body { 
@@ -25,8 +24,15 @@ body {
 
 /* LAYOUT */
 .wizard-wrapper {
-  flex: 1; width: 100%; max-width: 440px; margin: 0 auto; padding: 15px 20px 40px 20px; 
-  display: flex; flex-direction: column; position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full viewport height */
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 15px 20px 80px 20px; /* Bottom padding for nav */
+  position: relative;
+  overflow: hidden; /* Prevent double scrollbars */
 }
 
 /* HEADER */
@@ -319,29 +325,35 @@ body {
 /* Update #cards-wrapper */
 #cards-wrapper { 
   position: relative; 
+  flex: 1; /* Fills remaining space */
   width: 100%; 
-  height: 60vh; 
-  max-height: 580px; 
-  min-height: 420px;
-  margin-top: 10px; 
+  margin-top: 20px; 
   perspective: 1000px; 
-  /* Prevent scrolling on the wrapper area */
-  touch-action: none; 
-  overscroll-behavior: contain;
+  touch-action: none; /* Disables browser scroll on the cards */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Update .card */
 .card {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background: #ffffff; border-radius: 28px; 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%; /* Fill the wrapper */
+  max-height: 600px; /* Safety cap for tall screens */
+  background: #ffffff; 
+  border-radius: 28px; 
   box-shadow: 0 15px 40px -10px rgba(0,0,0,0.12);
   overflow: hidden; 
   transform-origin: 50% 100%; 
   will-change: transform; 
-  /* Critical for mobile smoothness */
   touch-action: none; 
   user-select: none;
-  display: flex; flex-direction: column; padding: 12px; 
+  display: flex; 
+  flex-direction: column; 
+  padding: 12px; 
 }
 /* 1. Ensure the container holds the image and stamps together */
 .card-image-box {
@@ -568,7 +580,21 @@ body {
 
 /* ALL PRODUCTS GRID (UPDATED TO MALL STYLE) */
 /* Adjusted z-index to sit below navbar but above content */
-.all-products-view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fafafa; z-index: 100; overflow-y: auto; padding: 0px; padding-bottom: 80px; display: none; }
+.all-products-view { 
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100vh; /* Use 100vh to fill screen */
+  background: #fafafa; 
+  z-index: 150; /* distinct from modals (200) and nav (250) */
+  overflow-y: scroll; /* Forces scroll behavior */
+  -webkit-overflow-scrolling: touch; /* Critical for iOS "stickiness" */
+  padding: 0; 
+  padding-bottom: 90px; /* Space for bottom nav */
+  display: none; 
+  overscroll-behavior-y: contain; /* Prevents pulling the whole page down */
+}
 .all-products-view.active { display: block; animation: slideUp 0.3s ease; }
 .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 40px; }
 .grid-item { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; cursor: pointer; }
@@ -587,7 +613,15 @@ body {
 .hero-subtitle { font-size: 14px; color: #aaa; margin-bottom: 20px; }
 .hero-btn { background: linear-gradient(92deg, #c21a1a 0%, #ff4d4d 100%); color: white; border: none; width: 100%; padding: 14px; border-radius: 14px; font-size: 16px; font-weight: 800; box-shadow: 0 5px 20px rgba(194, 26, 26, 0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
-.section-container { padding: 5px 0; }
+.section-container {
+    width: 100%;
+    margin: 0;         /* Remove margins to touch edges */
+    margin-bottom: 10px;
+    padding: 20px 0;   /* Top/Bottom padding only */
+    border-radius: 0;  /* Remove rounded corners for full-width sections */
+    box-shadow: none;  /* Remove shadow for flat look */
+    /* Keep background styles you already have inline */
+}
 .section-header { padding: 0 20px 15px; display: flex; justify-content: space-between; align-items: center; }
 .sec-title { font-size: 18px; font-weight: 800; color: #1d1d1f; position: relative; }
 .sec-title::after { content: ''; display: block; width: 40%; height: 3px; background: #c21a1a; border-radius: 2px; margin-top: 4px; }
@@ -3675,188 +3709,188 @@ const categoriesData = [
   { 
     id: 1, 
     tag: "cat_ana", 
-    title: "Fədakar Ana", 
+    title: "Mərhəmət Mələyi: Ana", 
     // Image: Warm kitchen atmosphere, cooking baking
     img: "https://images.unsplash.com/photo-1544652406-55174175da25?auto=format&fit=crop&q=80&w=400", 
-    desc: "Səhərdən axşama qədər bizim rahatlığımız üçün çalışan, mətbəxdə möcüzələr yaradan müqəddəs varlıq. Ona yorğunluğunu unudacaq bir hədiyyə seç.", 
-    ideas: ["Elektrikli Mətbəx Alətləri", "Gümüş Sırğa", "Ortopedik Mətbəx Xalçası", "Milli Plov Sinisi", "Qranit Qazan dəsti"] 
+    desc: "Özünü unudub, hər zaman bizi düşünən, qayğısı ilə evi isidən insan. Ona elə bir hədiyyə seç ki, həm işini asanlaşdırsın, həm də 'səni çox sevirəm' desin.", 
+    ideas: ["Robot Süpürgə", "Masaj Yastığı", "Adlı Mətbəx Önlüyü", "Buxarlı Ütü", "Xatirə Çərçivəsi"] 
   },
   { 
     id: 2, 
     tag: "cat_ata", 
-    title: "Zəhmli Ata", 
+    title: "Ailənin Dirəyi: Ata", 
     // Image: Classic watch, leather, masculine style
     img: "https://images.unsplash.com/photo-1617317376997-8748e6862c01?auto=format&fit=crop&q=80&w=400", 
-    desc: "Ailənin dirəyi, hisslərini çox bəlli etməsə də hər zaman bizi düşünən dağ kimi insan. Ona keyfiyyətli və statusunu vurğulayan əşyalar yaraşır.", 
-    ideas: ["Dəri Kəmər və Pulqabı", "Klassik Qol Saatı", "Avtomobil Bel Yastığı", "Taxta Nərd", "Dəri Ev Tərliyi"] 
+    desc: "Sevgisini sözlərlə deyil, zəhməti ilə göstərən gizli qəhrəman. Onun statusuna yaraşan, gündəlik həyatda istifadə edərkən səni xatırlayacağı bir jest et.", 
+    ideas: ["Keyfiyyətli Dəri Pulqabı", "Ortopedik Avto-yastıq", "Klassik Qol Saatı", "Təraş Dəsti", "Termos Fincan (Maşın üçün)"] 
   },
   { 
     id: 3, 
     tag: "cat_gelin", 
-    title: "Təzə Gəlin", 
+    title: "Zərif Başlanğıc: Təzə Gəlin", 
     // Image: Elegant jewelry, white tones, wedding vibe
     img: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&q=80&w=400", 
-    desc: "Yeni həyata qədəm qoyan, evini və cehizini bəzəməyə həvəsli zərif xanım. Onun evi və ya özü üçün şıq bir aksesuar seç.", 
-    ideas: ["Zirkon Gümüş Dəst", "Şüşə Mücrü (Qutu)", "Dekorativ Abajur", "Klaç Çanta", "Dekorativ Güldan"] 
+    desc: "Yeni həyata sevgi və həyəcanla başlayan o incə xanım. Onun yeni qurduğu yuvaya yaraşıq verəcək və ya özünü xüsusi hiss etdirəcək zövqlü seçimlər.", 
+    ideas: ["İki nəfərlik Səhər Yeməyi Dəsti", "Dekorativ Şamdanlar", "Ipək Xalat", "Zirkon Daşlı Sırğa", "Estetik Vaza"] 
   },
   { 
     id: 4, 
     tag: "cat_bey", 
-    title: "Həyat Yoldaşı (Bəy)", 
+    title: "Həyat Yoldaşım: Bəy", 
     // Image: Grooming kit, stylish man accessories
     img: "https://images.unsplash.com/photo-1621609764180-2ca554a9d6f2?auto=format&fit=crop&q=80&w=400", 
-    desc: "Evin həm texniki problemlərini həll edən, həm də sənin ən yaxın dostun. Ona işinə yarayacaq, amma stilini tamamlayan praktik hədiyyə lazımdır.", 
-    ideas: ["Saç/Saqqal Trimmeri", "Təravətli Ətir", "Alət Çantası", "Qalın Hudi", "Video-qeydiyyatçı"] 
+    desc: "Həm ən yaxın dostun, həm də güvəndiyin dağ. Ona alacağın hədiyyə həm kişi dünyasına xitab etməli, həm də sənin diqqətini göstərməlidir.", 
+    ideas: ["Ağıllı Saat Kəməri", "Trimmer (Təraş) Dəsti", "Alət Çantası (Toolbox)", "Keyfiyyətli Ətir", "Dəri Çanta (Messenger Bag)"] 
   },
   { 
     id: 5, 
     tag: "cat_xanim", 
-    title: "Həyat Yoldaşı (Xanım)", 
+    title: "Həyat Yoldaşım: Xanım", 
     // Image: Gift box, red ribbon, romantic mood
     img: "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&q=80&w=400", 
-    desc: "Səndən sadəcə hədiyyə yox, diqqət və sevgi gözləyən evin ürəyi. Onu özəl hiss etdirəcək romantik və baxımlı seçimlərə yönəl.", 
-    ideas: ["Pandora stili Qolbaq", "Saç Feni/Düzləşdirici", "SPA Kuponu", "Adlı Boyunbağı", "Ziyafət Çantası"] 
+    desc: "Evin istiliyi və sənin ilham mənbəyin. Ona sadəcə bir əşya yox, özünə zaman ayırmasını təmin edəcək və ya gözəlliyini vurğulayacak bir hədiyyə ver.", 
+    ideas: ["Üz Baxım Cihazı", "Mücrü (Kosmetika qutusu)", "SPA və ya Masaj Kuponu", "Şarm Qolbaq", "Saç Şəkilləndirici"] 
   },
 
   // --- GƏNCLƏR (YOUTH) ---
   { 
     id: 6, 
     tag: "cat_telebe", 
-    title: "Tələbə Gənc", 
+    title: "Gələcəyin Ümidi: Tələbə", 
     // Image: Chill vibe, headphones, street style
     img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400", 
-    desc: "Həyatı universitet, metro və dostları arasında keçən gənc. Ona trend olan, praktik və texnoloji hədiyyələr lazımdır.", 
-    ideas: ["Güclü Power Bank", "Simsiz Qulaqlıq", "Oversize Hudi", "Fast Food Kuponu", "Dizaynlı Termos"] 
+    desc: "Dərslər, imtahanlar və dostlar arasında qaçhaqaçda olan gənc. Enerjisini bərpa edəcək və ya tələbə həyatını asanlaşdıracaq müasir hədiyyələr.", 
+    ideas: ["Simsiz Qulaqlıq", "Böyük Həcmli Powerbank", "Oversize Hudi", "Stil Termos", "Sırt Çantası"] 
   },
   { 
     id: 7, 
     tag: "cat_baci", 
-    title: "Dəb Aşiqi Bacı", 
+    title: "Sirdaşım: Dəbli Bacı", 
     // Image: Pink aesthetics, makeup brushes, mirror
     img: "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&q=80&w=400", 
-    desc: "Pinterest və TikTok dünyasında yaşayan, estetik görünüşə önəm verən zövqlü xanım. Onun üçün hər şey 'Instagramlıq' olmalıdır.", 
-    ideas: ["Kosmetika Dəsti", "İpək Pijama", "Crossbody Çanta", "Makiyaj Fırçaları", "İşıqlı Güzgü"] 
+    desc: "Həm dalaşıb, həm barışdığın, amma onsuz edə bilmədiyin o insan. Onun Instagram-lıq dünyasına rəng qatacaq trend aksesuarlar seç.", 
+    ideas: ["Ring Light (İşıq)", "Mini Çiyin Çantası", "Makiyaj Fırça Dəsti", "İpək Pijama", "Bürclü Boyunbağı"] 
   },
   { 
     id: 8, 
     tag: "cat_qardas", 
-    title: "Geymer Qardaş", 
+    title: "Arxa-Dayan: Qardaş", 
     // Image: Neon lights, keyboard, gaming setup
     img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=400", 
-    desc: "Boş vaxtını oyunlarla keçirən, sadəliyi sevən 'kruq' uşağı. Ona parıltılı yox, əyləncəli və funksional şeylər al.", 
-    ideas: ["Geyminq Maus", "Basic T-shirt dəsti", "Noutbuk Çantası", "Steam Kartı", "Rahat Ev Şalvarı"] 
+    desc: "Səni qoruyan, zarafatcıl və bəzən kompüterdən ayrılmayan o doğma. Ona əyləncə dünyasına uyğun və ya rahatlığını təmin edən hədiyyələr yaraşır.", 
+    ideas: ["RGB Mauspad", "Keyfiyyətli Oyun Mausu", "Ev üçün Rahat Şort/Şalvar", "Qeympeyd (Joystick)", "T-shirt Dəsti"] 
   },
   { 
     id: 9, 
     tag: "cat_esger", 
-    title: "Əsgər", 
+    title: "Vətən Keşikçisi: Əsgər", 
     // Image: Tactical watch, dark gear, sturdy
     img: "https://images.unsplash.com/photo-1579912437766-7896df6d3cd3?auto=format&fit=crop&q=80&w=400", 
-    desc: "Vətən keşiyində duran, evdən uzaqda olan gənc. Ona göndərəcəyin hədiyyə dözümlü olmalı və ehtiyaclarını qarşılamalıdır.", 
-    ideas: ["Elektron Saat (G-Shock)", "Termal İçlik", "Gigiyena çantası", "Danışıq Konturu", "Yun Corablar"] 
+    desc: "Evdən uzaqda, vətən borcunu ödəyən məğrur gənc. Ona göndərəcəyin qutu sadəcə əşya deyil, evdən gələn bir parça istilik və dəstəkdir.", 
+    ideas: ["Dözümlü Elektron Saat", "Keyfiyyətli Termal Corablar", "Şəxsi Gigiyena Çantası", "Təraş Köpüyü və Ülgüc", "Şirniyyat Bağlaması"] 
   },
   { 
     id: 10, 
     tag: "cat_usaq", 
-    title: "Dəcəl Uşaq", 
+    title: "Evin Nəşəsi: Dəcəl Bala", 
     // Image: Colorful toys, legos, happy vibe
     img: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&q=80&w=400", 
-    desc: "Yerində dura bilməyən, rəngli dünyası olan balaca. Ona inkişaf etdirici və ya enerjisini ata biləcəyi oyuncaqlar seç.", 
-    ideas: ["Lego Konstruktor", "Rəsm Çemodanı", "Futbol Topu", "Ağıllı Saat", "Personajlı Lançboks"] 
+    desc: "Hər şeyi maraqla kəşf edən balaca tədqiqatçı. Onun xəyal dünyasını genişləndirəcək və enerjisini ata biləcəyi oyuncaqlar.", 
+    ideas: ["Lego Konstruktor", "Rəsm Çemodanı", "Ağıllı Uşaq Saatı", "Samokat", "Personajlı Lançboks"] 
   },
 
   // --- QOHUMLAR (RELATIVES) ---
   { 
     id: 11, 
     tag: "cat_nene", 
-    title: "Nənə", 
+    title: "Duası Bərəkətli: Nənə", 
     // Image: Tea cup, knitting, cozy sweater texture
     img: "https://images.unsplash.com/photo-1608135377645-da7c2c6ddb7b?auto=format&fit=crop&q=80&w=400", 
-    desc: "Süfrəsi bərəkətli, nəvələrinin yolunu gözləyən nurani insan. Ona rahatlıq və isti hiss etdirən hədiyyələr yaraşır.", 
-    ideas: ["Elektrikli Çaydan", "Yumşaq Namazlıq", "Kəlağayı/Şal", "Çay Dəsgahı", "Tonometr"] 
+    desc: "Süfrəsi hər zaman açıq, nağılları bitməyən nurani varlıq. Ona yaşlılığında rahatlıq verəcək və ya keçmişi xatırladacaq ənənəvi hədiyyələr seç.", 
+    ideas: ["Elektrikli Çaydan/Samovar", "Yumşaq Şal (Kəlağayı)", "Rahat Ev Ayaqqabısı", "Təzyiq Ölçən Aparat", "Hədiyyəlik Çay Qutusu"] 
   },
   { 
     id: 12, 
     tag: "cat_yeni_ev", 
-    title: "Yeni Ev Sahibi", 
+    title: "Xeyirli Ocaq: Yeni Ev Sahibi", 
     // Image: Home keys, cozy living room background
     img: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&q=80&w=400", 
-    desc: "Yeni mənzilə köçən və evin hər küncünü zövqlə doldurmağa çalışan ailə. Onlara evin bəzəyi olacaq əşyalar al.", 
-    ideas: ["Meyvə Qabı", "Tort Qabı", "Stəkan Dəsti", "Yataq Dəsti", "Doğrayıcı"] 
+    desc: "Yeni bir başlanğıc edən və yuvasını bəzəyən dostların. Evinə rəng qatacaq, hər istifadədə səni xatırladacaq interyer əşyaları.", 
+    ideas: ["Dekorativ Meyvə Qabı", "Mətbəx Taxtası Dəsti", "Keyfiyyətli Yataq Dəsti", "Blender/Doğrayıcı", "Divar Saatı"] 
   },
   { 
     id: 13, 
     tag: "cat_korpe", 
-    title: "Yeni Doğulmuş", 
+    title: "Möcüzəvi Qonaq: Yeni Doğulan", 
     // Image: Cute baby shoes, soft blanket
     img: "https://images.unsplash.com/photo-1583086762675-5a88bcc72548?auto=format&fit=crop&q=80&w=400", 
-    desc: "Dünyaya yeni gəlmiş mələk. Həm körpəyə, həm də ananın işinə yarayacaq təmiz və keyfiyyətli hədiyyələr.", 
-    ideas: ["Gümüş Sancaq", "Hamam Dəsti", "Plyuş Ədyal", "Mağaza Kartı", "Nəmər (Pul)"] 
+    desc: "Dünyaya göz açan məsum mələk. Həm körpənin rahatlığına, həm də yeni ananın işinə yarayacaq təmiz tərkibli və yumşaq hədiyyələr.", 
+    ideas: ["Muslin Ədyal", "Körpə Hamam Dəsti", "Xatirə Albomu", "Gümüş Sancaq", "Uşaq Mağazası Kartı"] 
   },
   { 
     id: 14, 
     tag: "cat_muellim", 
-    title: "Müəllim", 
+    title: "Yol Göstərən: Müəllim", 
     // Image: Notebook, glasses, library
     img: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=400", 
-    desc: "Biliyini bizimlə bölüşən zəhmətkeş ziyalı. Ona verəcəyin hədiyyə rəsmi, eyni zamanda istifadə edə biləcəyi zövqlü bir əşya olmalıdır.", 
-    ideas: ["Market Kartı", "Kofe Dəsti", "Büllur Vaza", "Şokolad Qutusu", "Bloknot"] 
+    desc: "Səbrli və fədakar elm insanı. Ona təşəkkürünü bildirəcək, masasında və ya gündəlik həyatında istifadə edə biləcəyi rəsmi, amma səmimi hədiyyə.", 
+    ideas: ["Dəri Qapaqlı Bloknot", "Premium Qələm", "Termo-Fincan", "Kitab Mağazası Kartı", "Masaüstü Orqanayzer"] 
   },
   { 
     id: 15, 
     tag: "cat_hekim", 
-    title: "Həkim", 
+    title: "Şəfa Verən: Həkim", 
     // Image: Stethoscope on clean desk
     img: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=400", 
-    desc: "Sağlamlığımızın keşikçisi. Minnətdarlıq etmək istədiyin bu peşəkaranın masasında saxlaya biləcəyi bir jest et.", 
-    ideas: ["Premium Şokolad", "Yarpaq Çay", "Masaüstü Suvenir", "Meyvə Səbəti", "Kofe Dəsti"] 
+    desc: "Gecəsi gündüzü olmayan, sağlamlığımızın keşikçisi. Minnətdarlıq əlaməti olaraq ona yorğunluğunu alacaq və ya kabinetinə yaraşacaq bir jest et.", 
+    ideas: ["Premium Şokolad Qutusu", "Keyfiyyətli Kofe Dəsti", "Masaüstü Suvenir", "Quru Meyvə Səbəti", "Yazı Ləvazimatı Dəsti"] 
   },
 
   // --- DOSTLAR (FRIENDS) ---
   { 
     id: 16, 
     tag: "cat_refiqe", 
-    title: "Sirdaş Rəfiqə", 
+    title: "Ruh Əkizi: Rəfiqə", 
     // Image: Two girls laughing, coffee vibe
     img: "https://images.unsplash.com/photo-1607453998825-f3f36da5ab18?auto=format&fit=crop&q=80&w=400", 
-    desc: "Bütün sirrlərini bilən ən yaxın rəfiqən. Ona 'bunu görəndə səni xatırladım' deyə biləcəyin trend hədiyyələr al.", 
-    ideas: ["Ətirli Şam", "Orqanayzer", "Şopper Çanta", "Fərdi Fincan", "Səyahət Qutusu"] 
+    desc: "Bütün sirrlərini bilən, dar gündə yanında olan insan. Ona 'bunu görəndə ağlıma sən gəldin' deyəcəyin, aranızdakı bağı gücləndirən hədiyyələr.", 
+    ideas: ["Ətirli Dekorativ Şam", "Şəxsi Adla Fincan", "Mini Səyahət Qutusu", "Şopper (Parça Çanta)", "Kosmetika Çantası"] 
   },
   { 
     id: 17, 
     tag: "cat_dost_ogl", 
-    title: "Avtoş Dost", 
+    title: "Sükan Arxasında: Avto-Həvəskar", 
     // Image: Steering wheel, luxury car interior
     img: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=400", 
-    desc: "Maşınına canı kimi baxan oğlan. Onun üçün maşın aksesuarları ən dəyərli hədiyyədir.", 
-    ideas: ["Avtomobil Tozsoranı", "Telefon Tutacağı", "Panel Təmizləyici", "Asma Ətir", "Açarlıq"] 
+    desc: "Maşınına özündən çox qulluq edən o dost. Onun üçün avtomobil aksesuarları sadəcə əşya yox, bir ehtirasdır. İşinə yarayacaq bir şey seç.", 
+    ideas: ["Güclü Avto-Tozsoran", "Maqnit Telefon Tutacağı", "Baqaj Orqanayzeri", "Salon üçün Özəl Ətir", "Təkər Pompası"] 
   },
   { 
     id: 18, 
     tag: "cat_cay", 
-    title: "Çay Aşiqi", 
+    title: "Söhbət Dəmi: Çaysevər", 
     // Image: Tea pouring into glass, steam
     img: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&q=80&w=400", 
-    desc: "Söhbəti çay süfrəsi arxasında edən insan. Ona çay mərasimini gözəlləşdirəcək aksesuarlar lazımdır.", 
-    ideas: ["Mürəbbə Dəsti", "Armudu Stəkan", "Dəm Çaydanı", "Çərəz Qutusu", "Mətbəx Dəsmalları"] 
+    desc: "Ən dərin söhbətləri çay süfrəsi arxasında edən dostun. Onun çay mərasimini daha zövqlü və dadlı edəcək kiçik detallar.", 
+    ideas: ["Armudu Stəkan Dəsti", "Qarışıq Çərəz Qutusu", "Egzotik Mürəbbə", "Şüşə Dəm Çaydanı", "Dekorativ Nəlbəki"] 
   },
   { 
     id: 19, 
     tag: "cat_ofis", 
-    title: "Ofis Yoldaşı", 
+    title: "Komanda Yoldaşı: Həmkar", 
     // Image: Minimalist desk, laptop, plant
     img: "https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=400", 
-    desc: "Hər gün işdə gördüyün həmkarın. Ona masasında istifadə edə biləcəyi, neytral amma maraqlı hədiyyə seç.", 
-    ideas: ["Fincan", "Təqvim", "Rəngli Corablar", "Bitki (Sukulent)", "Bloknot"] 
+    desc: "Hər səhər 'sabahın xeyir' dediyin iş yoldaşın. İş masasını canlandıracaq, gərgin iş günündə üzünü güldürəcək neytral və maraqlı seçimlər.", 
+    ideas: ["Masaüstü Təqvim", "USB Sərinkeş/İsidici", "Rəngli Corablar", "Sukulent (Dibçək gülü)", "Motivasiyalı Bloknot"] 
   },
   { 
     id: 20, 
     tag: "cat_mudir", 
-    title: "Rəhbər (Müdir)", 
+    title: "Liderlik Edən: Rəhbər", 
     // Image: Expensive fountain pen, leather notebook
     img: "https://images.unsplash.com/photo-1518655048521-f130df041f66?auto=format&fit=crop&q=80&w=400", 
-    desc: "Ciddiyyəti sevən, işinə məsuliyyətli rəhbər. Ona keyfiyyətli və kabinetinə yaraşan ağırlıqda hədiyyə lazımdır.", 
-    ideas: ["Dəri Orqanayzer", "Hədiyyəlik Çay", "Kabinet Gülü", "Bankir Lampası", "Kitab-Albom"] 
+    desc: "Ciddiyyəti və tələbkarlığı ilə seçilən lider. Ona hörmətini ifadə edən, kabinetinə ağırlıq gətirəcək statuslu hədiyyələr.", 
+    ideas: ["Vizitka Qabı (Dəri)", "Keyfiyyətli Qələm Dəsti", "Masaüstü Saat", "Elit Şokolad Dəsti", "Kabinet Bitkisi"] 
   }
 ];
 
@@ -4304,34 +4338,64 @@ function renderCards() {
 
 // --- CARD SWIPE ---
 function initCardSwipe(card, product) {
-  let startX = 0, startY = 0, currentX = 0, currentY = 0, isDragging = false;
+  let startX = 0, startY = 0, currentX = 0, currentY = 0;
+  let isDragging = false;
+  let isHorizontal = null; // null = determining, true = swipe, false = scroll
+  
   const likeInd = card.querySelector('.overlay-like');
   const nopeInd = card.querySelector('.overlay-nope');
 
   const onStart = (e) => {
     isDragging = true;
+    isHorizontal = null; // Reset direction check
     startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-    currentX = 0; currentY = 0;
+    currentX = 0; 
+    currentY = 0;
     card.style.transition = 'none';
     addDocumentListeners();
   };
 
   const onMove = (e) => {
     if (!isDragging) return;
+    
     const x = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     const y = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
-    currentX = x - startX; currentY = y - startY;
+    
+    const dx = x - startX;
+    const dy = y - startY;
 
-    if (Math.abs(currentX) > Math.abs(currentY)) {
-        if(e.cancelable && e.type === 'touchmove') e.preventDefault(); 
-        card.style.transform = `translate(${currentX}px, ${currentY / 5}px) rotate(${currentX / 15}deg)`;
-        const opacity = Math.min(1, Math.abs(currentX) / 80);
+    // 1. DIRECTION LOCKING LOGIC
+    if (isHorizontal === null) {
+        // If moved less than 10px, don't decide yet
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+
+        // Decide direction
+        isHorizontal = Math.abs(dx) > Math.abs(dy);
+        
+        // If vertical, cancel dragging immediately to let browser scroll
+        if (!isHorizontal) {
+            isDragging = false;
+            return; 
+        }
+    }
+
+    // 2. If we are locked to Horizontal, perform swipe
+    if (isHorizontal) {
+        if(e.cancelable) e.preventDefault(); // Stop browser back/forward gestures
+        
+        currentX = dx;
+        currentY = dy; // We allow slight Y movement for visual effect
+
+        card.style.transform = `translate(${currentX}px, ${currentY / 5}px) rotate(${currentX / 20}deg)`;
+        
+        const opacity = Math.min(1, Math.abs(currentX) / 100);
+        
         if (currentX > 0) { 
-            if(likeInd) { likeInd.style.opacity = opacity; likeInd.style.transform = `translateY(-50%) scale(${0.5 + (opacity * 0.5)})`; }
+            if(likeInd) { likeInd.style.opacity = opacity; }
             if(nopeInd) nopeInd.style.opacity = 0; 
         } else { 
-            if(nopeInd) { nopeInd.style.opacity = opacity; nopeInd.style.transform = `translateY(-50%) scale(${0.5 + (opacity * 0.5)})`; }
+            if(nopeInd) { nopeInd.style.opacity = opacity; }
             if(likeInd) likeInd.style.opacity = 0; 
         }
     }
@@ -4341,70 +4405,88 @@ function initCardSwipe(card, product) {
     if (!isDragging) return;
     isDragging = false;
     removeDocumentListeners();
+    
     if(likeInd) likeInd.style.opacity = 0;
     if(nopeInd) nopeInd.style.opacity = 0;
 
-    if (Math.abs(currentX) < 10 && Math.abs(currentY) < 10) { 
-      openModal(product, state.cardStack, state.cardStack.indexOf(product));
-      // LOG: Clicked Card
-      logUserAction("CardClick", product.name);
-      resetCard(); return; 
-    }
-
-    if (Math.abs(currentX) > 100) {
-     trackInteraction(); // <--- ADD THIS
-      const dir = currentX > 0 ? 1 : -1;
-      card.style.transition = 'transform 0.4s ease';
-      card.style.transform = `translate(${dir * window.innerWidth * 1.5}px, 0px) rotate(${dir * 30}deg)`;
-      
-      // LOG: Swiped Card
-      const action = dir === 1 ? "SwipeRight (Like)" : "SwipeLeft (Nope)";
-      logUserAction(action, product.name);
-
-      // Inside initCardSwipe -> onEnd function
-      setTimeout(() => {
-        card.innerHTML = ''; // Clear content first to free memory immediately
-        card.remove();        // Then remove the element
-        state.cardStack.shift();
-        
-        // --- NEW FAVORITES LOGIC ---
-     // --- UPDATED SWIPE RIGHT LOGIC ---
-        if (dir === 1) {
-             // Simply push the product. 
-             // We removed the ".some()" check so it doesn't block items with similar names.
-             state.likedProducts.push(product);
-             localStorage.setItem('brendimo_likes', JSON.stringify(state.likedProducts));
-            
-             renderCards(); // Show next card
-        } else {
-             renderCards(); // Swipe Left (Nope)
-        }
-        // --- END NEW LOGIC ---
-
-      }, 300);
+    // Threshold to trigger action
+    if (Math.abs(currentX) > 100) { 
+       const dir = currentX > 0 ? 1 : -1;
+       card.style.transition = 'transform 0.4s ease';
+       card.style.transform = `translate(${dir * window.innerWidth * 1.5}px, 50px) rotate(${dir * 30}deg)`;
+       
+       // Action
+       setTimeout(() => {
+         card.remove();
+         state.cardStack.shift();
+         
+         // Logic for Like/Nope
+         if (dir === 1) {
+             addToFavorites(product);
+             renderCards();
+         } else {
+             renderCards();
+         }
+       }, 300);
     } else {
-      resetCard();
+       // Snap back
+       card.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
+       card.style.transform = 'translate(0px, 0px) rotate(0deg)';
     }
+    
+    currentX = 0; 
+    currentY = 0;
   };
 
-  function resetCard() { card.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)'; card.style.transform = 'translate(0px, 0px) rotate(0deg)'; currentX = 0; currentY = 0; }
-  function addDocumentListeners() { document.addEventListener('mousemove', onMove); document.addEventListener('mouseup', onEnd); document.addEventListener('touchmove', onMove, {passive: false}); document.addEventListener('touchend', onEnd); }
-  function removeDocumentListeners() { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onEnd); document.removeEventListener('touchmove', onMove); document.removeEventListener('touchend', onEnd); }
+  function addDocumentListeners() { 
+      document.addEventListener('mousemove', onMove); 
+      document.addEventListener('mouseup', onEnd); 
+      document.addEventListener('touchmove', onMove, {passive: false}); 
+      document.addEventListener('touchend', onEnd); 
+  }
+  function removeDocumentListeners() { 
+      document.removeEventListener('mousemove', onMove); 
+      document.removeEventListener('mouseup', onEnd); 
+      document.removeEventListener('touchmove', onMove); 
+      document.removeEventListener('touchend', onEnd); 
+  }
 
   card.addEventListener('mousedown', onStart); 
-  card.addEventListener('touchstart', onStart, {passive: false}); 
+  card.addEventListener('touchstart', onStart, {passive: true}); 
 }
 
 // --- GLOBAL BACK SWIPE ---
 function initGlobalSwipe() {
     let startX = 0;
-    document.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, {passive: true});
+    let startY = 0;
+
+    document.addEventListener('touchstart', (e) => { 
+        startX = e.touches[0].clientX; 
+        startY = e.touches[0].clientY;
+    }, {passive: true});
+
     document.addEventListener('touchend', (e) => {
         const endX = e.changedTouches[0].clientX;
-        if (startX < 30 && (endX - startX > 100)) {
+        const endY = e.changedTouches[0].clientY;
+        
+        const diffX = endX - startX;
+        const diffY = endY - startY;
+
+        // Only trigger Back Swipe if:
+        // 1. Started from LEFT edge (0-30px)
+        // 2. Moved Right (> 80px)
+        // 3. Movement was mostly Horizontal (not scrolling down)
+        if (startX < 30 && diffX > 80 && Math.abs(diffX) > Math.abs(diffY)) {
             const modal = document.querySelector('.modal.active');
-            if (modal) { if(modal.id === 'product-modal') closeModal(); else closeAboutModal(); } 
-            else { goBack(); }
+            if (modal) { 
+                if(modal.id === 'product-modal') closeModal(); 
+                else if (modal.id === 'about-modal') closeAboutModal();
+                else if (modal.id === 'category-modal') closeCategoryModal();
+                else if (modal.id === 'zodiac-modal') closeZodiacModal();
+            } else { 
+                // Only go back in wizard if no modal is open
+                goBack(); 
+            }
         }
     }, {passive: true});
 }
