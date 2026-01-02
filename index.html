@@ -16,7 +16,8 @@
 /* RESET & BASE */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent; }
 body { 
-  background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; display: flex; flex-direction: column; 
+  background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100dvh; height: -webkit-fill-available;
+ display: flex; flex-direction: column; 
   /* Padding for Bottom Nav */
   padding-bottom: 70px; 
   overscroll-behavior-y: none; /* Prevent pull-to-refresh */
@@ -26,8 +27,8 @@ body {
 .wizard-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Full viewport height */
-  width: 100%;
+ height: 100dvh; 
+  height: -webkit-fill-available;  width: 100%;
   max-width: 440px;
   margin: 0 auto;
   padding: 15px 20px 80px 20px; /* Bottom padding for nav */
@@ -325,14 +326,22 @@ body {
 /* Update #cards-wrapper */
 #cards-wrapper { 
   position: relative; 
-  flex: 1; /* Fills remaining space */
   width: 100%; 
   margin-top: 20px; 
+  height: 60vh; /* EKRANIN 60%-ni TUTSUN */
+  min-height: 400px; /* Minimum hündürlük */
   perspective: 1000px; 
-  touch-action: none; /* Disables browser scroll on the cards */
+  touch-action: none; 
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Əlavə olaraq step-results konteynerini də düzəldin */
+#step-results {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Update .card */
@@ -554,7 +563,7 @@ body {
 .notif-desc { font-size: 13px; font-weight: 700; color: #333; }
 
 /* MODAL & REVIEWS (INSTAGRAM STYLE) */
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 200; display: none; padding-bottom: 0; }
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 300; display: none; padding-bottom: 0; }
 .modal.active { display: block; animation: slideUp 0.3s ease; }
 .modal-content-scroll { height: 100%; overflow-y: auto; padding: 20px 20px 100px 20px; overscroll-behavior-y: contain; }
 
@@ -594,6 +603,8 @@ body {
   padding-bottom: 90px; /* Space for bottom nav */
   display: none; 
   overscroll-behavior-y: contain; /* Prevents pulling the whole page down */
+  padding-bottom: 80px !important; /* Artırıldı */
+
 }
 .all-products-view.active { display: block; animation: slideUp 0.3s ease; }
 .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 40px; }
@@ -2952,13 +2963,13 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 
     <div class="values-grid" style="position: relative; z-index: 2; padding: 0 20px;">
         
-        <div class="value-card" onclick="triggerValueAction(this, 'Güvən', 'Bütün məhsullarımız 100% orijinaldır və zəmanətlidir.')" style="box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+        <div class="value-card" onclick="triggerValueAction(this, 'Güvən', 'Bütün məhsullarımız 100% yoxlanılır və zəmanətlidir.')" style="box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
             <div class="v-icon-box" style="background: #e0f2fe; color: #0284c7;">
                 🛡️
             </div>
             <div class="v-content">
                 <h3>Tam Güvən</h3>
-                <p>100% Orijinal</p>
+                <p>100% Seçilmiş Məhsullar</p>
             </div>
         </div>
 
@@ -3184,14 +3195,16 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 </div>
 
 <nav class="bottom-nav">
+
+    <div class="nav-item active" onclick="handleNavClick('mall')" id="nav-mall">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 15H5V8h14v10z"/></svg>
+    <span class="nav-text">SehrMall</span>
+  </div>
   <div class="nav-item" onclick="handleNavClick('wizard')" id="nav-wizard">
     <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5 9.5 9.75 12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/></svg>
     <span class="nav-text">Sehrbaz</span>
   </div>
-  <div class="nav-item active" onclick="handleNavClick('mall')" id="nav-mall">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 15H5V8h14v10z"/></svg>
-    <span class="nav-text">SehrMall</span>
-  </div>
+
   <div class="nav-item" onclick="handleNavClick('chat')" id="nav-chat">
     <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
     <span class="nav-text">SehrChat</span>
@@ -3242,6 +3255,7 @@ const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzMLzwp2qpBlUT1
 const WHATSAPP_NUMBER = "994556742535";
 
 // --- STATE ---
+let notifInterval = null;
 let currentStep = 0;
 const totalSteps = 5;
 // --- STATE (UPDATED) ---
@@ -3276,9 +3290,10 @@ let deviceName = getDeviceType();
 
 // --- INITIALIZATION ---
 function init() {
-    initStories();
+  initStories();
     preloadStories(); 
     fetchIP(); 
+  initCategories();
     initGlobalSwipe(); 
     initNotificationSwipe(); 
     initModalSwipe();
@@ -3286,8 +3301,6 @@ function init() {
     handleNavClick('mall');
     
     // ADD THIS LINE:
-    initBannerSlider(); 
-initCategories();
   initFeaturedReviews();
   initZodiac();
     updateUI();
@@ -4019,6 +4032,14 @@ function openCategoryModal(id) {
 
 function closeCategoryModal() {
     document.getElementById('category-modal').classList.remove('active');
+    
+    // Reset styles after a short delay for smooth transition
+    setTimeout(() => {
+        const header = document.querySelector('.cat-modal-header');
+        if(header) header.className = 'cat-modal-header'; // Reset classes
+        const ideaBox = document.querySelector('.idea-box');
+        if(ideaBox) ideaBox.style.display = 'block'; // Show ideas again
+    }, 300);
 }
   // --- BANNER SLIDER LOGIC ---
 function initBannerSlider() {
@@ -4124,6 +4145,9 @@ function updateUI() {
 function goBack() { 
     if (currentStep > 0) { 
         currentStep--; 
+        // Skip the loading step if we are coming back from results
+        if (currentStep === totalSteps) currentStep--; 
+        
         logUserAction("Nav", "Back Button");
         updateUI(); 
     } 
@@ -4157,7 +4181,9 @@ function handleOptionClick(e, key) {
 }
 
 // --- NEW HELPER: CENTRAL FAVORITE LOGIC ---
-function addToFavorites(product) {
+
+  
+  function addToFavorites(product) {
     // 1. Check if it already exists to prevent duplicates
     const exists = state.likedProducts.some(p => p.name === product.name);
      
@@ -4170,8 +4196,9 @@ function addToFavorites(product) {
             console.log("Saving not supported in DM");
         }
     }
+  }
 
-    }
+
 
 function removeFromFavoritesGlobal(productName) {
     const index = state.likedProducts.findIndex(p => p.name === productName);
@@ -4256,19 +4283,41 @@ function applyBadges(products) {
 }
 
 function processMatches() {
+  // 1. Əsas namizədləri qarışdırırıq
   let candidates = shuffleArray([...state.products]);
-  if (state.who) candidates = candidates.filter(p => match(p.target, state.who));
+  
+  // 2. İLK FİLTR: Yalnız "KİM" (Xanım/Bəy) uyğunluğunu yoxlayırıq.
+  // Əgər bazada "target" sütunu boşdursa, hamısına uyğun saysın.
+  let filtered = candidates.filter(p => !p.target || match(p.target, state.who));
 
-  state.cardStack = candidates.map(p => {
+  // EHTİYAT PLAN: Əgər filtrdən sonra heç nə qalmadısa (0 məhsul), 
+  // o zaman bütün məhsulları geri qaytar (boş ekrandansa, qarışıq məhsul daha yaxşıdır)
+  if (filtered.length === 0) {
+      console.log("Filtr nəticəsiz qaldı, bütün məhsullar göstərilir.");
+      filtered = candidates;
+  }
+
+  // 3. XAL SİSTEMİ (Score Logic)
+  state.cardStack = filtered.map(p => {
     let score = 0;
+    // Kim (Who) uyğundursa +50 xal
     if (match(p.target, state.who)) score += 50; 
+    
+    // Özəl gün (Occasion) uyğundursa +20
     if (match(p.occasion, state.occasion)) score += 20;
+    
+    // Mood/Tip uyğundursa +15
     if (match(p.mood, state.mood)) score += 15;
+    
+    // Stil (Style) uyğundursa +15
     if (match(p.style, state.style)) score += 15;
+    
+    // Büdcəyə uyğun deyilsə -40 xal çıxırıq (amma siyahıdan silmirik!)
     if (!checkBudget(p.price, state.budget)) score -= 40;
+    
     p.score = Math.min(100, Math.max(0, score));
     return p;
-  }).sort((a, b) => b.score - a.score);
+  }).sort((a, b) => b.score - a.score); // Ən yüksək xallıar üstdə
 }
 
 function match(dbField, userSelect) {
@@ -4772,7 +4821,9 @@ function toggleFaq(element) {
 // --- ORDER NOTIFICATIONS ---
 function startOrderNotifications() {
     if (state.orders.length === 0) return;
-    setInterval(() => {
+      if (notifInterval) clearInterval(notifInterval);
+
+    notifInterval = setInterval(() => {
         const order = state.orders[Math.floor(Math.random() * state.orders.length)];
         const phone = order.phone || "555555555";
         const maskedPhone = `*******${phone.slice(-2)}`;
@@ -4789,9 +4840,11 @@ function startOrderNotifications() {
 const CACHE_DURATION = 1000 * 60 * 60; 
 
 async function openAllProducts() {
-  document.getElementById('all-products-view').classList.add('active');
-  logUserAction('ViewAllProducts', 'Mall Tab'); 
-
+document.getElementById('all-products-view').classList.add('active');
+  logUserAction('ViewAllProducts', 'Mall Tab');
+  if (state.products.length === 0) {
+      document.getElementById('best-container').innerHTML = `<div style="padding:20px; text-align:center;">Sehrbaz məhsulları gətirir... 🪄</div>`;
+  }
   // --- 1. TURBO MODE: Check Local Cache ---
   const cachedRaw = localStorage.getItem('brendimo_cache_raw');
   const cachedTime = localStorage.getItem('brendimo_cache_time');
@@ -5045,15 +5098,22 @@ function startFlashTimer() {
     flashInterval = setInterval(update, 1000);
 }
 
+// KÖHNƏ KOD:
+// const pIndex = state.products.indexOf(p);
+// html += `<div class="prod-card" onclick="openModal(state.products[${pIndex}], state.products, ${pIndex})">...`
+
+// YENİ DÜZƏLİŞ:
 function renderSectionCards(container, list, badgeTxt, badgeCls) {
     let html = "";
-    list.forEach(p => {
-        // We need to pass the object correctly to onClick. 
-        // We use state.products index to keep it simple and compatible with OpenModal logic
+    // 'list' burada artıq filtr olunmuş siyahıdır (məs: under60)
+    list.forEach((p, localIndex) => {
+        // Məhsulun qlobal siyahıdakı yerini tapırıq (bəyənmə funksiyası üçün lazımdır)
         const pIndex = state.products.indexOf(p);
         
+        // DİQQƏT: openModal-a 'list' (filtr olunmuş siyahı) və 'localIndex' ötürürük
+        // Amma məhsulun özünü referans kimi state.products-dan götürmək daha təhlükəsizdir
         html += `
-        <div class="prod-card" onclick="openModal(state.products[${pIndex}], state.products, ${pIndex})">
+        <div class="prod-card" onclick="openModal(state.products[${pIndex}], renderCardSource_${container.id}, ${localIndex})">
             <div class="pc-img-box">
                <img src="${fixImageLink(p.image)}" class="pc-img" loading="lazy">
                <div class="badge-overlay ${badgeCls}">${badgeTxt}</div>
@@ -5067,6 +5127,11 @@ function renderSectionCards(container, list, badgeTxt, badgeCls) {
             </div>
         </div>`;
     });
+    
+    // Qlobal bir dəyişənə bu siyahını müvəqqəti yazırıq ki, HTML string içindən əlçatan olsun
+    // Bu 'dirty hack'dir amma string injection üçün ən asan yoldur.
+    window[`renderCardSource_${container.id}`] = list;
+    
     container.innerHTML = html;
 }
 
@@ -5193,7 +5258,7 @@ function redirectToWhatsApp(p) {
   // 1. We remove the setTimeout (Instagram hates delays)
   // 2. We use window.location.href (Forces navigation in the same tab)
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-window.top.location.href = url; // Forces the main window to change
+window.location.href = url;
 }
 
 function initTracking() { logUserAction('AppOpen'); }
@@ -5227,6 +5292,9 @@ function handleNavClick(tab) {
   } 
   else if (tab === 'mall') {
     openAllProducts();
+     initBannerSlider(); 
+            setTimeout(() => initBannerSlider(), 100); 
+
     const closeBtn = document.getElementById('all-products-close');
     if(closeBtn) closeBtn.style.display = 'none';
   } 
