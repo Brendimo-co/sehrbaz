@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lacoste | Warranty Policy</title>
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --lacoste-green: #004526;
+            --lacoste-white: #FFFFFF;
+            --lacoste-black: #1f1f1f;
+            --lacoste-gray: #f4f4f4;
+            --border-color: #e5e5e5;
+            --text-secondary: #555;
+            --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--lacoste-gray);
+            /* Subtle Pique Knit Pattern Effect */
+            background-image: radial-gradient(#e0e0e0 10%, transparent 11%), radial-gradient(#e0e0e0 10%, transparent 11%);
+            background-size: 6px 6px;
+            background-position: 0 0, 3px 3px;
+            color: var(--lacoste-black);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- HEADER & NAVIGATION --- */
+        header {
+            background: var(--lacoste-white);
+            height: 90px; /* Slightly taller for better spacing */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-bottom: 4px solid var(--lacoste-green);
+        }
+
+        .logo-container {
+            width: 250px; /* Increased width to prevent cutting off */
+            height: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-svg {
+            fill: var(--lacoste-green);
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: var(--lacoste-white);
+            padding: 60px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1 {
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: 800; /* Bolder for official look */
+            color: var(--lacoste-black);
+        }
+
+        h2 {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            color: var(--lacoste-green);
+        }
+
+        p {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #333;
+            text-align: justify;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 20px;
+        }
+
+        li {
+            font-size: 14px;
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        li::before {
+            content: "▪";
+            color: var(--lacoste-green);
+            position: absolute;
+            left: 0;
+            font-size: 18px;
+            line-height: 14px;
+        }
+
+        strong {
+            font-weight: 700;
+            color: var(--lacoste-black);
+        }
+
+        /* --- LANGUAGE TABS --- */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 15px 30px;
+            font-family: var(--font-main);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: var(--lacoste-green);
+        }
+
+        .tab-btn.active {
+            color: var(--lacoste-green);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--lacoste-green);
+        }
+
+        /* --- CONTENT VISIBILITY --- */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-secondary);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+            header {
+                height: 70px;
+            }
+            .logo-container {
+                width: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 300 60" xmlns="http://www.w3.org/2000/svg">
+               <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="42" letter-spacing="6">LACOSTE</text>
+            </svg>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Warranty Policy</h1>
+        <h2>Terms & Conditions</h2>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchLang('en')">English</button>
+            <button class="tab-btn" onclick="switchLang('az')">Azərbaycan</button>
+        </div>
+
+        <div id="content-en" class="content-section active">
+            <h3>Limited 3-Year Warranty Policy</h3>
+            
+            <p><strong>1. Coverage Scope:</strong><br>
+            This warranty covers solely manufacturing defects in materials and workmanship for a period of three (3) years from the date of purchase. It does not cover the natural lifespan of the product.</p>
+
+            <p><strong>2. Strict Exclusions (Not Covered):</strong><br>
+            To minimize validity risks, the following are strictly excluded from coverage:</p>
+            <ul>
+                <li><strong>Wear and Tear:</strong> Natural fading of color, pilling of fabric, thinning of soles, creasing of leather, or shape distortion due to regular use.</li>
+                <li><strong>Improper Care:</strong> Damage caused by failure to follow the specific washing/cleaning instructions on the internal label (e.g., shrinkage, color bleeding, bleach damage).</li>
+                <li><strong>Physical Damage:</strong> Tears, burns, scratches, accidental stains, or damage caused by sharp objects or external friction.</li>
+                <li><strong>Alterations:</strong> Any product that has been modified, tailored, or repaired by a third party.</li>
+            </ul>
+
+            <p><strong>3. Claim Process:</strong><br>
+            Warranty claims are subject to a mandatory technical inspection. The company reserves the sole right and discretion to determine if the issue is a manufacturing defect or the result of usage. If the claim is approved, the remedy is limited to repair or replacement of the item. Refunds are not permitted under this warranty policy after the statutory return period.</p>
+        </div>
+
+        <div id="content-az" class="content-section">
+            <h3>Məhdud 3 İllik Zəmanət Şərtləri</h3>
+            
+            <p><strong>1. Zəmanətin Əhatə Dairəsi:</strong><br>
+            Bu zəmanət, satış tarixindən etibarən üç (3) il müddətində yalnız material və istehsal (zavod) qüsurlarına şamil edilir. Zəmanət məhsulun təbii istismar müddətini əhatə etmir.</p>
+
+            <p><strong>2. İstisnalar (Zəmanətə daxil deyil):</strong><br>
+            Aşağıdakı hallar qəti şəkildə zəmanətə daxil edilmir:</p>
+            <ul>
+                <li><strong>Təbii Aşınma:</strong> Rəngin solması, parçanın tiftiklənməsi, dabanların yeyilməsi, dərinin qırışması və ya istifadə nəticəsində yaranan forma itkisi.</li>
+                <li><strong>Yanlış Qulluq:</strong> Daxili etiketdə göstərilən yuma/təmizləmə təlimatlarına əməl edilməməsi nəticəsində yaranan xəsarətlər (məsələn: kiçilmə, rəng qarışması, ağardıcı ləkələri).</li>
+                <li><strong>Mexaniki Zədələr:</strong> Cırılmalar, yanıqlar, cızıqlar, təsadüfi ləkələr və ya kənar sürtünmə nəticəsində yaranan deformasiyalar.</li>
+                <li><strong>Müdaxilə:</strong> Üçüncü tərəf tərəfindən məhsul üzərində hər hansı dəyişiklik, dərzi işləri və ya təmir aparıldıqda zəmanət qüvvədən düşür.</li>
+            </ul>
+
+            <p><strong>3. Müraciət Qaydası:</strong><br>
+            Zəmanət tələbləri məcburi texniki yoxlamadan keçirilməlidir. Şirkət, qüsurun istehsal xətası və ya istifadə nəticəsində yarandığını müəyyən etmək üçün müstəsna hüquqa malikdir. Tələb təsdiqlənərsə, şirkət məhsulu yalnız təmir etmək və ya dəyişdirmək öhdəliyi daşıyır. Qanunla müəyyən edilmiş qaytarma müddəti bitdikdən sonra pulun geri qaytarılması nəzərdə tutulmur.</p>
+        </div>
+
+        <div style="margin-top: 50px; text-align: center;">
+             <svg width="40" height="25" viewBox="0 0 40 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M38.5 8C38.5 8 36.5 7 35 7C33.5 7 32 8 32 8L30 6H25L23 4H18L16 6L12 6L8 9L3 9L1 11L1 14L4 16L9 16L12 14L16 14L20 17L26 17L30 14L35 14L39 11L38.5 8Z" fill="#004526"/>
+            </svg>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Lacoste S.A. All Rights Reserved.</p>
+        <p>Paris • London • Baku • New York</p>
+    </footer>
+
+    <script>
+        function switchLang(lang) {
+            // Hide all contents
+            document.querySelectorAll('.content-section').forEach(div => {
+                div.classList.remove('active');
+            });
+            // Deactivate all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Activate selected
+            document.getElementById('content-' + lang).classList.add('active');
+            
+            // Find the button that was clicked
+            const buttons = document.querySelectorAll('.tab-btn');
+            if(lang === 'en') buttons[0].classList.add('active');
+            if(lang === 'az') buttons[1].classList.add('active');
+        }
+    </script>
+</body>
+</html>
