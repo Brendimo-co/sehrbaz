@@ -16,24 +16,35 @@
 /* RESET & BASE */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent; }
 body { 
-  background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100dvh; height: -webkit-fill-available;
- display: flex; flex-direction: column; 
+  background: #fafafa; color: #1d1d1f; overflow-x: hidden; height: 100vh; display: flex; flex-direction: column; 
   /* Padding for Bottom Nav */
   padding-bottom: 70px; 
   overscroll-behavior-y: none; /* Prevent pull-to-refresh */
 }
 
 /* LAYOUT */
+/* Find this class in your CSS and update it */
 .wizard-wrapper {
   display: flex;
   flex-direction: column;
- height: 100dvh; 
-  height: -webkit-fill-available;  width: 100%;
+  /* Ensure the wrapper fills the screen but allows scrolling */
+  height: 100vh; 
+  height: 100dvh; 
+  width: 100%;
   max-width: 440px;
   margin: 0 auto;
-  padding: 15px 20px 80px 20px; /* Bottom padding for nav */
+  
+  /* CRITICAL FIX: Enable vertical scrolling */
+  overflow-y: auto; 
+  overflow-x: hidden;
+
+  /* Padding to ensure content isn't hidden behind Nav bar */
+  padding: 15px 20px 120px 20px; 
+  
   position: relative;
-  overflow: hidden; /* Prevent double scrollbars */
+  
+  /* Smooth scrolling for iOS */
+  -webkit-overflow-scrolling: touch; 
 }
 
 /* HEADER */
@@ -324,24 +335,19 @@ body {
 
 /* CARDS STACK */
 /* Update #cards-wrapper */
+/* CARDS STACK */
+/* Update #cards-wrapper */
 #cards-wrapper { 
   position: relative; 
+  /* flex: 1;  <-- REMOVE OR IGNORE THIS */
+  height: 60vh; /* <--- ADD THIS! This forces it to take 60% of the screen height */
   width: 100%; 
   margin-top: 20px; 
-  height: 60vh; /* EKRANIN 60%-ni TUTSUN */
-  min-height: 400px; /* Minimum hündürlük */
   perspective: 1000px; 
   touch-action: none; 
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* Əlavə olaraq step-results konteynerini də düzəldin */
-#step-results {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
 }
 
 /* Update .card */
@@ -563,7 +569,17 @@ body {
 .notif-desc { font-size: 13px; font-weight: 700; color: #333; }
 
 /* MODAL & REVIEWS (INSTAGRAM STYLE) */
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 300; display: none; padding-bottom: 0; }
+.modal { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: white; 
+    z-index: 10001; /* CHANGED FROM 200 TO 10001 */
+    display: none; 
+    padding-bottom: 0; 
+}
 .modal.active { display: block; animation: slideUp 0.3s ease; }
 .modal-content-scroll { height: 100%; overflow-y: auto; padding: 20px 20px 100px 20px; overscroll-behavior-y: contain; }
 
@@ -603,8 +619,6 @@ body {
   padding-bottom: 90px; /* Space for bottom nav */
   display: none; 
   overscroll-behavior-y: contain; /* Prevents pulling the whole page down */
-  padding-bottom: 80px !important; /* Artırıldı */
-
 }
 .all-products-view.active { display: block; animation: slideUp 0.3s ease; }
 .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 40px; }
@@ -2233,7 +2247,19 @@ body {
     z-index: 1;
     transform: rotate(-15deg);
 }  
-  
+/* --- FIX OVERLAPPING ISSUE --- */
+/* This forces the header, stories, and progress bar to keep their size 
+   and pushes the steps down, preventing overlap. */
+.header, 
+.stories-wrapper, 
+.progress-container {
+    flex-shrink: 0; 
+}
+
+/* Optional: Add a little more breathing room between stories and the next part */
+.progress-container {
+    margin-top: 10px;
+}  
 </style>
 <script>
 !function(f,b,e,v,n,t,s)
@@ -2371,6 +2397,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
     <h2 class="title" style="font-size: 20px; margin-bottom: 10px;">Onu xoşbəxt edəcək seçimlər ✨</h2>
     <div id="cards-wrapper"></div>
   </div>
+   </div>
   
   <div class="home-footer">
       <div class="about-trigger" onclick="openAboutModal()">
@@ -2963,13 +2990,13 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 
     <div class="values-grid" style="position: relative; z-index: 2; padding: 0 20px;">
         
-        <div class="value-card" onclick="triggerValueAction(this, 'Güvən', 'Bütün məhsullarımız 100% yoxlanılır və zəmanətlidir.')" style="box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+        <div class="value-card" onclick="triggerValueAction(this, 'Güvən', 'Bütün məhsullarımız 100% orijinaldır və zəmanətlidir.')" style="box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
             <div class="v-icon-box" style="background: #e0f2fe; color: #0284c7;">
                 🛡️
             </div>
             <div class="v-content">
                 <h3>Tam Güvən</h3>
-                <p>100% Seçilmiş Məhsullar</p>
+                <p>100% Orijinal</p>
             </div>
         </div>
 
@@ -3195,16 +3222,14 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 </div>
 
 <nav class="bottom-nav">
-
-    <div class="nav-item active" onclick="handleNavClick('mall')" id="nav-mall">
-    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 15H5V8h14v10z"/></svg>
-    <span class="nav-text">SehrMall</span>
-  </div>
   <div class="nav-item" onclick="handleNavClick('wizard')" id="nav-wizard">
     <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5 9.5 9.75 12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/></svg>
     <span class="nav-text">Sehrbaz</span>
   </div>
-
+  <div class="nav-item active" onclick="handleNavClick('mall')" id="nav-mall">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 15H5V8h14v10z"/></svg>
+    <span class="nav-text">SehrMall</span>
+  </div>
   <div class="nav-item" onclick="handleNavClick('chat')" id="nav-chat">
     <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
     <span class="nav-text">SehrChat</span>
@@ -3255,7 +3280,6 @@ const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzMLzwp2qpBlUT1
 const WHATSAPP_NUMBER = "994556742535";
 
 // --- STATE ---
-let notifInterval = null;
 let currentStep = 0;
 const totalSteps = 5;
 // --- STATE (UPDATED) ---
@@ -3290,10 +3314,9 @@ let deviceName = getDeviceType();
 
 // --- INITIALIZATION ---
 function init() {
-  initStories();
+    initStories();
     preloadStories(); 
     fetchIP(); 
-  initCategories();
     initGlobalSwipe(); 
     initNotificationSwipe(); 
     initModalSwipe();
@@ -3301,6 +3324,8 @@ function init() {
     handleNavClick('mall');
     
     // ADD THIS LINE:
+    initBannerSlider(); 
+initCategories();
   initFeaturedReviews();
   initZodiac();
     updateUI();
@@ -4032,14 +4057,6 @@ function openCategoryModal(id) {
 
 function closeCategoryModal() {
     document.getElementById('category-modal').classList.remove('active');
-    
-    // Reset styles after a short delay for smooth transition
-    setTimeout(() => {
-        const header = document.querySelector('.cat-modal-header');
-        if(header) header.className = 'cat-modal-header'; // Reset classes
-        const ideaBox = document.querySelector('.idea-box');
-        if(ideaBox) ideaBox.style.display = 'block'; // Show ideas again
-    }, 300);
 }
   // --- BANNER SLIDER LOGIC ---
 function initBannerSlider() {
@@ -4145,9 +4162,6 @@ function updateUI() {
 function goBack() { 
     if (currentStep > 0) { 
         currentStep--; 
-        // Skip the loading step if we are coming back from results
-        if (currentStep === totalSteps) currentStep--; 
-        
         logUserAction("Nav", "Back Button");
         updateUI(); 
     } 
@@ -4181,24 +4195,23 @@ function handleOptionClick(e, key) {
 }
 
 // --- NEW HELPER: CENTRAL FAVORITE LOGIC ---
-
-  
-  function addToFavorites(product) {
+function addToFavorites(product) {
     // 1. Check if it already exists to prevent duplicates
     const exists = state.likedProducts.some(p => p.name === product.name);
-     
+    
     // 2. If not in list, add it
     if (!exists) {
         state.likedProducts.push(product);
-      try {
+        try {
             localStorage.setItem('brendimo_likes', JSON.stringify(state.likedProducts));
         } catch (e) {
             console.log("Saving not supported in DM");
         }
     }
-  }
+} 
+// The extra } was removed here
 
-
+    
 
 function removeFromFavoritesGlobal(productName) {
     const index = state.likedProducts.findIndex(p => p.name === productName);
@@ -4216,36 +4229,62 @@ function shuffleArray(array) {
   }
   return array;
 }
-
+  
 async function fetchProducts() {
   const statusTextEl = document.getElementById('magic-status-text');
-  const messages = ["Sehrli axtarış işə düşdü... 🪄", "Ona özünü dəyərli hiss etdirəcək... ✨", "Sizin üçün xüsusi Endirim əlavə olunur 🪄", "Və... İdeal seçim tapıldı! 🎯"];
-  let msgIndex = 0;
-  statusTextEl.textContent = messages[0];
+  
+  // 1. 🚀 START FETCHING IMMEDIATELY (Before showing any text)
+  // We fire the request to Google Sheets instantly.
+  const dataPromise = Promise.all([
+    fetch(`${SHEETS_ENDPOINT}?action=getProducts`),
+    fetch(`${SHEETS_ENDPOINT}?action=getOrders`),
+    fetch(`${SHEETS_ENDPOINT}?action=getReviews`)
+  ]).then(async ([prodRes, orderRes, revRes]) => {
+      const prodData = await prodRes.json();
+      const orderData = await orderRes.json();
+      const revData = await revRes.json();
+      return { prodData, orderData, revData };
+  });
 
-  const textInterval = setInterval(() => {
-    msgIndex++;
-    if (msgIndex < messages.length) {
-      statusTextEl.style.animation = 'none';
-      statusTextEl.offsetHeight; 
-      statusTextEl.style.animation = 'textFade 0.5s ease';
-      statusTextEl.textContent = messages[msgIndex];
-    }
-  }, 1200); 
+  // The exact messages you want to show
+  const messages = [
+    "Sehrli axtarış işə düşdü... 🪄",
+    "Ona özünü dəyərli hiss etdirəcək... ✨",
+    "Sizin üçün xüsusi Endirim əlavə olunur 🪄",
+    "Və... İdeal seçim tapıldı! 🎯"
+  ];
+
+  // Helper function to create a pause
+  const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
   try {
-   // Capture the 3rd response as revRes
-const [prodRes, orderRes, revRes] = await Promise.all([ 
-    fetch(`${SHEETS_ENDPOINT}?action=getProducts`), 
-    fetch(`${SHEETS_ENDPOINT}?action=getOrders`), 
-    fetch(`${SHEETS_ENDPOINT}?action=getReviews`) 
-]);
-const prodData = await prodRes.json();
-const orderData = await orderRes.json();
-const revData = await revRes.json(); // Now this works
-    clearInterval(textInterval);
+    // 2. PLAY ANIMATIONS (While data is loading in background)
+    // We reduced the time from 1200ms to 500ms for a snappier feel.
+    
+    // Message 1
+    statusTextEl.textContent = messages[0];
+    await wait(1200); 
 
-    let rawProducts = shuffleArray(prodData.products || []);
+    // Message 2
+    statusTextEl.textContent = messages[1];
+    statusTextEl.style.animation = 'none'; statusTextEl.offsetHeight; statusTextEl.style.animation = 'textFade 0.3s ease';
+    await wait(1200);
+
+    // Message 3
+    statusTextEl.textContent = messages[2];
+    statusTextEl.style.animation = 'none'; statusTextEl.offsetHeight; statusTextEl.style.animation = 'textFade 0.3s ease';
+    await wait(1200); 
+
+    // Message 4
+    statusTextEl.textContent = messages[3];
+    statusTextEl.style.animation = 'none'; statusTextEl.offsetHeight; statusTextEl.style.animation = 'textFade 0.3s ease';
+    
+    // 3. WAIT FOR DATA 
+    // If internet is fast, data is already ready. If slow, we wait here.
+    const data = await dataPromise;
+
+    // 4. PROCESS DATA
+    let rawProducts = shuffleArray(data.prodData.products || []);
     state.products = rawProducts.map(p => {
         const randomDisc = Math.floor(Math.random() * (35 - 20 + 1)) + 20; 
         const oldPriceVal = (parseFloat(p.price) / (1 - (randomDisc / 100))).toFixed(0);
@@ -4254,23 +4293,25 @@ const revData = await revRes.json(); // Now this works
         return { ...p, discountPercent: randomDisc, oldPrice: oldPriceVal, isLowStock: isStockLow, stockCount: stockCount };
     });
 
-    state.orders = orderData.orders || [];
+    state.orders = data.orderData.orders || [];
+    // state.reviews = data.revData.reviews || []; 
+
     applyBadges(state.products);
     processMatches();
+    
+    // 5. TRANSITION TO RESULTS
     currentStep++;
     updateUI();
     renderCards();
-     
-    // Start notifications INSIDE the try block
+    
     startOrderNotifications(); 
 
     // Show popup 2 seconds later
     setTimeout(() => {
-          showCustomPopup('popup-welcome');
+        showCustomPopup('popup-welcome');
     }, 2000); 
 
   } catch (error) {
-    clearInterval(textInterval);
     console.error(error);
     document.getElementById('step-loading').innerHTML = "<p>Xəta baş verdi. Zəhmət olmasa yeniləyin.</p>";
   }
@@ -4283,41 +4324,19 @@ function applyBadges(products) {
 }
 
 function processMatches() {
-  // 1. Əsas namizədləri qarışdırırıq
   let candidates = shuffleArray([...state.products]);
-  
-  // 2. İLK FİLTR: Yalnız "KİM" (Xanım/Bəy) uyğunluğunu yoxlayırıq.
-  // Əgər bazada "target" sütunu boşdursa, hamısına uyğun saysın.
-  let filtered = candidates.filter(p => !p.target || match(p.target, state.who));
+  if (state.who) candidates = candidates.filter(p => match(p.target, state.who));
 
-  // EHTİYAT PLAN: Əgər filtrdən sonra heç nə qalmadısa (0 məhsul), 
-  // o zaman bütün məhsulları geri qaytar (boş ekrandansa, qarışıq məhsul daha yaxşıdır)
-  if (filtered.length === 0) {
-      console.log("Filtr nəticəsiz qaldı, bütün məhsullar göstərilir.");
-      filtered = candidates;
-  }
-
-  // 3. XAL SİSTEMİ (Score Logic)
-  state.cardStack = filtered.map(p => {
+  state.cardStack = candidates.map(p => {
     let score = 0;
-    // Kim (Who) uyğundursa +50 xal
     if (match(p.target, state.who)) score += 50; 
-    
-    // Özəl gün (Occasion) uyğundursa +20
     if (match(p.occasion, state.occasion)) score += 20;
-    
-    // Mood/Tip uyğundursa +15
     if (match(p.mood, state.mood)) score += 15;
-    
-    // Stil (Style) uyğundursa +15
     if (match(p.style, state.style)) score += 15;
-    
-    // Büdcəyə uyğun deyilsə -40 xal çıxırıq (amma siyahıdan silmirik!)
     if (!checkBudget(p.price, state.budget)) score -= 40;
-    
     p.score = Math.min(100, Math.max(0, score));
     return p;
-  }).sort((a, b) => b.score - a.score); // Ən yüksək xallıar üstdə
+  }).sort((a, b) => b.score - a.score);
 }
 
 function match(dbField, userSelect) {
@@ -4339,23 +4358,40 @@ function checkBudget(price, budgetStr) {
 function renderCards() {
   const container = document.getElementById('cards-wrapper');
   container.innerHTML = '';
+
+  // Handle empty state
   if (state.cardStack.length === 0) {
     container.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#888;"><p>Başqa seçim qalmadı.</p><button onclick="restartApp()" style="margin-top:10px; padding:10px 20px; background:#333; color:white; border:none; border-radius:8px;">Yenidən Başla</button></div>';
     return;
   }
+
+  // Render top 3 cards
   state.cardStack.slice(0, 3).forEach((p, index) => {
     const card = document.createElement('div');
     card.className = 'card';
+    
+    // 3D Stacking Effect
     const scale = 1 - (index * 0.05);
     const translateY = index * 20;
     card.style.zIndex = state.cardStack.length - index;
     card.style.transform = `translateY(${translateY}px) scale(${scale})`;
+    
+    // Opacity for background cards
     if (index !== 0) card.style.opacity = '0.5';
     else card.style.boxShadow = "0 20px 50px -12px rgba(0,0,0,0.15)";
 
+    // Badges HTML
     let badgesHtml = `<div class="match-badge">${p.score}% Uyğunluq</div>`;
     if (p.isBestSeller) badgesHtml += `<div class="badge-bestseller">🏆 Best Seller</div>`;
     if (p.isLowStock) badgesHtml += `<div class="badge-lowstock-fixed">⚠️ ${p.stockCount} ədəd qaldı</div>`;
+
+    // --- THE FIX: ADD CLICK LISTENER HERE ---
+    card.onclick = (e) => {
+        // Prevent opening if the user is swiping (basic check)
+        // Since only the top card (index 0) is interactive, we open that
+        openModal(p, state.cardStack, index); 
+    };
+    // ----------------------------------------
 
     card.innerHTML = `
       <div class="card-image-box">
@@ -4380,7 +4416,10 @@ function renderCards() {
           </div>
         </div>
       </div>`;
+
+    // Only init swipe for the top card
     if (index === 0) initCardSwipe(card, p);
+    
     container.appendChild(card);
   });
 }
@@ -4567,74 +4606,75 @@ function showPrevModalProduct() { if (currentModalIndex > 0) { openModal(current
 
 
 function openModal(p, sourceList = [], index = -1) {
- trackInteraction(); // <--- ADD THIS AT THE TOP
-  state.viewedProductCount++;
-  if (state.viewedProductCount >= 3) activateGlobalDiscount();
+    // SAFETY CHECK: If product 'p' is missing, stop to prevent crash
+    if (!p) {
+        console.error("Məhsul tapılmadı! (Product is undefined)");
+        return;
+    }
 
-  currentModalSource = sourceList.length ? sourceList : state.products;
-  currentModalIndex = index !== -1 ? index : currentModalSource.indexOf(p);
+    // Ensure trackInteraction exists before calling
+    if (typeof trackInteraction === 'function') trackInteraction();
 
-  document.getElementById('modal-img').src = fixImageLink(p.image);
-  document.getElementById('modal-title').textContent = p.name || "Premium Eksklüziv";
-  document.getElementById('modal-match-score').textContent = (p.score || "90") + "% UYĞUNLUQ";
+    state.viewedProductCount++;
+    if (state.viewedProductCount >= 3) activateGlobalDiscount();
 
-  // --- LIKE BUTTON LOGIC STARTS ---
-// --- LIKE BUTTON LOGIC STARTS (FIXED) ---
-  const imgWrapper = document.querySelector('.modal-image-wrapper');
-  
-  // 1. Remove old button to prevent duplicates
-  const oldBtn = imgWrapper.querySelector('.modal-like-btn');
-  if(oldBtn) oldBtn.remove();
+    currentModalSource = sourceList.length ? sourceList : state.products;
+    currentModalIndex = index !== -1 ? index : currentModalSource.indexOf(p);
 
-  // 2. Check current state
-  const isLiked = state.likedProducts.some(item => item.name === p.name);
+    // Fill Data
+    const imgEl = document.getElementById('modal-img');
+    if(imgEl) imgEl.src = fixImageLink(p.image);
+    
+    document.getElementById('modal-title').textContent = p.name || "Məhsul";
+    document.getElementById('modal-match-score').textContent = (p.score || "90") + "% UYĞUNLUQ";
 
-  // 3. Create the button
-  const btn = document.createElement('div');
-  btn.className = `modal-like-btn ${isLiked ? 'liked' : ''}`; 
-  // We use a specific heart symbol that responds better to CSS colors than the standard emoji
-  btn.innerHTML = '❤'; 
-  
-  // 4. Robust Click Handler
-  btn.onclick = (e) => {
-      e.stopPropagation(); // Stop modal from closing or swiping
-      e.preventDefault();  // Stop ghost clicks on mobile
+    // --- LIKE BUTTON LOGIC ---
+    const imgWrapper = document.querySelector('.modal-image-wrapper');
+    const oldBtn = imgWrapper.querySelector('.modal-like-btn');
+    if(oldBtn) oldBtn.remove();
 
-      // Check fresh state (in case it changed since modal opened)
-      const currentlyLiked = state.likedProducts.some(item => item.name === p.name);
+    const isLiked = state.likedProducts.some(item => item.name === p.name);
+    const btn = document.createElement('div');
+    btn.className = `modal-like-btn ${isLiked ? 'liked' : ''}`; 
+    btn.innerHTML = '❤'; 
+    
+    btn.onclick = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const currentlyLiked = state.likedProducts.some(item => item.name === p.name);
+        if (currentlyLiked) {
+            removeFromFavoritesGlobal(p.name);
+            btn.classList.remove('liked');
+        } else {
+            addToFavorites(p);
+            btn.classList.add('liked');
+            if (navigator.vibrate) navigator.vibrate(50);
+        }
+    };
+    imgWrapper.appendChild(btn);
+    // --- END LIKE LOGIC ---
 
-      if (currentlyLiked) {
-          // Remove
-          removeFromFavoritesGlobal(p.name);
-          btn.classList.remove('liked');
-      } else {
-          // Add
-          addToFavorites(p);
-          btn.classList.add('liked');
-          
-          // Tiny vibration for feedback (Android only usually)
-          if (navigator.vibrate) navigator.vibrate(50);
-      }
-  };
-  
-  imgWrapper.appendChild(btn);
-  // --- LIKE BUTTON LOGIC ENDS ---
-  // --- LIKE BUTTON LOGIC ENDS ---
+    document.getElementById('modal-price').innerHTML = `
+        <span style="text-decoration:line-through;color:#999;font-size:18px;margin-right:10px;">${p.oldPrice}₼</span>
+        <span style="color:#c21a1a;font-weight:800;font-size:26px;">${p.price} AZN</span>
+        <span class="discount-badge-small" style="font-size:14px; padding:4px 8px; vertical-align:middle;">-${p.discountPercent}%</span>
+    `;
+    
+    const descEl = document.getElementById('modal-desc');
+    if(descEl) descEl.textContent = p.description || "Məlumat yoxdur.";
 
-  document.getElementById('modal-price').innerHTML = `
-    <span style="text-decoration:line-through;color:#999;font-size:18px;margin-right:10px;">${p.oldPrice}₼</span>
-    <span style="color:#c21a1a;font-weight:800;font-size:26px;">${p.price} AZN</span>
-    <span class="discount-badge-small" style="font-size:14px; padding:4px 8px; vertical-align:middle;">-${p.discountPercent}%</span>
-  `;
-  document.getElementById('modal-desc').textContent = p.description;
-  
-  if(state.viewedProductCount >= 3) { document.getElementById('fear-bar-modal').style.display = 'block'; }
-  
-  fetchReviews(p.name);
-  document.getElementById('modal-whatsapp-btn').onclick = () => redirectToWhatsApp(p);
-  document.getElementById('product-modal').classList.add('active');
-  
-  initModalSwipe(); 
+    if(state.viewedProductCount >= 3) { 
+        const fearBar = document.getElementById('fear-bar-modal');
+        if(fearBar) fearBar.style.display = 'block'; 
+    }
+
+    fetchReviews(p.name);
+    
+    const waBtn = document.getElementById('modal-whatsapp-btn');
+    if(waBtn) waBtn.onclick = () => redirectToWhatsApp(p);
+
+    document.getElementById('product-modal').classList.add('active');
+    initModalSwipe(); 
 }
 
 // HELPER FUNCTION: Handles the click on the heart
@@ -4821,9 +4861,7 @@ function toggleFaq(element) {
 // --- ORDER NOTIFICATIONS ---
 function startOrderNotifications() {
     if (state.orders.length === 0) return;
-      if (notifInterval) clearInterval(notifInterval);
-
-    notifInterval = setInterval(() => {
+    setInterval(() => {
         const order = state.orders[Math.floor(Math.random() * state.orders.length)];
         const phone = order.phone || "555555555";
         const maskedPhone = `*******${phone.slice(-2)}`;
@@ -4840,11 +4878,9 @@ function startOrderNotifications() {
 const CACHE_DURATION = 1000 * 60 * 60; 
 
 async function openAllProducts() {
-document.getElementById('all-products-view').classList.add('active');
-  logUserAction('ViewAllProducts', 'Mall Tab');
-  if (state.products.length === 0) {
-      document.getElementById('best-container').innerHTML = `<div style="padding:20px; text-align:center;">Sehrbaz məhsulları gətirir... 🪄</div>`;
-  }
+  document.getElementById('all-products-view').classList.add('active');
+  logUserAction('ViewAllProducts', 'Mall Tab'); 
+
   // --- 1. TURBO MODE: Check Local Cache ---
   const cachedRaw = localStorage.getItem('brendimo_cache_raw');
   const cachedTime = localStorage.getItem('brendimo_cache_time');
@@ -5098,22 +5134,18 @@ function startFlashTimer() {
     flashInterval = setInterval(update, 1000);
 }
 
-// KÖHNƏ KOD:
-// const pIndex = state.products.indexOf(p);
-// html += `<div class="prod-card" onclick="openModal(state.products[${pIndex}], state.products, ${pIndex})">...`
-
-// YENİ DÜZƏLİŞ:
 function renderSectionCards(container, list, badgeTxt, badgeCls) {
     let html = "";
-    // 'list' burada artıq filtr olunmuş siyahıdır (məs: under60)
-    list.forEach((p, localIndex) => {
-        // Məhsulun qlobal siyahıdakı yerini tapırıq (bəyənmə funksiyası üçün lazımdır)
-        const pIndex = state.products.indexOf(p);
+    list.forEach(p => {
+        // Find the EXACT index of this product in the main global list
+        // This ensures that when we say "Open product #5", it opens the correct one.
+        const pIndex = state.products.findIndex(globalP => globalP.name === p.name);
         
-        // DİQQƏT: openModal-a 'list' (filtr olunmuş siyahı) və 'localIndex' ötürürük
-        // Amma məhsulun özünü referans kimi state.products-dan götürmək daha təhlükəsizdir
+        // Skip if product not found in global state (Safety)
+        if (pIndex === -1) return;
+
         html += `
-        <div class="prod-card" onclick="openModal(state.products[${pIndex}], renderCardSource_${container.id}, ${localIndex})">
+        <div class="prod-card" onclick="openModal(state.products[${pIndex}], state.products, ${pIndex})">
             <div class="pc-img-box">
                <img src="${fixImageLink(p.image)}" class="pc-img" loading="lazy">
                <div class="badge-overlay ${badgeCls}">${badgeTxt}</div>
@@ -5127,11 +5159,6 @@ function renderSectionCards(container, list, badgeTxt, badgeCls) {
             </div>
         </div>`;
     });
-    
-    // Qlobal bir dəyişənə bu siyahını müvəqqəti yazırıq ki, HTML string içindən əlçatan olsun
-    // Bu 'dirty hack'dir amma string injection üçün ən asan yoldur.
-    window[`renderCardSource_${container.id}`] = list;
-    
     container.innerHTML = html;
 }
 
@@ -5258,7 +5285,7 @@ function redirectToWhatsApp(p) {
   // 1. We remove the setTimeout (Instagram hates delays)
   // 2. We use window.location.href (Forces navigation in the same tab)
   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-window.location.href = url;
+window.top.location.href = url; // Forces the main window to change
 }
 
 function initTracking() { logUserAction('AppOpen'); }
@@ -5292,9 +5319,6 @@ function handleNavClick(tab) {
   } 
   else if (tab === 'mall') {
     openAllProducts();
-     initBannerSlider(); 
-            setTimeout(() => initBannerSlider(), 100); 
-
     const closeBtn = document.getElementById('all-products-close');
     if(closeBtn) closeBtn.style.display = 'none';
   } 
@@ -5612,4 +5636,4 @@ closeCategoryModal = function() {
   
 </script>
 </body>
-</html>
+</html>   
