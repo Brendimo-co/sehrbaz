@@ -1849,8 +1849,7 @@ function handleNavClick(tab) {
   } 
   else if (tab === 'mall') {
     // Redirection Placeholder for Sehrmall
-    alert("Sehrmall səhifəsinə yönləndirilir...");
-    // window.location.href = 'sehrmall.html'; 
+   window.location.href = 'sehrmall.html'; 
   } 
   else if (tab === 'fav') {
       openFavorites();
@@ -1866,12 +1865,10 @@ function handleNavClick(tab) {
         } 
     }, 500);
   } 
-  else if (tab === 'wheel') {
-    window.open('https://www.sehrbaz.com/vipaccount.html', '_blank');
-    setTimeout(() => { 
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); 
-        document.getElementById('nav-wizard').classList.add('active'); 
-    }, 500);
+ else if (tab === 'wheel') {
+    // CHANGE: Redirects to vipaccount.html
+window.open('vipaccount.html', '_blank');    
+    // Note: If you want it in a new tab, use: window.open('vipaccount.html', '_blank');
   }
 }
 
