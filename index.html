@@ -2260,6 +2260,125 @@ body {
 .progress-container {
     margin-top: 10px;
 }  
+/* --- REELS VIEW (TikTok Style) --- */
+.reels-view {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #000;
+    z-index: 20000; /* Above everything */
+    display: none; /* Hidden by default */
+}
+
+.reels-view.active {
+    display: block;
+}
+
+.reels-header {
+    position: absolute;
+    top: 0; left: 0; width: 100%;
+    padding: 15px 20px;
+    z-index: 20002;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+}
+
+.white-btn { color: white; font-weight: 700; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+.reels-logo { color: #FFD700; font-weight: 800; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+
+/* THE MAGIC: SCROLL SNAP */
+.reels-track {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory; /* Forces snapping */
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+/* Hide Scrollbar */
+.reels-track::-webkit-scrollbar { display: none; }
+
+/* INDIVIDUAL SLIDE */
+.reel-slide {
+    width: 100%;
+    height: 100vh; /* Full viewport height */
+    scroll-snap-align: start; /* Snaps to top */
+    position: relative;
+    background: #111;
+    overflow: hidden;
+}
+
+/* IMAGE */
+.reel-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Fills screen like TikTok */
+    display: block;
+}
+
+/* OVERLAY CONTENT (Bottom) */
+.reel-overlay {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%;
+    padding: 20px 20px 90px 20px; /* Padding for bottom nav space */
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
+    color: white;
+    z-index: 20001;
+    pointer-events: none; /* Let clicks pass through if needed */
+}
+
+.r-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; line-height: 1.2; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+.r-desc { font-size: 13px; color: #ddd; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.r-price-box { display: flex; align-items: baseline; gap: 10px; margin-bottom: 15px; }
+.r-price { font-size: 24px; font-weight: 800; color: #FFD700; }
+.r-old { font-size: 14px; text-decoration: line-through; color: #aaa; }
+
+/* ACTION BUTTONS (Right Side) */
+.reel-actions {
+    position: absolute;
+    bottom: 100px;
+    right: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 20002;
+    pointer-events: auto;
+}
+
+.r-action-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 5px;
+    color: white; font-size: 11px; font-weight: 600; text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    cursor: pointer;
+}
+.r-icon {
+    width: 45px; height: 45px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(5px);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: transform 0.2s;
+}
+.r-action-btn:active .r-icon { transform: scale(0.9); }
+.r-icon.liked { color: #ff0055; background: rgba(255,255,255,0.9); }
+
+/* BUY BUTTON */
+.r-buy-btn {
+    pointer-events: auto;
+    background: #c21a1a;
+    color: white;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    margin-top: 10px;
+}
+  
 </style>
 <script>
 !function(f,b,e,v,n,t,s)
@@ -3194,7 +3313,14 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
         <button onclick="closeCustomPopup('popup-delivery')" class="popup-btn">Super! 😍</button>
     </div>
 </div>
-  
+  <div id="reels-view" class="reels-view">
+    <div class="reels-header">
+        <div class="back-btn white-btn" onclick="closeReels()">← Geri</div>
+        <div class="reels-logo">Brendimo Reels</div>
+    </div>
+    
+    <div id="reels-track" class="reels-track"></div>
+</div>
 <script>
 // --- CONFIGURATION ---
 const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzMLzwp2qpBlUT1tZkKuKh0rzE7I7BRTCxdMZv8gvK2c8u9SNlFrFfBCO6HiR5nJjVpEw/exec"; 
@@ -3594,6 +3720,119 @@ function finishSpin(winner) {
     document.getElementById('mood-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
+
+// --- NEW REELS LOGIC ---
+
+// 1. Open the Reels View
+function openReelsMode(startIndex, sourceList) {
+    const view = document.getElementById('reels-view');
+    const track = document.getElementById('reels-track');
+    
+    // Safety check
+    if(!sourceList || sourceList.length === 0) return;
+
+    // Clear previous slides
+    track.innerHTML = '';
+
+    // Render ALL slides in the list
+    sourceList.forEach((p, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'reel-slide';
+        
+        // Check if liked
+        const isLiked = state.likedProducts.some(item => item.name === p.name);
+
+        slide.innerHTML = `
+            <img src="${fixImageLink(p.image)}" class="reel-img" loading="lazy">
+            
+            <div class="reel-actions">
+                <div class="r-action-btn" onclick="toggleReelLike(this, '${p.name}')">
+                    <div class="r-icon ${isLiked ? 'liked' : ''}">❤</div>
+                    <span>Bəyən</span>
+                </div>
+                <div class="r-action-btn" onclick="shareReel('${p.name}')">
+                    <div class="r-icon">↗</div>
+                    <span>Paylaş</span>
+                </div>
+                <div class="r-action-btn" onclick="openModalFromReel(${index})">
+                    <div class="r-icon">ℹ</div>
+                    <span>Detallar</span>
+                </div>
+            </div>
+
+            <div class="reel-overlay">
+                <div class="r-title">${p.name}</div>
+                <div class="r-desc">${p.description || 'Əla məhsul!'}</div>
+                <div class="r-price-box">
+                    <div class="r-price">${p.price}₼</div>
+                    <div class="r-old">${p.oldPrice}₼</div>
+                    <div class="discount-badge-small" style="background:#FFD700; color:black;">-${p.discountPercent}%</div>
+                </div>
+                <button class="r-buy-btn" onclick="redirectToWhatsAppFromReel('${p.name}', '${p.price}', '${fixImageLink(p.image)}')">WhatsApp ilə Sifariş Et</button>
+            </div>
+        `;
+        track.appendChild(slide);
+    });
+
+    // Show View
+    view.classList.add('active');
+
+    // Scroll to the clicked item instantly
+    const slides = track.querySelectorAll('.reel-slide');
+    if(slides[startIndex]) {
+        slides[startIndex].scrollIntoView();
+    }
+    
+    // Store current list context for the "Details" button
+    state.currentReelList = sourceList;
+}
+
+// 2. Close Reels
+function closeReels() {
+    document.getElementById('reels-view').classList.remove('active');
+}
+
+// 3. Handle Like inside Reels
+function toggleReelLike(btn, pName) {
+    const icon = btn.querySelector('.r-icon');
+    const p = state.products.find(x => x.name === pName);
+    
+    if (icon.classList.contains('liked')) {
+        removeFromFavoritesGlobal(pName);
+        icon.classList.remove('liked');
+    } else {
+        if(p) addToFavorites(p);
+        icon.classList.add('liked');
+        if(navigator.vibrate) navigator.vibrate(50);
+    }
+}
+
+// 4. Helper: Open original detail modal from Reel
+function openModalFromReel(index) {
+    // We use the list we saved in state
+    if(state.currentReelList && state.currentReelList[index]) {
+        openModal(state.currentReelList[index], state.currentReelList, index);
+    }
+}
+
+// 5. WhatsApp Redirect Helper for Reels
+function redirectToWhatsAppFromReel(name, price, img) {
+   const msg = `Salam Brendimo! Reels-də bunu gördüm: ${name} (${price} AZN). Sifariş vermək istəyirəm.`;
+   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+   window.open(url, '_blank');
+}
+
+function shareReel(name) {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Brendimo',
+            text: `Bu məhsula bax: ${name}`,
+            url: window.location.href
+        });
+    } else {
+        alert('Link kopyalandı!');
+    }
+}
   
 // --- FEATURED REVIEWS LOGIC ---
 function initFeaturedReviews() {
@@ -4965,7 +5204,7 @@ function renderLiveCards(container, list) {
         
         // Direct Object Binding
         card.onclick = function() {
-            openModal(p, list, i);
+            openReelsMode(i, list);
         };
 
         card.innerHTML = `
@@ -5069,7 +5308,7 @@ function renderSectionCards(container, list, badgeTxt, badgeCls) {
         // We pass 'list' as the source so "Next/Prev" buttons inside the modal 
         // will cycle through this specific category (e.g., only Best Sellers).
         card.onclick = function() {
-             openModal(p, list, i); 
+             openReelsMode(i, list); 
         };
 
         // 4. Fill the visual HTML
