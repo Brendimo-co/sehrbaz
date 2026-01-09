@@ -499,7 +499,225 @@ body {
     30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
     40%, 60% { transform: translate3d(4px, 0, 0); }
 }
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  /* Soft, modern shadow */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* Smooth transition for hover effects */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+  .btn-primary {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #3b82f6; /* Modern Blue */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb; /* Slightly darker blue */
+}
+
+  body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  color: #333333;
+  background-color: #f9fafb; /* Very light gray background is easier on eyes than pure white */
+  margin: 0;
+}
+
+/* --- INSTAGRAM REELS MODE STYLES --- */
+.reels-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 5000; /* Highest layer */
+    display: none; /* Hidden by default */
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory; /* This creates the "snap" effect */
+    scroll-behavior: smooth;
+}
+
+.reels-view.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.reels-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    z-index: 5002;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+}
+
+.reels-logo {
+    color: white;
+    font-weight: 800;
+    font-size: 16px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.white-btn {
+    color: white !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    background: rgba(255,255,255,0.2) !important;
+    padding: 8px 12px !important;
+    border-radius: 20px !important;
+    border: none !important;
+    backdrop-filter: blur(5px);
+}
+
+.reel-slide {
+    position: relative;
+    width: 100%;
+    height: 100vh; /* Full screen height */
+    scroll-snap-align: start; /* Snap to this point */
+    overflow: hidden;
+}
+
+.reel-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.9);
+}
+
+/* Right Side Action Buttons */
+.reel-actions {
+    position: absolute;
+    right: 15px;
+    bottom: 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 5001;
+    align-items: center;
+}
+
+.r-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.r-icon {
+    font-size: 28px;
+    color: white;
+    background: rgba(0,0,0,0.3);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+    transition: transform 0.2s;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.r-icon.liked {
+    color: #ff4d4d;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.r-action-btn span {
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+/* Bottom Text Overlay */
+.reel-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
+    color: white;
+    z-index: 5001;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.r-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.r-desc {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-bottom: 10px;
+    max-width: 80%;
+    line-height: 1.4;
+}
+
+.r-price-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.r-price {
+    font-size: 22px;
+    font-weight: 800;
+    color: #FFD700;
+}
+
+.r-old {
+    text-decoration: line-through;
+    color: rgba(255,255,255,0.6);
+    font-size: 14px;
+}
+
+.r-buy-btn {
+    width: 100%;
+    background: #25D366;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+  
 /* NOTIFICATION TOAST */
 .notif-toast {
     position: fixed; top: 15px; left: 50%; transform: translateX(-50%) translateY(-150px);
@@ -968,7 +1186,13 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
         <button onclick="closeCustomPopup('popup-delivery')" class="popup-btn">Super! 😍</button>
     </div>
 </div>
-  
+  <div id="reels-view" class="reels-view">
+    <div class="reels-header">
+        <div class="back-btn white-btn" onclick="closeReels()">← Geri</div>
+        <div class="reels-logo">Brendimo Reels</div>
+    </div>
+    <div id="reels-track" class="reels-track"></div>
+</div>
 <script>
 // --- CONFIGURATION ---
 const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzMLzwp2qpBlUT1tZkKuKh0rzE7I7BRTCxdMZv8gvK2c8u9SNlFrFfBCO6HiR5nJjVpEw/exec"; 
@@ -1283,7 +1507,7 @@ function renderCards() {
     if (p.isLowStock) badgesHtml += `<div class="badge-lowstock-fixed">⚠️ ${p.stockCount} ədəd qaldı</div>`;
 
     card.onclick = (e) => {
-        openModal(p, state.cardStack, index); 
+        openReelsMode(index, state.cardStack); 
     };
 
     card.innerHTML = `
@@ -2033,7 +2257,106 @@ function initBubbleDrag() {
         bubble.style.animation = 'floatBubble 3s ease-in-out infinite';
     });
 }
+// --- REELS LOGIC FOR WIZARD ---
 
+function openReelsMode(startIndex, sourceList) {
+    const view = document.getElementById('reels-view');
+    const track = document.getElementById('reels-track');
+    
+    // Safety check
+    if(!sourceList || sourceList.length === 0) return;
+
+    // Clear previous slides
+    track.innerHTML = '';
+
+    // Render ALL slides so user can scroll up/down
+    sourceList.forEach((p, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'reel-slide';
+        
+        // Check if liked
+        const isLiked = state.likedProducts.some(item => item.name === p.name);
+
+        slide.innerHTML = `
+            <img src="${fixImageLink(p.image)}" class="reel-img" loading="lazy">
+            
+            <div class="reel-actions">
+                <div class="r-action-btn" onclick="toggleReelLike(this, '${p.name}')">
+                    <div class="r-icon ${isLiked ? 'liked' : ''}">❤</div>
+                    <span>Bəyən</span>
+                </div>
+                <div class="r-action-btn" onclick="shareReel('${p.name}')">
+                    <div class="r-icon">↗</div>
+                    <span>Paylaş</span>
+                </div>
+                <div class="r-action-btn" onclick="closeReels(); openModal(state.cardStack[${index}], state.cardStack, ${index})">
+                    <div class="r-icon">ℹ</div>
+                    <span>Detallar</span>
+                </div>
+            </div>
+
+            <div class="reel-overlay">
+                <div class="r-title">${p.name}</div>
+                <div class="r-desc">${p.description ? p.description.substring(0, 80) + '...' : 'Əla məhsul!'}</div>
+                <div class="r-price-box">
+                    <div class="r-price">${p.price} AZN</div>
+                    ${p.oldPrice ? `<div class="r-old">${p.oldPrice} ₼</div>` : ''}
+                </div>
+                <button class="r-buy-btn" onclick="redirectToWhatsAppFromReel('${p.name}', '${p.price}')">WhatsApp ilə Sifariş Et</button>
+            </div>
+        `;
+        track.appendChild(slide);
+    });
+
+    // Show View
+    view.classList.add('active');
+
+    // Scroll to the specific slide immediately
+    setTimeout(() => {
+        const slides = track.querySelectorAll('.reel-slide');
+        if(slides[startIndex]) {
+            slides[startIndex].scrollIntoView({ behavior: 'auto' });
+        }
+    }, 10);
+
+    // Scroll to the clicked item instantly
+    const slides = track.querySelectorAll('.reel-slide');
+    if(slides[startIndex]) {
+        slides[startIndex].scrollIntoView();
+    }
+}
+
+function closeReels() {
+    document.getElementById('reels-view').classList.remove('active');
+}
+
+function toggleReelLike(btn, pName) {
+    const icon = btn.querySelector('.r-icon');
+    const p = state.products.find(x => x.name === pName);
+    
+    if (icon.classList.contains('liked')) {
+        removeFromFavoritesGlobal(pName);
+        icon.classList.remove('liked');
+    } else {
+        if(p) addToFavorites(p);
+        icon.classList.add('liked');
+        if(navigator.vibrate) navigator.vibrate(50);
+    }
+}
+
+function shareReel(name) {
+    if (navigator.share) {
+        navigator.share({ title: 'Brendimo', text: `Bu məhsula bax: ${name}`, url: window.location.href });
+    } else {
+        alert('Link kopyalandı!');
+    }
+}
+
+function redirectToWhatsAppFromReel(name, price) {
+   const msg = `Salam Brendimo! Reels-də bunu gördüm: ${name} (${price} AZN). Sifariş vermək istəyirəm.`;
+   const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+   window.open(url, '_blank');
+}
 function closeBubble() {
     document.getElementById('promo-bubble').style.display = 'none';
     logUserAction('BubbleClosed');
