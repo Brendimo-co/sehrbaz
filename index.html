@@ -5045,48 +5045,57 @@ async function openAllProducts() {
   document.getElementById('all-products-view').classList.add('active');
   logUserAction('ViewAllProducts', 'Mall Tab'); 
 
-  // --- 1. TURBO MODE: Check Local Cache ---
-  const cachedRaw = localStorage.getItem('brendimo_cache_raw');
-  const cachedTime = localStorage.getItem('brendimo_cache_time');
-  const now = Date.now();
-
-  // If we have data and it is fresh (less than 1 hour old)
-  if (cachedRaw && cachedTime && (now - cachedTime < CACHE_DURATION)) {
-      console.log("🚀 Turbo Mode: Loaded from Cache!");
-      const data = JSON.parse(cachedRaw);
-      // Shuffle cached data so it feels new every time
-      processAndRender(data.products, data.orders, data.reviews);
-      return; // STOP! No need to wait for Google.
-  }
-
-  // --- 2. STANDARD MODE: Fetch from Google (First time or Expired) ---
+  // --- ULTRA SPEEDY LOGIC: Show Cache First, Fetch Later ---
+  
   const container = document.getElementById('best-container'); 
-  // Only show "Loading..." if we didn't show cached data
-  if(state.products.length === 0) {
-      container.innerHTML = `<div style="padding: 20px; color: #888;">Məhsullar yüklənir...</div>`;
+  const cachedRaw = localStorage.getItem('brendimo_cache_raw');
+  let cacheRendered = false;
+
+  // 1. INSTANT RENDER: If we have ANY data saved, show it immediately (0ms wait)
+  if (cachedRaw) {
+      try {
+          console.log("🚀 Turbo Mode: Rendering cached data immediately...");
+          const data = JSON.parse(cachedRaw);
+          processAndRender(data.products, data.orders, data.reviews);
+          cacheRendered = true; 
+      } catch (e) {
+          console.error("Cache corrupted, waiting for network...");
+      }
   }
 
-  try {
-    const [prodRes, orderRes, revRes] = await Promise.all([ 
-        fetch(`${SHEETS_ENDPOINT}?action=getProducts`), 
-        fetch(`${SHEETS_ENDPOINT}?action=getOrders`), 
-        fetch(`${SHEETS_ENDPOINT}?action=getReviews`) 
-    ]);
-    
-    const products = (await prodRes.json()).products || [];
-    const orders = (await orderRes.json()).orders || [];
-    const reviews = (await revRes.json()).reviews || [];
+  // 2. SHOW LOADING: Only if cache was empty (First time visitor)
+  if (!cacheRendered && state.products.length === 0) {
+       container.innerHTML = `<div style="padding: 20px; color: #888; text-align:center;">🛍️ Vitrin Yüklənir...</div>`;
+  }
 
-    // Save to Phone (Cache) for next time
-    const cachePackage = { products, orders, reviews };
-    try {
-        localStorage.setItem('brendimo_cache_raw', JSON.stringify(cachePackage));
-        localStorage.setItem('brendimo_cache_time', now);
-    } catch (e) { console.log("Storage full"); }
+  // 3. SILENT BACKGROUND UPDATE: Fetch fresh data to update prices/stock
+  // We do NOT use 'await' here, so the user interface doesn't freeze.
+  Promise.all([ 
+      fetch(`${SHEETS_ENDPOINT}?action=getProducts`), 
+      fetch(`${SHEETS_ENDPOINT}?action=getOrders`), 
+      fetch(`${SHEETS_ENDPOINT}?action=getReviews`) 
+  ]).then(async ([prodRes, orderRes, revRes]) => {
+      
+      const products = (await prodRes.json()).products || [];
+      const orders = (await orderRes.json()).orders || [];
+      const reviews = (await revRes.json()).reviews || [];
 
-    processAndRender(products, orders, reviews);
+      // Save fresh data to phone for next time
+      const cachePackage = { products, orders, reviews };
+      localStorage.setItem('brendimo_cache_raw', JSON.stringify(cachePackage));
+      localStorage.setItem('brendimo_cache_time', Date.now());
 
-  } catch (error) { console.error(error); }
+      // Re-render the screen with fresh data
+      console.log("🔄 Data updated from server");
+      processAndRender(products, orders, reviews);
+
+  }).catch(error => {
+      console.error("Background update failed:", error);
+      // If user is seeing the loading screen and internet failed:
+      if (!cacheRendered) {
+          container.innerHTML = `<div style="padding:20px;color:#c21a1a;text-align:center;">İnternet bağlantısını yoxlayın.</div>`;
+      }
+  });
 }
 
 // --- NEW HELPER FUNCTION (Past this below openAllProducts) ---
