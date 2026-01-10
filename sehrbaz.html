@@ -1199,6 +1199,8 @@ const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzMLzwp2qpBlUT1
 const WHATSAPP_NUMBER = "994556742535";
 
 // --- STATE ---
+  // --- SPEED OPTIMIZATION VARIABLE ---
+let backgroundDataPromise = null;
 let currentStep = 0;
 const totalSteps = 5;
 // --- STATE (UPDATED) ---
@@ -1237,7 +1239,45 @@ function init() {
     initNotificationSwipe(); 
     initModalSwipe();
     initBubbleDrag();
-    // Default to wizard
+    
+    // --- 🚀 START FETCHING IMMEDIATELY (PRE-FETCH) ---
+    backgroundDataPromise = (async () => {
+        // 1. Check Cache First (Instant Load)
+        const cached = localStorage.getItem('brendimo_cache_raw');
+        if (cached) {
+            console.log("Using Cached Data for Wizard");
+            const parsed = JSON.parse(cached);
+            // Format to match expected structure
+            return { 
+                prodData: { products: parsed.products }, 
+                orderData: { orders: parsed.orders }, 
+                revData: { reviews: parsed.reviews } 
+            };
+        }
+
+        // 2. If no cache, fetch from Network
+        const [prodRes, orderRes, revRes] = await Promise.all([
+            fetch(`${SHEETS_ENDPOINT}?action=getProducts`),
+            fetch(`${SHEETS_ENDPOINT}?action=getOrders`),
+            fetch(`${SHEETS_ENDPOINT}?action=getReviews`)
+        ]);
+        
+        const prodData = await prodRes.json();
+        const orderData = await orderRes.json();
+        const revData = await revRes.json();
+
+        // Save to cache for next time
+        const cachePackage = { 
+            products: prodData.products, 
+            orders: orderData.orders, 
+            reviews: revData.reviews 
+        };
+        localStorage.setItem('brendimo_cache_raw', JSON.stringify(cachePackage));
+
+        return { prodData, orderData, revData };
+    })();
+    // ------------------------------------------------
+
     handleNavClick('wizard');
     updateUI();
 }
@@ -1372,46 +1412,36 @@ function shuffleArray(array) {
 async function fetchProducts() {
   const statusTextEl = document.getElementById('magic-status-text');
   
-  // 1. START FETCHING IMMEDIATELY
-  const dataPromise = Promise.all([
-    fetch(`${SHEETS_ENDPOINT}?action=getProducts`),
-    fetch(`${SHEETS_ENDPOINT}?action=getOrders`),
-    fetch(`${SHEETS_ENDPOINT}?action=getReviews`)
-  ]).then(async ([prodRes, orderRes, revRes]) => {
-      const prodData = await prodRes.json();
-      const orderData = await orderRes.json();
-      const revData = await revRes.json();
-      return { prodData, orderData, revData };
-  });
-
+  // Faster messages (0.8s instead of 1.2s)
   const messages = [
     "Sehrli axtarış işə düşdü... 🪄",
     "Ona özünü dəyərli hiss etdirəcək... ✨",
-    "Sizin üçün xüsusi Endirim əlavə olunur 🪄",
+    "Sizin üçün xüsusi Endirim hazırlanır 🪄",
     "Və... İdeal seçim tapıldı! 🎯"
   ];
 
   const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
   try {
+    // 1. Play Animation
     statusTextEl.textContent = messages[0];
-    await wait(1200); 
+    await wait(800); 
 
     statusTextEl.textContent = messages[1];
     statusTextEl.style.animation = 'none'; statusTextEl.offsetHeight; statusTextEl.style.animation = 'textFade 0.3s ease';
-    await wait(1200);
+    await wait(800);
 
     statusTextEl.textContent = messages[2];
     statusTextEl.style.animation = 'none'; statusTextEl.offsetHeight; statusTextEl.style.animation = 'textFade 0.3s ease';
-    await wait(1200); 
+    await wait(800); 
 
     statusTextEl.textContent = messages[3];
     statusTextEl.style.animation = 'none'; statusTextEl.offsetHeight; statusTextEl.style.animation = 'textFade 0.3s ease';
     
-    // WAIT FOR DATA 
-    const data = await dataPromise;
+    // 2. GET DATA (It should be ready by now!)
+    const data = await backgroundDataPromise;
 
-    // PROCESS DATA
+    // 3. Process Data
     let rawProducts = shuffleArray(data.prodData.products || []);
     state.products = rawProducts.map(p => {
         const randomDisc = Math.floor(Math.random() * (35 - 20 + 1)) + 20; 
@@ -1426,7 +1456,7 @@ async function fetchProducts() {
     applyBadges(state.products);
     processMatches();
     
-    // TRANSITION TO RESULTS
+    // 4. Show Results Instantly
     currentStep++;
     updateUI();
     renderCards();
@@ -1439,7 +1469,7 @@ async function fetchProducts() {
 
   } catch (error) {
     console.error(error);
-    document.getElementById('step-loading').innerHTML = "<p>Xəta baş verdi. Zəhmət olmasa yeniləyin.</p>";
+    document.getElementById('step-loading').innerHTML = "<p>İnternet bağlantısını yoxlayın.</p><button onclick='location.reload()'>Yenilə</button>";
   }
 }
 
