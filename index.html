@@ -78,6 +78,8 @@ html, body {
   display: block; 
   animation: slideUp 0.3s ease; 
 }
+
+  
 /* HEADER */
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; height: 40px; }
 .back-btn { font-size: 14px; color: #777; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 600; z-index: 50; }
@@ -2413,6 +2415,28 @@ html, body {
     font-size: 15px;
     margin-top: 10px;
 }
+
+/* --- REEL MATCH BADGE --- */
+.reel-match-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.15); /* Glass effect */
+    backdrop-filter: blur(4px);
+    color: #FFD700; /* Gold Text */
+    border: 1px solid rgba(255, 215, 0, 0.4); /* Gold Border */
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    margin-bottom: 8px; /* Space above title */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+  
+/* --- FIX: FORCE MODAL ON TOP OF REELS --- */
+#product-modal {
+    z-index: 20010 !important; /* Higher than Reels (20000) */
+}
   
 </style>
 <script>
@@ -3759,25 +3783,24 @@ function finishSpin(winner) {
 // --- NEW REELS LOGIC ---
 
 // 1. Open the Reels View
-// 1. Open Reels with Correct Like Status
 function openReelsMode(startIndex, sourceList) {
     const view = document.getElementById('reels-view');
     const track = document.getElementById('reels-track');
     
-    // Safety check
     if(!sourceList || sourceList.length === 0) return;
 
-    // Clear previous slides
     track.innerHTML = '';
 
-    // Render ALL slides in the list
     sourceList.forEach((p, index) => {
         const slide = document.createElement('div');
         slide.className = 'reel-slide';
         
-        // --- LOGIC FIX: Check if product is already in favorites ---
-        // We compare product names to see if it exists in state.likedProducts
         const isLiked = state.likedProducts.some(item => item.name === p.name);
+
+        // --- NEW: MATCH SCORE LOGIC ---
+        // If product has a real score (from Wizard), use it. 
+        // If not (browsing Mall), generate a random "AI Score" (85-99%) to look cool.
+        const score = p.score || Math.floor(Math.random() * (99 - 85 + 1)) + 85;
 
         slide.innerHTML = `
             <img src="${fixImageLink(p.image)}" class="reel-img" loading="lazy">
@@ -3798,6 +3821,8 @@ function openReelsMode(startIndex, sourceList) {
             </div>
 
             <div class="reel-overlay">
+                <div class="reel-match-badge">✨ ${score}% UYĞUNLUQ</div>
+                
                 <div class="r-title">${p.name}</div>
                 <div class="r-desc">${p.description ? p.description.substring(0, 60) + '...' : 'Əla məhsul!'}</div>
                 <div class="r-price-box">
@@ -3811,16 +3836,11 @@ function openReelsMode(startIndex, sourceList) {
         track.appendChild(slide);
     });
 
-    // Show View
     view.classList.add('active');
-
-    // Scroll to the clicked item instantly
-    const slides = track.querySelectorAll('.reel-slide');
-    if(slides[startIndex]) {
-        slides[startIndex].scrollIntoView();
-    }
     
-    // Store context
+    const slides = track.querySelectorAll('.reel-slide');
+    if(slides[startIndex]) slides[startIndex].scrollIntoView();
+    
     state.currentReelList = sourceList;
 }
 
