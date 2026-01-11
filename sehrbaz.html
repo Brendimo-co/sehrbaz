@@ -540,178 +540,101 @@ body {
 }
 
 /* --- INSTAGRAM REELS MODE STYLES --- */
+/* --- INSTAGRAM REELS MODE STYLES (UPDATED) --- */
 .reels-view {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     width: 100%;
-    height: 100%;
+    height: 100vh;
+    height: 100dvh; /* Mobile Perfect Fit */
     background: #000;
-    z-index: 5000; /* Highest layer */
-    display: none; /* Hidden by default */
+    z-index: 5000;
+    display: none;
     overflow-y: scroll;
-    scroll-snap-type: y mandatory; /* This creates the "snap" effect */
+    scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
 }
 
-.reels-view.active {
-    display: block;
-    animation: fadeIn 0.3s ease;
-}
+.reels-view.active { display: block; animation: fadeIn 0.3s ease; }
 
 .reels-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    padding: 20px;
-    z-index: 5002;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+    position: fixed; top: 0; left: 0; width: 100%; padding: 20px;
+    z-index: 5002; display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
 }
 
-.reels-logo {
-    color: white;
-    font-weight: 800;
-    font-size: 16px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-}
+.reels-logo { color: white; font-weight: 800; font-size: 16px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
-.white-btn {
-    color: white !important;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    background: rgba(255,255,255,0.2) !important;
-    padding: 8px 12px !important;
-    border-radius: 20px !important;
-    border: none !important;
-    backdrop-filter: blur(5px);
+/* NEW: Match Badge Style */
+.r-match-badge {
+    position: absolute; top: 80px; left: 20px;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.4);
+    padding: 6px 14px; border-radius: 20px;
+    color: #fff; font-weight: 800; font-size: 13px;
+    z-index: 5001;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
 .reel-slide {
-    position: relative;
-    width: 100%;
-    height: 100vh; /* Full screen height */
-    scroll-snap-align: start; /* Snap to this point */
+    position: relative; width: 100%;
+    height: 100vh;
+    height: 100dvh; /* Mobile Perfect Fit */
+    scroll-snap-align: start;
     overflow: hidden;
 }
 
-.reel-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: brightness(0.9);
-}
+.reel-img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.95); }
 
-/* Right Side Action Buttons */
+/* Right Side Actions */
 .reel-actions {
-    position: absolute;
-    right: 15px;
-    bottom: 120px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    z-index: 5001;
-    align-items: center;
+    position: absolute; right: 15px; bottom: 140px;
+    display: flex; flex-direction: column; gap: 22px;
+    z-index: 5001; align-items: center;
 }
 
-.r-action-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
-}
+.r-action-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
 
 .r-icon {
-    font-size: 28px;
-    color: white;
-    background: rgba(0,0,0,0.3);
-    width: 50px;
-    height: 50px;
+    font-size: 26px; color: white;
+    background: rgba(0, 0, 0, 0.4);
+    width: 48px; height: 48px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(4px);
-    transition: transform 0.2s;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.r-icon.liked {
-    color: #ff4d4d;
-    background: rgba(255, 255, 255, 0.2);
-}
+.r-icon:active { transform: scale(0.9); }
+.r-icon.liked { color: #ff4d4d; background: rgba(255, 255, 255, 0.9); border-color: white; transform: scale(1.1); }
 
-.r-action-btn span {
-    color: white;
-    font-size: 10px;
-    font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-}
+.r-action-btn span { color: white; font-size: 11px; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
 
-/* Bottom Text Overlay */
+/* Bottom Overlay */
 .reel-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 20px;
-    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
-    color: white;
-    z-index: 5001;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    position: absolute; bottom: 0; left: 0; width: 100%; padding: 25px 20px;
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 10%, rgba(0,0,0,0.7) 40%, transparent 100%);
+    color: white; z-index: 5001;
+    display: flex; flex-direction: column; align-items: flex-start;
 }
 
-.r-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 5px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-}
-
-.r-desc {
-    font-size: 13px;
-    opacity: 0.9;
-    margin-bottom: 10px;
-    max-width: 80%;
-    line-height: 1.4;
-}
-
-.r-price-box {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.r-price {
-    font-size: 22px;
-    font-weight: 800;
-    color: #FFD700;
-}
-
-.r-old {
-    text-decoration: line-through;
-    color: rgba(255,255,255,0.6);
-    font-size: 14px;
-}
+.r-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); line-height: 1.3; }
+.r-desc { font-size: 14px; opacity: 0.9; margin-bottom: 15px; max-width: 85%; line-height: 1.5; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+.r-price-box { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+.r-price { font-size: 24px; font-weight: 800; color: #FFD700; text-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+.r-old { text-decoration: line-through; color: rgba(255,255,255,0.7); font-size: 15px; }
 
 .r-buy-btn {
-    width: 100%;
-    background: #25D366;
-    color: white;
-    border: none;
-    padding: 14px;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+    width: 100%; background: #25D366; color: white; border: none;
+    padding: 16px; border-radius: 16px; font-weight: 700; font-size: 16px;
+    cursor: pointer; box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5);
+    transition: transform 0.1s;
 }
+.r-buy-btn:active { transform: scale(0.97); }
 
 @keyframes fadeIn {
     from { opacity: 0; }
@@ -2289,6 +2212,8 @@ function initBubbleDrag() {
 }
 // --- REELS LOGIC FOR WIZARD ---
 
+// --- UPDATED REELS LOGIC ---
+
 function openReelsMode(startIndex, sourceList) {
     const view = document.getElementById('reels-view');
     const track = document.getElementById('reels-track');
@@ -2299,17 +2224,22 @@ function openReelsMode(startIndex, sourceList) {
     // Clear previous slides
     track.innerHTML = '';
 
-    // Render ALL slides so user can scroll up/down
+    // Render ALL slides
     sourceList.forEach((p, index) => {
         const slide = document.createElement('div');
         slide.className = 'reel-slide';
         
-        // Check if liked
+        // Check if liked in Global State
         const isLiked = state.likedProducts.some(item => item.name === p.name);
+
+        // Calculate Match Score (Default to 94% if missing)
+        const matchScore = p.score || 94;
 
         slide.innerHTML = `
             <img src="${fixImageLink(p.image)}" class="reel-img" loading="lazy">
             
+            <div class="r-match-badge">⚡ ${matchScore}% Uyğunluq</div>
+
             <div class="reel-actions">
                 <div class="r-action-btn" onclick="toggleReelLike(this, '${p.name}')">
                     <div class="r-icon ${isLiked ? 'liked' : ''}">❤</div>
@@ -2319,7 +2249,7 @@ function openReelsMode(startIndex, sourceList) {
                     <div class="r-icon">↗</div>
                     <span>Paylaş</span>
                 </div>
-                <div class="r-action-btn" onclick="closeReels(); openModal(state.cardStack[${index}], state.cardStack, ${index})">
+                <div class="r-action-btn" onclick="openDetailsFromReel(${index})">
                     <div class="r-icon">ℹ</div>
                     <span>Detallar</span>
                 </div>
@@ -2327,7 +2257,7 @@ function openReelsMode(startIndex, sourceList) {
 
             <div class="reel-overlay">
                 <div class="r-title">${p.name}</div>
-                <div class="r-desc">${p.description ? p.description.substring(0, 80) + '...' : 'Əla məhsul!'}</div>
+                <div class="r-desc">${p.description ? p.description.substring(0, 90) + '...' : 'Məhsul haqqında ətraflı məlumat üçün detallara baxın.'}</div>
                 <div class="r-price-box">
                     <div class="r-price">${p.price} AZN</div>
                     ${p.oldPrice ? `<div class="r-old">${p.oldPrice} ₼</div>` : ''}
@@ -2341,6 +2271,9 @@ function openReelsMode(startIndex, sourceList) {
     // Show View
     view.classList.add('active');
 
+    // Store the current list globally so 'openDetailsFromReel' can use it
+    window.currentReelsList = sourceList;
+
     // Scroll to the specific slide immediately
     setTimeout(() => {
         const slides = track.querySelectorAll('.reel-slide');
@@ -2348,18 +2281,20 @@ function openReelsMode(startIndex, sourceList) {
             slides[startIndex].scrollIntoView({ behavior: 'auto' });
         }
     }, 10);
-
-    // Scroll to the clicked item instantly
-    const slides = track.querySelectorAll('.reel-slide');
-    if(slides[startIndex]) {
-        slides[startIndex].scrollIntoView();
-    }
 }
 
-function closeReels() {
-    document.getElementById('reels-view').classList.remove('active');
+// Helper function to open details smoothly
+function openDetailsFromReel(index) {
+    closeReels();
+    // Small delay to let the reels fade out slightly before modal pops up
+    setTimeout(() => {
+        if(window.currentReelsList && window.currentReelsList[index]) {
+            openModal(window.currentReelsList[index], window.currentReelsList, index);
+        }
+    }, 50);
 }
 
+// Updated Like Function to ensure visual sync
 function toggleReelLike(btn, pName) {
     const icon = btn.querySelector('.r-icon');
     const p = state.products.find(x => x.name === pName);
@@ -2370,10 +2305,22 @@ function toggleReelLike(btn, pName) {
     } else {
         if(p) addToFavorites(p);
         icon.classList.add('liked');
+        
+        // Haptic feedback
         if(navigator.vibrate) navigator.vibrate(50);
+        
+        // Optional: Show a small "Liked" toast or animation
+        triggerValueAction(document.body, "Sevimlilər", "Siyahıya əlavə edildi!");
     }
 }
 
+function closeReels() {
+    document.getElementById('reels-view').classList.remove('active');
+}
+
+
+
+  
 function shareReel(name) {
     if (navigator.share) {
         navigator.share({ title: 'Brendimo', text: `Bu məhsula bax: ${name}`, url: window.location.href });
