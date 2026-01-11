@@ -52,27 +52,25 @@ html, body {
 }
 
 /* 3. ENABLE SCROLL INSIDE MALL VIEW */
+/* Find this class in your CSS and UPDATE the padding line */
 .all-products-view { 
   position: fixed; 
   top: 0; 
   left: 0; 
   width: 100%; 
-  /* Use 100dvh to fill the visible screen exactly */
-  height: 100%;
   height: 100dvh; 
-  
   background: #fafafa; 
   z-index: 150; 
-  
-  /* Enable scrolling here */
   overflow-y: auto; 
   -webkit-overflow-scrolling: touch; 
   
-  padding: 0; 
-  padding-bottom: 90px; 
+  /* --- CHANGE THIS LINE 👇 --- */
+  padding: 60px 0 90px 0; /* Top padding (60px) creates space for the header */
+  
   display: none; 
   overscroll-behavior-y: contain; 
 }
+
 /* ADD THIS MISSING BLOCK HERE 👇 */
 .all-products-view.active { 
   display: block; 
@@ -2545,7 +2543,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 </div>
 
 <div id="all-products-view" class="all-products-view active">
-  <div style="position:sticky; top:0; z-index:20; display:flex; justify-content:space-between; padding:15px; align-items:center; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #eee;">
+  <div style="position:fixed; top:0; left:0; width:100%; z-index:20; display:flex; justify-content:space-between; padding:15px; align-items:center; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #eee;">
         <h2 class="title" style="font-size:20px; margin:0;">Hədiyyə Sehrbazı 🛍️</h2>
     </div>
 
@@ -3231,7 +3229,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 </div>
 
 <div id="favorites-view" class="all-products-view">
-  <div style="position:sticky; top:0; z-index:2; display:flex; justify-content:space-between; padding:15px; align-items:center; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);">
+  <div style="position:fixed; top:0; left:0; width:100%; z-index:2; display:flex; justify-content:space-between; padding:15px; align-items:center; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);">
     <h2 class="title" style="font-size:20px; margin:0;">Bəyəndiklərim ❤️</h2>
     <button onclick="clearFavorites()" style="background:transparent; border:none; color:#999; font-size:12px; font-weight:600;">Hamısını Sil</button>
   </div>
