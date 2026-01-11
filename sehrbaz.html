@@ -592,7 +592,7 @@ body {
 .reel-actions {
     position: absolute; right: 15px; bottom: 140px;
     display: flex; flex-direction: column; gap: 22px;
-    z-index: 5001; align-items: center;
+    z-index: 5010; align-items: center; pointer-events: auto; /* Ensures clicks go through */
 }
 
 .r-action-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
@@ -2012,40 +2012,45 @@ function restartApp() {
 }
 
 function handleNavClick(tab) {
+  // 1. Close all overlays (Modals, Reels, Favorites)
   closeModal(); 
+  closeReels(); 
+  document.getElementById('favorites-view').classList.remove('active');
 
+  // 2. Update the Bottom Navigation Icons (Active Styling)
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.getElementById(`nav-${tab}`).classList.add('active');
   
   logUserAction("NavClick", tab); 
 
-  document.getElementById('favorites-view').classList.remove('active');
-
+  // 3. Tab Logic
   if (tab === 'wizard') {
-    updateUI(); 
+    // ❌ OLD LINE: updateUI(); 
+    // ✅ FIX: Do nothing! 
+    // Since we removed the overlays in step 1, the Wizard is revealed 
+    // exactly where the user left it (Step 2, Step 3, or Results).
   } 
   else if (tab === 'mall') {
-    // Redirection Placeholder for Sehrmall
-   window.location.href = 'index.html'; 
+    window.location.href = 'index.html'; 
   } 
   else if (tab === 'fav') {
       openFavorites();
   }
   else if (tab === 'chat') {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank');
+    // Keep the previous tab active visually since Chat opens in new window/app
     setTimeout(() => { 
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); 
+        // Restore active class to whichever view is actually open
         if (document.getElementById('favorites-view').classList.contains('active')) {
              document.getElementById('nav-fav').classList.add('active');
         } else { 
-            document.getElementById('nav-wizard').classList.add('active'); 
+             document.getElementById('nav-wizard').classList.add('active'); 
         } 
     }, 500);
   } 
- else if (tab === 'wheel') {
-    // CHANGE: Redirects to vipaccount.html
-window.open('vipaccount.html', '_blank');    
-    // Note: If you want it in a new tab, use: window.open('vipaccount.html', '_blank');
+  else if (tab === 'wheel') {
+    window.open('vipaccount.html', '_blank');    
   }
 }
 
@@ -2284,15 +2289,22 @@ function openReelsMode(startIndex, sourceList) {
 }
 
 // Helper function to open details smoothly
+// New Fixed Code
 function openDetailsFromReel(index) {
-    closeReels();
-    // Small delay to let the reels fade out slightly before modal pops up
-    setTimeout(() => {
-        if(window.currentReelsList && window.currentReelsList[index]) {
-            openModal(window.currentReelsList[index], window.currentReelsList, index);
-        }
-    }, 50);
+    const productToOpen = (window.currentReelsList && window.currentReelsList[index]) 
+                          ? window.currentReelsList[index] 
+                          : state.products[index]; 
+
+    if (!productToOpen) return;
+
+    // DO NOT close reels. Keep it open in the background.
+    // closeReels();  <-- Commented out or deleted
+    
+    // Open the modal immediately on top
+    openModal(productToOpen, window.currentReelsList || state.products, index);
 }
+
+  
 
 // Updated Like Function to ensure visual sync
 function toggleReelLike(btn, pName) {
