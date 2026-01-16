@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Xüsusi Video Mesaj | Brendimo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    /* --- INHERITED STYLES FROM MAIN PAGE --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; -webkit-tap-highlight-color: transparent; }
+    html, body { width: 100%; height: 100%; overflow: hidden; position: fixed; background: #fafafa; color: #1d1d1f; }
+    
+    .wizard-wrapper {
+        height: 100%; height: 100dvh; width: 100%; max-width: 440px; margin: 0 auto;
+        overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 15px 20px 120px 20px; position: relative;
+    }
+
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; height: 40px; }
+    .logo { font-size: 20px; font-weight: 800; color: #c21a1a; letter-spacing: -0.5px; cursor: pointer; }
+    .back-btn { font-size: 14px; color: #777; cursor: pointer; font-weight: 600; }
+
+    /* --- SPECIAL PAGE SPECIFIC STYLES --- */
+    .upload-card {
+        background: white;
+        border-radius: 24px;
+        padding: 30px 20px;
+        text-align: center;
+        box-shadow: 0 15px 40px -10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        border: 1px solid #f0f0f0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Animated background blob */
+    .upload-card::before {
+        content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px;
+        background: #ffe3e3; border-radius: 50%; filter: blur(40px); opacity: 0.6; z-index: 0;
+    }
+
+    .icon-wrapper {
+        width: 80px; height: 80px; background: #c21a1a; color: white;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 32px; margin: 0 auto 20px auto;
+        box-shadow: 0 8px 20px rgba(194, 26, 26, 0.3);
+        position: relative; z-index: 1;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(194, 26, 26, 0.7); }
+        70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(194, 26, 26, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(194, 26, 26, 0); }
+    }
+
+    h2 { font-size: 22px; font-weight: 800; color: #1a1a1a; margin-bottom: 10px; position: relative; z-index: 1; }
+    p { font-size: 14px; color: #666; line-height: 1.5; margin-bottom: 25px; position: relative; z-index: 1; }
+
+    /* Custom File Input */
+    .file-input-container { position: relative; z-index: 2; }
+    
+    .custom-file-btn {
+        background: linear-gradient(92deg, #c21a1a 0%, #ff4d4d 100%);
+        color: white; padding: 16px; border-radius: 16px; width: 100%;
+        font-weight: 700; font-size: 15px; border: none; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+        box-shadow: 0 5px 15px rgba(194, 26, 26, 0.3);
+        transition: transform 0.2s;
+    }
+    .custom-file-btn:active { transform: scale(0.96); }
+
+    /* Hidden real input */
+    #video-input { display: none; }
+
+    /* Preview Area */
+    .preview-area { margin-top: 20px; display: none; border-radius: 12px; overflow: hidden; background: #000; }
+    video { width: 100%; border-radius: 12px; max-height: 300px; }
+
+    /* Progress Bar */
+    .progress-wrapper { margin-top: 20px; display: none; }
+    .progress-track { width: 100%; height: 6px; background: #eee; border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0%; background: #2ecc71; transition: width 0.3s; }
+    .status-text { font-size: 12px; color: #888; margin-top: 5px; font-weight: 600; }
+
+    /* Success QR Area */
+    .qr-result { display: none; margin-top: 20px; animation: slideUp 0.5s ease; }
+    .qr-box { background: #fffcf0; border: 2px dashed #FFD700; padding: 20px; border-radius: 16px; }
+    .qr-img { width: 150px; height: 150px; mix-blend-mode: multiply; }
+    .success-msg { color: #2ecc71; font-weight: 700; margin-top: 10px; display: block; }
+
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- BOTTOM NAV (Copied from Main) --- */
+    .bottom-nav {
+        position: fixed; bottom: 0; left: 0; width: 100%; height: 65px;
+        background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+        border-top: 1px solid #f0f0f0; display: flex; justify-content: space-around;
+        align-items: center; z-index: 250; padding-bottom: 5px;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.02);
+    }
+    .nav-item { display: flex; flex-direction: column; align-items: center; width: 20%; cursor: pointer; color: #999; }
+    .nav-item.active { color: #c21a1a; transform: translateY(-2px); }
+    .nav-icon { width: 24px; height: 24px; margin-bottom: 4px; fill: currentColor; }
+    .nav-text { font-size: 10px; font-weight: 600; }
+
+    /* Error Toast */
+    .error-toast {
+        position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+        background: #333; color: white; padding: 10px 20px; border-radius: 30px;
+        font-size: 13px; font-weight: 600; z-index: 1000; display: none;
+    }
+</style>
+</head>
+<body>
+
+<div id="error-toast" class="error-toast">⚠️ Xəta baş verdi</div>
+
+<div class="wizard-wrapper">
+    <div class="header">
+        <div class="back-btn" onclick="window.location.href='index.html'">← Ana Səhifə</div>
+        <div class="logo">Brendimo</div>
+        <div style="width: 40px;"></div> </div>
+
+    <div class="upload-card">
+        <div class="icon-wrapper">🎥</div>
+        <h2>Özəl Video Mesaj</h2>
+        <p>Hədiyyə sahibi üçün ürək sözlərini çatdır! <br><b>Maksimum 20 saniyə</b>.</p>
+
+        <div class="file-input-container" id="step-1">
+            <label for="video-input" class="custom-file-btn">
+                <span>📹 Video Çək / Yüklə</span>
+            </label>
+            <input type="file" id="video-input" accept="video/*" capture="user" onchange="handleFileSelect(event)">
+            <p style="font-size: 11px; margin-top: 10px; color: #999;">QR Kod avtomatik yaranacaq</p>
+        </div>
+
+        <div class="preview-area" id="preview-area">
+            <video id="video-preview" controls playsinline></video>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button onclick="resetUpload()" style="flex:1; padding: 12px; border-radius: 12px; border: 1px solid #ddd; background: white; font-weight: 600;">Ləğv et</button>
+                <button onclick="uploadVideo()" style="flex:1; padding: 12px; border-radius: 12px; border: none; background: #c21a1a; color: white; font-weight: 700;">Təsdiqlə ✅</button>
+            </div>
+        </div>
+
+        <div class="progress-wrapper" id="progress-area">
+            <div class="progress-track">
+                <div class="progress-fill" id="prog-fill"></div>
+            </div>
+            <div class="status-text" id="status-text">Video yüklənir... (0%)</div>
+        </div>
+
+        <div class="qr-result" id="qr-area">
+            <div class="qr-box">
+                <img id="final-qr" src="" class="qr-img">
+                <span class="success-msg">Hazırdır! 🎉</span>
+                <p style="font-size: 12px; margin-bottom: 0;">Bu QR kod qutunun içərisinə əlavə olunacaq.</p>
+            </div>
+            <button onclick="window.location.href='index.html'" style="margin-top: 20px; width: 100%; padding: 15px; background: #25D366; color: white; border: none; border-radius: 15px; font-weight: 700; font-size: 16px;">
+                Sifarişə Davam Et 👉
+            </button>
+        </div>
+    </div>
+
+    <div style="padding: 0 10px;">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 15px; color: #333;">Necə işləyir?</h3>
+        
+        <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start;">
+            <div style="background: #e0f2fe; color: #0284c7; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;">1</div>
+            <div>
+                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 4px;">Videonu Çək</h4>
+                <p style="font-size: 12px; margin: 0;">20 saniyəlik təbrik mesajını hazırla.</p>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start;">
+            <div style="background: #f0fdf4; color: #16a34a; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;">2</div>
+            <div>
+                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 4px;">Sistemə Yüklə</h4>
+                <p style="font-size: 12px; margin: 0;">Biz QR kod yaradıb sifarişinə əlavə edirik.</p>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 15px; align-items: flex-start;">
+            <div style="background: #fffbeb; color: #d97706; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0;">3</div>
+            <div>
+                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 4px;">Sürpriz!</h4>
+                <p style="font-size: 12px; margin: 0;">Hədiyyə sahibi kodu skan edib səni izləyir.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="nav-item" onclick="window.location.href='index.html'">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 15H5V8h14v10z"/></svg>
+    <span class="nav-text">SehrMall</span>
+  </div>
+  <div class="nav-item" onclick="window.location.href='sehrbaz.html'">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5 9.5 9.75 12 11zm0 2.5l-5-2.5-5 2.5 10 5 10-5-5-2.5-5 2.5z"/></svg>
+    <span class="nav-text">Sehrbaz</span>
+  </div>
+  <div class="nav-item" onclick="window.open('https://wa.me/994556742535', '_blank')">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+    <span class="nav-text">SehrChat</span>
+  </div>
+  <div class="nav-item" onclick="window.location.href='vipaccount.html'">
+    <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v4h-2zm0 6h2v4h-2z"/></svg>
+    <span class="nav-text">SehrQazan</span>
+  </div>
+  <div class="nav-item active"> <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    <span class="nav-text">Özəl</span>
+  </div>
+</nav>
+
+<script>
+    // --- ⚠️ PASTE YOUR DEPLOYED SCRIPT URL HERE ⚠️ ---
+    const SCRIPT_URL = "YOUR_WEB_APP_URL_HERE"; 
+    // Example: "https://script.google.com/macros/s/AKfycbx.../exec"
+
+    let selectedFile = null;
+
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // 1. Validation (Size check approx 25MB limit for safety, prefer <10MB)
+        if (file.size > 25 * 1024 * 1024) {
+            showError("Video çox böyükdür! Maksimum 20 saniyə olmalıdır.");
+            return;
+        }
+
+        // 2. Load Video Preview
+        const videoNode = document.getElementById('video-preview');
+        const fileURL = URL.createObjectURL(file);
+        videoNode.src = fileURL;
+        
+        // Check duration logic
+        videoNode.onloadedmetadata = function() {
+            if (videoNode.duration > 25) { // allow small buffer
+                showError("Video 20 saniyədən uzundur!");
+                resetUpload();
+            } else {
+                // Show Preview
+                selectedFile = file;
+                document.getElementById('step-1').style.display = 'none';
+                document.getElementById('preview-area').style.display = 'block';
+            }
+        };
+    }
+
+    function resetUpload() {
+        selectedFile = null;
+        document.getElementById('video-input').value = "";
+        document.getElementById('step-1').style.display = 'block';
+        document.getElementById('preview-area').style.display = 'none';
+        document.getElementById('progress-area').style.display = 'none';
+    }
+
+    function showError(msg) {
+        const t = document.getElementById('error-toast');
+        t.textContent = msg;
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 3000);
+    }
+
+    function uploadVideo() {
+        if (!selectedFile) return;
+        if (SCRIPT_URL === "YOUR_WEB_APP_URL_HERE") {
+            alert("Zəhmət olmasa Google Apps Script URL-ni koda əlavə edin!");
+            return;
+        }
+
+        // UI Updates
+        document.getElementById('preview-area').style.display = 'none';
+        document.getElementById('progress-area').style.display = 'block';
+        updateProgress(10, "Video emal edilir...");
+
+        // Convert to Base64
+        const reader = new FileReader();
+        reader.readAsDataURL(selectedFile);
+        reader.onload = async function() {
+            const base64Content = reader.result; // contains "data:video/mp4;base64,..."
+            
+            updateProgress(40, "Serverə göndərilir...");
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ file: base64Content })
+                });
+                
+                updateProgress(80, "QR Kod yaradılır...");
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    updateProgress(100, "Tamamlandı!");
+                    showSuccess(result.qrUrl);
+                } else {
+                    showError("Səhv baş verdi: " + result.message);
+                    resetUpload();
+                }
+
+            } catch (error) {
+                showError("İnternet xətası. Yenidən cəhd edin.");
+                console.error(error);
+                resetUpload();
+            }
+        };
+    }
+
+    function updateProgress(percent, text) {
+        document.getElementById('prog-fill').style.width = percent + "%";
+        document.getElementById('status-text').textContent = text;
+    }
+
+    function showSuccess(qrUrl) {
+        setTimeout(() => {
+            document.getElementById('progress-area').style.display = 'none';
+            document.getElementById('qr-area').style.display = 'block';
+            document.getElementById('final-qr').src = qrUrl;
+        }, 500);
+    }
+</script>
+
+</body>
+</html>
