@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giorgio Armani | Warranty & After-Sales</title>
+    <style>
+        /* --- ARMANI LUXURY VARIABLES --- */
+        :root {
+            --armani-black: #1a1a1a;
+            --armani-gold: #a6906a;
+            --armani-greige: #e2e0db;
+            --armani-off-white: #ffffff;
+            --text-main: #2b2b2b;
+            --font-display: 'Didot', 'Playfair Display', serif;
+            --font-body: 'Optima', 'Candara', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--armani-greige);
+            color: var(--text-main);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: var(--armani-black);
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            letter-spacing: 0.3em;
+        }
+
+        .logo-text {
+            color: var(--armani-off-white);
+            font-family: var(--font-display);
+            font-size: 26px;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+
+        .logo-sub {
+            color: var(--armani-gold);
+            font-size: 10px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .container {
+            max-width: 800px;
+            margin: 60px auto;
+            background: var(--armani-off-white);
+            padding: 80px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.05);
+            border-top: 1px solid var(--armani-greige);
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1 {
+            text-align: center;
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            font-size: 22px;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--armani-gold);
+            text-align: center;
+            margin-bottom: 50px;
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eee;
+            color: var(--armani-black);
+            letter-spacing: 1.5px;
+        }
+
+        p {
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #444;
+            text-align: justify;
+        }
+
+        ul {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        li {
+            font-size: 13px;
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+            color: #555;
+        }
+
+        li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 12px;
+            height: 1px;
+            background: var(--armani-gold);
+        }
+
+        /* --- TABS --- */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 50px;
+            gap: 20px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: 0.4s;
+            color: #999;
+            border-bottom: 1px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--armani-black);
+            border-bottom: 1px solid var(--armani-gold);
+        }
+
+        /* --- CONTENT SECTIONS --- */
+        .content-section {
+            display: none;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            text-align: center;
+            padding: 60px 0;
+            color: var(--armani-black);
+        }
+
+        footer p {
+            text-align: center;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .armani-eagle {
+            font-family: serif;
+            font-size: 24px;
+            margin-top: 40px;
+            opacity: 0.4;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 40px 25px; margin: 20px; }
+            header { height: 100px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-text">GIORGIO ARMANI</div>
+        <div class="logo-sub">Customer Care & Quality</div>
+    </header>
+
+    <div class="container">
+        <h1>After-Sales Policy</h1>
+        <h2>Authenticity & Excellence</h2>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchLang('en')">English</button>
+            <button class="tab-btn" onclick="switchLang('az')">Azərbaycan</button>
+        </div>
+
+        <div id="content-en" class="content-section active">
+            <h3>The Giorgio Armani Guarantee</h3>
+            
+            <p><strong>1. Excellence in Craftsmanship:</strong><br>
+            Giorgio Armani products are crafted with meticulous attention to detail. We offer a limited warranty covering manufacturing flaws for a period of two (2) years. This guarantee honors the integrity of the design and the quality of the materials used.</p>
+
+            <p><strong>2. Exclusions of Elegance:</strong><br>
+            To maintain the standards of the House, the following are not considered manufacturing defects:</p>
+            <ul>
+                <li><strong>Natural Evolution:</strong> The natural aging of fine leathers (patina), softening of silks, or characteristic textures of handmade fabrics.</li>
+                <li><strong>Improper Maintenance:</strong> Damage from dry cleaning not performed by specialists, exposure to direct sunlight, or non-compliant storage conditions.</li>
+                <li><strong>External Factors:</strong> Accidental pulls on delicate lace or knitwear, leather abrasions, and contact with corrosive substances (perfumes/cosmetics).</li>
+                <li><strong>Personal Alterations:</strong> Products modified by tailors outside the Giorgio Armani network will void all warranty rights.</li>
+            </ul>
+
+            <p><strong>3. Technical Inspection:</strong><br>
+            Every request is subject to a rigorous evaluation by our master artisans. If a defect is confirmed, we will provide a professional restoration or a replacement. Given the exclusivity of our collections, a refund is only issued if a replacement is unavailable and within the legal timeframe.</p>
+        </div>
+
+        <div id="content-az" class="content-section">
+            <h3>Giorgio Armani Zəmanəti</h3>
+            
+            <p><strong>1. Sənətkarlıqda Mükəmməllik:</strong><br>
+            Giorgio Armani məhsulları detallara xüsusi diqqət yetirilməklə hazırlanır. Biz, istehsal qüsurlarını əhatə edən iki (2) illik məhdud zəmanət təqdim edirik. Bu zəmanət dizaynın bütövlüyünə və istifadə olunan materialların keyfiyyətinə xidmət edir.</p>
+
+            <p><strong>2. İstisnalar:</strong><br>
+            Moda Evinin standartlarını qorumaq üçün aşağıdakılar istehsal qüsuru hesab edilmir:</p>
+            <ul>
+                <li><strong>Təbii Təkamül:</strong> Zərif dərilərin təbii qocalması (patina), ipəyin yumşalması və ya əl işi parçaların xarakterik teksturaları.</li>
+                <li><strong>Yanlış Baxım:</strong> İxtisaslaşmamış quru təmizləmə, birbaşa günəş işığına məruz qalma və ya uyğun olmayan saxlama şəraiti nəticəsində yaranan zədələr.</li>
+                <li><strong>Xarici Faktorlar:</strong> Zərif krujeva və ya trikotajın ilişməsi, dərinin sürtünməsi və korroziv maddələrlə (ətir/kosmetika) təmas.</li>
+                <li><strong>Fərdi Dəyişikliklər:</strong> Giorgio Armani şəbəkəsindən kənar dərzi tərəfindən dəyişdirilmiş məhsullar bütün zəmanət hüquqlarını itirir.</li>
+            </ul>
+
+            <p><strong>3. Texniki Qiymətləndirmə:</strong><br>
+            Hər bir müraciət ustalarımız tərəfindən ciddi qiymətləndirməyə tabedir. Qüsur təsdiqlənərsə, peşəkar bərpa və ya dəyişdirmə təmin ediləcəkdir. Kolleksiyalarımızın eksklüzivliyini nəzərə alaraq, pulun geri qaytarılması yalnız dəyişdirmə mümkün olmadıqda və qanuni müddət ərzində həyata keçirilir.</p>
+        </div>
+
+        <div style="text-align: center;">
+            <div class="armani-eagle">GA</div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Giorgio Armani S.p.A. All Rights Reserved.</p>
+        <p>MILANO • PARIS • BAKU • SHANGHAI</p>
+    </footer>
+
+    <script>
+        function switchLang(lang) {
+            document.querySelectorAll('.content-section').forEach(div => div.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('content-' + lang).classList.add('active');
+            
+            const buttons = document.querySelectorAll('.tab-btn');
+            if(lang === 'en') buttons[0].classList.add('active');
+            if(lang === 'az') buttons[1].classList.add('active');
+        }
+    </script>
+</body>
+</html>
