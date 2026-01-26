@@ -2437,6 +2437,58 @@ html, body {
     z-index: 20010 !important; /* Higher than Reels (20000) */
 }
   
+/* --- REELS PERFECT FIT --- */
+.reels-view {
+    height: 100dvh; /* Dinamik hündürlük - brauzer panellərini nəzərə alır */
+    overflow: hidden;
+}
+
+.reel-slide {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Şəkli mərkəzləyir */
+    background: #000;
+}
+
+.reel-img {
+    width: 100%;
+    height: auto; /* Şəkli kəsmir, nisbəti qoruyur */
+    max-height: 100%; 
+    object-fit: contain; /* Şəkil tam görünür, boş qalan yerlər qara olur */
+    z-index: 1;
+}
+
+/* Mətnin altındakı kölgə - Yazıların oxunması üçün */
+.reel-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+    padding: 30px 20px 100px 20px; /* Naviqasiya barı üçün boşluq */
+    pointer-events: none; /* Şəkli sıxmağa mane olmur */
+}
+
+/* Action düymələrinin (Like, Share) daha rahat görünməsi */
+.reel-actions {
+    right: 10px;
+    bottom: 120px; /* Yazılardan bir az yuxarıda */
+    gap: 15px;
+}
+
+.r-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Məhsulun başlığı və qiyməti */
+.r-title {
+    font-size: 18px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}  
+  
+  
 </style>
 <script>
 !function(f,b,e,v,n,t,s)
@@ -3788,26 +3840,22 @@ function openReelsMode(startIndex, sourceList) {
     
     if(!sourceList || sourceList.length === 0) return;
 
-    track.innerHTML = '';
+    track.innerHTML = ''; // Köhnə slaydları təmizlə
 
     sourceList.forEach((p, index) => {
         const slide = document.createElement('div');
         slide.className = 'reel-slide';
         
         const isLiked = state.likedProducts.some(item => item.name === p.name);
-
-        // --- NEW: MATCH SCORE LOGIC ---
-        // If product has a real score (from Wizard), use it. 
-        // If not (browsing Mall), generate a random "AI Score" (85-99%) to look cool.
-        const score = p.score || Math.floor(Math.random() * (99 - 85 + 1)) + 85;
+        const score = p.score || Math.floor(Math.random() * 15) + 85;
 
         slide.innerHTML = `
-            <img src="${fixImageLink(p.image)}" class="reel-img" loading="lazy">
+            <img src="${fixImageLink(p.image)}" class="reel-img" alt="${p.name}">
             
             <div class="reel-actions">
                 <div class="r-action-btn" onclick="toggleReelLike(this, '${p.name.replace(/'/g, "\\'")}')">
                     <div class="r-icon ${isLiked ? 'liked' : ''}">❤</div>
-                    <span>Bəyən</span>
+                    <span>${isLiked ? 'Bəyənildi' : 'Bəyən'}</span>
                 </div>
                 <div class="r-action-btn" onclick="shareReel('${p.name.replace(/'/g, "\\'")}')">
                     <div class="r-icon">↗</div>
@@ -3820,25 +3868,30 @@ function openReelsMode(startIndex, sourceList) {
             </div>
 
             <div class="reel-overlay">
-                <div class="reel-match-badge">✨ ${score}% UYĞUNLUQ</div>
-                
+                <div class="reel-match-badge">✨ ${score}% Uyğunluq</div>
                 <div class="r-title">${p.name}</div>
-                <div class="r-desc">${p.description ? p.description.substring(0, 60) + '...' : 'Əla məhsul!'}</div>
                 <div class="r-price-box">
                     <div class="r-price">${p.price}₼</div>
-                    <div class="r-old">${p.oldPrice}₼</div>
-                    <div class="discount-badge-small" style="background:#FFD700; color:black;">-${p.discountPercent}%</div>
+                    ${p.oldPrice ? `<div class="r-old">${p.oldPrice}₼</div>` : ''}
                 </div>
-                <button class="r-buy-btn" onclick="redirectToWhatsAppFromReel('${p.name.replace(/'/g, "\\'")}', '${p.price}', '${fixImageLink(p.image)}')">WhatsApp ilə Sifariş Et</button>
+                <button class="r-buy-btn" onclick="redirectToWhatsAppFromReel('${p.name.replace(/'/g, "\\'")}', '${p.price}')">
+                   Sifariş Et 🛍️
+                </button>
             </div>
         `;
         track.appendChild(slide);
     });
 
-    view.classList.add('active');
+    view.style.display = 'block'; // Əvvəl göstər
     
-    const slides = track.querySelectorAll('.reel-slide');
-    if(slides[startIndex]) slides[startIndex].scrollIntoView();
+    // Snapping-i aktiv etmək üçün kiçik gecikmə ilə sürüşdür
+    setTimeout(() => {
+        const slides = track.querySelectorAll('.reel-slide');
+        if(slides[startIndex]) {
+            slides[startIndex].scrollIntoView({ behavior: 'auto' });
+        }
+        view.classList.add('active');
+    }, 50);
     
     state.currentReelList = sourceList;
 }
@@ -3910,19 +3963,23 @@ function redirectToWhatsAppFromReel(name, price, img) {
 }
 
 function shareReel(name) {
-    // Generate the deep link
+    // 1. Create the link
     const specificLink = window.location.origin + window.location.pathname + '#p=' + encodeURIComponent(name);
 
+    // 2. Try Native Share (Mobile)
     if (navigator.share) {
         navigator.share({
             title: 'Brendimo Hədiyyə',
             text: `Bu məhsula bax: ${name}`,
-            url: specificLink // <--- Uses the specific link now
-        });
+            url: specificLink 
+        }).catch(console.error);
     } else {
-        // Fallback: Copy to clipboard
+        // 3. Fallback: Copy to clipboard (Desktop)
         navigator.clipboard.writeText(specificLink).then(() => {
-            alert('Link kopyalandı!');
+            alert('Link kopyalandı! Dostuna göndər.');
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            prompt("Link:", specificLink); // Ultimate fallback
         });
     }
 }
@@ -5182,7 +5239,6 @@ function processAndRender(rawProds, rawOrders, rawReviews) {
         const isStockLow = Math.random() < 0.3;
         const stockCount = isStockLow ? Math.floor(Math.random() * 5) + 1 : null;
         return { ...p, discountPercent: randomDisc, oldPrice: oldPriceVal, isLowStock: isStockLow, stockCount: stockCount };
-      checkDeepLinks(); // <--- This checks the URL once data is loaded
     });
     
     state.orders = rawOrders || [];
@@ -5191,6 +5247,8 @@ function processAndRender(rawProds, rawOrders, rawReviews) {
     applyBadges(state.products);
     startOrderNotifications();
     renderMallSections();
+        checkDeepLinks(); // <--- This checks the URL once data is loaded
+
 } // <--- Function ends here cleanly
   
 // NEW FUNCTION TO RENDER MALL SECTIONS
@@ -5915,7 +5973,6 @@ closeCategoryModal = function() {
     }, 300);
 }
   
-<script>
 /* --- 🔗 DEEP LINKING & ROUTING SYSTEM --- */
 
 // 1. Update URL without reloading page
@@ -5927,7 +5984,10 @@ function updateURL(key, value) {
 
 // 2. Clear URL (return to home)
 function clearURL() {
-    history.pushState(null, null, window.location.pathname);
+    // Only push state if we are actually changing something to avoid history clutter
+    if(window.location.hash) {
+        history.pushState(null, null, window.location.pathname);
+    }
 }
 
 // 3. The Router: Reads URL and opens content
@@ -5937,24 +5997,31 @@ function checkDeepLinks() {
 
     // Decode URL params
     const cleanHash = decodeURIComponent(hash.substring(1)); // Remove #
-    const [key, value] = cleanHash.split('=');
-
-    if (!value) return;
+    const parts = cleanHash.split('=');
+    
+    if (parts.length < 2) return;
+    
+    const key = parts[0];
+    const value = parts[1];
 
     // A. PRODUCT LINK (#p=ProductName)
     if (key === 'p') {
-        const product = state.products.find(x => x.name === value);
+        // Find product (case insensitive search is safer)
+        const product = state.products.find(x => x.name.toLowerCase() === value.toLowerCase());
+        
         if (product) {
+            console.log("Deep link found for:", product.name);
             // Wait a bit for UI to settle, then open
             setTimeout(() => {
                 openModal(product, state.products); 
             }, 500);
+        } else {
+            console.log("Product not found for deep link:", value);
         }
     }
 
     // B. CATEGORY LINK (#c=CategoryID)
     else if (key === 'c') {
-        // Convert value to number since IDs are numbers in your code
         const catId = parseInt(value); 
         setTimeout(() => {
             openCategoryModal(catId);
@@ -5964,7 +6031,6 @@ function checkDeepLinks() {
     // C. REELS VIEW (#v=reels)
     else if (key === 'v' && value === 'reels') {
         setTimeout(() => {
-            // Open reels with the first available product
             openReelsMode(0, state.products); 
         }, 500);
     }
@@ -5981,8 +6047,18 @@ window.addEventListener('popstate', () => {
         checkDeepLinks();
     }
 });
-</script>
 
+// Force re-initialization when the DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    init(); 
+    
+    const logo = document.querySelector('.logo');
+    if(logo) logo.addEventListener('click', restartApp);
+    
+    const backBtn = document.querySelector('.back-btn');
+    if(backBtn) backBtn.addEventListener('click', goBack);
+});
+  
 </script>
 </body>
 </html>   
