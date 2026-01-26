@@ -3910,14 +3910,20 @@ function redirectToWhatsAppFromReel(name, price, img) {
 }
 
 function shareReel(name) {
+    // Generate the deep link
+    const specificLink = window.location.origin + window.location.pathname + '#p=' + encodeURIComponent(name);
+
     if (navigator.share) {
         navigator.share({
-            title: 'Brendimo',
+            title: 'Brendimo Hədiyyə',
             text: `Bu məhsula bax: ${name}`,
-            url: window.location.href
+            url: specificLink // <--- Uses the specific link now
         });
     } else {
-        alert('Link kopyalandı!');
+        // Fallback: Copy to clipboard
+        navigator.clipboard.writeText(specificLink).then(() => {
+            alert('Link kopyalandı!');
+        });
     }
 }
   
@@ -4228,6 +4234,7 @@ function startCategoryAutoScroll() {
 
 // 2. OPEN MODAL & FILTER PRODUCTS
 function openCategoryModal(id) {
+  updateURL('c', id);
     const cat = categoriesData.find(c => c.id === id);
     if(!cat) return;
 
@@ -4290,6 +4297,7 @@ function openCategoryModal(id) {
 }
 
 function closeCategoryModal() {
+  if(window.location.hash.includes('#c=')) clearURL();
     document.getElementById('category-modal').classList.remove('active');
 }
   // --- BANNER SLIDER LOGIC ---
@@ -4836,6 +4844,7 @@ function showPrevModalProduct() { if (currentModalIndex > 0) { openModal(current
 function openModal(p, sourceList = [], index = -1) {
     // SAFETY CHECK: If product 'p' is missing, stop to prevent crash
     if (!p) {
+      updateURL('p', p.name);
         console.error("Məhsul tapılmadı! (Product is undefined)");
         return;
     }
@@ -4923,6 +4932,7 @@ function toggleLikeFromModal(product, btnElement) {
 
 // UPDATE: When closing modal, refresh the Favorites grid if it is open!
 function closeModal() { 
+  if(window.location.hash.includes('#p=')) clearURL();
     document.getElementById('product-modal').classList.remove('active'); 
     
     // Check if the user is currently on the Favorites Page
@@ -5172,6 +5182,7 @@ function processAndRender(rawProds, rawOrders, rawReviews) {
         const isStockLow = Math.random() < 0.3;
         const stockCount = isStockLow ? Math.floor(Math.random() * 5) + 1 : null;
         return { ...p, discountPercent: randomDisc, oldPrice: oldPriceVal, isLowStock: isStockLow, stockCount: stockCount };
+      checkDeepLinks(); // <--- This checks the URL once data is loaded
     });
     
     state.orders = rawOrders || [];
@@ -5904,6 +5915,74 @@ closeCategoryModal = function() {
     }, 300);
 }
   
+<script>
+/* --- 🔗 DEEP LINKING & ROUTING SYSTEM --- */
+
+// 1. Update URL without reloading page
+function updateURL(key, value) {
+    const newHash = `#${key}=${encodeURIComponent(value)}`;
+    // Prevents browser from jumping to top, just changes URL
+    history.pushState(null, null, newHash); 
+}
+
+// 2. Clear URL (return to home)
+function clearURL() {
+    history.pushState(null, null, window.location.pathname);
+}
+
+// 3. The Router: Reads URL and opens content
+function checkDeepLinks() {
+    const hash = window.location.hash;
+    if (!hash) return;
+
+    // Decode URL params
+    const cleanHash = decodeURIComponent(hash.substring(1)); // Remove #
+    const [key, value] = cleanHash.split('=');
+
+    if (!value) return;
+
+    // A. PRODUCT LINK (#p=ProductName)
+    if (key === 'p') {
+        const product = state.products.find(x => x.name === value);
+        if (product) {
+            // Wait a bit for UI to settle, then open
+            setTimeout(() => {
+                openModal(product, state.products); 
+            }, 500);
+        }
+    }
+
+    // B. CATEGORY LINK (#c=CategoryID)
+    else if (key === 'c') {
+        // Convert value to number since IDs are numbers in your code
+        const catId = parseInt(value); 
+        setTimeout(() => {
+            openCategoryModal(catId);
+        }, 500);
+    }
+
+    // C. REELS VIEW (#v=reels)
+    else if (key === 'v' && value === 'reels') {
+        setTimeout(() => {
+            // Open reels with the first available product
+            openReelsMode(0, state.products); 
+        }, 500);
+    }
+}
+
+// 4. Hook into the Browser "Back" Button
+window.addEventListener('popstate', () => {
+    // If user presses back and URL clears, close modals
+    if (!window.location.hash) {
+        closeModal();
+        closeCategoryModal();
+        closeReels();
+    } else {
+        checkDeepLinks();
+    }
+});
+</script>
+
 </script>
 </body>
 </html>   
