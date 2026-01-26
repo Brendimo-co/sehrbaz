@@ -369,17 +369,13 @@ html, body {
 /* Update #cards-wrapper */
 /* CARDS STACK */
 /* Update #cards-wrapper */
-#cards-wrapper { 
-  position: relative; 
-  /* flex: 1;  <-- REMOVE OR IGNORE THIS */
-  height: 60vh; /* <--- ADD THIS! This forces it to take 60% of the screen height */
-  width: 100%; 
-  margin-top: 20px; 
-  perspective: 1000px; 
-  touch-action: none; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+#cards-wrapper {
+    position: relative;
+    height: 65dvh; /* Uses dynamic height to avoid mobile browser jumping */
+    width: 100%;
+    margin-top: 10px;
+    perspective: 1000px;
+    touch-action: none;
 }
 
 /* Update .card */
@@ -403,22 +399,32 @@ html, body {
   padding: 12px; 
 }
 /* 1. Ensure the container holds the image and stamps together */
+/* Update this in your <style> tag */
 .card-image-box {
-  position: relative; /* Acts as the anchor */
-  width: 100%; 
-  height: 68%; /* Or whatever height you prefer */
-  border-radius: 20px;
-  overflow: hidden; 
-  background: #f4f4f5; 
-  display: block; /* changed from flex to block to prevent squeezing */
+    position: relative;
+    width: 100%;
+    height: 72%; /* Increased height to show more of the photo */
+    border-radius: 20px 20px 0 0; /* Rounded top only for a cleaner look */
+    overflow: hidden;
+    background: #f8f8f8; /* Light neutral background for transparent PNGs */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.card-image-box img { 
-  width: 100%; 
-  height: 100%; 
-  object-fit: cover; 
-  display: block;
-  pointer-events: none; /* Prevent drag issues */
+.card-image-box img {
+    width: 100%;
+    height: 100%;
+    /* 'contain' ensures the WHOLE photo is seen. 
+       'cover' fills the box but might crop edges. 
+       Use 'cover' for lifestyle photos, 'contain' for product-only shots. */
+    object-fit: cover; 
+    transition: transform 0.5s ease; /* Smooth zoom effect */
+}
+
+/* Subtle zoom when the user interacts */
+.card:active .card-image-box img {
+    transform: scale(1.05);
 }
 
 /* 2. The Stamps (Floating Labels) */
@@ -2487,7 +2493,67 @@ html, body {
     font-size: 18px;
     text-shadow: 0 2px 10px rgba(0,0,0,0.8);
 }  
-  
+
+  /* Fix for small screens */
+@media screen and (max-height: 700px) {
+    .card-info h3 { font-size: 18px; }
+    .card-desc-preview { display: none; } /* Hide description to save space for image */
+    #cards-wrapper { height: 70dvh; }
+    .card-image-box { height: 75%; }
+}
+
+/* Minimalist iOS Glass Bar */
+.reels-bottom-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px 20px 35px 20px;
+    /* Ultra-light glass effect */
+    background: rgba(255, 255, 255, 0.1); 
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 0.5px solid rgba(255, 255, 255, 0.2);
+    z-index: 20005;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Puts price left, button right */
+    gap: 15px;
+}
+
+.r-price-minimal {
+    color: white;
+    font-size: 20px;
+    font-weight: 800;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.r-buy-btn-transparent {
+    flex: 1;
+    height: 48px;
+    /* Very transparent white/red mix */
+    background: rgba(255, 255, 255, 0.15); 
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.r-buy-btn-transparent:active {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Hide the old text overlay completely */
+.reel-overlay {
+    display: none !important;
+}
+
   
 </style>
 <script>
@@ -3851,36 +3917,32 @@ function openReelsMode(startIndex, sourceList) {
         const isLiked = state.likedProducts.some(item => item.name === p.name);
         const score = p.score || Math.floor(Math.random() * 15) + 85;
 
-        slide.innerHTML = `
-            <img src="${fixImageLink(p.image)}" class="reel-img" alt="${p.name}">
-            
-            <div class="reel-actions">
-                <div class="r-action-btn" onclick="toggleReelLike(this, '${p.name.replace(/'/g, "\\'")}')">
-                    <div class="r-icon ${isLiked ? 'liked' : ''}">❤</div>
-                    <span>${isLiked ? 'Bəyənildi' : 'Bəyən'}</span>
-                </div>
-                <div class="r-action-btn" onclick="shareReel('${p.name.replace(/'/g, "\\'")}')">
-                    <div class="r-icon">↗</div>
-                    <span>Paylaş</span>
-                </div>
-                <div class="r-action-btn" onclick="openModalFromReel(${index})">
-                    <div class="r-icon">ℹ</div>
-                    <span>Detallar</span>
-                </div>
-            </div>
+     // Inside sourceList.forEach((p, index) => { ...
+slide.innerHTML = `
+    <img src="${fixImageLink(p.image)}" class="reel-img" alt="${p.name}">
+    
+    <div class="reel-actions">
+        <div class="r-action-btn" onclick="toggleReelLike(this, '${p.name.replace(/'/g, "\\'")}')">
+            <div class="r-icon ${isLiked ? 'liked' : ''}">❤</div>
+            <span>${isLiked ? 'Bəyənildi' : 'Bəyən'}</span>
+        </div>
+        <div class="r-action-btn" onclick="shareReel('${p.name.replace(/'/g, "\\'")}')">
+            <div class="r-icon">↗</div>
+            <span>Paylaş</span>
+        </div>
+        <div class="r-action-btn" onclick="openModalFromReel(${index})">
+            <div class="r-icon">ℹ</div>
+            <span>Detallar</span>
+        </div>
+    </div>
 
-            <div class="reel-overlay">
-                <div class="reel-match-badge">✨ ${score}% Uyğunluq</div>
-                <div class="r-title">${p.name}</div>
-                <div class="r-price-box">
-                    <div class="r-price">${p.price}₼</div>
-                    ${p.oldPrice ? `<div class="r-old">${p.oldPrice}₼</div>` : ''}
-                </div>
-                <button class="r-buy-btn" onclick="redirectToWhatsAppFromReel('${p.name.replace(/'/g, "\\'")}', '${p.price}')">
-                   Sifariş Et 🛍️
-                </button>
-            </div>
-        `;
+    <div class="reels-bottom-actions">
+        <div class="r-price-minimal">${p.price}₼</div>
+        <button class="r-buy-btn-transparent" onclick="redirectToWhatsAppFromReel('${p.name.replace(/'/g, "\\'")}', '${p.price}')">
+           Sifariş et 🛍️
+        </button>
+    </div>
+`;
         track.appendChild(slide);
     });
 
