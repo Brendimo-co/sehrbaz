@@ -3425,8 +3425,8 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 </div>
   <div id="reels-view" class="reels-view">
     <div class="reels-header">
-        <div class="back-btn white-btn" onclick="closeReels()">← Geri</div>
-        <div class="reels-logo">Brendimo Reels</div>
+<div class="back-btn white-btn" onclick="closeReels()">← Geri</div>
+      <div class="reels-logo">Brendimo Reels</div>
     </div>
     
     <div id="reels-track" class="reels-track"></div>
@@ -3927,7 +3927,12 @@ function toggleReelLike(btn, pName) {
 
 // 2. Close Reels
 function closeReels() {
-    document.getElementById('reels-view').classList.remove('active');
+    const reelsView = document.getElementById('reels-view');
+    reelsView.classList.remove('active');
+    setTimeout(() => {
+        reelsView.style.display = 'none';
+    }, 300); // Matches transition if you have one, or just hides it
+    logUserAction("CloseReels");
 }
 
 // 3. Handle Like inside Reels
