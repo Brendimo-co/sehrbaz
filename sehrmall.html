@@ -3611,6 +3611,7 @@ function initZodiac() {
 }
 
 function openZodiacModal(id) {
+  updateURL('zodiac', id); // <--- ADD THIS LINE
     const data = zodiacData.find(z => z.id === id);
     if (!data) return;
 
@@ -3681,6 +3682,7 @@ function openZodiacModal(id) {
 }
 
 function closeZodiacModal() {
+  clearURL(); // <--- ADD THIS LINE
     document.getElementById('zodiac-modal').classList.remove('active');
 }
 
@@ -5633,20 +5635,23 @@ function restartApp() {
   updateUI();
 }
 
-function handleNavClick(tab) {
+function handleNavClick(tab, shouldUpdateURL = true) {
   // 1. Force close any open product modal
   closeModal(); 
+
+  // Update URL if triggered by user click (not by router)
+  if (shouldUpdateURL && tab !== 'chat' && tab !== 'wheel' && tab !== 'wizard') {
+      updateURL('tab', tab);
+  }
 
   // Remove active state from all nav items
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   
-  // Highlight the clicked button (except for external links like wheel/chat if you prefer)
+  // Highlight the clicked button
   if (tab !== 'chat' && tab !== 'wheel' && tab !== 'wizard') {
       const navItem = document.getElementById(`nav-${tab}`);
       if(navItem) navItem.classList.add('active');
   }
-
-  logUserAction("NavClick", tab); 
 
   // Hide the specific views initially
   const mallView = document.getElementById('all-products-view');
@@ -5655,42 +5660,25 @@ function handleNavClick(tab) {
   if(mallView) mallView.classList.remove('active');
   if(favView) favView.classList.remove('active');
 
-  // --- LOGIC CHANGES BELOW ---
-
   if (tab === 'wizard') {
-    // CHANGE: Redirects to  instead of showing UI on this page
     window.location.href = 'index.html'; 
   } 
   else if (tab === 'mall') {
-    // Show the Mall (All Products)
-   
     openAllProducts();
-    const closeBtn = document.getElementById('all-products-close');
-    if(closeBtn) closeBtn.style.display = 'none';
   } 
   else if (tab === 'fav') {
       openFavorites();
   }
-  
   else if (tab === 'chat') {
     window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank');
-    // Reset visual state after a moment
+    // Visual reset logic
     setTimeout(() => { 
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); 
-        // Keep the current view active visually
-        if(mallView && mallView.classList.contains('active')) { 
-            document.getElementById('nav-mall').classList.add('active'); 
-        } else if (favView && favView.classList.contains('active')) {
-             document.getElementById('nav-fav').classList.add('active');
-        } else { 
-            document.getElementById('nav-mall').classList.add('active'); 
-        } 
+        // Reset URL to previous tab if chat opened
+        if(window.history.length > 1) window.history.back();
     }, 500);
   } 
   else if (tab === 'wheel') {
-    // CHANGE: Redirects to vipaccount.html
-window.open('vipaccount.html', '_blank');    
-    // Note: If you want it in a new tab, use: window.open('vipaccount.html', '_blank');
+    window.open('vipaccount.html', '_blank');    
   }
 }
   
@@ -5794,8 +5782,16 @@ function closeStory() {
   if (storyTimer) clearInterval(storyTimer);
 }
 
-function openAboutModal() { document.getElementById('about-modal').classList.add('active'); logUserAction("AboutModal"); }
-function closeAboutModal() { document.getElementById('about-modal').classList.remove('active'); }
+function openAboutModal() { 
+    updateURL('modal', 'about'); // <--- ADD THIS LINE
+    document.getElementById('about-modal').classList.add('active'); 
+    logUserAction("AboutModal"); 
+}
+
+function closeAboutModal() {
+    clearURL(); 
+    document.getElementById('about-modal').classList.remove('active'); 
+}
 
 // --- PAGE VISIBILITY HANDLER (Prevents freezing) ---
 document.addEventListener("visibilitychange", () => {
@@ -5927,6 +5923,7 @@ const bannerDetails = {
 };
 
 function openBannerModal(bannerId) {
+  updateURL('banner', bannerId); // <--- ADD THIS LINE
     const data = bannerDetails[bannerId];
     if(!data) return;
 
@@ -5980,28 +5977,30 @@ closeCategoryModal = function() {
     }, 300);
 }
   
-/* --- 🔗 DEEP LINKING & ROUTING SYSTEM --- */
+/* --- 🔗 SHAREABLE LINKS SYSTEM (FIXED) --- */
 
-/* --- 🔗 DEEP LINKING SYSTEM --- */
-
-// 1. Update URL without reloading (e.g., #p=Product Name)
+// 1. Update Browser URL (Silent Update)
 function updateURL(key, value) {
+    if(!value) return;
     const newHash = `#${key}=${encodeURIComponent(value)}`;
-    history.pushState(null, null, newHash); 
+    if(window.location.hash !== newHash) {
+        history.pushState(null, null, newHash);
+    }
 }
 
-// 2. Clear URL (return to home)
+// 2. Clear URL (Return to Clean State)
 function clearURL() {
     if(window.location.hash) {
         history.pushState(null, null, window.location.pathname);
     }
 }
 
-// 3. The Router: Reads URL and opens content on page load
+// 3. The Router (Opens the specific part of the page)
 function checkDeepLinks() {
     const hash = window.location.hash;
-    if (!hash) return;
+    if (!hash) return; 
 
+    console.log("🔗 Router checking:", hash);
     const cleanHash = decodeURIComponent(hash.substring(1)); 
     const parts = cleanHash.split('=');
     if (parts.length < 2) return;
@@ -6009,25 +6008,44 @@ function checkDeepLinks() {
     const key = parts[0];
     const value = parts[1];
 
-    // Handle Product Deep Link
+    // -- ROUTING LOGIC --
+    
+    // A. Open Specific Product (#p=Product Name)
     if (key === 'p') {
-        const product = state.products.find(x => x.name.toLowerCase() === value.toLowerCase());
-        if (product) {
-            setTimeout(() => openModal(product, state.products), 500);
-        }
+        const checkData = setInterval(() => {
+            if (state.products.length > 0) {
+                clearInterval(checkData);
+                const product = state.products.find(x => x.name.toLowerCase() === value.toLowerCase());
+                if (product) openModal(product, state.products);
+            }
+        }, 200); // Check every 200ms until data loads
     }
-    // Handle Category Deep Link
+    
+    // B. Open Zodiac (#zodiac=aries)
+    else if (key === 'zodiac') {
+        openZodiacModal(value);
+    }
+
+    // C. Open Category (#c=1)
     else if (key === 'c') {
-        const catId = parseInt(value); 
-        setTimeout(() => openCategoryModal(catId), 500);
+        // Wait slightly for categories to render
+        setTimeout(() => openCategoryModal(parseInt(value)), 500);
+    }
+    
+    // D. Open About Page (#modal=about)
+    else if (key === 'modal' && value === 'about') {
+        openAboutModal();
     }
 }
 
-// 4. Hook into Browser Back/Forward buttons
+// 4. Listen for "Back" button
 window.addEventListener('popstate', () => {
     if (!window.location.hash) {
+        // Close all modals if URL is cleared
         closeModal();
         closeCategoryModal();
+        closeZodiacModal();
+        closeAboutModal();
     } else {
         checkDeepLinks();
     }
