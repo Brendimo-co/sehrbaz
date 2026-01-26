@@ -2690,8 +2690,8 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
         <div class="hero-card visual-purple" onclick="window.location.href='vipaccount.html'">
             <div class="banner-text-content">
                 <div class="b-subtitle">OYNA & QAZAN</div>
-                <div class="b-title">VIP<br>HƏDİYYƏLƏR</div>
-                <button class="b-btn">Oyna 🎰</button>
+                <div class="b-title">Şans Çarxı<br>BOL HƏDİYYƏLƏR</div>
+                <button class="b-btn">Şansını Yoxla və Qazan! 🎰</button>
             </div>
             <div class="banner-visuals">
                 <img src="https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=150&h=150&fit=crop" class="b-img b-img-1">
@@ -5732,16 +5732,14 @@ function handleNavClick(tab, shouldUpdateURL = true) {
       openFavorites();
   }
   else if (tab === 'chat') {
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank');
-    // Visual reset logic
+window.location.href = `https://wa.me/${WHATSAPP_NUMBER}`;    // Visual reset logic
     setTimeout(() => { 
         // Reset URL to previous tab if chat opened
         if(window.history.length > 1) window.history.back();
     }, 500);
   } 
   else if (tab === 'wheel') {
-    window.open('vipaccount.html', '_blank');    
-  }
+window.location.href = 'vipaccount.html';  }
 }
   
 const storiesData = [
