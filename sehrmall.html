@@ -4354,6 +4354,7 @@ function openCategoryModal(id) {
 }
 
 function closeCategoryModal() {
+  clearURL(); // 👈 ADD THIS LINE
   if(window.location.hash.includes('#c=')) clearURL();
     document.getElementById('category-modal').classList.remove('active');
 }
@@ -4901,8 +4902,8 @@ function showPrevModalProduct() { if (currentModalIndex > 0) { openModal(current
 function openModal(p, sourceList = [], index = -1) {
     // SAFETY CHECK: If product 'p' is missing, stop to prevent crash
     if (!p) {
-      updateURL('p', p.name);
-        console.error("Məhsul tapılmadı! (Product is undefined)");
+updateURL('p', p.name);
+      console.error("Məhsul tapılmadı! (Product is undefined)");
         return;
     }
 
@@ -4989,6 +4990,7 @@ function toggleLikeFromModal(product, btnElement) {
 
 // UPDATE: When closing modal, refresh the Favorites grid if it is open!
 function closeModal() { 
+  clearURL(); // 👈 ADD THIS LINE
   if(window.location.hash.includes('#p=')) clearURL();
     document.getElementById('product-modal').classList.remove('active'); 
     
@@ -5975,88 +5977,55 @@ closeCategoryModal = function() {
   
 /* --- 🔗 DEEP LINKING & ROUTING SYSTEM --- */
 
-// 1. Update URL without reloading page
+/* --- 🔗 DEEP LINKING SYSTEM --- */
+
+// 1. Update URL without reloading (e.g., #p=Product Name)
 function updateURL(key, value) {
     const newHash = `#${key}=${encodeURIComponent(value)}`;
-    // Prevents browser from jumping to top, just changes URL
     history.pushState(null, null, newHash); 
 }
 
 // 2. Clear URL (return to home)
 function clearURL() {
-    // Only push state if we are actually changing something to avoid history clutter
     if(window.location.hash) {
         history.pushState(null, null, window.location.pathname);
     }
 }
 
-// 3. The Router: Reads URL and opens content
+// 3. The Router: Reads URL and opens content on page load
 function checkDeepLinks() {
     const hash = window.location.hash;
     if (!hash) return;
 
-    // Decode URL params
-    const cleanHash = decodeURIComponent(hash.substring(1)); // Remove #
+    const cleanHash = decodeURIComponent(hash.substring(1)); 
     const parts = cleanHash.split('=');
-    
     if (parts.length < 2) return;
     
     const key = parts[0];
     const value = parts[1];
 
-    // A. PRODUCT LINK (#p=ProductName)
+    // Handle Product Deep Link
     if (key === 'p') {
-        // Find product (case insensitive search is safer)
         const product = state.products.find(x => x.name.toLowerCase() === value.toLowerCase());
-        
         if (product) {
-            console.log("Deep link found for:", product.name);
-            // Wait a bit for UI to settle, then open
-            setTimeout(() => {
-                openModal(product, state.products); 
-            }, 500);
-        } else {
-            console.log("Product not found for deep link:", value);
+            setTimeout(() => openModal(product, state.products), 500);
         }
     }
-
-    // B. CATEGORY LINK (#c=CategoryID)
+    // Handle Category Deep Link
     else if (key === 'c') {
         const catId = parseInt(value); 
-        setTimeout(() => {
-            openCategoryModal(catId);
-        }, 500);
-    }
-
-    // C. REELS VIEW (#v=reels)
-    else if (key === 'v' && value === 'reels') {
-        setTimeout(() => {
-            openReelsMode(0, state.products); 
-        }, 500);
+        setTimeout(() => openCategoryModal(catId), 500);
     }
 }
 
-// 4. Hook into the Browser "Back" Button
+// 4. Hook into Browser Back/Forward buttons
 window.addEventListener('popstate', () => {
-    // If user presses back and URL clears, close modals
     if (!window.location.hash) {
         closeModal();
         closeCategoryModal();
-        closeReels();
     } else {
         checkDeepLinks();
     }
-});
-
-// Force re-initialization when the DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    init(); 
-    
-    const logo = document.querySelector('.logo');
-    if(logo) logo.addEventListener('click', restartApp);
-    
-    const backBtn = document.querySelector('.back-btn');
-    if(backBtn) backBtn.addEventListener('click', goBack);
 });
   
 </script>
