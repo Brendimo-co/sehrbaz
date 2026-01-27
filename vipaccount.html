@@ -874,15 +874,46 @@ spinBtn.addEventListener('click', async function() {
 
   let selected;
   // Rule enforcement
+// Rule enforcement
   if (nextSpinToday === 1) {
-    selected = GIFTS.find(g => g.tier === 'F' && /Qazanmad/i.test(g.name)) || { id: 'F_Fail', name: 'Qazanmadınız', tier: 'F', weight:0, color:'#64748B' };
+    // --- SPIN 1 CONFIGURATION ---
+    // Add the names of the gifts you want to appear in the 1st spin here
+    const choices1 = ['Qadın bralok', 'Alışqan', 'Klassik Bralok',
+      'Maşın Aks. (it)','Maşın Aks. (pişik)',
+      'Curren M1','Curren M2','Curren M3',
+      'Casio Qadın M1','Casio Qadın M2','Curren M4',
+      'Armani Saat','Kişi Boyunbağı','Kişi Qolbaq']; 
+    
+    const choiceName = choices1[Math.floor(Math.random() * choices1.length)];
+    // Find the item in GIFTS, or create a safe fallback if not found
+    selected = GIFTS.find(g => g.name === choiceName) || { id: 'S1_Rand', name: choiceName, tier: 'F', weight: 0, color:'#64748B' };
+
   } else if (nextSpinToday === 2) {
-    selected = GIFTS.find(g => /3 AZN Endirim/i.test(g.name)) || { id: 'F_1AZN', name: '3 AZN Endirim!', tier: 'F', weight:0, color:'#10B981' };
+    // --- SPIN 2 CONFIGURATION ---
+    // Add the names of the gifts you want to appear in the 2nd spin here
+    const choices2 = ['Qadın bralok', 'Alışqan', 'Klassik Bralok',
+      'Maşın Aks. (it)','Maşın Aks. (pişik)',
+      'Curren M1','Curren M2','Curren M3',
+      'Casio Qadın M1','Casio Qadın M2','Curren M4',
+      'Armani Saat','Kişi Boyunbağı','Kişi Qolbaq'];
+    
+    const choiceName = choices2[Math.floor(Math.random() * choices2.length)];
+    selected = GIFTS.find(g => g.name === choiceName) || { id: 'S2_Rand', name: choiceName, tier: 'C', weight: 0, color:'#3B82F6' };
+
   } else if (nextSpinToday === 3) {
-    const choices = ['Qadın bralok', 'Alışqan', 'Klassik Bralok','Maşın Aks. (it)','Maşın Aks. (pişik)','Curren M1','Curren M2','Curren M3','Casio Qadın M1','Casio Qadın M2','Curren M4','Armani Saat','Kişi Boyunbağı','Kişi Qolbaq'];
-    const choiceName = choices[Math.floor(Math.random() * choices.length)];
+    // --- SPIN 3 CONFIGURATION (Existing) ---
+    const choices3 = [
+      'Qadın bralok', 'Alışqan', 'Klassik Bralok',
+      'Maşın Aks. (it)','Maşın Aks. (pişik)',
+      'Curren M1','Curren M2','Curren M3',
+      'Casio Qadın M1','Casio Qadın M2','Curren M4',
+      'Armani Saat','Kişi Boyunbağı','Kişi Qolbaq'
+    ];
+    const choiceName = choices3[Math.floor(Math.random() * choices3.length)];
     selected = GIFTS.find(g => g.name === choiceName) || { id: 'C_Special', name: choiceName, tier: 'C', weight: 0, color:'#F59E0B' };
+
   } else {
+    // Fallback for any other spins (random weight)
     selected = weightedRandomPick(false);
   }
 
@@ -951,9 +982,9 @@ function showResultModal(selected, resp, spinNum) {
   let instr = '';
 
   if (spinNum === 1) {
-    resultTitle.textContent = "Bəxtini Yenə Sına!";
+    resultTitle.textContent = "Daha 2 dəfə də Şansını Yoxlaya Bilərsən!";
     resultGiftEl.style.color = "#94A3B8"; // Grey out loss
-    instr = "Adətən çarx 1 dəfə fırladılır. Amma bu gün sənə istisna edirik!";
+    instr = "Qazanacağın 3 Hədiyyədən sadəcə Birini Seçə bilərsən!";
     const b = document.createElement('button');
     b.className = 'btn primary';
     b.textContent = '👉 Yenidən Çevir';
@@ -961,15 +992,15 @@ function showResultModal(selected, resp, spinNum) {
     modalActions.appendChild(b);
   } else if (spinNum === 2) {
     resultTitle.textContent = "Təbriklər!";
-    instr = "3 AZN Endirim qazandın! Bunu götürə bilərsən və ya daha böyük hədiyyə üçün şansını yenidən yoxlaya bilərsən.";
+    instr = "Qazandığın hədiyyə və əlavə olaraq 2 AZN endirim təklif edirik! Bunu qəbul edə və ya şansını yenidən yoxlaya bilərsən. Təklif sadəcə bu mərhələ üçün keçərlidir!";
     
     const takeBtn = document.createElement('button');
     takeBtn.className = 'btn';
     takeBtn.style.background = '#334155';
     takeBtn.style.color = '#fff';
-    takeBtn.textContent = '💰 3 AZN Götürürəm';
+    takeBtn.textContent = '💰 Qazandığım hədiyyəni və əlavə 2 AZN Götürürəm!';
     takeBtn.onclick = () => {
-        alert("🎉 3 AZN endirim qeydə alındı! (Beh ödədikdə aktivləşir)");
+        alert("🎉 Qazandığınız Hədiyyə və 2 AZN endirim qeydə alındı! \n⏳ 60 dəqiqə ərzində 10 AZN beh ödəyərək sifarişini təsdiqlə!");
         closeModalFn();
     };
     
@@ -983,7 +1014,7 @@ function showResultModal(selected, resp, spinNum) {
   } else {
     // Final spin
     resultTitle.textContent = "Möhtəşəm!";
-    instr = `Təbriklər! ${selected.name} qazandın. \n⏳ 60 dəqiqə ərzində 10 AZN beh ödə, hədiyyəni rəsmiləşdir!`;
+    instr = `Təbriklər! ${selected.name} qazandın. \n⏳ 60 dəqiqə ərzində 10 AZN beh ödəyərək sifarişini təsdiqlə!`;
     const b = document.createElement('button');
     b.className = 'btn primary';
     b.textContent = 'Bağla';
