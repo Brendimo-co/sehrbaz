@@ -398,6 +398,28 @@
     ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 
+/* --- NEW: Product Image Styling --- */
+.modal-product-img {
+  width: 100%;
+  max-width: 220px; /* Limits size so it doesn't take over screen */
+  height: auto;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Deep shadow */
+  border: 2px solid rgba(255,255,255,0.1);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  object-fit: cover;
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+    
   </style>
 </head>
 <body>
@@ -458,21 +480,24 @@
 
   </main>
 
-  <div id="resultModal" class="modal-overlay" role="dialog" aria-modal="true">
-    <div class="modal-box">
-      <button id="closeModal" class="close-modal-x">×</button>
-      <span class="modal-icon">🎁</span>
-      <h2 id="resultTitle" class="modal-title">Təşəkkür edirik!</h2>
-      <p id="resultGift" class="modal-gift"></p>
-      <p id="resultTier" class="tier-badge hidden"></p>
-      
-      <div id="resultInstructions" class="modal-text"></div>
-      
-      <div id="modalActions" style="display:flex; flex-direction:column; gap:10px;">
-        <button id="modalOk" class="btn primary">Əla, Bitir</button>
-      </div>
+<div id="resultModal" class="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <button id="closeModal" class="close-modal-x">×</button>
+    
+    <img id="resultImage" class="modal-product-img hidden" src="" alt="Gift" />
+    
+    <span id="defaultModalIcon" class="modal-icon">🎁</span>
+
+    <h2 id="resultTitle" class="modal-title">Təşəkkür edirik!</h2>
+    <p id="resultGift" class="modal-gift"></p>
+    
+    <div id="resultInstructions" class="modal-text"></div>
+    
+    <div id="modalActions" style="display:flex; flex-direction:column; gap:10px;">
+      <button id="modalOk" class="btn primary">Əla, Bitir</button>
     </div>
   </div>
+</div>
 
   <audio id="sfx-spin" preload="auto" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"></audio> 
   <script>
@@ -506,9 +531,9 @@ const modalActions = document.getElementById('modalActions');
 
 /* --- GIFTS DATA --- */
 const GIFTS = [
-  { id: 'A1', name: '100 AZN Hədiyyə', tier: 'A', weight: 0.000, color: '#F59E0B' },
-  { id: 'A2', name: '15 AZN Endirim', tier: 'A', weight: 0.000, color: '#3B82F6' },
-  { id: 'A3', name: '50 AZN Hədiyyə', tier: 'A', weight: 0.000, color: '#EC4899' },
+  { id: 'A1', name: '100 AZN Hədiyyə', tier: 'A', weight: 0.000, color: '#F59E0B', img: '' },
+  { id: 'A2', name: '15 AZN Endirim', tier: 'A', weight: 0.000, color: '#3B82F6', img: '' },
+  { id: 'A3', name: '50 AZN Hədiyyə', tier: 'A', weight: 0.000, color: '#EC4899', img: '' },
   
   { id: 'D1', name: 'Qazanmadınız', tier: 'D', weight: 13.995, color: '#64748B' },
   { id: 'B1', name: 'Premium Parfüm', tier: 'B', weight: 0.495, color: '#8B5CF6' },
@@ -972,27 +997,49 @@ spinBtn.addEventListener('click', async function() {
 });
 
 /* --- MODAL LOGIC --- */
+/* --- MODAL LOGIC (UPDATED) --- */
 function showResultModal(selected, resp, spinNum) {
+  const resultImage = document.getElementById('resultImage');
+  const defaultIcon = document.getElementById('defaultModalIcon');
+  const resultGiftEl = document.getElementById('resultGift');
+  const resultTitle = document.getElementById('resultTitle');
+  const resultInstructions = document.getElementById('resultInstructions');
+  const modalActions = document.getElementById('modalActions');
+
+  // 1. SET TEXT
   resultGiftEl.textContent = selected.name;
-  resultTierEl.textContent = selected.tier;
-  resultTierEl.className = `tier-badge tier-${selected.tier}`; // Add color class logic later if needed
-  resultTierEl.classList.remove('hidden');
+  
+  // 2. SET IMAGE (The Logic)
+  if (selected.img && selected.img !== '') {
+    // If gift has an image link
+    resultImage.src = selected.img;
+    resultImage.classList.remove('hidden');   // Show Image
+    defaultIcon.classList.add('hidden');      // Hide Emoji
+  } else {
+    // If no image link
+    resultImage.classList.add('hidden');      // Hide Image
+    defaultIcon.classList.remove('hidden');   // Show Emoji
+  }
+
+  // 3. REMOVED TIER COLOR LOGIC COMPLETELY
 
   modalActions.innerHTML = '';
   let instr = '';
 
   if (spinNum === 1) {
     resultTitle.textContent = "Daha 2 dəfə də Şansını Yoxlaya Bilərsən!";
-    resultGiftEl.style.color = "#94A3B8"; // Grey out loss
+    resultGiftEl.style.color = "#94A3B8"; 
     instr = "Qazanacağın 3 Hədiyyədən sadəcə Birini Seçə bilərsən!";
+    
     const b = document.createElement('button');
     b.className = 'btn primary';
     b.textContent = '👉 Yenidən Çevir';
     b.onclick = () => { closeModalFn(); enableWheelUI(); };
     modalActions.appendChild(b);
+
   } else if (spinNum === 2) {
     resultTitle.textContent = "Təbriklər!";
-    instr = "Qazandığın hədiyyə və əlavə olaraq 2 AZN endirim təklif edirik! Bunu qəbul edə və ya şansını yenidən yoxlaya bilərsən. Təklif sadəcə bu mərhələ üçün keçərlidir!";
+    instr = "Qazandığın hədiyyə və əlavə olaraq 2 AZN endirim təklif edirik! Bunu qəbul edə və ya şansını yenidən yoxlaya bilərsən.";
     
     const takeBtn = document.createElement('button');
     takeBtn.className = 'btn';
@@ -1009,8 +1056,9 @@ function showResultModal(selected, resp, spinNum) {
     retryBtn.textContent = '🔄 Yox! Yenə Çevir';
     retryBtn.onclick = () => { closeModalFn(); enableWheelUI(); };
     
-    modalActions.appendChild(retryBtn); // Encourage spin
+    modalActions.appendChild(retryBtn);
     modalActions.appendChild(takeBtn);
+
   } else {
     // Final spin
     resultTitle.textContent = "Möhtəşəm!";
@@ -1025,7 +1073,7 @@ function showResultModal(selected, resp, spinNum) {
   resultInstructions.innerText = instr;
   resultModal.classList.add('active');
 }
-
+    
 function closeModalFn() {
   resultModal.classList.remove('active');
 }
