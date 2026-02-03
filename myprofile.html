@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#050505">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Brendimo | Profil</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Brendimo | Sadiqlik Proqramı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
+        /* --- RESET & VARIABLES --- */
         :root {
             --bg-body: #050505;
             --bg-surface: #141414;
@@ -24,179 +24,308 @@
             --radius-lg: 24px;
             --radius-md: 16px;
             --font: 'Plus Jakarta Sans', sans-serif;
+            --nav-height: 80px;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+            user-select: none;
+        }
 
         body {
-            margin: 0; padding: 0;
+            margin: 0;
+            padding: 0;
             background-color: var(--bg-body);
             color: var(--text-main);
             font-family: var(--font);
-            padding-bottom: 100px;
             min-height: 100vh;
+            padding-bottom: 100px; /* Space for Nav */
+            overflow-x: hidden;
         }
 
-        /* UTILITIES */
+        /* --- UTILITY CLASSES --- */
         .hidden { display: none !important; }
-        .container { max-width: 480px; margin: 0 auto; padding: 20px; }
-        h1, h2, h3 { margin: 0; }
-        
-        /* AUTH SCREEN */
+        .container { max-width: 480px; margin: 0 auto; padding: 20px; position: relative; }
+        h1, h2, h3, p { margin: 0; }
+        button { font-family: var(--font); }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+
+        /* --- AUTH SCREEN --- */
         #auth-screen {
-            position: fixed; inset: 0; z-index: 2000;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
             background: var(--bg-body);
-            display: flex; flex-direction: column; justify-content: center; padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 30px;
             background-image: radial-gradient(circle at top right, rgba(212, 175, 55, 0.1), transparent 40%);
         }
-        .brand-logo { font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 10px; letter-spacing: -1px; }
-        .brand-logo span { background: var(--primary-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        .input-group { margin-bottom: 15px; position: relative; }
+
+        .brand-logo {
+            font-size: 36px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+        .brand-logo span {
+            background: var(--primary-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .auth-sub { text-align: center; color: var(--text-muted); margin-bottom: 40px; font-size: 14px; }
+
+        .input-group { margin-bottom: 16px; }
         .input-field {
-            width: 100%; padding: 20px;
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-md); color: white; font-size: 16px;
+            width: 100%;
+            padding: 18px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: 16px;
             transition: 0.3s;
         }
         .input-field:focus { border-color: var(--primary); transform: translateY(-2px); }
+        .input-field::placeholder { color: #555; }
 
-        /* BUTTONS */
+        /* --- BUTTONS --- */
         .btn-primary {
-            width: 100%; padding: 18px;
-            background: var(--primary-grad); color: #000;
-            border: none; border-radius: var(--radius-md);
-            font-size: 16px; font-weight: 700; cursor: pointer;
+            width: 100%;
+            padding: 18px;
+            background: var(--primary-grad);
+            color: #000;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
             box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
             transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .btn-primary:active { transform: scale(0.98); }
         .btn-primary:disabled { opacity: 0.7; pointer-events: none; }
+        .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; height: 36px; }
+        
+        .btn-logout {
+            background: #222;
+            color: #fff;
+            margin-top: 30px;
+            border: 1px solid #333;
+        }
 
-        /* HEADER & WALLET */
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-top: 10px; }
-        .user-greet { font-size: 14px; color: var(--text-muted); }
+        /* --- HEADER --- */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-top: 10px;
+        }
+        .user-greet { font-size: 13px; color: var(--text-muted); margin-bottom: 2px; }
         .user-name { font-size: 20px; font-weight: 700; }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--primary); }
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 18px;
+        }
 
+        /* --- WALLET CARD --- */
         .wallet-card {
-            background: linear-gradient(160deg, #252525, #111);
+            background: linear-gradient(160deg, #2a2a2a, #111);
             border-radius: var(--radius-lg);
             padding: 25px;
             position: relative;
             overflow: hidden;
-            border: 1px solid var(--border);
+            border: 1px solid #333;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             margin-bottom: 30px;
+            text-align: center;
         }
         .wallet-card::before {
             content: ''; position: absolute; top: -50px; right: -50px;
             width: 150px; height: 150px; background: var(--primary);
             filter: blur(80px); opacity: 0.15;
         }
-        .balance-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .balance-amount { font-size: 48px; font-weight: 800; margin: 10px 0 5px 0; color: #fff; letter-spacing: -1px; }
-        .rate-info { font-size: 12px; color: var(--primary); background: rgba(212, 175, 55, 0.1); padding: 4px 10px; border-radius: 20px; display: inline-block; font-weight: 600; }
+        .balance-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .balance-amount { font-size: 42px; font-weight: 800; margin: 8px 0; color: #fff; letter-spacing: -1px; }
+        .rate-info {
+            font-size: 11px;
+            color: var(--primary);
+            background: rgba(212, 175, 55, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: 600;
+        }
 
-        /* GRID LAYOUTS */
-        .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
+        /* --- SECTIONS --- */
+        .section-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 15px; }
         .section-title { font-size: 18px; font-weight: 700; }
-        
+        .section-sub { font-size: 12px; color: var(--text-muted); }
+
+        /* --- GAMES GRID --- */
         .games-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 35px; }
         .game-card {
-            background: var(--bg-surface); border: 1px solid var(--border);
-            border-radius: var(--radius-md); padding: 20px 10px;
-            text-align: center; cursor: pointer; position: relative;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 15px 5px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            transition: 0.2s;
         }
-        .game-card.locked { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
-        .game-emoji { font-size: 32px; margin-bottom: 8px; display: block; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); }
+        .game-card:active { transform: scale(0.96); background: var(--bg-card); }
+        .game-card.locked { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
+        
+        .game-emoji { font-size: 32px; display: block; margin-bottom: 8px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
         .game-title { font-size: 12px; font-weight: 600; }
-        .game-badge {
+        .game-status {
             position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
             background: var(--success); color: #000; font-size: 9px; 
-            padding: 2px 6px; border-radius: 4px; font-weight: 700;
+            padding: 2px 6px; border-radius: 4px; font-weight: 700; display: none;
         }
+        .game-card.locked .game-status { display: block; background: #444; color: #fff; }
 
-        /* LISTS (Shop/Tasks) */
+        /* --- LIST ITEMS (Tasks, Shop, History) --- */
         .list-card {
-            background: var(--bg-surface); padding: 16px;
-            border-radius: var(--radius-md); margin-bottom: 12px;
-            display: flex; align-items: center; gap: 15px;
+            background: var(--bg-surface);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
             border: 1px solid transparent;
             transition: 0.2s;
         }
-        .list-card:active { transform: scale(0.98); background: var(--bg-card); }
-        .icon-box { width: 48px; height: 48px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-        .card-info { flex: 1; }
-        .card-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
-        .card-sub { font-size: 12px; color: var(--text-muted); }
-        .price-tag { color: var(--primary); font-weight: 700; font-size: 14px; }
-
-        /* COUPONS */
-        .coupon {
-            background: linear-gradient(90deg, #222, #1a1a1a);
-            border: 1px solid #333; border-left: 4px solid var(--primary);
-            padding: 15px; margin-bottom: 10px; border-radius: 8px;
-            position: relative; display: flex; justify-content: space-between; align-items: center;
+        .list-card:active { background: var(--bg-card); }
+        
+        .icon-box {
+            width: 42px; height: 42px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
         }
-        .coupon::after {
+        
+        .card-content { flex: 1; min-width: 0; }
+        .card-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-desc { font-size: 12px; color: var(--text-muted); }
+        .text-success { color: var(--success); }
+        .text-primary { color: var(--primary); }
+        
+        .price-badge { font-weight: 700; color: var(--primary); font-size: 14px; }
+        .history-amount { font-weight: 700; font-size: 14px; }
+        .amount-pos { color: var(--success); }
+        .amount-neg { color: #fff; }
+
+        /* --- INVENTORY COUPONS --- */
+        .coupon-card {
+            background: linear-gradient(90deg, #1f1f1f, #181818);
+            border: 1px solid #333;
+            border-left: 4px solid var(--primary);
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .coupon-card::after {
             content: ""; position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
             height: 12px; width: 12px; background: var(--bg-body); border-radius: 50%;
         }
 
-        /* NAVIGATION */
+        /* --- NAVIGATION --- */
         .nav-bar {
             position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(20,20,20,0.95); backdrop-filter: blur(10px);
+            height: var(--nav-height);
+            background: rgba(15,15,15,0.95);
+            backdrop-filter: blur(12px);
             border-top: 1px solid var(--border);
             display: flex; justify-content: space-around;
-            padding: 15px 0 30px 0; z-index: 100;
+            padding-top: 12px;
+            z-index: 100;
         }
-        .nav-item { color: #666; text-align: center; width: 60px; transition: 0.3s; }
-        .nav-item.active { color: var(--primary); transform: translateY(-5px); }
-        .nav-item svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 4px; }
-        .nav-label { font-size: 10px; font-weight: 600; display: block; }
+        .nav-item {
+            color: #666; text-align: center; width: 64px;
+            transition: 0.3s; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .nav-item.active { color: var(--primary); }
+        .nav-item svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 6px; }
+        .nav-label { font-size: 10px; font-weight: 600; }
 
-        /* MODAL */
+        /* --- MODAL --- */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000;
             display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none; transition: 0.3s;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
         }
         .modal-overlay.active { opacity: 1; pointer-events: all; }
         .modal-box {
-            background: #1e1e1e; width: 90%; max-width: 340px;
+            background: #1e1e1e; width: 85%; max-width: 320px;
             border-radius: 24px; padding: 30px 20px; text-align: center;
             border: 1px solid var(--border); position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        .close-btn { position: absolute; top: 15px; right: 15px; padding: 10px; cursor: pointer; color: #666; }
+        .close-btn { position: absolute; top: 15px; right: 15px; padding: 10px; cursor: pointer; color: #666; font-size: 20px; line-height: 1; }
 
-        /* LOADERS */
-        .loader { width: 18px; height: 18px; border: 2px solid #fff; border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: rot 1s infinite linear; }
+        /* --- LOADERS --- */
+        .loader {
+            width: 20px; height: 20px;
+            border: 2px solid #fff; border-bottom-color: transparent;
+            border-radius: 50%; display: inline-block;
+            animation: rot 0.8s infinite linear;
+        }
         @keyframes rot { 100% { transform: rotate(360deg); } }
         
-        .error-msg { color: var(--danger); font-size: 13px; margin-top: 10px; text-align: center; }
+        .error-msg { color: var(--danger); font-size: 13px; margin-top: 12px; text-align: center; line-height: 1.4; }
+
     </style>
 </head>
 <body>
 
     <div id="auth-screen">
         <div class="brand-logo">Brendimo<br><span>Müştəri</span></div>
-        <p style="text-align:center; color:#666; margin-bottom:40px;">Loyallıq proqramına daxil olun</p>
+        <div class="auth-sub">Loyallıq proqramına xoş gəldiniz</div>
         
         <div class="input-group">
             <input type="text" id="reg-name" class="input-field" placeholder="Adınız" autocomplete="name">
         </div>
         <div class="input-group">
-            <input type="tel" id="reg-phone" class="input-field" placeholder="WhatsApp (050...)" autocomplete="tel">
+            <input type="tel" id="reg-phone" class="input-field" placeholder="Mobil Nömrə (050...)" autocomplete="tel">
         </div>
         
         <button class="btn-primary" id="btn-login" onclick="App.handleLoginBtn()">DAXİL OL</button>
         <div id="login-error" class="error-msg hidden"></div>
     </div>
 
-    <div id="app-container" class="container hidden">
+    <div id="app-container" class="container hidden fade-in">
         
         <div class="header-row">
             <div>
@@ -215,51 +344,57 @@
         <div id="view-home" class="view-section">
             <div class="section-header">
                 <div class="section-title">Gündəlik Şans</div>
-                <div style="font-size:12px; color:var(--text-muted)">Hər gün 1 dəfə</div>
+                <div class="section-sub">Hər gün 1 dəfə</div>
             </div>
 
             <div class="games-container">
                 <div class="game-card" id="g-wheel" onclick="Games.play('wheel')">
                     <div class="game-emoji">🎡</div>
                     <div class="game-title">Çarx</div>
-                    <div class="game-badge hidden" id="s-wheel">Hazırdır</div>
+                    <div class="game-status">Oynanılıb</div>
                 </div>
                 <div class="game-card" id="g-scratch" onclick="Games.play('scratch')">
                     <div class="game-emoji">🎫</div>
                     <div class="game-title">Poz-Qazan</div>
-                    <div class="game-badge hidden" id="s-scratch">Hazırdır</div>
+                    <div class="game-status">Oynanılıb</div>
                 </div>
                 <div class="game-card" id="g-cards" onclick="Games.play('cards')">
                     <div class="game-emoji">🃏</div>
                     <div class="game-title">Kartlar</div>
-                    <div class="game-badge hidden" id="s-cards">Hazırdır</div>
+                    <div class="game-status">Oynanılıb</div>
                 </div>
             </div>
 
             <div class="section-header">
                 <div class="section-title">Missiyalar</div>
             </div>
-            <div id="tasks-list"></div>
+            <div id="tasks-list">
+                </div>
         </div>
 
         <div id="view-shop" class="view-section hidden">
             <div class="section-header">
                 <div class="section-title">Kuponlarım</div>
             </div>
-            <div id="inventory-list"></div>
+            <div id="inventory-list">
+                </div>
             
             <div class="section-header" style="margin-top:30px;">
                 <div class="section-title">Kataloq</div>
+                <div class="section-sub">Xalları dəyiş</div>
             </div>
-            <div id="shop-catalog"></div>
+            <div id="shop-catalog">
+                </div>
         </div>
 
         <div id="view-history" class="view-section hidden">
             <div class="section-header">
-                <div class="section-title">Əməliyyatlar</div>
+                <div class="section-title">Son Əməliyyatlar</div>
             </div>
-            <div id="history-list"></div>
-            <button class="btn-primary" style="background:#222; color:#fff; margin-top:30px;" onclick="App.logout()">Çıxış Et</button>
+            <div id="history-list">
+                </div>
+            
+            <button class="btn-primary btn-logout" onclick="App.logout()">Hesabdan Çıx</button>
         </div>
 
     </div>
@@ -287,12 +422,19 @@
     </div>
 
     <script>
-        // --- CONFIGURATION ---
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwsyM6KVUDbwfMSP2ssMKCcaJCzIhnN2TiMxx3cBevFJ3qQJ_B8ySCkpfFMhIcMRUUy/exec'; 
+        // ==========================================
+        // CONFIGURATION
+        // ==========================================
+        // PASTE YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL BELOW
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxnBsHgjMKFtOt3jPAIM3xisKASKw9g6b_C6npq0LrAjtgGkCYWHh62BZ0_uc0P9Dib/exec'; 
 
-        // --- STATE MANAGEMENT ---
+        // ==========================================
+        // STATE MANAGEMENT (STORE)
+        // ==========================================
         const Store = {
-            key: 'brendimo_user_v5', // Increment version to clear old cache
+            key: 'brendimo_user_v7',
+            
+            // Default State
             data: {
                 name: '',
                 phone: '',
@@ -301,78 +443,71 @@
                 history: [],
                 completedTasks: [],
                 lastPlayDate: '', 
-                dailyWinClaimed: false
+                playedGames: {} // CHANGED: Changed from boolean to object to track specific games
             },
 
+            // Load from LocalStorage
             load() {
-                const s = localStorage.getItem(this.key);
-                if(s) {
-                    try { this.data = {...this.data, ...JSON.parse(s)}; } catch(e){}
+                const stored = localStorage.getItem(this.key);
+                if(stored) {
+                    try {
+                        this.data = { ...this.data, ...JSON.parse(stored) };
+                    } catch(e) { console.error("Load Error", e); }
                 }
+
+                // Daily Reset Logic
                 const today = new Date().toLocaleDateString();
-                if(this.data.lastPlayDate !== today) {
+                if (this.data.lastPlayDate !== today) {
                     this.data.lastPlayDate = today;
-                    this.data.dailyWinClaimed = false;
+                    this.data.dailyWinClaimed = false; // Reset game availability
+                    this.data.playedGames = {}; // CHANGED: Reset all games for the new day
                     this.save();
                 }
-                return !!this.data.phone;
+
+                return !!(this.data.phone && this.data.name);
             },
 
+            // Save to LocalStorage
             save() {
                 localStorage.setItem(this.key, JSON.stringify(this.data));
             },
 
-            // NOTE: This triggers a background sync to sheet. 
-            // We use no-cors here for speed, but Login uses CORS for accuracy.
-            sync() {
+            // Sync with Google Sheet (Fire & Forget)
+            async sync() {
                 if(!this.data.phone) return;
                 try {
-                    const formData = new FormData();
-                    formData.append('action', 'sync');
-                    formData.append('data', JSON.stringify(this.data));
-                    
+                    // We use fetch with keepalive to ensure it sends even if page closes
                     fetch(API_URL, {
                         method: 'POST',
-                        mode: 'no-cors',
-                        body: formData
+                        body: JSON.stringify({
+                            action: 'sync',
+                            data: this.data
+                        }),
+                        keepalive: true
                     });
-                } catch(e) { console.log("Sync skipped"); }
+                } catch(e) {
+                    console.error("Sync Failed", e);
+                }
+                // Always re-render UI after state change
                 UI.render();
             },
 
-            addCoins(n, desc) {
-                this.data.coins += n;
-                this.log('+', n, desc);
+            // Helper to update state safely
+            update(callback) {
+                callback(this.data);
                 this.save();
                 this.sync();
-            },
-
-            spendCoins(n, desc) {
-                if(this.data.coins < n) return false;
-                this.data.coins -= n;
-                this.log('-', n, desc);
-                this.save();
-                this.sync();
-                return true;
-            },
-
-            log(sign, n, desc) {
-                this.data.history.unshift({
-                    date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-                    amount: `${sign}${n}`,
-                    desc: desc
-                });
             }
         };
 
-        // --- APP LOGIC ---
+        // ==========================================
+        // APP LOGIC
+        // ==========================================
         const App = {
             init() {
-                // If we have local data, we show main immediately, 
-                // BUT we also trigger a silent refresh from the sheet to update balance.
-                if(Store.load()) {
+                // Check if user is logged in
+                if (Store.load()) {
                     this.showMain();
-                    this.refreshUserData(Store.data.phone);
                 } else {
                     document.getElementById('auth-screen').classList.remove('hidden');
                 }
@@ -382,322 +517,324 @@
                 const nameInp = document.getElementById('reg-name');
                 const phoneInp = document.getElementById('reg-phone');
                 const btn = document.getElementById('btn-login');
-                const errDiv = document.getElementById('login-error');
-                
-                const name = nameInp.value.trim();
-                const phone = phoneInp.value.trim().replace(/[^0-9]/g,'');
+                const err = document.getElementById('login-error');
 
-                if(name.length < 2 || phone.length < 9) {
-                    errDiv.innerText = "Zəhmət olmasa adı və nömrəni düzgün yazın.";
-                    errDiv.classList.remove('hidden');
+                const name = nameInp.value.trim();
+                const phone = phoneInp.value.trim().replace(/[^0-9]/g, '');
+
+                if (name.length < 2 || phone.length < 9) {
+                    err.innerText = "Zəhmət olmasa adı və nömrəni düzgün daxil edin.";
+                    err.classList.remove('hidden');
                     return;
                 }
 
+                // UI Loading State
                 btn.disabled = true;
                 btn.innerHTML = '<span class="loader"></span>';
-                errDiv.classList.add('hidden');
+                err.classList.add('hidden');
 
                 try {
-                    // STEP 1: CHECK SHEET (Strict Logic)
-                    // We add a timestamp (_t) to prevent browser caching of the GET request
-                    const response = await fetch(`${API_URL}?action=login&phone=${phone}&_t=${Date.now()}`);
+                    // Login Request (Get or Create User)
+                    const url = `${API_URL}?action=login&phone=${phone}&name=${encodeURIComponent(name)}`;
+                    const response = await fetch(url);
                     const json = await response.json();
 
-                    if(json.status === 'success') {
-                        // USER EXISTS: Fetch needed data
+                    if (json.status === 'success') {
+                        // Merge server data into local store
                         Store.data = { ...Store.data, ...json.data };
-                        Store.data.phone = phone; // Ensure phone is set
                         Store.save();
                         this.showMain();
-                    } else if(json.status === 'not_found' || json.result === 'not_found') {
-                        // USER NEW: Register them
-                        await this.registerNewUser(name, phone);
                     } else {
-                        throw new Error("Naməlum cavab");
+                        throw new Error(json.message || "Xəta baş verdi");
                     }
 
-                } catch(e) {
+                } catch (e) {
                     console.error(e);
-                    errDiv.innerText = "Bağlantı xətası. İnternetinizi yoxlayın.";
-                    errDiv.classList.remove('hidden');
+                    err.innerText = "Serverlə əlaqə qurulmadı. İnterneti yoxlayın.";
+                    err.classList.remove('hidden');
                     btn.disabled = false;
                     btn.innerText = "DAXİL OL";
                 }
             },
 
-            async registerNewUser(name, phone) {
-                // Prepare new user data
-                const initialData = {
-                    name: name,
-                    phone: phone,
-                    coins: 50, // Welcome Bonus
-                    inventory: [],
-                    history: [{
-                        date: new Date().toLocaleDateString(),
-                        amount: "+50",
-                        desc: "Xoş Gəldin Bonusu"
-                    }]
-                };
-
-                // Send to Sheet (Using POST to ensure write)
-                const formData = new FormData();
-                formData.append('action', 'register');
-                formData.append('data', JSON.stringify(initialData));
-
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const json = await response.json();
-                
-                if(json.status === 'success') {
-                    Store.data = { ...Store.data, ...initialData };
-                    Store.save();
-                    this.showMain();
-                } else {
-                    throw new Error("Qeydiyyat xətası");
-                }
-            },
-
-            // Updates balance silently in background for returning users
-            async refreshUserData(phone) {
-                try {
-                    const response = await fetch(`${API_URL}?action=login&phone=${phone}&_t=${Date.now()}`);
-                    const json = await response.json();
-                    if(json.status === 'success') {
-                        // Only update coins/inventory to avoid overwriting local game states if needed
-                        Store.data.coins = json.data.coins;
-                        Store.data.inventory = json.data.inventory || [];
-                        Store.save();
-                        UI.render();
-                    }
-                } catch(e) { console.log("Silent refresh failed"); }
-            },
-
             showMain() {
                 document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app-container').classList.remove('hidden');
+                const app = document.getElementById('app-container');
+                app.classList.remove('hidden');
+                
                 document.getElementById('main-nav').classList.remove('hidden');
+
+                // Set Header Info
                 document.getElementById('u-name').innerText = Store.data.name;
-                document.getElementById('u-initials').innerText = Store.data.name[0] ? Store.data.name[0].toUpperCase() : 'B';
+                const initial = Store.data.name.charAt(0).toUpperCase();
+                document.getElementById('u-initials').innerText = initial;
+
                 UI.render();
                 this.nav('home');
             },
 
             nav(view) {
-                document.querySelectorAll('.view-section').forEach(e => e.classList.add('hidden'));
+                // Hide all sections
+                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                // Show selected
                 document.getElementById(`view-${view}`).classList.remove('hidden');
-                document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+                
+                // Update Nav Icons
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                 
                 const idx = view === 'home' ? 0 : view === 'shop' ? 1 : 2;
                 document.querySelectorAll('.nav-item')[idx].classList.add('active');
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
             },
 
             logout() {
-                if(confirm("Çıxış etmək istəyirsiniz?")) {
+                if(confirm("Hesabdan çıxmaq istəyirsiniz?")) {
                     localStorage.removeItem(Store.key);
                     location.reload();
                 }
             }
         };
 
-        // --- UI RENDERER ---
+        // ==========================================
+        // UI RENDERER
+        // ==========================================
         const UI = {
             render() {
+                // 1. Balance
                 document.getElementById('u-coins').innerText = Store.data.coins;
-                
-                // Games Status
-                ['wheel','scratch','cards'].forEach(g => {
-                    const ts = localStorage.getItem(`last_${g}`);
-                    const isToday = ts && new Date(parseInt(ts)).toLocaleDateString() === new Date().toLocaleDateString();
+
+                // 2. Games Status (CHANGED: Checks individual game status)
+                const playedMap = Store.data.playedGames || {};
+                ['wheel', 'scratch', 'cards'].forEach(g => {
                     const el = document.getElementById(`g-${g}`);
-                    const badge = document.getElementById(`s-${g}`);
-                    if(isToday) {
+                    if (playedMap[g] === true) {
                         el.classList.add('locked');
-                        badge.innerText = "Sabah gəl";
-                        badge.classList.remove('hidden');
                     } else {
                         el.classList.remove('locked');
-                        badge.classList.add('hidden');
                     }
                 });
 
-                // Tasks
-                const tasks = [
-                    { id: 'ig', text: 'Instagram-da izlə', reward: 50, url: 'https://instagram.com/brendimo.az' },
-                    { id: 'wp', text: 'WhatsApp Kanalı', reward: 50, url: '#' },
-                    { id: 'tk', text: 'TikTok-da izlə', reward: 50, url: '#' }
+                // 3. Tasks List
+                const tasksData = [
+                    { id: 'insta_sub', title: 'Instagram-da izlə', reward: 50, url: 'https://instagram.com/brendimo.az' },
+                    { id: 'wp_join', title: 'WhatsApp Kanalı', reward: 50, url: '#' },
+                    { id: 'tiktok_sub', title: 'TikTok-da izlə', reward: 50, url: '#' }
                 ];
-                document.getElementById('tasks-list').innerHTML = tasks.map(t => {
-                    const done = Store.data.completedTasks.includes(t.id);
+
+                const tasksContainer = document.getElementById('tasks-list');
+                tasksContainer.innerHTML = tasksData.map(t => {
+                    const isDone = Store.data.completedTasks.includes(t.id);
                     return `
                     <div class="list-card">
                         <div class="icon-box">📢</div>
-                        <div class="card-info">
-                            <div class="card-title">${t.text}</div>
-                            <div class="card-sub" style="color:${done ? 'var(--success)' : 'var(--primary)'}">${done ? 'Tamamlandı' : '+'+t.reward+' Xal'}</div>
+                        <div class="card-content">
+                            <div class="card-title">${t.title}</div>
+                            <div class="card-desc ${isDone ? 'text-success' : 'text-primary'}">
+                                ${isDone ? 'Tamamlandı' : '+' + t.reward + ' Xal'}
+                            </div>
                         </div>
-                        ${!done ? `<button class="btn-primary" style="width:auto; padding:8px 16px; font-size:12px;" onclick="Tasks.do('${t.id}','${t.url}',${t.reward})">İzlə</button>` : ''}
+                        ${!isDone ? `<button class="btn-primary btn-sm" onclick="Ops.doTask('${t.id}', '${t.url}', ${t.reward})">Keç</button>` : ''}
                     </div>`;
                 }).join('');
 
-                // Shop
-                const products = [
-                    { id: 1, name: '10% Endirim', price: 200, icon: '🏷️' },
-                    { id: 2, name: '5 AZN Balans', price: 500, icon: '💳' },
-                    { id: 3, name: '50 AZN Cashback', price: 5000, icon: '💎' },
-                    { id: 4, name: 'Sürpriz Qutu', price: 1500, icon: '🎁' }
+                // 4. Shop Catalog
+                const productsData = [
+                    { name: '10% Endirim', price: 200, icon: '🏷️' },
+                    { name: '5 AZN Balans', price: 500, icon: '💳' },
+                    { name: '50 AZN Cashback', price: 5000, icon: '💎' },
+                    { name: 'Sürpriz Qutu', price: 1500, icon: '🎁' }
                 ];
-                document.getElementById('shop-catalog').innerHTML = products.map(p => `
-                <div class="list-card">
-                    <div class="icon-box">${p.icon}</div>
-                    <div class="card-info">
-                        <div class="card-title">${p.name}</div>
-                        <div class="price-tag">${p.price} Xal</div>
-                    </div>
-                    <button class="btn-primary" style="width:auto; padding:8px 16px; font-size:12px;" onclick="Shop.buy('${p.name}', ${p.price})">Al</button>
-                </div>`).join('');
 
-                // Inventory
-                const inv = document.getElementById('inventory-list');
-                if(!Store.data.inventory || Store.data.inventory.length === 0) inv.innerHTML = '<div style="text-align:center; color:#555; font-size:13px;">Hələ ki, kuponunuz yoxdur</div>';
-                else inv.innerHTML = Store.data.inventory.map(i => `
-                    <div class="coupon">
-                        <div>
-                            <div style="font-weight:700; color:var(--primary)">${i.name}</div>
-                            <div style="font-size:10px; color:#888">${i.date}</div>
+                const shopContainer = document.getElementById('shop-catalog');
+                shopContainer.innerHTML = productsData.map(p => `
+                    <div class="list-card">
+                        <div class="icon-box">${p.icon}</div>
+                        <div class="card-content">
+                            <div class="card-title">${p.name}</div>
+                            <div class="price-badge">${p.price} Xal</div>
                         </div>
-                        <div style="font-size:20px">🎫</div>
+                        <button class="btn-primary btn-sm" onclick="Ops.buyItem('${p.name}', ${p.price})">Al</button>
                     </div>
                 `).join('');
 
-                // History
-                const hist = document.getElementById('history-list');
-                if(!Store.data.history) Store.data.history = [];
-                hist.innerHTML = Store.data.history.map(h => `
-                    <div class="list-card" style="padding:10px;">
-                        <div class="card-info">
-                            <div class="card-title" style="font-size:13px">${h.desc}</div>
-                            <div class="card-sub">${h.date}</div>
-                        </div>
-                        <div style="font-weight:700; color:${h.amount.includes('+')? 'var(--success)':'#fff'}">${h.amount}</div>
-                    </div>
-                `).join('');
-            }
-        };
-
-        // --- GAME LOGIC ---
-        const Games = {
-            play(game) {
-                // Check if already played today
-                const last = localStorage.getItem(`last_${game}`);
-                if(last && new Date(parseInt(last)).toLocaleDateString() === new Date().toLocaleDateString()) return;
-
-                // Win Logic: 
-                let result = 0; 
-                if (Store.data.dailyWinClaimed) {
-                    result = 0; // Already won today
+                // 5. Inventory
+                const invContainer = document.getElementById('inventory-list');
+                if (!Store.data.inventory || Store.data.inventory.length === 0) {
+                    invContainer.innerHTML = '<div style="text-align:center; color:#555; font-size:13px; padding:10px;">Aktiv kuponunuz yoxdur</div>';
                 } else {
-                    // Check if this is the 3rd game attempted today (Force win if last chance)
-                    let playedCount = 0;
-                    ['wheel','scratch','cards'].forEach(g => {
-                         const ts = localStorage.getItem(`last_${g}`);
-                         if(ts && new Date(parseInt(ts)).toLocaleDateString() === new Date().toLocaleDateString()) playedCount++;
-                    });
-                    
-                    if (playedCount === 2) { 
-                        // Last game of the day, force win
-                        result = 20 + Math.floor(Math.random()*30); 
-                    } else {
-                        // Standard Chance
-                        if(Math.random() > 0.6) result = 10 + Math.floor(Math.random()*40);
-                    }
+                    const revInv = [...Store.data.inventory].reverse();
+                    invContainer.innerHTML = revInv.map(i => `
+                        <div class="coupon-card">
+                            <div>
+                                <div style="font-weight:700; color:#fff; font-size:15px; margin-bottom:4px;">${i.name}</div>
+                                <div style="font-size:11px; color:#888;">${i.date}</div>
+                            </div>
+                            <div style="font-size:24px;">🎟️</div>
+                        </div>
+                    `).join('');
                 }
+
+                // 6. History
+                const histContainer = document.getElementById('history-list');
+                if (!Store.data.history || Store.data.history.length === 0) {
+                    histContainer.innerHTML = '<div style="text-align:center; color:#555; font-size:13px; padding:10px;">Əməliyyat yoxdur</div>';
+                } else {
+                    histContainer.innerHTML = Store.data.history.map(h => {
+                        const isPlus = h.amount.includes('+');
+                        return `
+                        <div class="list-card" style="padding:12px 16px;">
+                            <div class="card-content">
+                                <div class="card-title" style="font-size:14px;">${h.desc}</div>
+                                <div class="card-desc">${h.date}</div>
+                            </div>
+                            <div class="history-amount ${isPlus ? 'amount-pos' : 'amount-neg'}">${h.amount}</div>
+                        </div>`;
+                    }).join('');
+                }
+            }
+        };      
+
+       // ==========================================
+        // GAME LOGIC
+        // ==========================================
+        const Games = {
+            activeGame: null, // CHANGED: Added tracker for current game
+
+            play(type) {
+                // CHANGED: Check only the specific game type
+                if (Store.data.playedGames && Store.data.playedGames[type]) {
+                    alert("Bu oyunu bu gün oynamısınız. Sabah yenidən cəhd edin!");
+                    return;
+                }
+
+                this.activeGame = type; // CHANGED: Save current game type
 
                 const modal = document.getElementById('modal');
                 const content = document.getElementById('modal-content');
                 modal.classList.add('active');
-                
-                if(game === 'wheel') {
-                    content.innerHTML = `
-                        <h3 style="margin-bottom:20px;">Şans Çarxı</h3>
-                        <div style="width:200px; height:200px; border-radius:50%; border:4px solid var(--primary); margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:40px;">🎡</div>
-                        <button class="btn-primary" style="margin-top:20px;" onclick="Games.finish('${game}', ${result})">Fırlat</button>
+
+                // Render Game UI in Modal
+                let html = '';
+                if (type === 'wheel') {
+                    html = `
+                        <div style="font-size:60px; margin-bottom:20px;">🎡</div>
+                        <h3 style="margin-bottom:10px;">Şans Çarxı</h3>
+                        <p style="color:#888; margin-bottom:20px; font-size:13px;">Fırlat və şansını yoxla!</p>
+                        <button class="btn-primary" onclick="Games.finish()">FIRLAT</button>
                     `;
-                } else if (game === 'scratch') {
-                    content.innerHTML = `
+                } else if (type === 'scratch') {
+                    html = `
                         <h3 style="margin-bottom:20px;">Poz-Qazan</h3>
-                        <div style="background:#333; height:100px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;">
-                            <span style="font-size:24px; color:#888;">???</span>
+                        <div style="background:#333; height:100px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:25px; border:2px dashed #555;">
+                            <span style="font-size:24px; color:#aaa; letter-spacing:4px;">?????</span>
                         </div>
-                        <button class="btn-primary" onclick="Games.finish('${game}', ${result})">Poz</button>
+                        <button class="btn-primary" onclick="Games.finish()">POZ</button>
                     `;
-                } else {
-                    content.innerHTML = `
+                } else if (type === 'cards') {
+                    html = `
                         <h3 style="margin-bottom:20px;">Kart Seç</h3>
-                        <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px;">
-                            <div style="width:60px; height:80px; background:#333; border-radius:8px;"></div>
-                            <div style="width:60px; height:80px; background:#333; border-radius:8px;"></div>
-                            <div style="width:60px; height:80px; background:#333; border-radius:8px;"></div>
+                        <div style="display:flex; gap:10px; justify-content:center; margin-bottom:25px;">
+                            <div style="width:60px; height:85px; background:#333; border-radius:8px; border:1px solid #555;"></div>
+                            <div style="width:60px; height:85px; background:#333; border-radius:8px; border:1px solid #555;"></div>
+                            <div style="width:60px; height:85px; background:#333; border-radius:8px; border:1px solid #555;"></div>
                         </div>
-                        <button class="btn-primary" onclick="Games.finish('${game}', ${result})">Seç</button>
+                        <button class="btn-primary" onclick="Games.finish()">SEÇ</button>
                     `;
                 }
+                content.innerHTML = html;
             },
 
-            finish(game, amount) {
+            finish() {
                 const content = document.getElementById('modal-content');
-                content.innerHTML = '<div class="loader"></div>';
-                
+                content.innerHTML = '<div class="loader" style="margin:40px auto;"></div>';
+
+                // Determine Result (Simple Probability)
+                const isWin = Math.random() < 0.4;
+                const points = isWin ? Math.floor(Math.random() * 41) + 10 : 0;
+
                 setTimeout(() => {
-                    localStorage.setItem(`last_${game}`, Date.now());
-                    
-                    if(amount > 0) {
-                        Store.addCoins(amount, 'Oyun Uduşu');
-                        Store.data.dailyWinClaimed = true; 
-                        Store.save(); 
-                        alert(`Təbriklər! ${amount} Xal qazandınız.`);
-                    } else {
-                        alert("Təəssüf, bu dəfə alınmadı.");
-                    }
-                    Store.save();
+                    Store.update(data => {
+                        // CHANGED: Lock only the current game
+                        if (!data.playedGames) data.playedGames = {};
+                        data.playedGames[this.activeGame] = true; 
+                        
+                        if (points > 0) {
+                            data.coins += points;
+                            data.history.unshift({
+                                date: new Date().toLocaleString(),
+                                amount: `+${points}`,
+                                desc: 'Oyun Uduşu'
+                            });
+                        }
+                    });
+
                     document.getElementById('modal').classList.remove('active');
-                    UI.render();
-                }, 1500);
+                    
+                    if (points > 0) {
+                        alert(`Təbriklər! ${points} Xal qazandınız!`);
+                    } else {
+                        alert("Təəssüf, bu dəfə alınmadı. Sabah yenə gözləyirik!");
+                    }
+                    
+                    this.activeGame = null; // Reset tracker
+                }, 1500); 
             }
         };
-
-        const Tasks = {
-            do(id, url, reward) {
-                if(confirm("Səhifəyə keçid edib tapşırığı tamamlayın.")) {
+        // ==========================================
+        // OPERATIONS (TASKS & SHOP)
+        // ==========================================
+        const Ops = {
+            doTask(taskId, url, reward) {
+                if (confirm("Tapşırığı yerinə yetirmək üçün səhifəyə keçid edilsin?")) {
                     window.open(url, '_blank');
+                    
+                    // Simple timeout simulation to verify task
                     setTimeout(() => {
-                        if(confirm("Abunə oldunuz?")) {
-                            Store.addCoins(reward, 'Tapşırıq');
-                            Store.data.completedTasks.push(id);
-                            Store.save();
+                        if(confirm("Abunə oldunuzmu?")) {
+                            Store.update(data => {
+                                data.coins += reward;
+                                data.completedTasks.push(taskId);
+                                data.history.unshift({
+                                    date: new Date().toLocaleString(),
+                                    amount: `+${reward}`,
+                                    desc: 'Tapşırıq'
+                                });
+                            });
+                            alert("Təşəkkürlər! Xallar balansınıza əlavə olundu.");
                         }
                     }, 3000);
                 }
-            }
-        };
+            },
 
-        const Shop = {
-            buy(name, price) {
-                if(confirm(`${name} almaq üçün ${price} Xal?`)) {
-                    if(Store.spendCoins(price, `Market: ${name}`)) {
-                        Store.data.inventory.push({ name: name, date: new Date().toLocaleDateString() });
-                        Store.save();
-                        alert("Uğurla alındı!");
-                    } else {
-                        alert("Balans kifayət deyil");
-                    }
+            buyItem(name, price) {
+                if (Store.data.coins < price) {
+                    alert("Balansınız kifayət deyil.");
+                    return;
+                }
+
+                if (confirm(`${name} almaq istədiyinizə əminsiniz? (${price} Xal)`)) {
+                    Store.update(data => {
+                        data.coins -= price;
+                        data.inventory.push({
+                            name: name,
+                            date: new Date().toLocaleDateString()
+                        });
+                        data.history.unshift({
+                            date: new Date().toLocaleString(),
+                            amount: `-${price}`,
+                            desc: `Market: ${name}`
+                        });
+                    });
+                    alert("Uğurla alındı! Kuponunuz 'Kuponlarım' bölməsindədir.");
                 }
             }
         };
 
+        // Initialize App on Load
         window.onload = App.init.bind(App);
+
     </script>
 </body>
 </html>
