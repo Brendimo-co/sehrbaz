@@ -4100,24 +4100,21 @@ function redirectToWhatsAppFromReel(name, price, img) {
 }
 
 function shareReel(name) {
-    // 1. Create the link
-    const specificLink = window.location.origin + window.location.pathname + '#p=' + encodeURIComponent(name);
-
+    // 1. Generate the exact Deep Link
+    // Encodes the name properly to handle spaces and special characters
+const exactLink = window.location.origin + window.location.pathname + '#view=product&id=' + encodeURIComponent(name);
+  
     // 2. Try Native Share (Mobile)
     if (navigator.share) {
         navigator.share({
             title: 'Brendimo Hədiyyə',
             text: `Bu məhsula bax: ${name}`,
-            url: specificLink 
+            url: exactLink
         }).catch(console.error);
     } else {
-        // 3. Fallback: Copy to clipboard (Desktop)
-        navigator.clipboard.writeText(specificLink).then(() => {
-            alert('Link kopyalandı! Dostuna göndər.');
-        }).catch(err => {
-            console.error('Failed to copy: ', err);
-            prompt("Link:", specificLink); // Ultimate fallback
-        });
+        // 3. Desktop Fallback: Show the link in a prompt so you can SEE and COPY it
+        // Using prompt() allows the user to visually inspect the link
+        prompt("Bu məhsulun birbaşa linki:", exactLink);
     }
 }
   
@@ -6034,7 +6031,6 @@ closeCategoryModal = function() {
 }
 
 
-
   
 /* --- 🔗 SHAREABLE LINKS SYSTEM (FIXED) --- */
 
@@ -6059,25 +6055,38 @@ function checkDeepLinks() {
     const hash = window.location.hash;
     if (!hash) return; 
 
-    console.log("🔗 Router checking:", hash);
+    // Remove the '#' and decode special characters (like %20 for spaces)
     const cleanHash = decodeURIComponent(hash.substring(1)); 
     const parts = cleanHash.split('=');
+    
     if (parts.length < 2) return;
     
     const key = parts[0];
     const value = parts[1];
 
-    // -- ROUTING LOGIC --
-    
-    // A. Open Specific Product (#p=Product Name)
+    // LOGIC: If the link is #p=ProductName
+// LOGIC: If the link is #p=ProductName (Legacy Support)
     if (key === 'p') {
+        let attempts = 0; // FIX: Add attempt counter to prevent infinite loop
         const checkData = setInterval(() => {
-            if (state.products.length > 0) {
+            attempts++;
+            // Stop after 10 seconds (50 attempts) if product not found
+            if (attempts > 50) { 
                 clearInterval(checkData);
-                const product = state.products.find(x => x.name.toLowerCase() === value.toLowerCase());
-                if (product) openModal(product, state.products);
+                console.log("Deep link timeout: Product not found");
+                return;
             }
-        }, 200); // Check every 200ms until data loads
+
+            if (state.products && state.products.length > 0) {
+                const product = state.products.find(x => x.name.toLowerCase() === value.toLowerCase());
+                
+                if (product) {
+                    clearInterval(checkData);
+                    // Redirect to new Router format immediately
+                    openModal(product, state.products);
+                }
+            }
+        }, 200); 
     }
     
     // B. Open Zodiac (#zodiac=aries)
@@ -6163,13 +6172,17 @@ const Router = {
         // 2. ROUTING LOGIC
         // If the current view is NOT what the URL says, we update the UI
         
+     if (hash.startsWith('p=') || hash.startsWith('c=') || hash.startsWith('zodiac=')) {
+             return; 
+        }
+
         if (!view || view === 'mall') {
             closeAllModalsUI();
             if(!document.getElementById('all-products-view').classList.contains('active')) {
                 openAllProducts();
             }
             activateNavUI('mall');
-        } 
+        }
         else if (view === 'fav') {
             closeAllModalsUI();
             openFavorites();
