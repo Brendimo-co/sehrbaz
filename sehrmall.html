@@ -3548,15 +3548,16 @@ function init() {
     initModalSwipe();
     initBubbleDrag();
     
-    handleNavClick('mall'); // <--- THIS LINE OPENS THE MALL
-    
     initBannerSlider();
     initCategories();
     initFeaturedReviews();
     initZodiac();
     
-    // You can remove or comment out updateUI() since you hid the wizard
-    // updateUI(); 
+    // 🚀 Start Router
+    Router.init();
+    
+    // Fetch data immediately
+    openAllProducts(); 
 }
   
 function preloadStories() {
@@ -3679,8 +3680,72 @@ function initZodiac() {
     });
 }
 
-function openZodiacModal(id) {
-  updateURL('zodiac', id); // <--- ADD THIS LINE
+
+  function openCategoryModal(id, updateUrl = true) {
+    if (updateUrl) Router.set('category', id);
+
+    const cat = categoriesData.find(c => c.id === id);
+    if(!cat) return;
+
+    // ... [Original Logic Preserved] ...
+    document.getElementById('cm-icon').textContent = "🎁";
+    document.getElementById('cm-title').textContent = cat.title;
+    document.getElementById('cm-desc').textContent = cat.desc || "Seçimlər";
+    
+    const list = document.getElementById('cm-ideas-list');
+    list.innerHTML = '';
+    const ideas = cat.ideas || ["Hədiyyə"];
+    ideas.forEach(idea => {
+        const li = document.createElement('li');
+        li.innerHTML = `✨ ${idea}`;
+        list.appendChild(li);
+    });
+
+    const productGrid = document.getElementById('cm-products-grid');
+    productGrid.innerHTML = '<div style="width:100%; text-align:center; padding:20px; color:#999;">Yüklənir...</div>';
+    
+    const matches = state.products.filter(p => p.tag && p.tag.toLowerCase().includes(cat.tag));
+    productGrid.innerHTML = '';
+    
+    if (matches.length > 0) {
+        matches.slice(0, 5).forEach(p => {
+             const el = document.createElement('div');
+             el.className = 'grid-item';
+             el.onclick = () => openModal(p, matches, matches.indexOf(p));
+             el.innerHTML = `
+                <img src="${fixImageLink(p.image)}" loading="lazy">
+                <div class="grid-info">
+                    <div class="grid-title">${p.name}</div>
+                    <div class="grid-price-box">
+                        <span class="grid-new-price">${p.price} AZN</span>
+                    </div>
+                </div>`;
+             productGrid.appendChild(el);
+        });
+    } else {
+        productGrid.innerHTML = `<div style="padding:20px; text-align:center;">Məhsul tapılmadı.</div>`;
+    }
+
+    document.getElementById('category-modal').classList.add('active');
+    logUserAction("CategoryView", cat.title);
+}
+
+function closeCategoryModal() {
+    Router.clear();
+    document.getElementById('category-modal').classList.remove('active');
+    
+    // Reset banner styles
+    setTimeout(() => {
+       const header = document.querySelector('.cat-modal-header');
+       if(header) header.className = 'cat-modal-header';
+       const ideaBox = document.querySelector('.idea-box');
+       if(ideaBox) ideaBox.style.display = 'block';
+    }, 300);
+}
+
+  
+function openZodiacModal(id, updateUrl = true) {
+    if (updateUrl) Router.set('zodiac', id);
     const data = zodiacData.find(z => z.id === id);
     if (!data) return;
 
@@ -3751,7 +3816,7 @@ function openZodiacModal(id) {
 }
 
 function closeZodiacModal() {
-  clearURL(); // <--- ADD THIS LINE
+    Router.clear();
     document.getElementById('zodiac-modal').classList.remove('active');
 }
 
@@ -4361,75 +4426,7 @@ function startCategoryAutoScroll() {
     }, 3000); // Speed: Every 3 seconds
 }
 
-// 2. OPEN MODAL & FILTER PRODUCTS
-function openCategoryModal(id) {
-  updateURL('c', id);
-    const cat = categoriesData.find(c => c.id === id);
-    if(!cat) return;
 
-    // A. Set Text Content (With Fallbacks)
-    document.getElementById('cm-icon').textContent = "🎁"; // Default icon
-    document.getElementById('cm-title').textContent = cat.title;
-    document.getElementById('cm-desc').textContent = cat.desc || "Bu kateqoriya üçün ən ideal və xüsusi seçimlər."; // Default text
-    
-    const list = document.getElementById('cm-ideas-list');
-    list.innerHTML = '';
-    
-    // Fallback ideas if not present
-    const ideas = cat.ideas || ["Möhtəşəm Hədiyyə Dəsti", "Xüsusi Qablaşdırma", "Orijinal Aksesuar"];
-    ideas.forEach(idea => {
-        const li = document.createElement('li');
-        li.innerHTML = `✨ ${idea}`;
-        list.appendChild(li);
-    });
-
-    // B. FETCH & SHOW MATCHING PRODUCTS
-    const productGrid = document.getElementById('cm-products-grid');
-    productGrid.innerHTML = '<div style="width:100%; text-align:center; padding:20px; color:#999;">Yüklənir...</div>';
-    
-    // Filter from global state.products
-    // We look for the 'tag' inside the product's tag field in Google Sheets
-    // Column M should contain words like "cat_ana" or "cat_telebe"
-    const matches = state.products.filter(p => p.tag && p.tag.toLowerCase().includes(cat.tag));
-    
-    productGrid.innerHTML = '';
-    
-    if (matches.length > 0) {
-        // Show max 5 products
-        matches.slice(0, 5).forEach(p => {
-             const pIndex = state.products.indexOf(p);
-             const el = document.createElement('div');
-             el.className = 'grid-item';
-             el.onclick = () => openModal(p, matches, matches.indexOf(p)); // Opens the big product details modal
-             
-             el.innerHTML = `
-                <img src="${fixImageLink(p.image)}" loading="lazy">
-                <div class="grid-info">
-                    <div class="grid-title">${p.name}</div>
-                    <div class="grid-price-box">
-                        <span class="grid-new-price">${p.price} AZN</span>
-                    </div>
-                </div>`;
-             productGrid.appendChild(el);
-        });
-    } else {
-        productGrid.innerHTML = `
-            <div style="grid-column: span 2; text-align:center; color:#999; padding:20px; background:#f9f9f9; border-radius:10px;">
-                <span style="font-size:30px; display:block; margin-bottom:10px;">😕</span>
-                Bu kateqoriyaya uyğun məhsul hələ əlavə edilməyib. <br>
-                <small>(Excel-də "tag" sütununa <b>${cat.tag}</b> yazın)</small>
-            </div>`;
-    }
-
-    document.getElementById('category-modal').classList.add('active');
-    logUserAction("CategoryView", cat.title);
-}
-
-function closeCategoryModal() {
-  clearURL(); // 👈 ADD THIS LINE
-  if(window.location.hash.includes('#c=')) clearURL();
-    document.getElementById('category-modal').classList.remove('active');
-}
   // --- BANNER SLIDER LOGIC ---
 function initBannerSlider() {
     const track = document.getElementById('banner-track');
@@ -4971,15 +4968,17 @@ function showPrevModalProduct() { if (currentModalIndex > 0) { openModal(current
 // --- MODAL & REVIEWS ---
 
 
-function openModal(p, sourceList = [], index = -1) {
-    // SAFETY CHECK: If product 'p' is missing, stop to prevent crash
+function openModal(p, sourceList = [], index = -1, updateUrl = true) {
+    // SAFETY CHECK
     if (!p) {
-updateURL('p', p.name);
-      console.error("Məhsul tapılmadı! (Product is undefined)");
+        console.error("Məhsul tapılmadı!");
         return;
     }
 
-    // Ensure trackInteraction exists before calling
+    // 🚀 ROUTER UPDATE: Set URL to #view=product&id=ProductName
+    if (updateUrl) Router.set('product', p.name);
+
+    // Ensure trackInteraction exists
     if (typeof trackInteraction === 'function') trackInteraction();
 
     state.viewedProductCount++;
@@ -5019,7 +5018,6 @@ updateURL('p', p.name);
         }
     };
     imgWrapper.appendChild(btn);
-    // --- END LIKE LOGIC ---
 
     document.getElementById('modal-price').innerHTML = `
         <span style="text-decoration:line-through;color:#999;font-size:18px;margin-right:10px;">${p.oldPrice}₼</span>
@@ -5062,14 +5060,13 @@ function toggleLikeFromModal(product, btnElement) {
 
 // UPDATE: When closing modal, refresh the Favorites grid if it is open!
 function closeModal() { 
-  clearURL(); // 👈 ADD THIS LINE
-  if(window.location.hash.includes('#p=')) clearURL();
+    Router.clear(); // Updates URL back to parent view
     document.getElementById('product-modal').classList.remove('active'); 
     
-    // Check if the user is currently on the Favorites Page
+    // Refresh favorites grid if needed
     const favView = document.getElementById('favorites-view');
-    if (favView.classList.contains('active')) {
-        renderFavorites(); // RE-RENDER the grid to remove unliked items immediately
+    if (favView && favView.classList.contains('active')) {
+        renderFavorites();
     }
 }
 
@@ -5701,53 +5698,46 @@ function restartApp() {
 }
 
 function handleNavClick(tab, shouldUpdateURL = true) {
-  // 1. Force close any open product modal
-  closeModal(); 
+    // 1. External Links
+    if (tab === 'chat') {
+        window.location.href = `https://wa.me/${WHATSAPP_NUMBER}`;
+        return;
+    } 
+    else if (tab === 'wheel') {
+        window.location.href = 'vipaccount.html';
+        return;
+    }
+    else if (tab === 'account') {
+        window.location.href = 'myprofile.html';
+        return;
+    }
+    else if (tab === 'wizard') {
+        window.location.href = 'index.html'; 
+        return;
+    }
 
-  // Update URL if triggered by user click (not by router)
-  if (shouldUpdateURL && tab !== 'chat' && tab !== 'wheel' && tab !== 'wizard') {
-      updateURL('tab', tab);
-  }
+    // 2. Internal Routing
+    // We set the URL, and the Router.check() listener will handle the UI changes
+    Router.set(tab);
+    
+    // Visual update immediately for responsiveness
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const navItem = document.getElementById(`nav-${tab}`);
+    if(navItem) navItem.classList.add('active');
 
-  // Remove active state from all nav items
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  
-  // Highlight the clicked button
-  if (tab !== 'chat' && tab !== 'wheel' && tab !== 'wizard') {
-      const navItem = document.getElementById(`nav-${tab}`);
-      if(navItem) navItem.classList.add('active');
-  }
-
-  // Hide the specific views initially
-  const mallView = document.getElementById('all-products-view');
-  const favView = document.getElementById('favorites-view');
-  
-  if(mallView) mallView.classList.remove('active');
-  if(favView) favView.classList.remove('active');
-
-  if (tab === 'wizard') {
-    window.location.href = 'index.html'; 
-  } 
-  else if (tab === 'mall') {
-    openAllProducts();
-  } 
-  else if (tab === 'fav') {
-      openFavorites();
-  }
-  else if (tab === 'chat') {
-window.location.href = `https://wa.me/${WHATSAPP_NUMBER}`;    // Visual reset logic
-    setTimeout(() => { 
-        // Reset URL to previous tab if chat opened
-        if(window.history.length > 1) window.history.back();
-    }, 500);
-  } 
-  else if (tab === 'wheel') {
-window.location.href = 'vipaccount.html';  }
-  else if (tab === 'account') {
-    window.location.href = 'myprofile.html';
-  }
+    // Hide views logic
+    const mallView = document.getElementById('all-products-view');
+    const favView = document.getElementById('favorites-view');
+    
+    if(tab === 'mall') {
+        if(favView) favView.classList.remove('active');
+        if(mallView) mallView.classList.add('active');
+    } else if (tab === 'fav') {
+        if(mallView) mallView.classList.remove('active');
+        if(favView) favView.classList.add('active');
+        renderFavorites(); // Ensure favorites are rendered
+    }
 }
-  
 const storiesData = [
   { id: 1, title: 'Müştərilər', thumb: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&h=150&fit=crop', content: 'https://github.com/Brendimo-co/sehrbaz/blob/main/memnun.png?raw=true&fit=crop', type: 'story' },
   { id: 'about', title: 'Biz Kimik?', thumb: 'https://cdn-icons-png.flaticon.com/512/189/189664.png', type: 'action', action: openAboutModal },
@@ -5848,14 +5838,14 @@ function closeStory() {
   if (storyTimer) clearInterval(storyTimer);
 }
 
-function openAboutModal() { 
-    updateURL('modal', 'about'); // <--- ADD THIS LINE
+function openAboutModal(updateUrl = true) { 
+    if (updateUrl) Router.set('modal', 'about');
     document.getElementById('about-modal').classList.add('active'); 
     logUserAction("AboutModal"); 
 }
 
 function closeAboutModal() {
-    clearURL(); 
+    Router.clear();
     document.getElementById('about-modal').classList.remove('active'); 
 }
 
@@ -5988,8 +5978,8 @@ const bannerDetails = {
     }
 };
 
-function openBannerModal(bannerId) {
-  updateURL('banner', bannerId); // <--- ADD THIS LINE
+function openBannerModal(bannerId, updateUrl = true) {
+    if (updateUrl) Router.set('banner', bannerId);
     const data = bannerDetails[bannerId];
     if(!data) return;
 
@@ -6042,6 +6032,9 @@ closeCategoryModal = function() {
         document.querySelector('.idea-box').style.display = 'block'; // Show ideas again
     }, 300);
 }
+
+
+
   
 /* --- 🔗 SHAREABLE LINKS SYSTEM (FIXED) --- */
 
@@ -6116,7 +6109,125 @@ window.addEventListener('popstate', () => {
         checkDeepLinks();
     }
 });
-  
+  /* --- 🚀 NEW ROUTER ENGINE (SUBDOMAIN LOGIC) --- */
+const Router = {
+    // Updates the URL without triggering a reload
+    set: (view, id = null) => {
+        let hash = `#view=${view}`;
+        if (id) hash += `&id=${encodeURIComponent(id)}`;
+        
+        // Prevent duplicate history entries
+        if (window.location.hash !== hash) {
+            history.pushState(null, null, hash);
+        }
+    },
+
+    // Returns to the main tab view (handles closing modals via URL)
+    clear: () => {
+        const currentTab = document.querySelector('.nav-item.active');
+        const tabId = currentTab ? currentTab.id.replace('nav-', '') : 'mall';
+        const newHash = `#view=${tabId}`;
+        
+        if (window.location.hash !== newHash) {
+            history.pushState(null, null, newHash);
+        }
+    },
+
+    // Initialize listeners
+    init: () => {
+        window.addEventListener('hashchange', Router.check);
+        window.addEventListener('load', Router.check);
+    },
+
+    // The Brain: Decides what to show based on the URL
+    check: async () => {
+        const hash = window.location.hash.substring(1);
+        const params = new URLSearchParams(hash);
+        const view = params.get('view');
+        const id = params.get('id');
+
+        console.log(`🧭 Routing to: ${view} ID: ${id}`);
+
+        // 1. DATA WAIT LOGIC: If opening a product, wait for data to load
+        if ((view === 'product' || view === 'category' || view === 'zodiac') && state.products.length === 0) {
+            await new Promise(resolve => {
+                const check = setInterval(() => {
+                    if (state.products.length > 0) {
+                        clearInterval(check);
+                        resolve();
+                    }
+                }, 200); // Check every 200ms
+            });
+        }
+
+        // 2. ROUTING LOGIC
+        // If the current view is NOT what the URL says, we update the UI
+        
+        if (!view || view === 'mall') {
+            closeAllModalsUI();
+            if(!document.getElementById('all-products-view').classList.contains('active')) {
+                openAllProducts();
+            }
+            activateNavUI('mall');
+        } 
+        else if (view === 'fav') {
+            closeAllModalsUI();
+            openFavorites();
+            activateNavUI('fav');
+        }
+        else if (view === 'account') {
+            window.location.href = 'myprofile.html';
+        }
+        else if (view === 'wheel') {
+            window.location.href = 'vipaccount.html';
+        }
+        else if (view === 'chat') {
+             // Chat is external, do nothing or redirect
+        }
+        else if (view === 'product' && id) {
+            const pName = decodeURIComponent(id);
+            const product = state.products.find(x => x.name === pName);
+            // Open modal only if it's not already open with this product
+            const currentTitle = document.getElementById('modal-title').textContent;
+            if (product && (!document.getElementById('product-modal').classList.contains('active') || currentTitle !== pName)) {
+                openModal(product, state.products, -1, false); // false = don't update URL inside
+            }
+        }
+        else if (view === 'category' && id) {
+            if (!document.getElementById('category-modal').classList.contains('active')) {
+                openCategoryModal(parseInt(id), false);
+            }
+        }
+        else if (view === 'zodiac' && id) {
+            if (!document.getElementById('zodiac-modal').classList.contains('active')) {
+                openZodiacModal(id, false);
+            }
+        }
+        else if (view === 'modal' && id === 'about') {
+            if (!document.getElementById('about-modal').classList.contains('active')) {
+                openAboutModal(false);
+            }
+        }
+        else if (view === 'banner' && id) {
+             if (!document.getElementById('category-modal').classList.contains('active')) {
+                openBannerModal(id, false);
+             }
+        }
+    }
+};
+
+// UI Helper: visually highlight nav without logic
+function activateNavUI(tab) {
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const navItem = document.getElementById(`nav-${tab}`);
+    if(navItem) navItem.classList.add('active');
+}
+
+// UI Helper: Close all modals (DOM only)
+function closeAllModalsUI() {
+    document.querySelectorAll('.modal').forEach(el => el.classList.remove('active'));
+    // Do not hide main views here, handleNavClick handles that
+}
 </script>
 </body>
 </html>   
