@@ -3974,58 +3974,110 @@ function openReelsMode(startIndex, sourceList) {
     const view = document.getElementById('reels-view');
     const track = document.getElementById('reels-track');
     
-    if(!sourceList || sourceList.length === 0) return;
+    // Safety check: if list is empty, stop
+    if (!sourceList || sourceList.length === 0) return;
 
-    track.innerHTML = ''; // Köhnə slaydları təmizlə
+    // 1. URL UPDATE LOGIC (The Fix)
+    // We get the product at the starting index and update the browser URL
+    const activeProduct = sourceList[startIndex];
+    if (activeProduct && activeProduct.id) {
+        // This puts #view=reel&id=123 in the address bar
+        Router.set('reel', activeProduct.id); 
+    }
 
-    sourceList.forEach((p, index) => {
-        const slide = document.createElement('div');
-        slide.className = 'reel-slide';
+    // 2. DOM Rendering (Only rebuild if list changed to save performance)
+    // We check if the track is empty OR if we switched to a new list (e.g. from 'Best Sellers' to 'New')
+    if (track.children.length === 0 || state.currentReelList !== sourceList) {
+        track.innerHTML = ''; // Clear old slides
         
-        const isLiked = state.likedProducts.some(item => item.name === p.name);
-        const score = p.score || Math.floor(Math.random() * 15) + 85;
+        sourceList.forEach((p, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'reel-slide';
+            
+            // Check if user already liked this
+            const isLiked = state.likedProducts.some(item => item.name === p.name);
+            
+            // Clean the name string to prevent JS errors with apostrophes
+            const safeName = p.name.replace(/'/g, "\\'");
+            
+            // Build the HTML for one slide
+            slide.innerHTML = `
+                <img src="${fixImageLink(p.image)}" class="reel-img" alt="${p.name}" loading="${Math.abs(index - startIndex) < 2 ? 'eager' : 'lazy'}">
+                
+                <div class="reel-actions">
+                    <div class="r-action-btn" onclick="toggleReelLike(this, '${safeName}')">
+                        <div class="r-icon ${isLiked ? 'liked' : ''}">❤</div>
+                        <span>${isLiked ? 'Bəyənildi' : 'Bəyən'}</span>
+                    </div>
+                    
+                    <div class="r-action-btn" onclick="shareReel('${safeName}')">
+                        <div class="r-icon">↗</div>
+                        <span>Paylaş</span>
+                    </div>
+                    
+                    <div class="r-action-btn" onclick="openModalFromReel(${index})">
+                        <div class="r-icon">ℹ</div>
+                        <span>Detallar</span>
+                    </div>
+                </div>
 
-     // Inside sourceList.forEach((p, index) => { ...
-slide.innerHTML = `
-    <img src="${fixImageLink(p.image)}" class="reel-img" alt="${p.name}">
+                <div class="reels-bottom-actions">
+                    <div class="r-price-minimal">${p.price}₼</div>
+                    <button class="r-buy-btn-transparent" onclick="redirectToWhatsAppFromReel('${safeName}', '${p.price}')">
+                       Sifariş et 🛍️
+                    </button>
+                </div>
+            `;
+            
+            // Assign the Product ID to the slide element for easy retrieval during scroll
+            slide.setAttribute('data-product-id', p.id);
+            
+            track.appendChild(slide);
+        });
+        
+        // Save the current list to state so we know what we are looking at
+        state.currentReelList = sourceList;
+    }
+
+    // 3. Show the View
+    view.style.display = 'block';
     
-    <div class="reel-actions">
-        <div class="r-action-btn" onclick="toggleReelLike(this, '${p.name.replace(/'/g, "\\'")}')">
-            <div class="r-icon ${isLiked ? 'liked' : ''}">❤</div>
-            <span>${isLiked ? 'Bəyənildi' : 'Bəyən'}</span>
-        </div>
-        <div class="r-action-btn" onclick="shareReel('${p.name.replace(/'/g, "\\'")}')">
-            <div class="r-icon">↗</div>
-            <span>Paylaş</span>
-        </div>
-        <div class="r-action-btn" onclick="openModalFromReel(${index})">
-            <div class="r-icon">ℹ</div>
-            <span>Detallar</span>
-        </div>
-    </div>
+    // 4. Scroll to the specific slide immediately
+    const slides = track.querySelectorAll('.reel-slide');
+    if (slides[startIndex]) {
+        slides[startIndex].scrollIntoView({ behavior: 'auto' }); 
+    }
 
-    <div class="reels-bottom-actions">
-        <div class="r-price-minimal">${p.price}₼</div>
-        <button class="r-buy-btn-transparent" onclick="redirectToWhatsAppFromReel('${p.name.replace(/'/g, "\\'")}', '${p.price}')">
-           Sifariş et 🛍️
-        </button>
-    </div>
-`;
-        track.appendChild(slide);
+    // 5. Add Active Class for transition
+    requestAnimationFrame(() => {
+        view.classList.add('active');
     });
 
-    view.style.display = 'block'; // Əvvəl göstər
+    // 6. ATTACH SCROLL LISTENER (To update URL on Swipe)
+    // We remove old listeners first to avoid duplicates
+    track.onscroll = null; 
     
-    // Snapping-i aktiv etmək üçün kiçik gecikmə ilə sürüşdür
-    setTimeout(() => {
-        const slides = track.querySelectorAll('.reel-slide');
-        if(slides[startIndex]) {
-            slides[startIndex].scrollIntoView({ behavior: 'auto' });
-        }
-        view.classList.add('active');
-    }, 50);
-    
-    state.currentReelList = sourceList;
+    let scrollTimeout;
+    track.onscroll = function() {
+        // Debounce: Wait until scrolling stops for 50ms before updating URL
+        // This prevents the browser history from getting flooded
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const scrollPos = track.scrollTop;
+            const slideHeight = track.clientHeight;
+            // Calculate which slide index is currently visible
+            const currentIndex = Math.round(scrollPos / slideHeight);
+            
+            if (sourceList[currentIndex]) {
+                const currentId = sourceList[currentIndex].id;
+                // Update URL silently (replaceState) so back button doesn't loop through every scroll
+                const newHash = `#view=reel&id=${encodeURIComponent(currentId)}`;
+                if (window.location.hash !== newHash) {
+                   history.replaceState(null, null, newHash);
+                }
+            }
+        }, 100);
+    };
 }
 
 // 2. Toggle Like Logic (Fixed)
@@ -4061,9 +4113,15 @@ function toggleReelLike(btn, pName) {
 function closeReels() {
     const reelsView = document.getElementById('reels-view');
     reelsView.classList.remove('active');
+    
+    // Wait for transition, then hide
     setTimeout(() => {
         reelsView.style.display = 'none';
-    }, 300); // Matches transition if you have one, or just hides it
+    }, 300);
+
+    // Clear Router URL back to Main Mall
+    Router.clear(); 
+    
     logUserAction("CloseReels");
 }
 
@@ -4100,27 +4158,28 @@ function redirectToWhatsAppFromReel(name, price, img) {
 }
 
 function shareReel(name) {
-    // 1. Find Product by Name to get the ID
+    // 1. Find Product Object to get ID
+    // We search by name because the reel button passes the name currently
     const product = state.products.find(x => x.name === name);
     
     if (!product) {
-        alert("Xəta: Məhsul tapılmadı");
+        console.error("Share Error: Product not found in state");
         return;
     }
 
-    // 2. Generate Deep Link using ID
-    const exactLink = window.location.origin + window.location.pathname + '#view=product&id=' + encodeURIComponent(product.id);
+    // 2. Generate Deep Link for REEL VIEW
+    // Note: We use 'reel' instead of 'product'
+    const exactLink = `${window.location.origin}${window.location.pathname}#view=reel&id=${encodeURIComponent(product.id)}`;
   
-    // 3. Try Native Share (Mobile)
+    // 3. Native Share or Fallback
     if (navigator.share) {
         navigator.share({
-            title: 'Brendimo Hədiyyə',
-            text: `Bu məhsula bax: ${product.name}`,
+            title: 'Brendimo Reels',
+            text: `Bu videoya bax: ${product.name}`,
             url: exactLink
         }).catch(console.error);
     } else {
-        // Desktop Fallback
-        prompt("Bu məhsulun birbaşa linki:", exactLink);
+        prompt("Bu videonun birbaşa linki:", exactLink);
     }
 }
   
@@ -5425,14 +5484,14 @@ function renderMallSections() {
 
 // --- HELPER: RENDER LIVE CARDS ---
 function renderLiveCards(container, list) {
-    if(!container) return;
+    if (!container) return;
     container.innerHTML = ''; // Clear container
 
     list.forEach((p, i) => {
         const card = document.createElement('div');
         card.className = 'prod-card';
         
-        // Direct Object Binding
+        // Direct Click Binding
         card.onclick = function() {
             openReelsMode(i, list);
         };
@@ -5454,6 +5513,8 @@ function renderLiveCards(container, list) {
         container.appendChild(card);
     });
 }
+
+  
 
 // --- HELPER: RENDER THE FLASH CARD ---
 function renderFlashCard(p) {
@@ -5525,28 +5586,32 @@ function startFlashTimer() {
     flashInterval = setInterval(update, 1000);
 }
 
+
 function renderSectionCards(container, list, badgeTxt, badgeCls) {
     // 1. Clear the container first
+    if (!container) return;
     container.innerHTML = ''; 
 
+    // 2. Loop through the list of products
     list.forEach((p, i) => {
-        // 2. Create the element programmatically
+        // Create the card element
         const card = document.createElement('div');
         card.className = 'prod-card';
 
-        // 3. Attach the click event DIRECTLY to the object (The Fix)
-        // We pass 'list' as the source so "Next/Prev" buttons inside the modal 
-        // will cycle through this specific category (e.g., only Best Sellers).
+        // 3. Attach Click Event
+        // We pass 'i' (index) and 'list' (the full array)
         card.onclick = function() {
              openReelsMode(i, list); 
         };
 
-        // 4. Fill the visual HTML
+        // 4. Build the Card HTML
+        // Note: fixImageLink checks for broken images
         card.innerHTML = `
             <div class="pc-img-box">
                <img src="${fixImageLink(p.image)}" class="pc-img" loading="lazy">
                <div class="badge-overlay ${badgeCls}">${badgeTxt}</div>
             </div>
+            
             <div class="pc-content">
                <div class="pc-title">${p.name}</div>
                <div class="pc-prices">
@@ -5555,10 +5620,12 @@ function renderSectionCards(container, list, badgeTxt, badgeCls) {
                </div>
             </div>`;
 
-        // 5. Add to the container
+        // 5. Append to the scrollable container
         container.appendChild(card);
     });
 }
+
+  
 // --- FAVORITES LOGIC (NEW) ---
 function openFavorites() {
     document.getElementById('favorites-view').classList.add('active');
@@ -6123,12 +6190,11 @@ window.addEventListener('popstate', () => {
         checkDeepLinks();
     }
 });
-  /* --- 🚀 NEW ROUTER ENGINE (SUBDOMAIN LOGIC) --- */
-const Router = {
-    // Updates the URL without triggering a reload
+
+  const Router = {
+    // Updates URL without reload
     set: (view, id = null) => {
         let hash = `#view=${view}`;
-        // --- CHANGE IS HERE: Encode ID properly ---
         if (id) hash += `&id=${encodeURIComponent(id)}`;
         
         if (window.location.hash !== hash) {
@@ -6151,85 +6217,100 @@ const Router = {
         window.addEventListener('load', Router.check);
     },
 
+    // --- THE TURBO CHECK ENGINE ---
     check: async () => {
         const hash = window.location.hash.substring(1);
         const params = new URLSearchParams(hash);
         const view = params.get('view');
         const id = params.get('id');
 
-        console.log(`🧭 Routing to: ${view} ID: ${id}`);
+        console.log(`🚀 Router: ${view} | ID: ${id}`);
 
-        // 1. DATA WAIT LOGIC
-        if ((view === 'product' || view === 'category' || view === 'zodiac') && state.products.length === 0) {
-            await new Promise(resolve => {
+        // --- SPEED FIX: INSTANT CACHE LOADING ---
+        // If state is empty but we have a specific link, try to load from cache immediately
+        if ((view === 'reel' || view === 'product') && state.products.length === 0) {
+            const cached = localStorage.getItem('brendimo_cache_raw');
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    // Manually populate state just for this lookup
+                    state.products = parsed.products; 
+                    console.log("⚡ Turbo Cache Loaded: " + state.products.length + " products");
+                } catch(e) { 
+                    console.log("Cache Error"); 
+                }
+            }
+        }
+
+        // WAIT LOOP: If cache failed or was empty, wait for network (Fallback)
+        if ((view === 'reel' || view === 'product') && state.products.length === 0) {
+             await new Promise(resolve => {
                 const check = setInterval(() => {
                     if (state.products.length > 0) {
                         clearInterval(check);
                         resolve();
                     }
-                }, 200); 
+                }, 100); // Fast 100ms check
             });
         }
 
-        // 2. ROUTING LOGIC
-        if (hash.startsWith('p=') || hash.startsWith('c=') || hash.startsWith('zodiac=')) {
-             return; // Ignore legacy links handled by checkDeepLinks
-        }
+        // --- ROUTING LOGIC ---
 
-        if (!view || view === 'mall') {
+        // 1. REEL VIEW (The new requirement)
+        if (view === 'reel' && id) {
+            const cleanId = decodeURIComponent(id);
+            // Strict String comparison for safety
+            const productIndex = state.products.findIndex(x => String(x.id) === String(cleanId));
+            
+            if (productIndex > -1) {
+                // HIDE other views to make it clean
+                document.getElementById('all-products-view').classList.remove('active');
+                closeAllModalsUI();
+                
+                // OPEN Reels Mode directly at this index
+                // We pass state.products as the list so the user can scroll up/down to other items too
+                openReelsMode(productIndex, state.products);
+            } else {
+                console.warn("Product ID not found for Reel:", cleanId);
+            }
+        }
+        // 2. PRODUCT DETAILS VIEW (Legacy / Modal)
+        else if (view === 'product' && id) {
+            const cleanId = decodeURIComponent(id);
+            const product = state.products.find(x => String(x.id) === String(cleanId));
+            
+            if (product) {
+                // Ensure Modal isn't already open
+                const modal = document.getElementById('product-modal');
+                if (!modal.classList.contains('active') || modal.getAttribute('data-active-id') !== String(product.id)) {
+                    modal.setAttribute('data-active-id', String(product.id));
+                    openModal(product, state.products, -1, false);
+                }
+            }
+        }
+        // 3. DEFAULT: MALL VIEW
+        else if (!view || view === 'mall') {
             closeAllModalsUI();
+            // Close reels if open
+            const reelsView = document.getElementById('reels-view');
+            if(reelsView) {
+                reelsView.classList.remove('active'); 
+                reelsView.style.display = 'none';
+            }
+
             if(!document.getElementById('all-products-view').classList.contains('active')) {
                 openAllProducts();
             }
             activateNavUI('mall');
         }
+        // 4. OTHER VIEWS
         else if (view === 'fav') {
             closeAllModalsUI();
             openFavorites();
             activateNavUI('fav');
         }
-        else if (view === 'account') {
-            window.location.href = 'myprofile.html';
-        }
-        else if (view === 'wheel') {
-            window.location.href = 'vipaccount.html';
-        }
-        else if (view === 'product' && id) {
-            const cleanId = decodeURIComponent(id);
-            
-            // --- CRITICAL FIX: Look up by ID, converting both to Strings for safety ---
-            const product = state.products.find(x => String(x.id) === String(cleanId));
-            
-            // Check if modal is already open with THIS product to prevent loops
-            // We store the current ID on the modal element to check against
-            const modalEl = document.getElementById('product-modal');
-            const currentOpenId = modalEl.getAttribute('data-active-id');
-
-            if (product && (!modalEl.classList.contains('active') || currentOpenId !== String(product.id))) {
-                modalEl.setAttribute('data-active-id', product.id); // Save ID to DOM
-                openModal(product, state.products, -1, false); // false = don't update URL
-            }
-        }
-        else if (view === 'category' && id) {
-            if (!document.getElementById('category-modal').classList.contains('active')) {
-                openCategoryModal(parseInt(id), false);
-            }
-        }
-        else if (view === 'zodiac' && id) {
-            if (!document.getElementById('zodiac-modal').classList.contains('active')) {
-                openZodiacModal(id, false);
-            }
-        }
-        else if (view === 'modal' && id === 'about') {
-            if (!document.getElementById('about-modal').classList.contains('active')) {
-                openAboutModal(false);
-            }
-        }
-        else if (view === 'banner' && id) {
-             if (!document.getElementById('category-modal').classList.contains('active')) {
-                openBannerModal(id, false);
-             }
-        }
+        else if (view === 'account') window.location.href = 'myprofile.html';
+        else if (view === 'wheel') window.location.href = 'vipaccount.html';
     }
 };
 
