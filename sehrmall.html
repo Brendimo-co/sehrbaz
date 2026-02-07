@@ -3502,7 +3502,7 @@ src="https://www.facebook.com/tr?id=752296677155305&ev=PageView&noscript=1"
 </div>
 <script>
 // --- CONFIGURATION ---
-const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbzMLzwp2qpBlUT1tZkKuKh0rzE7I7BRTCxdMZv8gvK2c8u9SNlFrFfBCO6HiR5nJjVpEw/exec"; 
+const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbztQY-wKpanM5QRTJQm3pGsZFPZLzU4SMho08i5mORDzVGLFyFqlIOA0Cytkpy4xZ_iSw/exec"; 
 const WHATSAPP_NUMBER = "994556742535";
 
 // --- STATE ---
@@ -4100,20 +4100,26 @@ function redirectToWhatsAppFromReel(name, price, img) {
 }
 
 function shareReel(name) {
-    // 1. Generate the exact Deep Link
-    // Encodes the name properly to handle spaces and special characters
-const exactLink = window.location.origin + window.location.pathname + '#view=product&id=' + encodeURIComponent(name);
+    // 1. Find Product by Name to get the ID
+    const product = state.products.find(x => x.name === name);
+    
+    if (!product) {
+        alert("Xəta: Məhsul tapılmadı");
+        return;
+    }
+
+    // 2. Generate Deep Link using ID
+    const exactLink = window.location.origin + window.location.pathname + '#view=product&id=' + encodeURIComponent(product.id);
   
-    // 2. Try Native Share (Mobile)
+    // 3. Try Native Share (Mobile)
     if (navigator.share) {
         navigator.share({
             title: 'Brendimo Hədiyyə',
-            text: `Bu məhsula bax: ${name}`,
+            text: `Bu məhsula bax: ${product.name}`,
             url: exactLink
         }).catch(console.error);
     } else {
-        // 3. Desktop Fallback: Show the link in a prompt so you can SEE and COPY it
-        // Using prompt() allows the user to visually inspect the link
+        // Desktop Fallback
         prompt("Bu məhsulun birbaşa linki:", exactLink);
     }
 }
@@ -4964,7 +4970,6 @@ function showPrevModalProduct() { if (currentModalIndex > 0) { openModal(current
 
 // --- MODAL & REVIEWS ---
 
-
 function openModal(p, sourceList = [], index = -1, updateUrl = true) {
     // SAFETY CHECK
     if (!p) {
@@ -4972,8 +4977,8 @@ function openModal(p, sourceList = [], index = -1, updateUrl = true) {
         return;
     }
 
-    // 🚀 ROUTER UPDATE: Set URL to #view=product&id=ProductName
-    if (updateUrl) Router.set('product', p.name);
+    // --- CHANGE IS HERE: Use ID instead of Name for URL ---
+    if (updateUrl && p.id) Router.set('product', p.id); 
 
     // Ensure trackInteraction exists
     if (typeof trackInteraction === 'function') trackInteraction();
@@ -6123,15 +6128,14 @@ const Router = {
     // Updates the URL without triggering a reload
     set: (view, id = null) => {
         let hash = `#view=${view}`;
+        // --- CHANGE IS HERE: Encode ID properly ---
         if (id) hash += `&id=${encodeURIComponent(id)}`;
         
-        // Prevent duplicate history entries
         if (window.location.hash !== hash) {
             history.pushState(null, null, hash);
         }
     },
 
-    // Returns to the main tab view (handles closing modals via URL)
     clear: () => {
         const currentTab = document.querySelector('.nav-item.active');
         const tabId = currentTab ? currentTab.id.replace('nav-', '') : 'mall';
@@ -6142,13 +6146,11 @@ const Router = {
         }
     },
 
-    // Initialize listeners
     init: () => {
         window.addEventListener('hashchange', Router.check);
         window.addEventListener('load', Router.check);
     },
 
-    // The Brain: Decides what to show based on the URL
     check: async () => {
         const hash = window.location.hash.substring(1);
         const params = new URLSearchParams(hash);
@@ -6157,7 +6159,7 @@ const Router = {
 
         console.log(`🧭 Routing to: ${view} ID: ${id}`);
 
-        // 1. DATA WAIT LOGIC: If opening a product, wait for data to load
+        // 1. DATA WAIT LOGIC
         if ((view === 'product' || view === 'category' || view === 'zodiac') && state.products.length === 0) {
             await new Promise(resolve => {
                 const check = setInterval(() => {
@@ -6165,15 +6167,13 @@ const Router = {
                         clearInterval(check);
                         resolve();
                     }
-                }, 200); // Check every 200ms
+                }, 200); 
             });
         }
 
         // 2. ROUTING LOGIC
-        // If the current view is NOT what the URL says, we update the UI
-        
-     if (hash.startsWith('p=') || hash.startsWith('c=') || hash.startsWith('zodiac=')) {
-             return; 
+        if (hash.startsWith('p=') || hash.startsWith('c=') || hash.startsWith('zodiac=')) {
+             return; // Ignore legacy links handled by checkDeepLinks
         }
 
         if (!view || view === 'mall') {
@@ -6194,16 +6194,20 @@ const Router = {
         else if (view === 'wheel') {
             window.location.href = 'vipaccount.html';
         }
-        else if (view === 'chat') {
-             // Chat is external, do nothing or redirect
-        }
         else if (view === 'product' && id) {
-            const pName = decodeURIComponent(id);
-            const product = state.products.find(x => x.name === pName);
-            // Open modal only if it's not already open with this product
-            const currentTitle = document.getElementById('modal-title').textContent;
-            if (product && (!document.getElementById('product-modal').classList.contains('active') || currentTitle !== pName)) {
-                openModal(product, state.products, -1, false); // false = don't update URL inside
+            const cleanId = decodeURIComponent(id);
+            
+            // --- CRITICAL FIX: Look up by ID, converting both to Strings for safety ---
+            const product = state.products.find(x => String(x.id) === String(cleanId));
+            
+            // Check if modal is already open with THIS product to prevent loops
+            // We store the current ID on the modal element to check against
+            const modalEl = document.getElementById('product-modal');
+            const currentOpenId = modalEl.getAttribute('data-active-id');
+
+            if (product && (!modalEl.classList.contains('active') || currentOpenId !== String(product.id))) {
+                modalEl.setAttribute('data-active-id', product.id); // Save ID to DOM
+                openModal(product, state.products, -1, false); // false = don't update URL
             }
         }
         else if (view === 'category' && id) {
