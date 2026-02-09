@@ -43,7 +43,7 @@
   <script>
     // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
     // Ensure this URL ends in /exec
-    const API_URL = "https://script.google.com/macros/s/AKfycbzF62TETkrGXlWK8mdSUZJj9c24liay9I2LL6TMbEvGiLZD99GKxGfBPOp6pgQvk-sB/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxAoqILs6QjCIL7lwLVzRBtP0JTLqIBmUhcly6ZmytCnMMoqSBadUis9Hea0wCYaAsd/exec";
   </script>
 
   <div id="view-login" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 transition-transform duration-500">
@@ -158,11 +158,11 @@
   <script>
     // --- STATE MANAGEMENT ---
     const state = {
-      user: null,         // Stores User Profile
-      tasks: [],          // Stores All Tasks
-      submissions: {},    // Stores Status of Tasks (Pending/Approved)
+      user: null,         
+      tasks: [],          
+      submissions: {},    
       currentLevel: 1,
-      selectedTask: null  // Task being uploaded
+      selectedTask: null  
     };
 
     // --- UI CONTROLLER ---
@@ -172,7 +172,7 @@
       toggleLoader: (btnId, show) => {
         const text = document.getElementById(`${btnId}-text`);
         const loader = document.getElementById(`${btnId}-loader`);
-        const btn = document.getElementById(btnId); // Fixed logic here
+        const btn = document.getElementById(btnId.replace('-text', '')); 
 
         if (show) {
           text.classList.add('hidden');
@@ -189,7 +189,6 @@
         state.selectedTask = state.tasks.find(t => t.id === taskId);
         ui.el('modal-task-title').innerText = state.selectedTask.title;
         
-        // Reset Inputs
         ui.el('inp-file').value = '';
         ui.el('upload-preview').classList.add('hidden');
         ui.el('upload-placeholder').classList.remove('hidden');
@@ -207,14 +206,14 @@
       },
 
       toast: (msg) => {
-        alert(msg); // Simple alert for reliability
+        alert(msg); 
       }
     };
 
     // --- MAIN APP LOGIC ---
     const app = {
       
-      // 1. LOGIN
+      // 1. LOGIN (DÜZƏLDİLDİ)
       login: async () => {
         const phone = ui.el('inp-phone').value.trim();
         if (!phone) return ui.toast('Zəhmət olmasa nömrənizi daxil edin.');
@@ -222,36 +221,28 @@
         ui.toggleLoader('btn-login', true);
 
         try {
-          // Send Request to Google Apps Script
-          // IMPORTANT: 'no-cors' mode is NOT used here because we need the response JSON.
-          // This requires the Google Script to be deployed as "Anyone".
-          const response = await fetch(`${API_URL}?action=login&phone=${phone}`, {
-            method: "GET",
-            redirect: "follow"
-          });
-          
+          const response = await fetch(`${API_URL}?action=login&phone=${phone}`);
           const data = await response.json();
 
-          if (data.success) {
-            // Save State
+          // DÜZƏLİŞ: status === 'success' yoxlanılır
+          if (data.status === 'success') {
             state.user = data.user;
             state.tasks = data.tasks;
             state.submissions = data.submissions;
             
-            // Switch View
             ui.el('view-login').classList.add('hidden');
             ui.el('view-dashboard').classList.remove('hidden');
             
-            // Render UI
             app.renderHeader();
-            app.filterLevel(1); // Default Level 1
+            app.filterLevel(1); 
 
           } else {
-            ui.toast('Xəta: ' + data.error);
+            // DÜZƏLİŞ: data.error əvəzinə data.message
+            ui.toast('Xəta: ' + (data.message || 'Naməlum xəta'));
           }
         } catch (e) {
+          ui.toast('Server Xətası: İnternet bağlantısını yoxlayın.');
           console.error(e);
-          ui.toast('Server Xətası: İnternet bağlantısını yoxlayın və ya nömrənin düzgünlüyünə əmin olun.');
         } finally {
           ui.toggleLoader('btn-login', false);
         }
@@ -262,14 +253,13 @@
         ui.el('user-name').innerText = state.user.name;
         ui.el('user-avatar').innerText = state.user.name.charAt(0).toUpperCase();
         ui.el('user-points').innerText = state.user.points;
-        ui.el('user-balance').innerText = state.user.balanceAZN || "0.00";
+        ui.el('user-balance').innerText = state.user.balance || "0.00";
       },
 
       // 3. FILTER & RENDER TASKS
       filterLevel: (level) => {
         state.currentLevel = level;
         
-        // Update Tabs UI
         document.querySelectorAll('.tab-btn').forEach(btn => {
           if (parseInt(btn.dataset.level) === level) {
             btn.className = "tab-btn active px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-blue-600 text-white transition-all shadow-md transform scale-105";
@@ -278,7 +268,6 @@
           }
         });
 
-        // Filter Data
         const filteredTasks = state.tasks.filter(t => parseInt(t.level) === level);
         const container = ui.el('task-container');
         
@@ -347,9 +336,8 @@
           reader.readAsDataURL(file);
         }
       },
-      
 
-      // 5. SUBMIT PROOF (POST to GAS)
+      // 5. SUBMIT PROOF (DÜZƏLDİLDİ)
       submitProof: () => {
         const file = ui.el('inp-file').files[0];
         if (!file) return;
@@ -372,7 +360,6 @@
           };
 
           try {
-            // Send POST request with JSON string body
             const response = await fetch(API_URL, {
               method: 'POST',
               body: JSON.stringify(payload)
@@ -380,14 +367,16 @@
             
             const data = await response.json();
 
-            if (data.success) {
+            // DÜZƏLİŞ: status === 'success' yoxlanılır
+            if (data.status === 'success') {
               ui.closeModal();
               ui.toast("✅ Sübut uğurla göndərildi! Admin təsdiqindən sonra xal hesabınıza oturacaq.");
               
               state.submissions[state.selectedTask.id] = 'Pending';
               app.filterLevel(state.currentLevel); 
             } else {
-              ui.toast("Xəta: " + data.error);
+              // DÜZƏLİŞ: data.error əvəzinə data.message
+              ui.toast("Xəta: " + (data.message || 'Naməlum xəta'));
             }
 
           } catch (err) {
