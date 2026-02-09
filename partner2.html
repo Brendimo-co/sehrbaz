@@ -1,1023 +1,404 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0B0E14">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Brendimo Premium | Loyallıq</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <style>
-        /* --- RESET & VARIABLES --- */
-        :root {
-            /* Palette: Deep Midnight & Electric Aurora */
-            --bg-body: #0B0E14;
-            --bg-surface: #151921;
-            --bg-card: #1E232F;
-            
-            --text-main: #FFFFFF;
-            --text-muted: #94A3B8;
-            
-            /* Gradients */
-            --primary-grad: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
-            --gold-grad: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
-            --success-grad: linear-gradient(135deg, #10B981 0%, #34D399 100%);
-            
-            --accent-color: #8b5cf6;
-            --accent-glow: 0 0 25px rgba(139, 92, 246, 0.3);
-            
-            --border-light: rgba(255, 255, 255, 0.08);
-            
-            --radius-sm: 12px;
-            --radius-md: 18px;
-            --radius-lg: 28px;
-            
-            --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        
-        body {
-            margin: 0; padding: 0;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-
-        /* Ambient Background Glows */
-        body::before {
-            content: ""; position: fixed; top: -20%; left: -20%; width: 60%; height: 60%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.15), transparent 70%);
-            filter: blur(80px); pointer-events: none; z-index: -1;
-        }
-        body::after {
-            content: ""; position: fixed; bottom: -10%; right: -10%; width: 60%; height: 60%;
-            background: radial-gradient(circle, rgba(217, 70, 239, 0.1), transparent 70%);
-            filter: blur(80px); pointer-events: none; z-index: -1;
-        }
-
-        /* --- ANIMATIONS --- */
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(15px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .fade-in { animation: fadeSlideUp 0.5s var(--ease-smooth) forwards; opacity: 0; }
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-
-        /* --- UI COMPONENTS --- */
-        .hidden { display: none !important; }
-
-        .btn-primary {
-            width: 100%; padding: 18px;
-            background: var(--primary-grad);
-            color: #fff; border: none;
-            border-radius: var(--radius-md);
-            font-size: 16px; font-weight: 700;
-            cursor: pointer; position: relative; overflow: hidden;
-            box-shadow: 0 8px 20px -5px rgba(139, 92, 246, 0.4);
-            transition: transform 0.2s, background 0.3s;
-        }
-        .btn-primary:active { transform: scale(0.97); }
-        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; filter: grayscale(1); }
-        
-        .btn-sm {
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid var(--border-light);
-            border-radius: 50px;
-            color: #fff; font-size: 12px; font-weight: 600;
-            cursor: pointer;
-        }
-
-        .input-group { position: relative; margin-bottom: 20px; }
-        .input-field {
-            width: 100%; padding: 22px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius-md);
-            color: #fff; font-size: 16px;
-            transition: 0.3s;
-        }
-        .input-field:focus { 
-            border-color: var(--accent-color); 
-            background: rgba(139, 92, 246, 0.05); 
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
-        }
-
-        /* --- AUTH SCREEN --- */
-        #auth-screen {
-            position: fixed; inset: 0; z-index: 2000;
-            background: var(--bg-body);
-            display: flex; flex-direction: column; justify-content: center;
-            padding: 30px;
-        }
-        .brand-logo {
-            font-size: 42px; font-weight: 800; letter-spacing: -1.5px;
-            text-align: center; margin-bottom: 8px;
-            background: var(--primary-grad);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .auth-sub { text-align: center; color: var(--text-muted); margin-bottom: 40px; font-size: 15px; }
-
-        /* --- MAIN CONTAINER --- */
-        .container {
-            max-width: 480px; margin: 0 auto;
-            padding: 20px 20px 140px 20px;
-            min-height: 100vh;
-        }
-
-        /* HEADER */
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-top: 10px; }
-        .user-welcome { font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--accent-color); margin-bottom: 4px; letter-spacing: 1px; }
-        .user-name { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
-        .avatar {
-            width: 48px; height: 48px;
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            border: 1px solid var(--border-light);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; color: #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        /* HOLOGRAPHIC WALLET CARD */
-        .wallet-card {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: var(--radius-lg);
-            padding: 24px; position: relative; overflow: hidden;
-            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.6);
-            margin-bottom: 32px;
-            display: flex; flex-direction: column; justify-content: space-between;
-            min-height: 180px;
-        }
-        .wallet-card::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.3) 0, transparent 50%), 
-                        radial-gradient(at 100% 100%, rgba(217, 70, 239, 0.3) 0, transparent 50%);
-            animation: rotateMesh 10s linear infinite; opacity: 0.6;
-        }
-        @keyframes rotateMesh { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        .card-top { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-start; }
-        .card-chip { width: 40px; height: 28px; background: rgba(255,255,255,0.1); border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); }
-        .balance-group { position: relative; z-index: 2; margin-top: auto; }
-        .balance-label { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
-        .balance-amount { font-size: 44px; font-weight: 800; color: #fff; letter-spacing: -1px; text-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-        .balance-amount span { font-size: 18px; font-weight: 500; opacity: 0.8; margin-left: 4px; }
-
-        /* --- SECTION TITLES & FILTERS --- */
-        .section-header { 
-            margin-bottom: 16px; margin-top: 10px; padding: 0 4px; 
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .section-title { font-size: 18px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
-        .section-title::before { content:''; width:4px; height:18px; background: var(--primary-grad); border-radius: 4px; }
-        
-        .sort-select {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-muted);
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-family: inherit;
-        }
-
-        /* --- DAILY CHECK-IN --- */
-        .daily-checkin-wrapper {
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 20px;
-            border: 1px solid var(--border-light);
-            margin-bottom: 30px;
-            position: relative;
-            overflow: hidden;
-        }
-        .daily-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
-        .streak-count { font-weight: 700; color: #fbbf24; display: flex; align-items: center; gap: 6px; }
-
-        .days-row {
-            display: flex; justify-content: space-between; align-items: center;
-            position: relative;
-        }
-        .days-row::before {
-            content: ''; position: absolute; top: 50%; left: 10px; right: 10px; height: 4px;
-            background: rgba(255,255,255,0.05); border-radius: 4px; z-index: 0; transform: translateY(-50%);
-        }
-        
-        .day-item {
-            position: relative; z-index: 1;
-            width: 40px; height: 40px;
-            border-radius: 12px;
-            background: #2D3342;
-            border: 2px solid transparent;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: 700; color: var(--text-muted);
-            transition: all 0.3s var(--ease-bounce);
-        }
-        .day-item.claimed {
-            background: #10B981; color: #fff;
-            border-color: #10B981;
-        }
-        .day-item.active {
-            background: var(--bg-card);
-            border-color: var(--accent-color);
-            color: #fff;
-            transform: scale(1.15);
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
-            cursor: pointer;
-            animation: pulseGlow 2s infinite;
-        }
-        .day-item.locked { opacity: 0.5; }
-        
-        .day-val { font-size: 10px; margin-top: -2px; }
-
-        .checkin-btn {
-            margin-top: 20px;
-            width: 100%; padding: 12px;
-            border-radius: 14px; border: none;
-            background: var(--bg-surface);
-            color: var(--text-muted); font-weight: 600;
-            pointer-events: none;
-        }
-        .checkin-btn.ready {
-            background: var(--primary-grad);
-            color: #fff; pointer-events: auto; cursor: pointer;
-        }
-
-        /* --- REDESIGNED MISSIONS & STATUS --- */
-        #missions-list { display: grid; gap: 16px; }
-        
-        .mission-card {
-            background: rgba(30, 35, 47, 0.6);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-light);
-            border-radius: 24px;
-            padding: 0;
-            display: flex; flex-direction: column;
-            position: relative; overflow: hidden;
-            transition: transform 0.2s;
-        }
-        .mission-card:active { transform: scale(0.98); }
-        
-        .m-card-top {
-            padding: 20px;
-            display: flex; align-items: center; gap: 16px;
-            position: relative; z-index: 2;
-        }
-        .m-icon {
-            width: 50px; height: 50px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .m-content { flex: 1; }
-        .m-title { font-weight: 700; font-size: 16px; color: #fff; margin-bottom: 4px; }
-        .m-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;}
-        
-        .m-card-bottom {
-            padding: 12px 20px;
-            background: rgba(0,0,0,0.2);
-            display: flex; justify-content: space-between; align-items: center;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-        
-        .xp-pill {
-            padding: 6px 12px;
-            background: rgba(139, 92, 246, 0.15);
-            border-radius: 8px;
-            color: #c4b5fd; font-size: 12px; font-weight: 800;
-            display: flex; align-items: center; gap: 4px;
-        }
-        
-        /* Status Badges */
-        .status-badge {
-            font-size: 11px; font-weight: 700;
-            padding: 4px 10px; border-radius: 20px;
-            display: flex; align-items: center; gap: 4px;
-            text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .status-badge.new { background: rgba(255,255,255,0.1); color: #fff; }
-        .status-badge.done { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-        .status-badge.pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-
-        /* --- LEADERBOARD --- */
-        .leaderboard-list {
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        .rank-item {
-            display: flex; align-items: center;
-            background: rgba(255,255,255,0.03);
-            padding: 14px; border-radius: 16px;
-            border: 1px solid var(--border-light);
-        }
-        .rank-num {
-            width: 30px; font-weight: 800; font-size: 16px; color: var(--text-muted); text-align: center;
-        }
-        .rank-item:nth-child(1) .rank-num { color: #fbbf24; font-size: 20px; text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
-        .rank-item:nth-child(2) .rank-num { color: #94a3b8; }
-        .rank-item:nth-child(3) .rank-num { color: #b45309; }
-        
-        .rank-avatar {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: #2D3342; margin: 0 12px;
-            display: flex; align-items: center; justify-content: center; font-weight: 700;
-        }
-        .rank-info { flex: 1; }
-        .rank-name { font-weight: 700; font-size: 14px; }
-        .rank-xp { font-weight: 600; color: var(--accent-color); font-size: 13px; }
-
-        .rank-item.is-me {
-            background: rgba(139, 92, 246, 0.1);
-            border-color: var(--accent-color);
-        }
-
-        /* --- EMPTY STATES --- */
-        .empty-state {
-            text-align: center; padding: 40px 20px;
-            color: var(--text-muted); font-size: 14px;
-            background: rgba(255,255,255,0.02);
-            border: 1px dashed rgba(255,255,255,0.1); 
-            border-radius: var(--radius-md);
-        }
-
-        /* --- NAVIGATION --- */
-        .nav-bar {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 100px;
-            display: flex; justify-content: space-around; align-items: center;
-            padding: 12px; z-index: 1000;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            padding-bottom: max(12px, env(safe-area-inset-bottom));
-        }
-        .nav-btn {
-            background: none; border: none; padding: 10px;
-            color: #64748b; transition: 0.3s;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            position: relative;
-        }
-        .nav-btn svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 0; transition: 0.3s; }
-        
-        .nav-btn.active { color: #fff; }
-        .nav-btn.active svg { transform: translateY(-3px); filter: drop-shadow(0 0 8px var(--accent-color)); }
-        .nav-btn.active::after {
-            content: ''; position: absolute; bottom: 0; width: 4px; height: 4px;
-            background: var(--accent-color); border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-color);
-        }
-
-        /* --- MODAL & UPLOAD --- */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
-            z-index: 3000; display: none; align-items: flex-end; justify-content: center;
-        }
-        .modal-box {
-            background: #111827;
-            width: 100%; max-width: 500px;
-            border-radius: 30px 30px 0 0;
-            padding: 30px; border-top: 1px solid rgba(255,255,255,0.1);
-            position: relative; animation: fadeSlideUp 0.4s var(--ease-bounce);
-            padding-bottom: max(30px, env(safe-area-inset-bottom));
-            box-shadow: 0 -10px 50px rgba(0,0,0,0.7);
-        }
-        .modal-emoji { font-size: 60px; margin-bottom: 10px; display: inline-block; filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.4)); }
-        .modal-title { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 5px; }
-        .modal-reward { font-size: 18px; color: var(--accent-color); font-weight: 700; margin-bottom: 20px; }
-        .modal-desc-box { 
-            text-align: left; background: rgba(255,255,255,0.03); 
-            padding: 20px; border-radius: 16px; margin: 20px 0; border: 1px solid rgba(255,255,255,0.05);
-        }
-        .modal-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-        .modal-text { font-size: 14px; line-height: 1.6; color: #e2e8f0; margin-bottom: 15px; }
-
-        /* UPLOAD STYLES */
-        .upload-area {
-            border: 2px dashed rgba(255,255,255,0.2);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.3s;
-            background: rgba(255,255,255,0.02);
-            margin-bottom: 15px;
-        }
-        .upload-area:hover { border-color: var(--accent-color); background: rgba(139, 92, 246, 0.05); }
-        .upload-icon { font-size: 32px; margin-bottom: 8px; color: var(--text-muted); }
-        .upload-text { font-size: 14px; color: #fff; font-weight: 600; }
-        .upload-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-        
-        .file-selected {
-            display: flex; align-items: center; gap: 10px;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 10px; border-radius: 12px;
-            margin-bottom: 15px; color: #fff; font-size: 13px;
-        }
-        
-        /* SPINNER */
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid #fff;
-            border-radius: 50%;
-            width: 20px; height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-
-    </style>
-</head>
-<body>
-
-    <div id="auth-screen">
-        <div class="brand-logo">Brendimo<span style="color:#fff">.</span></div>
-        <div class="auth-sub">Premium Müştəri Loyallıq Klubu</div>
-        
-        <div class="input-group">
-            <input type="text" id="reg-name" class="input-field" placeholder="Ad və Soyad">
-        </div>
-        <div class="input-group">
-            <input type="tel" id="reg-phone" class="input-field" placeholder="Mobil Nömrə (məs: 0505554433)">
-        </div>
-        
-        <button class="btn-primary" id="btn-login" onclick="App.handleLogin()">KLUBUNA QOŞUL</button>
-        <p id="login-error" style="color: #ef4444; text-align: center; font-size: 13px; margin-top: 20px;" class="hidden"></p>
-    </div>
-
-    <div id="app-container" class="container hidden">
-        
-        <div class="header-row fade-in delay-1">
-            <div>
-                <div class="user-welcome">Xoş gəldin</div>
-                <div class="user-name" id="u-name">Hörmətli Müştəri</div>
-            </div>
-            <div class="avatar" id="u-avatar">B</div>
-        </div>
-
-        <div class="wallet-card fade-in delay-2">
-            <div class="card-top">
-                <div class="card-chip"></div>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-            </div>
-            <div class="balance-group">
-                <div class="balance-label">ÜMUMI BALANS</div>
-                <div class="balance-amount" id="u-coins">0<span>XP</span></div>
-            </div>
-        </div>
-
-        <div id="view-home" class="view-section fade-in delay-3">
-            
-            <div class="section-header">
-                <div class="section-title">Gündəlik Bonus</div>
-                <div class="streak-count">🔥 <span id="streak-display">0 Gün</span></div>
-            </div>
-            
-            <div class="daily-checkin-wrapper" id="daily-module">
-                <div class="daily-header">
-                    <span style="font-size:12px; color:var(--text-muted);">Hər gün daxil ol, qazan!</span>
-                </div>
-                <div class="days-row" id="streak-days">
-                </div>
-                <button id="btn-checkin" class="checkin-btn" onclick="Daily.checkIn()">GÖZLƏYİN...</button>
-            </div>
-
-            <div class="section-header">
-                <div class="section-title">Tapşırıqlar</div>
-                <select id="mission-sort" class="sort-select" onchange="UI.renderMissions()">
-                    <option value="new">Ən Yenilər</option>
-                    <option value="high">Çox XP</option>
-                </select>
-            </div>
-            
-            <div id="missions-list">
-                <div class="empty-state">Yüklənir...</div>
-            </div>
-        </div>
-
-        <div id="view-leaderboard" class="view-section hidden fade-in">
-            <div class="section-header">
-                <div class="section-title">Liderlər Cədvəli</div>
-                <span style="font-size:12px; color:var(--accent-color)">TOP 20</span>
-            </div>
-            <div style="background:var(--primary-grad); border-radius:16px; padding:20px; margin-bottom:20px; text-align:center;">
-                <div style="font-size:12px; color:rgba(255,255,255,0.8);">SİZİN SIRALAMANIZ</div>
-                <div style="font-size:32px; font-weight:800; margin:5px 0;">#<span id="my-rank">--</span></div>
-                <div style="font-size:12px; opacity:0.8;">Bütün Brendimo üzvləri arasında</div>
-            </div>
-            <div id="leaderboard-list" class="leaderboard-list">
-            </div>
-        </div>
-
-        <div id="view-shop" class="view-section hidden fade-in">
-            <div class="section-header"><div class="section-title">Kuponlarım</div></div>
-            <div id="inventory-list" class="empty-state">Henüz kuponunuz yoxdur.</div>
-            
-            <div class="section-header" style="margin-top: 30px;"><div class="section-title">Kataloq</div></div>
-            <div id="shop-list" class="empty-state">Məhsullar tezliklə...</div>
-        </div>
-
-        <div id="view-history" class="view-section hidden fade-in">
-            <div class="section-header"><div class="section-title">Tarixçə</div></div>
-            <div id="history-list"></div>
-            <button class="btn-primary" style="margin-top: 40px; background: rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); box-shadow:none;" onclick="App.logout()">ÇIXIŞ ET</button>
-        </div>
-
-    </div>
-
-    <nav class="nav-bar hidden" id="main-nav">
-        <button class="nav-btn active" onclick="App.nav('home', this)">
-            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        </button>
-        <button class="nav-btn" onclick="App.nav('leaderboard', this)">
-             <svg viewBox="0 0 24 24"><path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/></svg>
-        </button>
-        <button class="nav-btn" onclick="App.nav('shop', this)">
-            <svg viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2-2v2H4c-1.11 0-2 .89-2 2v14c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm-8-2h4v2h-4V4z"/></svg>
-        </button>
-        <button class="nav-btn" onclick="App.nav('history', this)">
-            <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.53.85-1.07-3.13-1.86V8h-2z"/></svg>
-        </button>
-    </nav>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Brendimo - Oyunlaşdırma Paneli</title>
   
-    <div id="modal" class="modal-overlay">
-        <div class="modal-box">
-            <div style="width:40px; height:4px; background:rgba(255,255,255,0.1); margin:0 auto 20px auto; border-radius:2px;"></div>
-            <div style="position:absolute; top:20px; right:20px; color:#fff; font-size:24px; cursor:pointer;" onclick="UI.closeModal()">×</div>
-            <div id="modal-body"></div>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    /* Hide Scrollbar */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Animations */
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Spinner */
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3b82f6;
+      border-radius: 50%;
+      width: 24px; height: 24px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* Glass Effect */
+    .glass {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
+
+  <script>
+    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+    // Ensure this URL ends in /exec
+    const API_URL = "https://script.google.com/macros/s/AKfycbzF62TETkrGXlWK8mdSUZJj9c24liay9I2LL6TMbEvGiLZD99GKxGfBPOp6pgQvk-sB/exec";
+  </script>
+
+  <div id="view-login" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 transition-transform duration-500">
+    <div class="w-full max-w-sm">
+      <div class="flex justify-center mb-8">
+        <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-200">
+          <i class="fa-solid fa-gem text-4xl text-white"></i>
         </div>
+      </div>
+      
+      <h1 class="text-3xl font-bold text-center text-slate-900 mb-2">Brendimo</h1>
+      <p class="text-center text-gray-500 mb-8">Komanda Portalına Xoş Gəlmisiniz</p>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-bold text-gray-400 uppercase ml-1">Telefon Nömrəsi</label>
+          <div class="relative mt-1">
+            <span class="absolute left-4 top-3.5 text-gray-400"><i class="fa-solid fa-phone"></i></span>
+            <input type="tel" id="inp-phone" placeholder="məs: 0501234567" 
+              class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 outline-none focus:ring-2 focus:ring-blue-500 font-bold transition-all">
+          </div>
+        </div>
+        
+        <button id="btn-login" onclick="app.login()" 
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+          <span id="btn-login-text">Daxil Ol</span>
+          <div id="btn-login-loader" class="loader border-t-white hidden"></div>
+        </button>
+      </div>
+
+      <p class="text-center text-xs text-gray-400 mt-6">Qeydiyyat üçün adminlə əlaqə saxlayın.</p>
+    </div>
+  </div>
+
+  <div id="view-dashboard" class="flex-1 flex flex-col relative hidden max-w-md mx-auto w-full bg-gray-50 shadow-2xl h-full">
+    
+    <header class="glass sticky top-0 z-20 px-5 pt-safe-top pb-3 border-b border-gray-200">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow-sm">
+            <span id="user-avatar">?</span>
+          </div>
+          <div class="leading-tight">
+            <h2 class="font-bold text-lg text-slate-800 truncate w-32" id="user-name">İstifadəçi</h2>
+            <p class="text-xs text-gray-500 font-medium">Balans: <span id="user-balance" class="text-green-600 font-bold">0.00</span> AZN</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 text-white px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2">
+          <i class="fa-solid fa-star text-yellow-400 text-xs"></i>
+          <span class="font-bold text-sm"><span id="user-points">0</span> xal</span>
+        </div>
+      </div>
+
+      <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1 mt-2">
+        <button onclick="app.filterLevel(1)" class="tab-btn active px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-blue-600 text-white transition-all shadow-md" data-level="1">Səviyyə 1</button>
+        <button onclick="app.filterLevel(2)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border border-gray-200 transition-all" data-level="2">Səviyyə 2</button>
+        <button onclick="app.filterLevel(3)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border border-gray-200 transition-all" data-level="3">Səviyyə 3</button>
+        <button onclick="app.filterLevel(4)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border border-gray-200 transition-all" data-level="4">Səviyyə 4</button>
+        <button onclick="app.filterLevel(5)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border border-gray-200 transition-all" data-level="5">Səviyyə 5</button>
+      </div>
+    </header>
+
+    <main id="task-container" class="flex-1 overflow-y-auto p-5 pb-24 space-y-4 scroll-smooth">
+      <div class="text-center py-10 text-gray-400 animate-pulse">
+        Məlumatlar yüklənir...
+      </div>
+    </main>
+
+    <div class="absolute bottom-0 w-full glass border-t border-gray-200 pb-safe-bottom z-30 p-4 text-center">
+      <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">100 XAL = 1 AZN</p>
     </div>
 
-    <input type="file" id="file-input" hidden accept="image/*,.pdf">
+  </div>
 
-    <script>
-        // --- CONFIG ---
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyme_ho75RSgc_5P3Pg7CNfTgsesdPMxgR5ric4coFzCAlM5RZhDvP8_AppagsQlHmP/exec';
+  <div id="modal-upload" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 fade-in shadow-2xl relative">
+      
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h3 class="text-xl font-bold text-slate-800">Sübut Yüklə</h3>
+          <p class="text-sm text-gray-500 truncate w-48" id="modal-task-title">Tapşırıq Adı</p>
+        </div>
+        <button onclick="ui.closeModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
 
-        const Store = {
-            data: {
-                name: '', phone: '', coins: 0, 
-                inventory: [], history: [], 
-                completedTasks: [], // IDs of approved/auto-complete tasks
-                pendingTasks: [],   // IDs of tasks "Under Review"
-                lastCheckIn: '', streak: 0
-            },
-            missions: [],
+      <label class="block w-full h-40 border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 hover:border-blue-400 transition-all relative overflow-hidden group">
+        <input type="file" id="inp-file" accept="image/*" class="hidden" onchange="app.previewImage()">
+        
+        <div id="upload-placeholder" class="text-center p-4 transition-transform group-hover:scale-105">
+          <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-2 text-blue-500">
+            <i class="fa-solid fa-camera text-xl"></i>
+          </div>
+          <p class="text-sm font-bold text-gray-600">Şəkil çək və ya yüklə</p>
+          <p class="text-[10px] text-gray-400 mt-1">PNG, JPG (Maks 5MB)</p>
+        </div>
+        
+        <img id="upload-preview" class="absolute inset-0 w-full h-full object-cover hidden rounded-2xl">
+      </label>
+
+      <button id="btn-submit" onclick="app.submitProof()" disabled 
+        class="w-full mt-5 bg-gray-200 text-gray-400 font-bold py-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex justify-center gap-2">
+        <span id="btn-submit-text">Göndər</span>
+        <div id="btn-submit-loader" class="loader border-t-white w-5 h-5 hidden"></div>
+      </button>
+
+    </div>
+  </div>
+
+  <script>
+    // --- STATE MANAGEMENT ---
+    const state = {
+      user: null,         // Stores User Profile
+      tasks: [],          // Stores All Tasks
+      submissions: {},    // Stores Status of Tasks (Pending/Approved)
+      currentLevel: 1,
+      selectedTask: null  // Task being uploaded
+    };
+
+    // --- UI CONTROLLER ---
+    const ui = {
+      el: (id) => document.getElementById(id),
+      
+      toggleLoader: (btnId, show) => {
+        const text = document.getElementById(`${btnId}-text`);
+        const loader = document.getElementById(`${btnId}-loader`);
+        const btn = document.getElementById(btnId); // Fixed logic here
+
+        if (show) {
+          text.classList.add('hidden');
+          loader.classList.remove('hidden');
+          btn.disabled = true;
+        } else {
+          text.classList.remove('hidden');
+          loader.classList.add('hidden');
+          btn.disabled = false;
+        }
+      },
+
+      openModal: (taskId) => {
+        state.selectedTask = state.tasks.find(t => t.id === taskId);
+        ui.el('modal-task-title').innerText = state.selectedTask.title;
+        
+        // Reset Inputs
+        ui.el('inp-file').value = '';
+        ui.el('upload-preview').classList.add('hidden');
+        ui.el('upload-placeholder').classList.remove('hidden');
+        
+        const btn = ui.el('btn-submit');
+        btn.disabled = true;
+        btn.classList.remove('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-200');
+        btn.classList.add('bg-gray-200', 'text-gray-400');
+        
+        ui.el('modal-upload').classList.remove('hidden');
+      },
+
+      closeModal: () => {
+        ui.el('modal-upload').classList.add('hidden');
+      },
+
+      toast: (msg) => {
+        alert(msg); // Simple alert for reliability
+      }
+    };
+
+    // --- MAIN APP LOGIC ---
+    const app = {
+      
+      // 1. LOGIN
+      login: async () => {
+        const phone = ui.el('inp-phone').value.trim();
+        if (!phone) return ui.toast('Zəhmət olmasa nömrənizi daxil edin.');
+        
+        ui.toggleLoader('btn-login', true);
+
+        try {
+          // Send Request to Google Apps Script
+          // IMPORTANT: 'no-cors' mode is NOT used here because we need the response JSON.
+          // This requires the Google Script to be deployed as "Anyone".
+          const response = await fetch(`${API_URL}?action=login&phone=${phone}`, {
+            method: "GET",
+            redirect: "follow"
+          });
+          
+          const data = await response.json();
+
+          if (data.success) {
+            // Save State
+            state.user = data.user;
+            state.tasks = data.tasks;
+            state.submissions = data.submissions;
             
-            save() { 
-                localStorage.setItem('brendimo_v11_pro', JSON.stringify(this.data)); 
-                this.sync();
-            },
+            // Switch View
+            ui.el('view-login').classList.add('hidden');
+            ui.el('view-dashboard').classList.remove('hidden');
             
-            load() {
-                const local = localStorage.getItem('brendimo_v11_pro');
-                if(local) {
-                    const parsed = JSON.parse(local);
-                    // Ensure pendingTasks exists (migration support)
-                    if(!parsed.pendingTasks) parsed.pendingTasks = [];
-                    this.data = { ...this.data, ...parsed };
-                }
-                return !!this.data.phone;
-            },
+            // Render UI
+            app.renderHeader();
+            app.filterLevel(1); // Default Level 1
 
-            async sync() {
-                try {
-                    fetch(API_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({ action: 'sync', data: this.data }),
-                        keepalive: true
-                    });
-                } catch(e) {}
-                UI.render();
+          } else {
+            ui.toast('Xəta: ' + data.error);
+          }
+        } catch (e) {
+          console.error(e);
+          ui.toast('Server Xətası: İnternet bağlantısını yoxlayın və ya nömrənin düzgünlüyünə əmin olun.');
+        } finally {
+          ui.toggleLoader('btn-login', false);
+        }
+      },
+
+      // 2. RENDER HEADER
+      renderHeader: () => {
+        ui.el('user-name').innerText = state.user.name;
+        ui.el('user-avatar').innerText = state.user.name.charAt(0).toUpperCase();
+        ui.el('user-points').innerText = state.user.points;
+        ui.el('user-balance').innerText = state.user.balanceAZN || "0.00";
+      },
+
+      // 3. FILTER & RENDER TASKS
+      filterLevel: (level) => {
+        state.currentLevel = level;
+        
+        // Update Tabs UI
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          if (parseInt(btn.dataset.level) === level) {
+            btn.className = "tab-btn active px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-blue-600 text-white transition-all shadow-md transform scale-105";
+          } else {
+            btn.className = "tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border border-gray-200 transition-all hover:bg-gray-50";
+          }
+        });
+
+        // Filter Data
+        const filteredTasks = state.tasks.filter(t => parseInt(t.level) === level);
+        const container = ui.el('task-container');
+        
+        if (filteredTasks.length === 0) {
+          container.innerHTML = `<div class="text-center py-20 text-gray-400 flex flex-col items-center"><i class="fa-regular fa-folder-open text-4xl mb-2 opacity-50"></i><p>Bu səviyyədə tapşırıq yoxdur.</p></div>`;
+          return;
+        }
+
+        let html = '';
+        filteredTasks.forEach(t => {
+          const status = state.submissions[t.id] || null; 
+          
+          let cardStyle = "border-l-4 border-blue-500";
+          let statusBadge = "";
+          let btnHtml = `<button onclick="ui.openModal('${t.id}')" class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors">Yüklə</button>`;
+
+          if (status === 'Pending') {
+            cardStyle = "border-l-4 border-orange-400 opacity-90";
+            statusBadge = `<span class="text-[10px] font-bold text-orange-500 bg-orange-50 px-2 py-0.5 rounded uppercase tracking-wide"><i class="fa-regular fa-clock"></i> Yoxlanılır</span>`;
+            btnHtml = `<span class="text-orange-400 text-xs font-bold">Gözləyir...</span>`;
+          } else if (status === 'Approved') {
+            cardStyle = "border-l-4 border-green-500 bg-green-50/30 opacity-60";
+            statusBadge = `<span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded uppercase tracking-wide"><i class="fa-solid fa-check"></i> Qəbul Edildi</span>`;
+            btnHtml = `<span class="text-green-600 text-xs font-bold"><i class="fa-solid fa-check-circle"></i> Hazırdır</span>`;
+          }
+
+          html += `
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 ${cardStyle} relative transition-all active:scale-[0.99]">
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="font-bold text-slate-800 text-sm w-3/4 leading-tight">${t.title}</h3>
+                <span class="font-bold text-blue-600 text-sm bg-blue-50 px-2 py-1 rounded-lg">+${t.points}</span>
+              </div>
+              <p class="text-xs text-gray-500 mb-3 leading-relaxed">${t.desc}</p>
+              <div class="flex justify-between items-center mt-2 border-t border-gray-50 pt-3">
+                ${statusBadge || '<span></span>'}
+                ${btnHtml}
+              </div>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      },
+
+      // 4. IMAGE PREVIEW
+      previewImage: () => {
+        const file = ui.el('inp-file').files[0];
+        if (file) {
+          if(file.size > 5 * 1024 * 1024) {
+            ui.toast("Şəkilin ölçüsü 5MB-dan çox ola bilməz.");
+            ui.el('inp-file').value = '';
+            return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = ui.el('upload-preview');
+            img.src = e.target.result;
+            img.classList.remove('hidden');
+            ui.el('upload-placeholder').classList.add('hidden');
+            
+            const btn = ui.el('btn-submit');
+            btn.disabled = false;
+            btn.classList.remove('bg-gray-200', 'text-gray-400');
+            btn.classList.add('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-200');
+          };
+          reader.readAsDataURL(file);
+        }
+      },
+      
+
+      // 5. SUBMIT PROOF (POST to GAS)
+      submitProof: () => {
+        const file = ui.el('inp-file').files[0];
+        if (!file) return;
+
+        ui.toggleLoader('btn-submit', true);
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async (e) => {
+          const base64 = e.target.result.split(',')[1];
+          
+          const payload = {
+            action: 'submitTask',
+            phone: state.user.phone,
+            taskId: state.selectedTask.id,
+            points: state.selectedTask.points,
+            fileName: file.name,
+            mimeType: file.type,
+            base64: base64
+          };
+
+          try {
+            // Send POST request with JSON string body
+            const response = await fetch(API_URL, {
+              method: 'POST',
+              body: JSON.stringify(payload)
+            });
+            
+            const data = await response.json();
+
+            if (data.success) {
+              ui.closeModal();
+              ui.toast("✅ Sübut uğurla göndərildi! Admin təsdiqindən sonra xal hesabınıza oturacaq.");
+              
+              state.submissions[state.selectedTask.id] = 'Pending';
+              app.filterLevel(state.currentLevel); 
+            } else {
+              ui.toast("Xəta: " + data.error);
             }
+
+          } catch (err) {
+            console.error(err);
+            ui.toast("Gözlənilməz xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.");
+          } finally {
+            ui.toggleLoader('btn-submit', false);
+          }
         };
-
-        const App = {
-            async handleLogin() {
-                const name = document.getElementById('reg-name').value.trim();
-                const phone = document.getElementById('reg-phone').value.trim().replace(/[^0-9]/g, '');
-                const btn = document.getElementById('btn-login');
-                const err = document.getElementById('login-error');
-
-                if(name.length < 3 || phone.length < 9) {
-                    err.innerText = "Məlumatları düzgün daxil edin.";
-                    err.classList.remove('hidden');
-                    return;
-                }
-
-                btn.disabled = true;
-                btn.innerHTML = `Yoxlanılır...`; 
-
-                try {
-                    const res = await fetch(`${API_URL}?action=login&phone=${phone}&name=${encodeURIComponent(name)}`);
-                    const json = await res.json();
-
-                    if(json.status === 'success') {
-                        Store.data = { ...Store.data, ...json.data };
-                        // Ensure pending tasks is initialized
-                        if(!Store.data.pendingTasks) Store.data.pendingTasks = [];
-                        
-                        Store.missions = json.missions || [];
-                        Store.save();
-                        this.initMain();
-                    }
-                } catch(e) {
-                    err.innerText = "Server xətası. İnterneti yoxlayın.";
-                    err.classList.remove('hidden');
-                    btn.disabled = false;
-                    btn.innerText = "KLUBUNA QOŞUL";
-                }
-            },
-
-            initMain() {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('app-container').classList.remove('hidden');
-                document.getElementById('main-nav').classList.remove('hidden');
-                
-                const firstName = Store.data.name.split(' ')[0];
-                document.getElementById('u-name').innerText = Store.data.name;
-                document.getElementById('u-avatar').innerText = firstName.charAt(0).toUpperCase();
-                
-                UI.render();
-                Daily.init();
-            },
-
-            nav(view, el) {
-                document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
-                const newView = document.getElementById(`view-${view}`);
-                newView.classList.remove('hidden');
-                newView.classList.add('fade-in');
-                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-                el.classList.add('active');
-                window.scrollTo(0,0);
-
-                if(view === 'leaderboard') Leaderboard.render();
-            },
-
-            logout() {
-                if(confirm("Çıxmaq istəyirsiniz?")) {
-                    localStorage.clear();
-                    location.reload();
-                }
-            }
-        };
-
-        const UI = {
-            render() {
-                document.getElementById('u-coins').innerHTML = `${Store.data.coins}<span>XP</span>`;
-                this.renderMissions();
-                
-                // History
-                const hList = document.getElementById('history-list');
-                hList.innerHTML = Store.data.history.length ? Store.data.history.map((h, index) => `
-                    <div class="mission-card fade-in" style="animation-delay: ${index * 0.05}s; padding:12px; flex-direction:row; align-items:center; margin-bottom:10px;">
-                        <div class="m-content">
-                            <div class="m-title" style="font-size:14px; margin-bottom:2px;">${h.desc}</div>
-                            <div style="font-size:11px; color:var(--text-muted);">${h.date}</div>
-                        </div>
-                        <div style="font-weight:700; color:${h.amount.includes('+') ? '#4ade80' : '#fff'}">${h.amount}</div>
-                    </div>
-                `).join('') : '<div class="empty-state">Tarixçə boşdur.</div>';
-            },
-
-            renderMissions() {
-                const mList = document.getElementById('missions-list');
-                const sortType = document.getElementById('mission-sort').value;
-                
-                let sortedMissions = [...Store.missions];
-                
-                if(sortType === 'high') {
-                    sortedMissions.sort((a,b) => b.points - a.points);
-                } else {
-                    sortedMissions.reverse();
-                }
-
-                if(sortedMissions.length === 0) {
-                    mList.innerHTML = `<div class="empty-state">Hal-hazırda aktiv missiya yoxdur.</div>`;
-                } else {
-                    mList.innerHTML = sortedMissions.map((m, index) => {
-                        // Check Status
-                        const isDone = Store.data.completedTasks.includes(m.id);
-                        const isPending = Store.data.pendingTasks.includes(m.id);
-                        
-                        let badgeHtml = '';
-                        let icon = '⚡';
-                        
-                        if (isDone) {
-                            badgeHtml = '<div class="status-badge done">✔ Tamamlandı</div>';
-                            icon = '✅';
-                        } else if (isPending) {
-                            badgeHtml = '<div class="status-badge pending">⏳ Yoxlanılır</div>';
-                            icon = '📂';
-                        } else {
-                            badgeHtml = '<div class="status-badge new">Yeni</div>';
-                        }
-                        
-                        return `
-                        <div class="mission-card fade-in" style="animation-delay: ${index * 0.1}s" onclick="UI.openMission('${m.id}')">
-                            <div class="m-card-top">
-                                <div class="m-icon">${icon}</div>
-                                <div class="m-content">
-                                    <div class="m-title">${m.title}</div>
-                                    <div class="m-desc">${m.desc.substring(0, 60)}...</div>
-                                </div>
-                            </div>
-                            <div class="m-card-bottom">
-                                <div class="xp-pill">
-                                    <span>💎</span> ${m.points} XP
-                                </div>
-                                ${badgeHtml}
-                            </div>
-                        </div>`;
-                    }).join('');
-                }
-            },
-
-            openMission(id) {
-                const m = Store.missions.find(x => x.id === id);
-                if(!m) return;
-                
-                const isDone = Store.data.completedTasks.includes(id);
-                const isPending = Store.data.pendingTasks.includes(id);
-                
-                let html = `
-                    <div class="modal-emoji">🚀</div>
-                    <h2 class="modal-title">${m.title}</h2>
-                    <div class="modal-reward">+${m.points} XP Qazan</div>
-                    
-                    <div class="modal-desc-box">
-                        <div class="modal-label">TAPŞIRIQ</div>
-                        <div class="modal-text">${m.desc}</div>
-                        
-                        <div class="modal-label">ADDIMLAR</div>
-                        <div class="modal-text" style="white-space:pre-line">${m.steps}</div>
-                    </div>
-                `;
-
-                if(isDone) {
-                    html += `<button class="btn-primary" style="background:#222; color:#555;" disabled>ARTIQ TAMAMLANIB</button>`;
-                } else if (isPending) {
-                    html += `
-                        <div style="text-align:center; padding:15px; background:rgba(245, 158, 11, 0.1); border-radius:12px; border:1px solid rgba(245, 158, 11, 0.3); margin-bottom:15px;">
-                            <div style="font-weight:700; color:#fbbf24;">🔍 YOXLANILIR</div>
-                            <div style="font-size:12px; color:rgba(255,255,255,0.7); margin-top:5px;">Sübut göndərilib. Admin təsdiqindən sonra balans artacaq.</div>
-                        </div>
-                        <button class="btn-primary" onclick="UI.closeModal()">BAĞLA</button>
-                    `;
-                } else {
-                    // NEW: Upload Form
-                    html += `
-                        <div id="upload-container">
-                             <div class="upload-area" onclick="document.getElementById('file-input').click()">
-                                <div class="upload-icon">📎</div>
-                                <div class="upload-text">Sübut yüklə</div>
-                                <div class="upload-sub">Screenshot və ya PDF</div>
-                            </div>
-                            <div id="file-preview" class="hidden"></div>
-                        </div>
-                        <button id="btn-submit-task" class="btn-primary" onclick="UI.submitProof('${m.id}')" disabled>TƏSDİQLƏ VƏ QAZAN</button>
-                    `;
-                }
-
-                this.openModal(html);
-
-                // Attach File Listener if not done/pending
-                if(!isDone && !isPending) {
-                    const fileInput = document.getElementById('file-input');
-                    fileInput.value = ''; // Reset
-                    fileInput.onchange = (e) => {
-                        const file = e.target.files[0];
-                        if(file) {
-                            const preview = document.getElementById('file-preview');
-                            preview.innerHTML = `<div class="file-selected">📄 ${file.name} (${(file.size/1024).toFixed(1)} KB)</div>`;
-                            preview.classList.remove('hidden');
-                            document.querySelector('.upload-area').style.borderColor = '#10B981';
-                            document.getElementById('btn-submit-task').disabled = false;
-                        }
-                    };
-                }
-            },
-
-            submitProof(missionId) {
-                const fileInput = document.getElementById('file-input');
-                const file = fileInput.files[0];
-                if(!file) return alert("Zəhmət olmasa sübut yükləyin.");
-
-                const btn = document.getElementById('btn-submit-task');
-                btn.disabled = true;
-                btn.innerHTML = `<span class="spinner"></span> Yüklənir...`;
-
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = async function() {
-                    const base64Data = reader.result.split(',')[1]; // Remove header
-                    // Clean Mission Title for filename
-                    const missionTitle = Store.missions.find(m=>m.id === missionId).title.replace(/[^a-zA-Z0-9]/g, "_");
-                    const newFileName = `${Store.data.phone}_${missionTitle}_${Date.now()}.${file.name.split('.').pop()}`;
-
-                    const payload = {
-                        action: 'upload_proof',
-                        phone: Store.data.phone,
-                        missionId: missionId,
-                        fileName: newFileName,
-                        mimeType: file.type,
-                        fileData: base64Data
-                    };
-
-                    try {
-                        // Send to Backend
-                        const res = await fetch(API_URL, {
-                            method: 'POST',
-                            body: JSON.stringify(payload)
-                        });
-                        
-                        // NOTE: Even if backend returns 404 (due to script deployment issues), we simulate success for UI
-                        // In production, check await res.json() status
-                        
-                        // Update Local State to Pending
-                        Store.data.pendingTasks.push(missionId);
-                        Store.save();
-                        
-                        UI.closeModal();
-                        UI.render(); // Update UI to show Pending Badge
-                        
-                        UI.openModal(`
-                            <div class="modal-emoji">⏳</div>
-                            <h2 class="modal-title">Gözləmədə</h2>
-                            <div class="modal-text" style="text-align:center">
-                                Sübutunuz uğurla göndərildi!<br>
-                                Hazırda status: <b>Yoxlanılır (Monitoring)</b>.<br>
-                                Təsdiqləndikdən sonra bonus balansınıza oturacaq.
-                            </div>
-                            <button class="btn-primary" onclick="UI.closeModal()">BAŞA DÜŞDÜM</button>
-                        `);
-
-                    } catch(e) {
-                        alert("Yükləmə xətası yarandı. Yenidən cəhd edin.");
-                        btn.disabled = false;
-                        btn.innerText = "TƏSDİQLƏ VƏ QAZAN";
-                    }
-                };
-            },
-
-            openModal(html) {
-                document.getElementById('modal-body').innerHTML = html;
-                document.getElementById('modal').style.display = 'flex';
-            },
-            closeModal() { document.getElementById('modal').style.display = 'none'; }
-        };
-
-        // --- DAILY STREAK LOGIC ---
-        const Daily = {
-            rewards: [10, 20, 30, 40, 50, 75, 150], 
-
-            init() {
-                const today = new Date().toDateString();
-                const last = Store.data.lastCheckIn;
-                
-                if(last) {
-                    const lastDate = new Date(last);
-                    const diffTime = Math.abs(new Date(today) - lastDate);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                    
-                    if(diffDays > 1 && last !== today) {
-                        Store.data.streak = 0;
-                    }
-                }
-
-                this.renderUI(today === last);
-            },
-
-            renderUI(isClaimedToday) {
-                const streak = Store.data.streak;
-                const daysEl = document.getElementById('streak-days');
-                const btn = document.getElementById('btn-checkin');
-                document.getElementById('streak-display').innerText = `${streak} Gün`;
-                
-                let html = '';
-                for(let i=0; i<7; i++) {
-                    let cls = 'day-item';
-                    if(i < streak) cls += ' claimed'; 
-                    else if (i === streak) cls += isClaimedToday ? ' claimed' : ' active';
-                    else cls += ' locked'; 
-                    
-                    html += `
-                        <div class="${cls}">
-                            <div>Gün</div>
-                            <div class="day-val">${i+1}</div>
-                        </div>
-                    `;
-                }
-                daysEl.innerHTML = html;
-
-                if(isClaimedToday) {
-                    btn.innerText = "SABAH GƏLİN";
-                    btn.classList.remove('ready');
-                } else {
-                    const reward = this.rewards[Math.min(streak, 6)];
-                    btn.innerText = `GÜN ${streak + 1} BONUSUNU GÖTÜR (+${reward} XP)`;
-                    btn.classList.add('ready');
-                }
-            },
-
-            checkIn() {
-                const today = new Date().toDateString();
-                if(Store.data.lastCheckIn === today) return;
-
-                const currentStreak = Store.data.streak;
-                const reward = this.rewards[Math.min(currentStreak, 6)];
-                
-                Store.data.coins += reward;
-                Store.data.streak = (currentStreak + 1) % 8; 
-                if(Store.data.streak === 0) Store.data.streak = 1; 
-
-                Store.data.lastCheckIn = today;
-                
-                Store.data.history.unshift({
-                    date: new Date().toLocaleString(),
-                    amount: `+${reward}`,
-                    desc: `Gündəlik Giriş (Gün ${Store.data.streak})`
-                });
-                
-                Store.save();
-                this.renderUI(true);
-                
-                UI.openModal(`
-                    <div class="modal-emoji">🔥</div>
-                    <h2 class="modal-title">Gün ${Store.data.streak}</h2>
-                    <div class="modal-reward">+${reward} XP Qazandınız!</div>
-                    <p class="modal-text" style="text-align:center">Ard-arda daxil olaraq daha çox qazanın.</p>
-                    <button class="btn-primary" onclick="UI.closeModal()">SUPER</button>
-                `);
-            }
-        };
-
-        // --- MOCK LEADERBOARD ---
-        const Leaderboard = {
-            render() {
-                const list = document.getElementById('leaderboard-list');
-                const myXP = Store.data.coins;
-                const myName = Store.data.name;
-
-                let users = [
-                    { name: 'Elvin M.', xp: myXP + 1200 },
-                    { name: 'Aysel K.', xp: myXP + 850 },
-                    { name: 'Rəşad H.', xp: myXP + 400 },
-                    { name: 'Leyla B.', xp: myXP + 150 },
-                    { name: myName, xp: myXP, isMe: true }, 
-                    { name: 'Kamran Ə.', xp: Math.max(0, myXP - 50) },
-                    { name: 'Fidan S.', xp: Math.max(0, myXP - 200) },
-                    { name: 'Orxan Q.', xp: Math.max(0, myXP - 450) },
-                ];
-
-                users.sort((a,b) => b.xp - a.xp);
-                const myRank = users.findIndex(u => u.isMe) + 1;
-                document.getElementById('my-rank').innerText = myRank;
-
-                list.innerHTML = users.map((u, i) => `
-                    <div class="rank-item ${u.isMe ? 'is-me' : ''}">
-                        <div class="rank-num">${i+1}</div>
-                        <div class="rank-avatar">${u.name.charAt(0)}</div>
-                        <div class="rank-info">
-                            <div class="rank-name">${u.name} ${u.isMe ? '(Sən)' : ''}</div>
-                            <div class="rank-xp">${u.xp} XP</div>
-                        </div>
-                        ${i < 3 ? '<div>🏆</div>' : ''}
-                    </div>
-                `).join('');
-            }
-        };
-
-        window.onload = () => {
-            if(Store.load()) App.initMain();
-        };
-    </script>
+      }
+    };
+  </script>
 </body>
 </html>
-
