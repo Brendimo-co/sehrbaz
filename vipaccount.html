@@ -443,7 +443,7 @@
         <div class="form-group">
           <label for="phone">WhatsApp Nömrəsi</label>
           <div class="input-wrapper">
-            <input id="phone" name="phone" type="text" placeholder="050 123 45 67" required />
+            <input id="phone" name="phone" type="text" placeholder="050 123 45 67" />
           </div>
         </div>
 
@@ -827,8 +827,12 @@ form.addEventListener('submit', async function(e) {
   
   if(name.length < 2) { alert('Zəhmət olmasa adınızı tam daxil edin.'); return; }
   
-  const phone = sanitizePhone(phoneRaw);
-  if(!/^\+?[0-9]{9,15}$/.test(phone)) { alert('Nömrə düzgün deyil.'); return; }
+ const phone = sanitizePhone(phoneRaw);
+  // Only validate IF the user actually typed a number. If empty, let it pass.
+  if(phone.length > 0 && !/^\+?[0-9]{9,15}$/.test(phone)) { 
+      alert('Nömrə düzgün deyil.'); 
+      return; 
+  }
 
   submitBtn.disabled = true;
   submitBtn.innerHTML = `<span>⏳ Yoxlanılır...</span>`;
