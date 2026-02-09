@@ -18,7 +18,9 @@
 
     /* Animations */
     .fade-in { animation: fadeIn 0.4s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .slide-up { animation: slideUp 0.3s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
     /* Spinner */
     .loader {
@@ -36,17 +38,27 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
+    
+    /* Media Container */
+    .media-wrapper {
+      position: relative;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
 
- 
   <script>
-    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
-    // Ensure this URL ends in /exec
-    const API_URL = "https://script.google.com/macros/s/AKfycbxM2SXUrnCYRekPdmX3DsiM12G7KkfTWKfbsTNfbBtTRFw3HCvvhdyKzIQnK4tvUdcL/exec";
+    // PASTE YOUR NEW GOOGLE APPS SCRIPT WEB APP URL HERE
+    const API_URL = "https://script.google.com/macros/s/AKfycbw2WMKzbwN36bEu2L_1I_PQnOt1DJdfjJRQnFql2GWst1o51iT37fj0lhgX7vlM7-To/exec";
   </script>
 
+  
   <div id="view-login" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 transition-transform duration-500">
     <div class="w-full max-w-sm">
       <div class="flex justify-center mb-8">
@@ -117,56 +129,63 @@
     <div class="absolute bottom-0 w-full glass border-t border-gray-200 pb-safe-bottom z-30 p-4 text-center">
       <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">100 XAL = 1 AZN</p>
     </div>
-
   </div>
 
-  <div id="modal-upload" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-3xl p-6 fade-in shadow-2xl relative">
+  <div id="modal-detail" class="fixed inset-0 z-40 bg-white hidden flex flex-col h-full overflow-hidden slide-up">
+    
+    <div class="glass px-5 py-4 border-b border-gray-100 flex justify-between items-center sticky top-0 z-50">
+      <button onclick="ui.closeDetail()" class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h3 class="font-bold text-slate-800 text-lg truncate px-4" id="detail-title">Tapşırıq Adı</h3>
+      <div class="w-10"></div> </div>
+
+    <div class="flex-1 overflow-y-auto p-5 pb-32">
+      <div id="detail-media-container" class="space-y-4 mb-6"></div>
       
-      <div class="flex justify-between items-start mb-4">
-        <div>
-          <h3 class="text-xl font-bold text-slate-800">Sübut Yüklə</h3>
-          <p class="text-sm text-gray-500 truncate w-48" id="modal-task-title">Tapşırıq Adı</p>
-        </div>
-        <button onclick="ui.closeModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+      <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-6">
+        <h4 class="text-xs font-bold text-blue-500 uppercase mb-2">Təlimat</h4>
+        <p class="text-sm text-gray-600 leading-relaxed" id="detail-desc">...</p>
       </div>
 
-      <label class="block w-full h-40 border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 hover:border-blue-400 transition-all relative overflow-hidden group">
-        <input type="file" id="inp-file" accept="image/*" class="hidden" onchange="app.previewImage()">
-        
-        <div id="upload-placeholder" class="text-center p-4 transition-transform group-hover:scale-105">
-          <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-2 text-blue-500">
-            <i class="fa-solid fa-camera text-xl"></i>
-          </div>
-          <p class="text-sm font-bold text-gray-600">Şəkil çək və ya yüklə</p>
-          <p class="text-[10px] text-gray-400 mt-1">PNG, JPG (Maks 5MB)</p>
+      <div id="detail-action-area">
         </div>
-        
-        <img id="upload-preview" class="absolute inset-0 w-full h-full object-cover hidden rounded-2xl">
-      </label>
-
-      <button id="btn-submit" onclick="app.submitProof()" disabled 
-        class="w-full mt-5 bg-gray-200 text-gray-400 font-bold py-4 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm flex justify-center gap-2">
-        <span id="btn-submit-text">Göndər</span>
-        <div id="btn-submit-loader" class="loader border-t-white w-5 h-5 hidden"></div>
-      </button>
-
     </div>
   </div>
 
+  <template id="upload-template">
+    <div class="border-t pt-6">
+      <h4 class="font-bold text-slate-800 mb-3">Sübut Yüklə</h4>
+      
+      <label class="block w-full h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-all relative overflow-hidden group">
+        <input type="file" id="inp-file" accept="image/*" class="hidden" onchange="app.previewImage()">
+        
+        <div id="upload-placeholder" class="text-center p-4">
+          <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-300 mb-2"></i>
+          <p class="text-xs font-bold text-gray-500">Şəkil seçin</p>
+        </div>
+        
+        <img id="upload-preview" class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
+      </label>
+
+      <button id="btn-submit" onclick="app.submitProof()" disabled 
+        class="w-full mt-4 bg-gray-200 text-gray-400 font-bold py-3.5 rounded-xl transition-all disabled:opacity-50 shadow-sm flex justify-center gap-2">
+        <span id="btn-submit-text">Təsdiqlə və Göndər</span>
+        <div id="btn-submit-loader" class="loader border-t-white w-5 h-5 hidden"></div>
+      </button>
+    </div>
+  </template>
+
   <script>
-    // --- STATE MANAGEMENT ---
     const state = {
-      user: null,         
-      tasks: [],          
-      submissions: {},    
+      user: null,
+      tasks: [],
+      media: [], // Holds video/pdf links
+      submissions: {},
       currentLevel: 1,
-      selectedTask: null  
+      selectedTask: null
     };
 
-    // --- UI CONTROLLER ---
     const ui = {
       el: (id) => document.getElementById(id),
       
@@ -186,24 +205,86 @@
         }
       },
 
-      openModal: (taskId) => {
+      openDetail: (taskId) => {
         state.selectedTask = state.tasks.find(t => t.id === taskId);
-        ui.el('modal-task-title').innerText = state.selectedTask.title;
+        const task = state.selectedTask;
+        const status = state.submissions[task.id] || null;
+
+        // Populate Modal
+        ui.el('detail-title').innerText = task.title;
+        ui.el('detail-desc').innerText = task.desc;
+
+        // Render Media
+        const mediaContainer = ui.el('detail-media-container');
+        mediaContainer.innerHTML = '';
         
-        ui.el('inp-file').value = '';
-        ui.el('upload-preview').classList.add('hidden');
-        ui.el('upload-placeholder').classList.remove('hidden');
+        const taskMedia = state.media.filter(m => m.taskId === task.id);
         
-        const btn = ui.el('btn-submit');
-        btn.disabled = true;
-        btn.classList.remove('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-200');
-        btn.classList.add('bg-gray-200', 'text-gray-400');
-        
-        ui.el('modal-upload').classList.remove('hidden');
+        if (taskMedia.length > 0) {
+          taskMedia.forEach(m => {
+            let mediaHtml = '';
+            
+            if (m.type === 'VIDEO') {
+              mediaHtml = `
+                <div class="media-wrapper aspect-video bg-black flex items-center justify-center">
+                  <video controls class="w-full h-full" src="${m.url}"></video>
+                </div>
+                <p class="text-xs text-gray-500 italic mb-2">${m.caption || 'Video təlimat'}</p>
+              `;
+            } else if (m.type === 'IMAGE') {
+              mediaHtml = `
+                <div class="media-wrapper">
+                  <img src="${m.url}" class="w-full object-cover rounded-lg">
+                </div>
+                <p class="text-xs text-gray-500 italic mb-2">${m.caption || ''}</p>
+              `;
+            } else if (m.type === 'PDF') {
+              mediaHtml = `
+                <a href="${m.url}" target="_blank" class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl hover:bg-red-100 transition-colors">
+                  <i class="fa-solid fa-file-pdf text-red-500 text-2xl"></i>
+                  <div>
+                    <h5 class="font-bold text-slate-800 text-sm">PDF Sənəd</h5>
+                    <p class="text-xs text-red-400">Oxumaq üçün toxunun</p>
+                  </div>
+                  <i class="fa-solid fa-external-link-alt ml-auto text-red-300"></i>
+                </a>
+              `;
+            }
+            mediaContainer.innerHTML += mediaHtml;
+          });
+        }
+
+        // Render Action Area based on Status
+        const actionArea = ui.el('detail-action-area');
+        if (status === 'Approved') {
+          actionArea.innerHTML = `
+            <div class="bg-green-50 text-green-700 p-4 rounded-xl text-center border border-green-200">
+              <i class="fa-solid fa-check-circle text-2xl mb-2"></i>
+              <p class="font-bold">Təbriklər! Tapşırıq qəbul edildi.</p>
+              <p class="text-xs mt-1">+${task.points} xal qazandınız</p>
+            </div>`;
+        } else if (status === 'Pending') {
+          actionArea.innerHTML = `
+            <div class="bg-orange-50 text-orange-600 p-4 rounded-xl text-center border border-orange-200">
+              <i class="fa-solid fa-clock text-2xl mb-2"></i>
+              <p class="font-bold">Yoxlanılır...</p>
+              <p class="text-xs mt-1">Admin təsdiqi gözlənilir</p>
+            </div>`;
+        } else {
+          // Show Upload Form
+          const template = document.getElementById('upload-template').content.cloneNode(true);
+          actionArea.innerHTML = '';
+          actionArea.appendChild(template);
+        }
+
+        ui.el('modal-detail').classList.remove('hidden');
       },
 
-      closeModal: () => {
-        ui.el('modal-upload').classList.add('hidden');
+      closeDetail: () => {
+        ui.el('modal-detail').classList.add('hidden');
+        // Stop videos
+        const videos = document.querySelectorAll('video');
+        videos.forEach(v => v.pause());
       },
 
       toast: (msg) => {
@@ -211,10 +292,7 @@
       }
     };
 
-    // --- MAIN APP LOGIC ---
     const app = {
-      
-      // 1. LOGIN (DÜZƏLDİLDİ)
       login: async () => {
         const phone = ui.el('inp-phone').value.trim();
         if (!phone) return ui.toast('Zəhmət olmasa nömrənizi daxil edin.');
@@ -225,10 +303,10 @@
           const response = await fetch(`${API_URL}?action=login&phone=${phone}`);
           const data = await response.json();
 
-          // DÜZƏLİŞ: status === 'success' yoxlanılır
           if (data.status === 'success') {
             state.user = data.user;
             state.tasks = data.tasks;
+            state.media = data.media; // Store Media
             state.submissions = data.submissions;
             
             ui.el('view-login').classList.add('hidden');
@@ -236,9 +314,7 @@
             
             app.renderHeader();
             app.filterLevel(1); 
-
           } else {
-            // DÜZƏLİŞ: data.error əvəzinə data.message
             ui.toast('Xəta: ' + (data.message || 'Naməlum xəta'));
           }
         } catch (e) {
@@ -249,7 +325,6 @@
         }
       },
 
-      // 2. RENDER HEADER
       renderHeader: () => {
         ui.el('user-name').innerText = state.user.name;
         ui.el('user-avatar').innerText = state.user.name.charAt(0).toUpperCase();
@@ -257,7 +332,6 @@
         ui.el('user-balance').innerText = state.user.balance || "0.00";
       },
 
-      // 3. FILTER & RENDER TASKS
       filterLevel: (level) => {
         state.currentLevel = level;
         
@@ -281,30 +355,32 @@
         filteredTasks.forEach(t => {
           const status = state.submissions[t.id] || null; 
           
-          let cardStyle = "border-l-4 border-blue-500";
-          let statusBadge = "";
-          let btnHtml = `<button onclick="ui.openModal('${t.id}')" class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors">Yüklə</button>`;
-
+          let cardColor = "bg-white border-gray-100";
+          let statusIcon = `<i class="fa-solid fa-chevron-right text-gray-300"></i>`;
+          
           if (status === 'Pending') {
-            cardStyle = "border-l-4 border-orange-400 opacity-90";
-            statusBadge = `<span class="text-[10px] font-bold text-orange-500 bg-orange-50 px-2 py-0.5 rounded uppercase tracking-wide"><i class="fa-regular fa-clock"></i> Yoxlanılır</span>`;
-            btnHtml = `<span class="text-orange-400 text-xs font-bold">Gözləyir...</span>`;
+            cardColor = "bg-orange-50 border-orange-200";
+            statusIcon = `<i class="fa-solid fa-clock text-orange-400"></i>`;
           } else if (status === 'Approved') {
-            cardStyle = "border-l-4 border-green-500 bg-green-50/30 opacity-60";
-            statusBadge = `<span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded uppercase tracking-wide"><i class="fa-solid fa-check"></i> Qəbul Edildi</span>`;
-            btnHtml = `<span class="text-green-600 text-xs font-bold"><i class="fa-solid fa-check-circle"></i> Hazırdır</span>`;
+            cardColor = "bg-green-50 border-green-200 opacity-80";
+            statusIcon = `<i class="fa-solid fa-check-circle text-green-500"></i>`;
           }
 
           html += `
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 ${cardStyle} relative transition-all active:scale-[0.99]">
-              <div class="flex justify-between items-start mb-2">
-                <h3 class="font-bold text-slate-800 text-sm w-3/4 leading-tight">${t.title}</h3>
-                <span class="font-bold text-blue-600 text-sm bg-blue-50 px-2 py-1 rounded-lg">+${t.points}</span>
+            <div onclick="ui.openDetail('${t.id}')" class="${cardColor} p-4 rounded-xl shadow-sm border relative transition-all active:scale-[0.98] flex items-center gap-4 cursor-pointer">
+              
+              <div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 text-gray-400 font-bold text-xl overflow-hidden">
+                ${t.thumbnailURL ? `<img src="${t.thumbnailURL}" class="w-full h-full object-cover">` : '<i class="fa-solid fa-list-check"></i>'}
               </div>
-              <p class="text-xs text-gray-500 mb-3 leading-relaxed">${t.desc}</p>
-              <div class="flex justify-between items-center mt-2 border-t border-gray-50 pt-3">
-                ${statusBadge || '<span></span>'}
-                ${btnHtml}
+
+              <div class="flex-1 min-w-0">
+                <h3 class="font-bold text-slate-800 text-sm truncate">${t.title}</h3>
+                <p class="text-xs text-gray-500 truncate mt-0.5">${t.desc}</p>
+              </div>
+
+              <div class="flex flex-col items-end gap-1">
+                <span class="font-bold text-blue-600 text-xs bg-blue-50 px-2 py-0.5 rounded-md">+${t.points}</span>
+                <div class="mt-1 text-sm">${statusIcon}</div>
               </div>
             </div>
           `;
@@ -312,7 +388,6 @@
         container.innerHTML = html;
       },
 
-      // 4. IMAGE PREVIEW
       previewImage: () => {
         const file = ui.el('inp-file').files[0];
         if (file) {
@@ -321,7 +396,6 @@
             ui.el('inp-file').value = '';
             return;
           }
-
           const reader = new FileReader();
           reader.onload = (e) => {
             const img = ui.el('upload-preview');
@@ -338,7 +412,6 @@
         }
       },
 
-      // 5. SUBMIT PROOF (DÜZƏLDİLDİ)
       submitProof: () => {
         const file = ui.el('inp-file').files[0];
         if (!file) return;
@@ -368,21 +441,19 @@
             
             const data = await response.json();
 
-            // DÜZƏLİŞ: status === 'success' yoxlanılır
             if (data.status === 'success') {
-              ui.closeModal();
-              ui.toast("✅ Sübut uğurla göndərildi! Admin təsdiqindən sonra xal hesabınıza oturacaq.");
-              
+              ui.toast("✅ Sübut uğurla göndərildi!");
               state.submissions[state.selectedTask.id] = 'Pending';
-              app.filterLevel(state.currentLevel); 
+              
+              // Refresh View
+              ui.openDetail(state.selectedTask.id); // Re-render modal to show 'Pending' state
+              app.filterLevel(state.currentLevel); // Update list view
             } else {
-              // DÜZƏLİŞ: data.error əvəzinə data.message
               ui.toast("Xəta: " + (data.message || 'Naməlum xəta'));
             }
-
           } catch (err) {
             console.error(err);
-            ui.toast("Gözlənilməz xəta baş verdi. Zəhmət olmasa yenidən cəhd edin.");
+            ui.toast("Xəta baş verdi.");
           } finally {
             ui.toggleLoader('btn-submit', false);
           }
