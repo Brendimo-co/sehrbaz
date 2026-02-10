@@ -432,13 +432,50 @@
         ui.el('detail-title').innerText = task.title;
         ui.el('detail-desc').innerText = task.desc;
         
-        // Render Media
+     // --- MEDIA RENDERER ---
         const media = state.media.filter(m => m.taskId === id);
+        
         ui.el('detail-media').innerHTML = media.map(m => {
-           if(m.type === 'VIDEO') return `<div class="media-wrapper aspect-video flex items-center justify-center"><video controls class="w-full h-full" src="${m.url}"></video></div><p class="text-xs text-gray-500 italic mb-2">${m.caption || ''}</p>`;
-           if(m.type === 'IMAGE') return `<div class="media-wrapper"><img src="${m.url}" class="w-full object-cover"></div><p class="text-xs text-gray-500 italic mb-2">${m.caption || ''}</p>`;
-           if(m.type === 'PDF') return `<a href="${m.url}" target="_blank" class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl mb-2 hover:bg-red-100 transition-colors"><i class="fa-solid fa-file-pdf text-red-500 text-2xl"></i><div><h5 class="font-bold text-sm text-slate-800">PDF Sənəd</h5><p class="text-xs text-red-400">Oxumaq üçün toxunun</p></div><i class="fa-solid fa-external-link-alt ml-auto text-red-300"></i></a>`;
-           return '';
+           let content = '';
+           // Helper: Create a force-download link if it's Google Drive
+           let downloadUrl = m.url;
+           if (m.url.includes('drive.google.com') && m.url.includes('/file/d/')) {
+             const fileId = m.url.split('/file/d/')[1].split('/')[0];
+             downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+           }
+           
+           // 1. Determine Content Type
+           if(m.type === 'VIDEO') {
+             // Note: Google Drive videos might require 'preview' link to play, 
+             // but here we assume direct link or compatible player logic
+             content = `<div class="media-wrapper aspect-video flex items-center justify-center bg-black"><video controls class="w-full h-full" src="${m.url}"></video></div>`;
+           } else if(m.type === 'IMAGE') {
+             // For Images, we try to use the direct link for preview if possible, 
+             // otherwise just show the wrapper
+             content = `<div class="media-wrapper"><img src="${m.url}" class="w-full object-cover" onerror="this.src='https://placehold.co/600x400?text=Image+Preview'"></div>`;
+           } else if(m.type === 'PDF') {
+             content = `
+               <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl">
+                 <i class="fa-solid fa-file-pdf text-red-500 text-3xl"></i>
+                 <div>
+                   <h5 class="font-bold text-sm text-slate-800">PDF Sənəd</h5>
+                   <p class="text-xs text-red-400">Faylı aşağıdan yükləyin</p>
+                 </div>
+               </div>`;
+           }
+
+           // 2. Render Card with FIXED Download Button
+           return `
+             <div class="mb-6">
+               ${content}
+               <div class="flex justify-between items-start mt-2">
+                 <p class="text-xs text-gray-500 italic w-2/3 pt-1">${m.caption || ''}</p>
+                 
+                 <a href="${downloadUrl}" target="_blank" download class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors shadow-md active:scale-95">
+                   <i class="fa-solid fa-cloud-arrow-down"></i> Yüklə
+                 </a>
+               </div>
+             </div>`;
         }).join('');
 
         // Action Area Logic
