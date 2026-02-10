@@ -424,6 +424,7 @@
       },
 
       // 6. OPEN TASK DETAIL
+    // 6. OPEN TASK DETAIL (MODIFIED)
       openDetail: (id) => {
         const task = state.tasks.find(t => t.id === id);
         state.selectedTask = task;
@@ -431,7 +432,7 @@
         ui.el('detail-title').innerText = task.title;
         ui.el('detail-desc').innerText = task.desc;
         
-        // Render Media (Video, Image, PDF)
+        // Render Media
         const media = state.media.filter(m => m.taskId === id);
         ui.el('detail-media').innerHTML = media.map(m => {
            if(m.type === 'VIDEO') return `<div class="media-wrapper aspect-video flex items-center justify-center"><video controls class="w-full h-full" src="${m.url}"></video></div><p class="text-xs text-gray-500 italic mb-2">${m.caption || ''}</p>`;
@@ -440,7 +441,7 @@
            return '';
         }).join('');
 
-        // Render Action Area based on status
+        // Action Area Logic
         const status = state.submissions[id];
         const action = ui.el('detail-action');
         
@@ -448,19 +449,27 @@
           action.innerHTML = `
             <div class="bg-green-50 text-green-700 p-5 rounded-xl text-center border border-green-200">
               <i class="fa-solid fa-check-circle text-3xl mb-2"></i>
-              <p class="font-bold">Təbriklər! Tapşırıq qəbul edildi.</p>
-              <p class="text-xs mt-1">+${task.points} xal hesabınıza əlavə olundu</p>
+              <p class="font-bold">Qəbul Edildi</p>
             </div>`;
         } else if (status === 'Pending') {
           action.innerHTML = `
             <div class="bg-orange-50 text-orange-600 p-5 rounded-xl text-center border border-orange-200">
               <i class="fa-solid fa-clock text-3xl mb-2"></i>
               <p class="font-bold">Yoxlanılır...</p>
-              <p class="text-xs mt-1">Sübut admin tərəfindən yoxlanılır</p>
             </div>`;
         } else {
-          // Upload Form
+          // --- NEW: DISPLAY PROOF TYPE INSTRUCTION ---
+          const instruction = task.proofType ? task.proofType : "Şəkil";
+          
           action.innerHTML = `
+            <div class="bg-blue-50 border border-blue-100 p-3 rounded-lg mb-4 flex items-start gap-3">
+              <i class="fa-solid fa-circle-info text-blue-500 mt-1"></i>
+              <div>
+                <p class="text-xs text-blue-400 font-bold uppercase">Tələb Olunan Sübut:</p>
+                <p class="text-sm text-blue-900 font-medium">${instruction}</p>
+              </div>
+            </div>
+
             <h4 class="font-bold text-slate-800 mb-3">Sübut Yüklə</h4>
             <label class="block w-full h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-all relative overflow-hidden group bg-gray-50">
               <input type="file" id="inp-file" accept="image/*" class="hidden" onchange="app.previewImage()">
