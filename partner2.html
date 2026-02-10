@@ -3,62 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Brendimo - Oyunlaşdırma Paneli</title>
+  <title>Brendimo - Panel</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
+    /* General Settings */
     body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
     
-    /* Hide Scrollbar */
+    /* Scrollbar Hiding */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
+    
     /* Animations */
-    .fade-in { animation: fadeIn 0.4s ease-out; }
+    .fade-in { animation: fadeIn 0.3s ease-out; }
     .slide-up { animation: slideUp 0.3s ease-out; }
+    
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-    /* Spinner */
+    /* Visual Effects */
+    .glass { 
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(10px); 
+      -webkit-backdrop-filter: blur(10px); 
+    }
+    .gradient-card { 
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
+    }
+    
+    /* Loading Spinner */
     .loader {
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #3b82f6;
+      border: 3px solid #f3f3f3; 
+      border-top: 3px solid #3b82f6; 
       border-radius: 50%;
-      width: 24px; height: 24px;
+      width: 24px; height: 24px; 
       animation: spin 1s linear infinite;
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* Glass Effect */
-    .glass {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-    
-    /* Media Container */
+    /* Media Wrapper */
     .media-wrapper {
-      position: relative;
-      width: 100%;
       border-radius: 12px;
       overflow: hidden;
-      margin-bottom: 1rem;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: #000;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
 
   <script>
-    // PASTE YOUR NEW GOOGLE APPS SCRIPT WEB APP URL HERE
-    const API_URL = "https://script.google.com/macros/s/AKfycbw2WMKzbwN36bEu2L_1I_PQnOt1DJdfjJRQnFql2GWst1o51iT37fj0lhgX7vlM7-To/exec";
+    // ⚠️ REPLACE THIS URL WITH YOUR GOOGLE SCRIPT WEB APP URL ⚠️
+    const API_URL = "https://script.google.com/macros/s/AKfycbx2hT0F9dWLATCP87XtT5oYvpSiiZzAVzEn8zqgQFtPiqBi6bRJ8DVP-TQDv2WU3_iR/exec"; 
   </script>
 
-  
   <div id="view-login" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 transition-transform duration-500">
     <div class="w-full max-w-sm">
       <div class="flex justify-center mb-8">
@@ -68,395 +69,507 @@
       </div>
       
       <h1 class="text-3xl font-bold text-center text-slate-900 mb-2">Brendimo</h1>
-      <p class="text-center text-gray-500 mb-8">Komanda Portalına Xoş Gəlmisiniz</p>
+      <p class="text-center text-gray-500 mb-8">Partnyor Portalı</p>
       
       <div class="space-y-4">
-        <div>
-          <label class="text-xs font-bold text-gray-400 uppercase ml-1">Telefon Nömrəsi</label>
-          <div class="relative mt-1">
-            <span class="absolute left-4 top-3.5 text-gray-400"><i class="fa-solid fa-phone"></i></span>
-            <input type="tel" id="inp-phone" placeholder="məs: 0501234567" 
-              class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 outline-none focus:ring-2 focus:ring-blue-500 font-bold transition-all">
-          </div>
+        <div class="relative">
+          <span class="absolute left-4 top-3.5 text-gray-400"><i class="fa-solid fa-phone"></i></span>
+          <input type="tel" id="inp-phone" placeholder="Nömrə (məs: 0501234567)" 
+            class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 outline-none focus:ring-2 focus:ring-blue-500 font-bold transition-all">
         </div>
         
         <button id="btn-login" onclick="app.login()" 
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all flex justify-center items-center gap-2">
           <span id="btn-login-text">Daxil Ol</span>
           <div id="btn-login-loader" class="loader border-t-white hidden"></div>
         </button>
       </div>
-
-      <p class="text-center text-xs text-gray-400 mt-6">Qeydiyyat üçün adminlə əlaqə saxlayın.</p>
     </div>
   </div>
 
-  <div id="view-dashboard" class="flex-1 flex flex-col relative hidden max-w-md mx-auto w-full bg-gray-50 shadow-2xl h-full">
+  <div id="view-main" class="flex-1 flex flex-col relative hidden max-w-md mx-auto w-full bg-gray-50 shadow-2xl h-full">
     
-    <header class="glass sticky top-0 z-20 px-5 pt-safe-top pb-3 border-b border-gray-200">
+    <header class="glass sticky top-0 z-20 px-5 pt-safe-top pb-2 border-b border-gray-200">
       <div class="flex justify-between items-center py-4">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow-sm">
             <span id="user-avatar">?</span>
           </div>
           <div class="leading-tight">
-            <h2 class="font-bold text-lg text-slate-800 truncate w-32" id="user-name">İstifadəçi</h2>
-            <p class="text-xs text-gray-500 font-medium">Balans: <span id="user-balance" class="text-green-600 font-bold">0.00</span> AZN</p>
+            <h2 class="font-bold text-lg text-slate-800 truncate w-32" id="user-name">User</h2>
+            <p class="text-xs text-gray-500 font-medium">Xoş gəlmisiniz</p>
           </div>
         </div>
-
+        
         <div class="bg-slate-900 text-white px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2">
           <i class="fa-solid fa-star text-yellow-400 text-xs"></i>
           <span class="font-bold text-sm"><span id="user-points">0</span> xal</span>
         </div>
       </div>
-
-      <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1 mt-2">
-        <button onclick="app.filterLevel(1)" class="tab-btn active px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-blue-600 text-white transition-all shadow-md" data-level="1">Səviyyə 1</button>
-        <button onclick="app.filterLevel(2)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border border-gray-200 transition-all" data-level="2">Səviyyə 2</button>
-        <button onclick="app.filterLevel(3)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border border-gray-200 transition-all" data-level="3">Səviyyə 3</button>
-        <button onclick="app.filterLevel(4)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border border-gray-200 transition-all" data-level="4">Səviyyə 4</button>
-        <button onclick="app.filterLevel(5)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border border-gray-200 transition-all" data-level="5">Səviyyə 5</button>
-      </div>
     </header>
 
-    <main id="task-container" class="flex-1 overflow-y-auto p-5 pb-24 space-y-4 scroll-smooth">
-      <div class="text-center py-10 text-gray-400 animate-pulse">
-        Məlumatlar yüklənir...
+    <main class="flex-1 overflow-y-auto pb-24 relative">
+      
+      <div id="page-tasks" class="p-5 space-y-4 fade-in">
+        
+        <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2 mb-2 sticky top-0 bg-gray-50 z-10 py-2">
+          <button onclick="app.filterLevel(1)" class="tab-btn active px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-blue-600 text-white shadow-md" data-level="1">Səviyyə 1</button>
+          <button onclick="app.filterLevel(2)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border" data-level="2">Səviyyə 2</button>
+          <button onclick="app.filterLevel(3)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border" data-level="3">Səviyyə 3</button>
+          <button onclick="app.filterLevel(4)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border" data-level="4">Səviyyə 4</button>
+          <button onclick="app.filterLevel(5)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border" data-level="5">Səviyyə 5</button>
+        </div>
+        
+        <div id="task-container" class="space-y-4">
+          </div>
+      </div>
+
+      <div id="page-wallet" class="p-5 space-y-6 fade-in hidden">
+        
+        <div class="gradient-card rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-4 opacity-20"><i class="fa-solid fa-wallet text-6xl"></i></div>
+          <p class="text-blue-100 text-xs font-medium mb-1">Cari Balans</p>
+          <h2 class="text-3xl font-bold mb-6"><span id="wallet-balance">0.00</span> <span class="text-lg">AZN</span></h2>
+          
+          <div class="flex justify-between items-end border-t border-blue-400/30 pt-4">
+            <div>
+              <p class="text-blue-200 text-[10px] uppercase">Gözləyən</p>
+              <p class="font-bold text-sm"><span id="wallet-pending">0.00</span> AZN</p>
+            </div>
+            <div class="text-right">
+              <p class="text-blue-200 text-[10px] uppercase">Cəmi Çıxarılan</p>
+              <p class="font-bold text-sm"><span id="wallet-withdrawn">0.00</span> AZN</p>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="ui.openWithdrawModal()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold shadow-lg flex justify-center items-center gap-2 active:scale-95 transition-transform hover:bg-slate-800">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+          Vəsait Çıxar (Min 5 AZN)
+        </button>
+
+        <div>
+          <h3 class="font-bold text-slate-800 mb-3 text-sm">Son Əməliyyatlar</h3>
+          <div id="wallet-history" class="space-y-3">
+            </div>
+        </div>
       </div>
     </main>
 
-    <div class="absolute bottom-0 w-full glass border-t border-gray-200 pb-safe-bottom z-30 p-4 text-center">
-      <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">100 XAL = 1 AZN</p>
+    <div class="absolute bottom-0 w-full glass border-t border-gray-200 pb-safe-bottom z-30 flex justify-around p-2">
+      <button onclick="app.nav('home')" id="nav-home" class="flex-1 p-3 rounded-xl flex flex-col items-center gap-1 text-blue-600 transition-colors">
+        <i class="fa-solid fa-list-check text-xl"></i>
+        <span class="text-[10px] font-bold">Tapşırıqlar</span>
+      </button>
+      <button onclick="app.nav('wallet')" id="nav-wallet" class="flex-1 p-3 rounded-xl flex flex-col items-center gap-1 text-gray-400 transition-colors">
+        <i class="fa-solid fa-wallet text-xl"></i>
+        <span class="text-[10px] font-bold">Balans</span>
+      </button>
     </div>
+
   </div>
 
-  <div id="modal-detail" class="fixed inset-0 z-40 bg-white hidden flex flex-col h-full overflow-hidden slide-up">
-    
-    <div class="glass px-5 py-4 border-b border-gray-100 flex justify-between items-center sticky top-0 z-50">
-      <button onclick="ui.closeDetail()" class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors">
+  <div id="modal-detail" class="fixed inset-0 z-40 bg-white hidden flex flex-col h-full slide-up">
+    <div class="glass px-5 py-4 border-b flex justify-between items-center sticky top-0 z-50">
+      <button onclick="ui.closeModals()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
         <i class="fa-solid fa-arrow-left"></i>
       </button>
-      <h3 class="font-bold text-slate-800 text-lg truncate px-4" id="detail-title">Tapşırıq Adı</h3>
+      <h3 class="font-bold truncate px-4 text-lg text-slate-800" id="detail-title">Tapşırıq Adı</h3>
       <div class="w-10"></div> </div>
-
+    
     <div class="flex-1 overflow-y-auto p-5 pb-32">
-      <div id="detail-media-container" class="space-y-4 mb-6"></div>
+      <div id="detail-media" class="space-y-4 mb-6"></div>
       
-      <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 mb-6">
-        <h4 class="text-xs font-bold text-blue-500 uppercase mb-2">Təlimat</h4>
-        <p class="text-sm text-gray-600 leading-relaxed" id="detail-desc">...</p>
-      </div>
-
-      <div id="detail-action-area">
-        </div>
+      <div class="bg-blue-50 p-4 rounded-xl text-sm text-gray-700 leading-relaxed border border-blue-100" id="detail-desc"></div>
+      
+      <div id="detail-action" class="mt-6 border-t pt-6"></div>
     </div>
   </div>
 
-  <template id="upload-template">
-    <div class="border-t pt-6">
-      <h4 class="font-bold text-slate-800 mb-3">Sübut Yüklə</h4>
-      
-      <label class="block w-full h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-all relative overflow-hidden group">
-        <input type="file" id="inp-file" accept="image/*" class="hidden" onchange="app.previewImage()">
-        
-        <div id="upload-placeholder" class="text-center p-4">
-          <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-300 mb-2"></i>
-          <p class="text-xs font-bold text-gray-500">Şəkil seçin</p>
+  <div id="modal-withdraw" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 fade-in relative shadow-2xl">
+      <div class="flex justify-between mb-4">
+        <h3 class="font-bold text-lg text-slate-800">Balansı Çıxar</h3>
+        <button onclick="ui.closeModals()"><i class="fa-solid fa-xmark text-gray-400 text-xl"></i></button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs text-gray-400 font-bold uppercase">Ad Soyad</label>
+          <input type="text" id="wd-name" class="w-full p-3 border border-gray-200 rounded-xl font-bold outline-none focus:border-blue-500 bg-gray-50 focus:bg-white transition-colors">
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 font-bold uppercase">Kart Nömrəsi (16 rəqəm)</label>
+          <input type="tel" id="wd-card" placeholder="0000 0000 0000 0000" class="w-full p-3 border border-gray-200 rounded-xl font-bold outline-none focus:border-blue-500 bg-gray-50 focus:bg-white transition-colors">
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 font-bold uppercase">Məbləğ (AZN)</label>
+          <input type="number" id="wd-amount" placeholder="Min 5" class="w-full p-3 border border-gray-200 rounded-xl font-bold outline-none focus:border-blue-500 bg-gray-50 focus:bg-white transition-colors">
         </div>
         
-        <img id="upload-preview" class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
-      </label>
-
-      <button id="btn-submit" onclick="app.submitProof()" disabled 
-        class="w-full mt-4 bg-gray-200 text-gray-400 font-bold py-3.5 rounded-xl transition-all disabled:opacity-50 shadow-sm flex justify-center gap-2">
-        <span id="btn-submit-text">Təsdiqlə və Göndər</span>
-        <div id="btn-submit-loader" class="loader border-t-white w-5 h-5 hidden"></div>
-      </button>
+        <p class="text-xs text-gray-400 text-center">Çıxarış 24 saat ərzində təsdiqlənir.</p>
+        
+        <button id="btn-withdraw" onclick="app.requestWithdraw()" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold flex justify-center items-center gap-2 shadow-lg active:scale-95 transition-all">
+          <span>Təsdiqlə</span>
+          <div id="loader-wd" class="loader border-t-white w-5 h-5 hidden"></div>
+        </button>
+      </div>
     </div>
-  </template>
+  </div>
 
   <script>
+    // GLOBAL STATE
     const state = {
-      user: null,
-      tasks: [],
-      media: [], // Holds video/pdf links
-      submissions: {},
-      currentLevel: 1,
+      user: null, 
+      tasks: [], 
+      media: [], 
+      submissions: {}, 
+      withdrawals: [],
+      currentLevel: 1, 
       selectedTask: null
     };
 
+    // UI CONTROLLER
     const ui = {
       el: (id) => document.getElementById(id),
       
-      toggleLoader: (btnId, show) => {
-        const text = document.getElementById(`${btnId}-text`);
-        const loader = document.getElementById(`${btnId}-loader`);
-        const btn = document.getElementById(btnId.replace('-text', '')); 
-
+      toggleLoader: (btnId, loaderId, show) => {
+        const btn = ui.el(btnId);
+        const loader = ui.el(loaderId);
+        const span = btn.querySelector('span');
         if (show) {
-          text.classList.add('hidden');
+          span?.classList.add('hidden');
           loader.classList.remove('hidden');
           btn.disabled = true;
         } else {
-          text.classList.remove('hidden');
+          span?.classList.remove('hidden');
           loader.classList.add('hidden');
           btn.disabled = false;
         }
       },
 
-      openDetail: (taskId) => {
-        state.selectedTask = state.tasks.find(t => t.id === taskId);
-        const task = state.selectedTask;
-        const status = state.submissions[task.id] || null;
-
-        // Populate Modal
-        ui.el('detail-title').innerText = task.title;
-        ui.el('detail-desc').innerText = task.desc;
-
-        // Render Media
-        const mediaContainer = ui.el('detail-media-container');
-        mediaContainer.innerHTML = '';
-        
-        const taskMedia = state.media.filter(m => m.taskId === task.id);
-        
-        if (taskMedia.length > 0) {
-          taskMedia.forEach(m => {
-            let mediaHtml = '';
-            
-            if (m.type === 'VIDEO') {
-              mediaHtml = `
-                <div class="media-wrapper aspect-video bg-black flex items-center justify-center">
-                  <video controls class="w-full h-full" src="${m.url}"></video>
-                </div>
-                <p class="text-xs text-gray-500 italic mb-2">${m.caption || 'Video təlimat'}</p>
-              `;
-            } else if (m.type === 'IMAGE') {
-              mediaHtml = `
-                <div class="media-wrapper">
-                  <img src="${m.url}" class="w-full object-cover rounded-lg">
-                </div>
-                <p class="text-xs text-gray-500 italic mb-2">${m.caption || ''}</p>
-              `;
-            } else if (m.type === 'PDF') {
-              mediaHtml = `
-                <a href="${m.url}" target="_blank" class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl hover:bg-red-100 transition-colors">
-                  <i class="fa-solid fa-file-pdf text-red-500 text-2xl"></i>
-                  <div>
-                    <h5 class="font-bold text-slate-800 text-sm">PDF Sənəd</h5>
-                    <p class="text-xs text-red-400">Oxumaq üçün toxunun</p>
-                  </div>
-                  <i class="fa-solid fa-external-link-alt ml-auto text-red-300"></i>
-                </a>
-              `;
-            }
-            mediaContainer.innerHTML += mediaHtml;
-          });
-        }
-
-        // Render Action Area based on Status
-        const actionArea = ui.el('detail-action-area');
-        if (status === 'Approved') {
-          actionArea.innerHTML = `
-            <div class="bg-green-50 text-green-700 p-4 rounded-xl text-center border border-green-200">
-              <i class="fa-solid fa-check-circle text-2xl mb-2"></i>
-              <p class="font-bold">Təbriklər! Tapşırıq qəbul edildi.</p>
-              <p class="text-xs mt-1">+${task.points} xal qazandınız</p>
-            </div>`;
-        } else if (status === 'Pending') {
-          actionArea.innerHTML = `
-            <div class="bg-orange-50 text-orange-600 p-4 rounded-xl text-center border border-orange-200">
-              <i class="fa-solid fa-clock text-2xl mb-2"></i>
-              <p class="font-bold">Yoxlanılır...</p>
-              <p class="text-xs mt-1">Admin təsdiqi gözlənilir</p>
-            </div>`;
-        } else {
-          // Show Upload Form
-          const template = document.getElementById('upload-template').content.cloneNode(true);
-          actionArea.innerHTML = '';
-          actionArea.appendChild(template);
-        }
-
-        ui.el('modal-detail').classList.remove('hidden');
+      closeModals: () => {
+        ui.el('modal-detail').classList.add('hidden');
+        ui.el('modal-withdraw').classList.add('hidden');
+        // Stop any playing videos
+        document.querySelectorAll('video').forEach(v => v.pause());
       },
 
-      closeDetail: () => {
-        ui.el('modal-detail').classList.add('hidden');
-        // Stop videos
-        const videos = document.querySelectorAll('video');
-        videos.forEach(v => v.pause());
+      openWithdrawModal: () => {
+        // Auto-fill name if we have it
+        ui.el('wd-name').value = state.user.name || '';
+        ui.el('modal-withdraw').classList.remove('hidden');
       },
 
       toast: (msg) => {
+        // Simple alert for reliability across mobile devices
         alert(msg); 
       }
     };
 
+    // APP LOGIC
     const app = {
+      // 1. LOGIN
       login: async () => {
         const phone = ui.el('inp-phone').value.trim();
-        if (!phone) return ui.toast('Zəhmət olmasa nömrənizi daxil edin.');
+        if (!phone) return ui.toast('Zəhmət olmasa nömrə daxil edin');
         
-        ui.toggleLoader('btn-login', true);
-
+        ui.toggleLoader('btn-login', 'btn-login-loader', true);
         try {
-          const response = await fetch(`${API_URL}?action=login&phone=${phone}`);
-          const data = await response.json();
-
+          const res = await fetch(`${API_URL}?action=login&phone=${phone}`);
+          const data = await res.json();
+          
           if (data.status === 'success') {
+            // Save Data to State
             state.user = data.user;
             state.tasks = data.tasks;
-            state.media = data.media; // Store Media
+            state.media = data.media;
             state.submissions = data.submissions;
+            state.withdrawals = data.withdrawals || [];
             
+            // Switch Screens
             ui.el('view-login').classList.add('hidden');
-            ui.el('view-dashboard').classList.remove('hidden');
+            ui.el('view-main').classList.remove('hidden');
             
-            app.renderHeader();
-            app.filterLevel(1); 
+            // Render Everything
+            app.renderUI();
           } else {
-            ui.toast('Xəta: ' + (data.message || 'Naməlum xəta'));
+            ui.toast(data.message);
           }
-        } catch (e) {
-          ui.toast('Server Xətası: İnternet bağlantısını yoxlayın.');
-          console.error(e);
-        } finally {
-          ui.toggleLoader('btn-login', false);
+        } catch (e) { 
+          console.error(e); 
+          ui.toast("Serverlə əlaqə yaradıla bilmədi. İnterneti yoxlayın."); 
         }
+        ui.toggleLoader('btn-login', 'btn-login-loader', false);
       },
 
-      renderHeader: () => {
+      // 2. RENDER UI
+      renderUI: () => {
+        // Header Info
         ui.el('user-name').innerText = state.user.name;
         ui.el('user-avatar').innerText = state.user.name.charAt(0).toUpperCase();
         ui.el('user-points').innerText = state.user.points;
-        ui.el('user-balance').innerText = state.user.balance || "0.00";
+        
+        // Initial Task Filter
+        app.filterLevel(1);
+        
+        // Wallet Info
+        app.renderWallet();
       },
 
-      filterLevel: (level) => {
-        state.currentLevel = level;
+      // 3. RENDER WALLET
+      renderWallet: () => {
+        ui.el('wallet-balance').innerText = state.user.balance;
+        ui.el('wallet-withdrawn').innerText = state.user.totalWithdrawn;
+        ui.el('wallet-pending').innerText = state.user.pendingWithdrawal;
         
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-          if (parseInt(btn.dataset.level) === level) {
-            btn.className = "tab-btn active px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-blue-600 text-white transition-all shadow-md transform scale-105";
-          } else {
-            btn.className = "tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border border-gray-200 transition-all hover:bg-gray-50";
-          }
-        });
-
-        const filteredTasks = state.tasks.filter(t => parseInt(t.level) === level);
-        const container = ui.el('task-container');
-        
-        if (filteredTasks.length === 0) {
-          container.innerHTML = `<div class="text-center py-20 text-gray-400 flex flex-col items-center"><i class="fa-regular fa-folder-open text-4xl mb-2 opacity-50"></i><p>Bu səviyyədə tapşırıq yoxdur.</p></div>`;
-          return;
+        const historyCont = ui.el('wallet-history');
+        if (state.withdrawals.length === 0) {
+          historyCont.innerHTML = `<p class="text-center text-gray-400 text-sm py-4">Hələ əməliyyat yoxdur</p>`;
+        } else {
+          historyCont.innerHTML = state.withdrawals.map(w => {
+            let color = "text-orange-500 bg-orange-50";
+            let label = "Gözləyir";
+            
+            if (w.status === 'Paid') { 
+              color = "text-green-600 bg-green-50"; 
+              label = "Ödənildi"; 
+            } else if (w.status === 'Rejected') { 
+              color = "text-red-600 bg-red-50"; 
+              label = "Ləğv"; 
+            }
+            
+            const date = new Date(w.date).toLocaleDateString('az-AZ');
+            
+            return `
+              <div class="bg-white p-3 rounded-xl border border-gray-100 flex justify-between items-center">
+                <div>
+                  <p class="font-bold text-sm text-slate-800">Çıxarış</p>
+                  <p class="text-[10px] text-gray-400">${date}</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-bold text-slate-800">${w.amount} AZN</p>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded ${color}">${label}</span>
+                </div>
+              </div>`;
+          }).join('');
         }
-
-        let html = '';
-        filteredTasks.forEach(t => {
-          const status = state.submissions[t.id] || null; 
-          
-          let cardColor = "bg-white border-gray-100";
-          let statusIcon = `<i class="fa-solid fa-chevron-right text-gray-300"></i>`;
-          
-          if (status === 'Pending') {
-            cardColor = "bg-orange-50 border-orange-200";
-            statusIcon = `<i class="fa-solid fa-clock text-orange-400"></i>`;
-          } else if (status === 'Approved') {
-            cardColor = "bg-green-50 border-green-200 opacity-80";
-            statusIcon = `<i class="fa-solid fa-check-circle text-green-500"></i>`;
-          }
-
-          html += `
-            <div onclick="ui.openDetail('${t.id}')" class="${cardColor} p-4 rounded-xl shadow-sm border relative transition-all active:scale-[0.98] flex items-center gap-4 cursor-pointer">
-              
-              <div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 text-gray-400 font-bold text-xl overflow-hidden">
-                ${t.thumbnailURL ? `<img src="${t.thumbnailURL}" class="w-full h-full object-cover">` : '<i class="fa-solid fa-list-check"></i>'}
-              </div>
-
-              <div class="flex-1 min-w-0">
-                <h3 class="font-bold text-slate-800 text-sm truncate">${t.title}</h3>
-                <p class="text-xs text-gray-500 truncate mt-0.5">${t.desc}</p>
-              </div>
-
-              <div class="flex flex-col items-end gap-1">
-                <span class="font-bold text-blue-600 text-xs bg-blue-50 px-2 py-0.5 rounded-md">+${t.points}</span>
-                <div class="mt-1 text-sm">${statusIcon}</div>
-              </div>
-            </div>
-          `;
-        });
-        container.innerHTML = html;
       },
 
+      // 4. NAVIGATION TAB SWITCH
+      nav: (page) => {
+        if (page === 'home') {
+          ui.el('page-tasks').classList.remove('hidden');
+          ui.el('page-wallet').classList.add('hidden');
+          ui.el('nav-home').classList.add('text-blue-600'); 
+          ui.el('nav-home').classList.remove('text-gray-400');
+          ui.el('nav-wallet').classList.add('text-gray-400'); 
+          ui.el('nav-wallet').classList.remove('text-blue-600');
+        } else {
+          ui.el('page-tasks').classList.add('hidden');
+          ui.el('page-wallet').classList.remove('hidden');
+          ui.el('nav-wallet').classList.add('text-blue-600'); 
+          ui.el('nav-wallet').classList.remove('text-gray-400');
+          ui.el('nav-home').classList.add('text-gray-400'); 
+          ui.el('nav-home').classList.remove('text-blue-600');
+        }
+      },
+
+      // 5. FILTER TASKS BY LEVEL
+      filterLevel: (lvl) => {
+        state.currentLevel = lvl;
+        
+        // Update Buttons
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          if (+b.dataset.level === lvl) 
+            b.className = "tab-btn active px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-blue-600 text-white shadow-md transition-all";
+          else 
+            b.className = "tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border border-gray-200 transition-all";
+        });
+        
+        // Filter Tasks
+        const tasks = state.tasks.filter(t => +t.level === lvl);
+        
+        // Render List
+        ui.el('task-container').innerHTML = tasks.length ? tasks.map(t => {
+          const status = state.submissions[t.id];
+          let icon = '<i class="fa-solid fa-chevron-right text-gray-300"></i>';
+          let bg = 'bg-white border-gray-100';
+          
+          if (status === 'Approved') {
+            icon = '<i class="fa-solid fa-check-circle text-green-500 text-lg"></i>';
+            bg = 'bg-green-50 border-green-200 opacity-80';
+          } else if (status === 'Pending') {
+            icon = '<i class="fa-solid fa-clock text-orange-400 text-lg"></i>';
+            bg = 'bg-orange-50 border-orange-200';
+          }
+          
+          return `
+            <div onclick="app.openDetail('${t.id}')" class="${bg} p-4 rounded-xl shadow-sm border flex items-center gap-4 cursor-pointer transition-transform active:scale-[0.98]">
+               <div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-200">
+                 ${t.thumbnailURL ? `<img src="${t.thumbnailURL}" class="w-full h-full object-cover">` : '<i class="fa-solid fa-list-check text-gray-400"></i>'}
+               </div>
+               
+               <div class="flex-1 min-w-0">
+                 <h3 class="font-bold text-sm text-slate-800 truncate">${t.title}</h3>
+                 <p class="text-xs text-gray-500 truncate mt-0.5">${t.desc}</p>
+               </div>
+               
+               <div class="flex flex-col items-end gap-1">
+                 <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">+${t.points}</span>
+                 ${icon}
+               </div>
+            </div>`;
+        }).join('') : '<div class="text-center py-10"><i class="fa-regular fa-folder-open text-4xl text-gray-200 mb-2"></i><p class="text-gray-400 text-sm">Bu səviyyədə tapşırıq yoxdur</p></div>';
+      },
+
+      // 6. OPEN TASK DETAIL
+      openDetail: (id) => {
+        const task = state.tasks.find(t => t.id === id);
+        state.selectedTask = task;
+        
+        ui.el('detail-title').innerText = task.title;
+        ui.el('detail-desc').innerText = task.desc;
+        
+        // Render Media (Video, Image, PDF)
+        const media = state.media.filter(m => m.taskId === id);
+        ui.el('detail-media').innerHTML = media.map(m => {
+           if(m.type === 'VIDEO') return `<div class="media-wrapper aspect-video flex items-center justify-center"><video controls class="w-full h-full" src="${m.url}"></video></div><p class="text-xs text-gray-500 italic mb-2">${m.caption || ''}</p>`;
+           if(m.type === 'IMAGE') return `<div class="media-wrapper"><img src="${m.url}" class="w-full object-cover"></div><p class="text-xs text-gray-500 italic mb-2">${m.caption || ''}</p>`;
+           if(m.type === 'PDF') return `<a href="${m.url}" target="_blank" class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl mb-2 hover:bg-red-100 transition-colors"><i class="fa-solid fa-file-pdf text-red-500 text-2xl"></i><div><h5 class="font-bold text-sm text-slate-800">PDF Sənəd</h5><p class="text-xs text-red-400">Oxumaq üçün toxunun</p></div><i class="fa-solid fa-external-link-alt ml-auto text-red-300"></i></a>`;
+           return '';
+        }).join('');
+
+        // Render Action Area based on status
+        const status = state.submissions[id];
+        const action = ui.el('detail-action');
+        
+        if (status === 'Approved') {
+          action.innerHTML = `
+            <div class="bg-green-50 text-green-700 p-5 rounded-xl text-center border border-green-200">
+              <i class="fa-solid fa-check-circle text-3xl mb-2"></i>
+              <p class="font-bold">Təbriklər! Tapşırıq qəbul edildi.</p>
+              <p class="text-xs mt-1">+${task.points} xal hesabınıza əlavə olundu</p>
+            </div>`;
+        } else if (status === 'Pending') {
+          action.innerHTML = `
+            <div class="bg-orange-50 text-orange-600 p-5 rounded-xl text-center border border-orange-200">
+              <i class="fa-solid fa-clock text-3xl mb-2"></i>
+              <p class="font-bold">Yoxlanılır...</p>
+              <p class="text-xs mt-1">Sübut admin tərəfindən yoxlanılır</p>
+            </div>`;
+        } else {
+          // Upload Form
+          action.innerHTML = `
+            <h4 class="font-bold text-slate-800 mb-3">Sübut Yüklə</h4>
+            <label class="block w-full h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-all relative overflow-hidden group bg-gray-50">
+              <input type="file" id="inp-file" accept="image/*" class="hidden" onchange="app.previewImage()">
+              <div id="upload-placeholder" class="text-center p-4">
+                <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-300 mb-2"></i>
+                <p class="text-xs font-bold text-gray-500">Şəkil seçin</p>
+              </div>
+              <img id="upload-preview" class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
+            </label>
+            <button onclick="app.submitProof()" id="btn-submit" class="w-full mt-4 bg-slate-900 text-white py-3.5 rounded-xl font-bold flex justify-center items-center shadow-lg active:scale-95 transition-all">
+              <span id="btn-submit-text">Təsdiqlə və Göndər</span>
+              <div id="btn-submit-loader" class="loader hidden w-5 h-5 border-t-white"></div>
+            </button>
+          `;
+        }
+        
+        ui.el('modal-detail').classList.remove('hidden');
+      },
+
+      // 7. PREVIEW UPLOAD IMAGE
       previewImage: () => {
         const file = ui.el('inp-file').files[0];
         if (file) {
-          if(file.size > 5 * 1024 * 1024) {
-            ui.toast("Şəkilin ölçüsü 5MB-dan çox ola bilməz.");
-            ui.el('inp-file').value = '';
-            return;
-          }
+          if(file.size > 5 * 1024 * 1024) return ui.toast("Fayl çox böyükdür (Max 5MB)");
+          
           const reader = new FileReader();
           reader.onload = (e) => {
-            const img = ui.el('upload-preview');
-            img.src = e.target.result;
-            img.classList.remove('hidden');
+            ui.el('upload-preview').src = e.target.result;
+            ui.el('upload-preview').classList.remove('hidden');
             ui.el('upload-placeholder').classList.add('hidden');
-            
-            const btn = ui.el('btn-submit');
-            btn.disabled = false;
-            btn.classList.remove('bg-gray-200', 'text-gray-400');
-            btn.classList.add('bg-blue-600', 'text-white', 'shadow-lg', 'shadow-blue-200');
           };
           reader.readAsDataURL(file);
         }
       },
 
-      submitProof: () => {
+      // 8. REQUEST WITHDRAWAL
+      requestWithdraw: async () => {
+        const name = ui.el('wd-name').value;
+        const card = ui.el('wd-card').value;
+        const amount = ui.el('wd-amount').value;
+        
+        if (!name || !card || !amount) return ui.toast("Bütün xanaları doldurun");
+        if (Number(amount) < 5) return ui.toast("Minimum məbləğ 5 AZN-dir");
+        if (Number(amount) > Number(state.user.balance)) return ui.toast("Balansda kifayət qədər vəsait yoxdur");
+
+        ui.toggleLoader('btn-withdraw', 'loader-wd', true);
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST', 
+            body: JSON.stringify({ 
+              action: 'requestWithdrawal', 
+              phone: state.user.phone, 
+              fullName: name, 
+              cardNumber: card, 
+              amount: amount 
+            })
+          });
+          const data = await res.json();
+          
+          if (data.status === 'success') {
+            ui.toast("Sorğu uğurla göndərildi!");
+            
+            // Update Local State instantly (Optimistic UI)
+            state.user.balance = (state.user.balance - amount).toFixed(2);
+            state.user.pendingWithdrawal = (Number(state.user.pendingWithdrawal) + Number(amount)).toFixed(2);
+            state.withdrawals.unshift({ date: new Date().toISOString(), amount: amount, status: 'Pending' });
+            
+            app.renderWallet();
+            ui.closeModals();
+          } else {
+            ui.toast(data.message);
+          }
+        } catch(e) { ui.toast("Xəta baş verdi"); }
+        ui.toggleLoader('btn-withdraw', 'loader-wd', false);
+      },
+
+      // 9. SUBMIT TASK PROOF
+      submitProof: async () => {
         const file = ui.el('inp-file').files[0];
-        if (!file) return;
-
-        ui.toggleLoader('btn-submit', true);
-
+        if (!file) return ui.toast("Fayl seçin");
+        
+        ui.toggleLoader('btn-submit', 'btn-submit-loader', true);
+        
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = async (e) => {
-          const base64 = e.target.result.split(',')[1];
-          
-          const payload = {
-            action: 'submitTask',
-            phone: state.user.phone,
-            taskId: state.selectedTask.id,
-            points: state.selectedTask.points,
-            fileName: file.name,
-            mimeType: file.type,
-            base64: base64
-          };
-
-          try {
-            const response = await fetch(API_URL, {
-              method: 'POST',
-              body: JSON.stringify(payload)
-            });
-            
-            const data = await response.json();
-
-            if (data.status === 'success') {
-              ui.toast("✅ Sübut uğurla göndərildi!");
-              state.submissions[state.selectedTask.id] = 'Pending';
-              
-              // Refresh View
-              ui.openDetail(state.selectedTask.id); // Re-render modal to show 'Pending' state
-              app.filterLevel(state.currentLevel); // Update list view
-            } else {
-              ui.toast("Xəta: " + (data.message || 'Naməlum xəta'));
-            }
-          } catch (err) {
-            console.error(err);
-            ui.toast("Xəta baş verdi.");
-          } finally {
-            ui.toggleLoader('btn-submit', false);
-          }
+           const payload = {
+             action: 'submitTask', 
+             phone: state.user.phone, 
+             taskId: state.selectedTask.id,
+             points: state.selectedTask.points, 
+             base64: e.target.result
+           };
+           
+           try {
+             const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+             const d = await res.json();
+             
+             if (d.status === 'success') {
+               ui.toast("Uğurla Yükləndi!");
+               state.submissions[state.selectedTask.id] = 'Pending';
+               app.openDetail(state.selectedTask.id); // Refresh modal
+               app.filterLevel(state.currentLevel);   // Refresh list
+             } else {
+               ui.toast(d.message);
+             }
+           } catch(err) { ui.toast("Xəta baş verdi"); }
+           
+           ui.toggleLoader('btn-submit', 'btn-submit-loader', false);
         };
       }
     };
