@@ -3,799 +3,727 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Brendimo Staff Dashboard</title>
+  <title>Brendimo - Panel</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    /* --- iOS Design System --- */
-    :root {
-      --primary: #007AFF;
-      --success: #34C759;
-      --warning: #FF9500;
-      --danger: #FF3B30;
-      --bg: #F2F2F7;
-      --card-bg: #FFFFFF;
-      --text-main: #1C1C1E;
-      --text-sec: #8E8E93;
-      --border: #E5E5EA;
-      --input-bg: #F2F2F7;
-      --radius: 16px;
-      --shadow: 0 4px 20px rgba(0,0,0,0.05);
-      --nav-height: 85px;
+    /* General Settings */
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    /* Scrollbar Hiding */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Animations */
+    .fade-in { animation: fadeIn 0.3s ease-out; }
+    .slide-up { animation: slideUp 0.3s ease-out; }
+    
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+    /* Visual Effects */
+    .glass { 
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(10px); 
+      -webkit-backdrop-filter: blur(10px); 
     }
+    .gradient-card { 
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
+    }
+    
+    /* Loading Spinner */
+    .loader {
+      border: 3px solid #f3f3f3; 
+      border-top: 3px solid #3b82f6; 
+      border-radius: 50%;
+      width: 24px; height: 24px; 
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text-main);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
+    /* Media Wrapper */
+    .media-wrapper {
+      border-radius: 12px;
       overflow: hidden;
+      background: #000;
+      margin-bottom: 10px;
     }
-
-    /* --- Views (Tabs) --- */
-    .view-container {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px 20px 100px 20px; /* Space for bottom nav */
-      display: none;
-      animation: fadeIn 0.2s ease-out;
-    }
-
-    .view-container.active { display: block; }
-
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-    h2 { margin: 10px 0 20px; font-size: 26px; font-weight: 800; text-align: center; letter-spacing: -0.5px; }
-    h4 { margin: 0 0 10px; font-size: 17px; font-weight: 600; }
-
-    /* --- Cards --- */
-    .card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: var(--shadow);
-      margin-bottom: 20px;
-    }
-
-    /* --- Inputs --- */
-    label {
-      display: block; font-size: 12px; font-weight: 600; text-transform: uppercase;
-      color: var(--text-sec); margin-bottom: 6px; margin-left: 4px;
-    }
-
-    input, select, textarea {
-      width: 100%; padding: 14px; background: var(--input-bg);
-      border: 1px solid transparent; border-radius: 12px;
-      font-size: 16px; color: var(--text-main); font-family: inherit;
-      margin-bottom: 15px; transition: 0.2s;
-    }
-    
-    input:focus, select:focus, textarea:focus { background: #fff; border-color: var(--primary); }
-    
-    /* --- Buttons --- */
-    .btn {
-      width: 100%; padding: 16px; border-radius: 14px; border: none;
-      font-weight: 700; font-size: 16px; cursor: pointer;
-      display: flex; justify-content: center; align-items: center;
-      transition: transform 0.1s;
-    }
-    .btn:active { transform: scale(0.98); opacity: 0.9; }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-success { background: var(--success); color: white; }
-    .btn-danger { background: rgba(255, 59, 48, 0.1); color: var(--danger); font-size: 14px; padding: 8px 12px; width: auto;}
-    .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; }
-
-    /* --- List Items --- */
-    .item-list { list-style: none; padding: 0; margin: 0; }
-    .item-list li {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 0; border-bottom: 1px solid var(--border);
-    }
-    .item-list li:last-child { border-bottom: none; }
-
-    /* --- Badges --- */
-    .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-    .badge.Delivered { background: #E0F8E5; color: var(--success); }
-    .badge.Preparing, .badge.Pending { background: #FFF4E5; color: var(--warning); }
-    .badge.Deleted { background: #FFE5E5; color: var(--danger); }
-
-    /* --- Stats Grid --- */
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .stat-card {
-      background: var(--card-bg); padding: 15px; border-radius: var(--radius);
-      box-shadow: var(--shadow); text-align: center;
-    }
-    .stat-val { font-size: 20px; font-weight: 800; margin: 5px 0; }
-    .stat-label { font-size: 11px; color: var(--text-sec); text-transform: uppercase; }
-
-    /* --- Bottom Navigation --- */
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(255,255,255,0.95);
-      border-top: 1px solid var(--border);
-      height: var(--nav-height);
-      display: flex; justify-content: space-around;
-      padding-bottom: 20px; z-index: 1000;
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    }
-
-    .nav-item {
-      background: none; border: none; flex: 1;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      color: #C7C7CC; font-size: 10px; font-weight: 600;
-      cursor: pointer; transition: color 0.2s;
-    }
-    .nav-item svg { width: 26px; height: 26px; margin-bottom: 4px; fill: currentColor; }
-    .nav-item.active { color: var(--primary); }
-
-    /* --- Loading Overlay --- */
-    #loader {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255,255,255,0.8); z-index: 2000;
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-    }
-    .spinner {
-      width: 40px; height: 40px; border: 4px solid var(--border);
-      border-top-color: var(--primary); border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* --- Date Inputs Wrapper --- */
-    .date-row { display: flex; gap: 10px; }
-    .date-row div { flex: 1; }
-
-/* --- NEW STYLES FOR LIST DETAILS --- */
-.row-detail {
-    display: flex; 
-    justify-content: space-between; 
-    margin-bottom: 8px; 
-    font-size: 14px;
-    border-bottom: 1px dashed #f0f0f0;
-    padding-bottom: 4px;
-}
-.label-detail { color: #8E8E93; font-weight: 500; }
-.val-detail { font-weight: 600; text-align: right; max-width: 65%; color: #333; }
-
-.note-area {
-    margin-top: 10px;
-    background: #FAFAFA;
-    padding: 10px;
-    border-radius: 12px;
-    border: 1px solid #E5E5EA;
-}
-.note-textarea {
-    width: 100%;
-    border: 1px solid #DDD;
-    border-radius: 8px;
-    padding: 8px;
-    font-size: 14px;
-    font-family: inherit;
-    resize: none;
-}
-.note-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 5px;
-}
-.row-detail {
-    display: flex; 
-    justify-content: space-between; 
-    margin-bottom: 6px; 
-    font-size: 14px;
-}
-.label-detail { color: #8E8E93; }
-.val-detail { font-weight: 500; text-align: right; max-width: 65%; }
-
-
-    
   </style>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
 
-  <div id="loader" style="display: none;">
-    <div class="spinner"></div>
-    <p style="margin-top: 15px; font-weight: 600; color: #8E8E93;">Məlumatlar Yüklənir...</p>
+  <script>
+    // ⚠️ REPLACE THIS URL WITH YOUR GOOGLE SCRIPT WEB APP URL ⚠️
+    const API_URL = "https://script.google.com/macros/s/AKfycbx2hT0F9dWLATCP87XtT5oYvpSiiZzAVzEn8zqgQFtPiqBi6bRJ8DVP-TQDv2WU3_iR/exec"; 
+  </script>
+
+  <div id="view-login" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 transition-transform duration-500">
+    <div class="w-full max-w-sm">
+      <div class="flex justify-center mb-8">
+        <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-200">
+          <i class="fa-solid fa-gem text-4xl text-white"></i>
+        </div>
+      </div>
+      
+      <h1 class="text-3xl font-bold text-center text-slate-900 mb-2">Brendimo</h1>
+      <p class="text-center text-gray-500 mb-8">Partnyor Portalı</p>
+      
+      <div class="space-y-4">
+        <div class="relative">
+          <span class="absolute left-4 top-3.5 text-gray-400"><i class="fa-solid fa-phone"></i></span>
+          <input type="tel" id="inp-phone" placeholder="Nömrə (məs: 0501234567)" 
+            class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 outline-none focus:ring-2 focus:ring-blue-500 font-bold transition-all">
+        </div>
+        
+        <button id="btn-login" onclick="app.login()" 
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+          <span id="btn-login-text">Daxil Ol</span>
+          <div id="btn-login-loader" class="loader border-t-white hidden"></div>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div id="tab-add" class="view-container active">
-    <h2>Yeni Sifariş</h2>
+  <div id="view-main" class="flex-1 flex flex-col relative hidden max-w-md mx-auto w-full bg-gray-50 shadow-2xl h-full">
     
-    <div class="card" style="text-align:center; padding:10px;">
-        <label>İstifadəçi</label>
-        <span id="displayUsername" style="font-weight:700; font-size:18px; color:var(--primary);">...</span>
-    </div>
-
-    <form id="orderForm">
-      <div class="card">
-        <h4>Müştəri Məlumatları</h4>
-        <input type="text" id="customerName" placeholder="Ad və Soyad" required>
-        <input type="tel" id="contactInfo" placeholder="Əlaqə Nömrəsi (994...)" required>
-        <input type="text" id="deliveryAddress" placeholder="Çatdırılma Ünvanı" required>
+    <header class="glass sticky top-0 z-20 px-5 pt-safe-top pb-2 border-b border-gray-200">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow-sm">
+            <span id="user-avatar">?</span>
+          </div>
+          <div class="leading-tight">
+            <h2 class="font-bold text-lg text-slate-800 truncate w-32" id="user-name">User</h2>
+            <p class="text-xs text-gray-500 font-medium">Xoş gəlmisiniz</p>
+          </div>
+        </div>
         
-        <div class="date-row">
-           <div>
-             <label>Sifariş Tarixi</label>
-             <input type="date" id="orderDate" required>
+        <div class="bg-slate-900 text-white px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2">
+          <i class="fa-solid fa-star text-yellow-400 text-xs"></i>
+          <span class="font-bold text-sm"><span id="user-points">0</span> xal</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto pb-24 relative">
+      
+      <div id="page-tasks" class="p-5 space-y-4 fade-in">
+        
+        <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2 mb-2 sticky top-0 bg-gray-50 z-10 py-2">
+          <button onclick="app.filterLevel(1)" class="tab-btn active px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-blue-600 text-white shadow-md" data-level="1">Səviyyə 1</button>
+          <button onclick="app.filterLevel(2)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border" data-level="2">Səviyyə 2</button>
+          <button onclick="app.filterLevel(3)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border" data-level="3">Səviyyə 3</button>
+          <button onclick="app.filterLevel(4)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border" data-level="4">Səviyyə 4</button>
+          <button onclick="app.filterLevel(5)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border" data-level="5">Səviyyə 5</button>
+        </div>
+        
+        <div id="task-container" class="space-y-4">
+          </div>
+      </div>
+
+      <div id="page-wallet" class="p-5 space-y-6 fade-in hidden">
+        <div id="page-profile" class="p-5 space-y-6 fade-in hidden">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
+           <div class="w-20 h-20 bg-blue-100 rounded-full mx-auto flex items-center justify-center mb-4">
+             <i class="fa-solid fa-store text-3xl text-blue-600"></i>
            </div>
-           <div>
-             <label>Mənbə</label>
-             <select id="salesSource" required>
-               <option value="Brendimoaz">Brendimoaz</option>
-               <option value="Brendimo.az">Brendimo.az</option>
-               <option value="Idealhediyyeler">Idealhediyyeler</option>
-               <option value="Idealhediyye.az">Idealhediyye.az</option>
-               <option value="Whatsapp35">Whatsapp35</option>
-               <option value="Whatsapp29">Whatsapp29</option>
-               <option value="Brendimo.lei">Brendimo.lei</option>
-             </select>
-           </div>
+           <h2 class="text-xl font-bold text-slate-800">Satıcı Profili</h2>
+           <p class="text-sm text-gray-500 mt-2">Bu səhifə yalnız 2-ci səviyyəyə çatdıqda aktivləşir.</p>
+        </div>
+
+        <div class="space-y-3">
+           <label class="block text-xs font-bold text-gray-400 uppercase">Mağaza Adı</label>
+           <input type="text" class="w-full p-3 bg-white border border-gray-200 rounded-xl font-bold text-slate-700" placeholder="Mağaza adı...">
+           
+           <label class="block text-xs font-bold text-gray-400 uppercase mt-4">Əlaqə Nömrəsi</label>
+           <input type="text" class="w-full p-3 bg-white border border-gray-200 rounded-xl font-bold text-slate-700" placeholder="+994...">
+           
+           <button class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold mt-6 shadow-lg">Yadda Saxla</button>
         </div>
       </div>
-
-      <div class="card">
-        <h4>Səbət</h4>
-        <div style="display: flex; gap: 10px;">
-           <input type="text" id="productSearch" placeholder="Məhsul axtar..." style="flex:2;">
-           <input type="number" id="qtyInput" value="1" min="1" style="flex:1;">
-        </div>
-        
-        <select id="productSearchResults" style="display:none; margin-top:-10px;"></select>
-
-        <button type="button" id="btnAddProduct" class="btn btn-primary btn-sm" style="width:100%; margin-bottom:15px;">Səbətə Əlavə Et</button>
-
-        <ul id="cartList" class="item-list"></ul>
-        
-        <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <label style="margin:0;">Əlavə Kuriyer Ödənişi (AZN)</label>
-                <input type="number" id="courierCost" value="0" step="0.01" style="width:80px; text-align:right; margin:0;">
+        <div class="gradient-card rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-4 opacity-20"><i class="fa-solid fa-wallet text-6xl"></i></div>
+          <p class="text-blue-100 text-xs font-medium mb-1">Cari Balans</p>
+          <h2 class="text-3xl font-bold mb-6"><span id="wallet-balance">0.00</span> <span class="text-lg">AZN</span></h2>
+          
+          <div class="flex justify-between items-end border-t border-blue-400/30 pt-4">
+            <div>
+              <p class="text-blue-200 text-[10px] uppercase">Gözləyən</p>
+              <p class="font-bold text-sm"><span id="wallet-pending">0.00</span> AZN</p>
             </div>
-            
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-weight:600; font-size:16px;">CƏMİ:</span>
-                <span id="displayTotal" style="font-weight:800; font-size:24px; color:var(--primary);">0.00 ₼</span>
+            <div class="text-right">
+              <p class="text-blue-200 text-[10px] uppercase">Cəmi Çıxarılan</p>
+              <p class="font-bold text-sm"><span id="wallet-withdrawn">0.00</span> AZN</p>
             </div>
+          </div>
         </div>
 
-        <label style="margin-top:15px;">Qiyməti Əllə Dəyiş (Könüllü)</label>
-        <input type="number" id="manualTotal" placeholder="Avtomatik hesablanır" step="0.01">
+        <button onclick="ui.openWithdrawModal()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold shadow-lg flex justify-center items-center gap-2 active:scale-95 transition-transform hover:bg-slate-800">
+          <i class="fa-solid fa-money-bill-transfer"></i>
+          Vəsait Çıxar (Min 5 AZN)
+        </button>
+
+        <div>
+          <h3 class="font-bold text-slate-800 mb-3 text-sm">Son Əməliyyatlar</h3>
+          <div id="wallet-history" class="space-y-3">
+            </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="absolute bottom-0 w-full glass border-t border-gray-200 pb-safe-bottom z-30 flex justify-around p-2">
+      <button onclick="app.nav('home')" id="nav-home" class="flex-1 p-3 rounded-xl flex flex-col items-center gap-1 text-blue-600 transition-colors">
+        <i class="fa-solid fa-list-check text-xl"></i>
+        <span class="text-[10px] font-bold">Tapşırıqlar</span>
+      </button>
+      
+      <button onclick="app.nav('wallet')" id="nav-wallet" class="flex-1 p-3 rounded-xl flex flex-col items-center gap-1 text-gray-400 transition-colors">
+        <i class="fa-solid fa-wallet text-xl"></i>
+        <span class="text-[10px] font-bold">Balans</span>
+      </button>
+
+      <button onclick="app.nav('profile')" id="nav-profile" class="flex-1 p-3 rounded-xl flex flex-col items-center gap-1 text-gray-400 transition-colors relative">
+        <i id="icon-profile" class="fa-solid fa-lock text-xl"></i>
+        <span class="text-[10px] font-bold">Satıcı</span>
+      </button>
+    </div>
+
+  </div>
+
+  <div id="modal-detail" class="fixed inset-0 z-40 bg-white hidden flex flex-col h-full slide-up">
+    <div class="glass px-5 py-4 border-b flex justify-between items-center sticky top-0 z-50">
+      <button onclick="ui.closeModals()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <h3 class="font-bold truncate px-4 text-lg text-slate-800" id="detail-title">Tapşırıq Adı</h3>
+      <div class="w-10"></div> </div>
+    
+    <div class="flex-1 overflow-y-auto p-5 pb-32">
+      <div id="detail-media" class="space-y-4 mb-6"></div>
+      
+      <div class="bg-blue-50 p-4 rounded-xl text-sm text-gray-700 leading-relaxed border border-blue-100" id="detail-desc"></div>
+      
+      <div id="detail-action" class="mt-6 border-t pt-6"></div>
+    </div>
+  </div>
+
+  <div id="modal-withdraw" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-3xl p-6 fade-in relative shadow-2xl">
+      <div class="flex justify-between mb-4">
+        <h3 class="font-bold text-lg text-slate-800">Balansı Çıxar</h3>
+        <button onclick="ui.closeModals()"><i class="fa-solid fa-xmark text-gray-400 text-xl"></i></button>
       </div>
 
-      <div class="card">
-        <label>Ödəniş Metodu</label>
-        <select id="paymentMethod" required>
-          <option value="cash">Nağd</option>
-          <option value="card">Kart</option>
-        </select>
-
-        <label>Xüsusi Qeydlər</label>
-        <textarea id="specialInstructions" rows="3" placeholder="Məs: Məhsul, paketləmə və ya çatdırılma barədə əlavə qeydlər..."></textarea>
-
-        <button type="submit" class="btn btn-success">Sifarişi Təsdiqlə</button>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs text-gray-400 font-bold uppercase">Ad Soyad</label>
+          <input type="text" id="wd-name" class="w-full p-3 border border-gray-200 rounded-xl font-bold outline-none focus:border-blue-500 bg-gray-50 focus:bg-white transition-colors">
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 font-bold uppercase">Kart Nömrəsi (16 rəqəm)</label>
+          <input type="tel" id="wd-card" placeholder="0000 0000 0000 0000" class="w-full p-3 border border-gray-200 rounded-xl font-bold outline-none focus:border-blue-500 bg-gray-50 focus:bg-white transition-colors">
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 font-bold uppercase">Məbləğ (AZN)</label>
+          <input type="number" id="wd-amount" placeholder="Min 5" class="w-full p-3 border border-gray-200 rounded-xl font-bold outline-none focus:border-blue-500 bg-gray-50 focus:bg-white transition-colors">
+        </div>
+        
+        <p class="text-xs text-gray-400 text-center">Çıxarış 24 saat ərzində təsdiqlənir.</p>
+        
+        <button id="btn-withdraw" onclick="app.requestWithdraw()" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold flex justify-center items-center gap-2 shadow-lg active:scale-95 transition-all">
+          <span>Təsdiqlə</span>
+          <div id="loader-wd" class="loader border-t-white w-5 h-5 hidden"></div>
+        </button>
       </div>
-    </form>
-  </div>
-
-  <div id="tab-list" class="view-container">
-    <h2>Sifarişlər</h2>
-
-    <div class="card">
-       <label>Tarix Aralığı</label>
-       <div class="date-row">
-         <input type="date" id="filterStart">
-         <input type="date" id="filterEnd">
-       </div>
-       <button onclick="renderOrderList()" class="btn btn-primary btn-sm" style="margin-top:5px;">Yenilə</button>
-    </div>
-
-    <div class="stats-grid" style="margin-bottom: 20px;">
-       <div class="stat-card" style="background: var(--primary); color: white;">
-          <div class="stat-val" id="listTotalCount">0</div>
-          <div class="stat-label" style="color: rgba(255,255,255,0.8);">Sifariş Sayı</div>
-       </div>
-       <div class="stat-card" style="background: var(--success); color: white;">
-          <div class="stat-val" id="listTotalRevenue">0.00 ₼</div>
-          <div class="stat-label" style="color: rgba(255,255,255,0.8);">Toplam Məbləğ</div>
-       </div>
-    </div>
-
-    <div id="ordersContainer"></div>
-  </div>
-
-  <div id="tab-stats" class="view-container">
-    <h2>Performans Analizi</h2>
-    
-    <div class="card">
-       <label>Dövr</label>
-       <select id="statsPeriod" onchange="renderStats()">
-          <option value="today">Bu Gün</option>
-          <option value="yesterday">Dünən</option>
-          <option value="thisMonth" selected>Bu Ay</option>
-          <option value="lastMonth">Keçən Ay</option>
-          <option value="all">Bütün Zamanlar</option>
-       </select>
-    </div>
-
-    <div class="stats-grid">
-       <div class="stat-card">
-          <div class="stat-label">Toplam Satış</div>
-          <div class="stat-val" id="statRevenue" style="color:var(--primary)">0 ₼</div>
-       </div>
-       <div class="stat-card">
-          <div class="stat-label">Xalis Gəlir (Təxmini)</div>
-          <div class="stat-val" id="statProfit" style="color:var(--success)">0 ₼</div>
-       </div>
-       <div class="stat-card">
-          <div class="stat-label">Sifariş Sayı</div>
-          <div class="stat-val" id="statCount">0</div>
-       </div>
-       <div class="stat-card">
-          <div class="stat-label">Uğurlu Çatdırılma</div>
-          <div class="stat-val" id="statRate">0%</div>
-       </div>
-       <div class="stat-card" style="grid-column: span 2;">
-          <div class="stat-label">Ortalama Sifariş Dəyəri (AOV)</div>
-          <div class="stat-val" id="statAOV">0 ₼</div>
-       </div>
     </div>
   </div>
 
-  <nav class="bottom-nav">
-    <button class="nav-item active" onclick="switchTab('tab-add', this)">
-      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-      <span>Yeni</span>
-    </button>
-    <button class="nav-item" onclick="switchTab('tab-list', this)">
-      <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
-      <span>Siyahı</span>
-    </button>
-    <button class="nav-item" onclick="switchTab('tab-stats', this)">
-      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
-      <span>Analiz</span>
-    </button>
-  </nav>
-
- <script>
-    // --- CONFIGURATION ---
-    const API_URL = 'https://script.google.com/macros/s/AKfycbx1YlgDnhNmVjFItmOBu0uDGnH5DU9DSJyepswkCDvK-aAc79Z3TDp9vXSojrDb65oI/exec';
-    const PRODUCT_API = 'https://script.google.com/macros/s/AKfycbx4epS0yxkG51pVRq0GAZs_GcWyHjUHq8CFDcNk16XQjNVdFbuBoeGgOZWLTzL_uKMe/exec';
-
-    // --- STATE MANAGEMENT ---
-    let currentUser = '';
-    let cart = [];
-    let globalOrdersData = []; 
-
-    // --- INITIALIZATION ---
-    window.addEventListener('DOMContentLoaded', () => {
-        // 1. Detect Username
-        const params = new URLSearchParams(window.location.search);
-        const urlUser = params.get('username') || params.get('user');
-        
-        if (urlUser) {
-            currentUser = urlUser;
-            localStorage.setItem('staff_username', currentUser);
-        } else {
-            currentUser = localStorage.getItem('staff_username') || '';
-        }
-
-        const displayUser = currentUser ? currentUser : "Admin Modu (Hamısı)";
-        document.getElementById('displayUsername').textContent = displayUser;
-
-        // 2. Set Default Dates
-        const today = new Date().toISOString().split('T')[0];
-        const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-        
-        document.getElementById('orderDate').value = tomorrow;
-        document.getElementById('filterStart').value = today;
-        document.getElementById('filterEnd').value = tomorrow;
-
-        // 3. Load Data
-        fetchAllData();
-    });
-
-    // --- NAVIGATION ---
-    function switchTab(tabId, btn) {
-        document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        btn.classList.add('active');
-
-        if (tabId === 'tab-list') renderOrderList();
-        if (tabId === 'tab-stats') renderStats();
-    }
-
-    // --- CORE DATA FETCHING ---
-    async function fetchAllData() {
-        toggleLoader(true);
-        try {
-            const response = await fetch(`${API_URL}?action=getGlobalStats`);
-            const json = await response.json();
-            
-            if (json.success) {
-                globalOrdersData = json.data;
-                if (currentUser) {
-                    globalOrdersData = globalOrdersData.filter(o => o.staff === currentUser);
-                }
-                console.log("Data loaded:", globalOrdersData.length, "orders");
-                renderOrderList();
-                renderStats();
-            } else {
-                alert("Məlumatları yükləmək mümkün olmadı.");
-            }
-        } catch (error) {
-            console.error(error);
-            alert("İnternet xətası.");
-        } finally {
-            toggleLoader(false);
-        }
-    }
-
-    // --- TAB 1: NEW ORDER LOGIC ---
-    
-    // Product Search & Populate Dropdown
-    document.getElementById('productSearch').addEventListener('input', async function(e) {
-        const term = e.target.value.toLowerCase();
-        const select = document.getElementById('productSearchResults');
-        
-        if (term.length < 2) {
-            select.style.display = 'none';
-            return;
-        }
-
-        try {
-            const res = await fetch(`${PRODUCT_API}?action=getProducts&searchTerm=${encodeURIComponent(term)}`);
-            const data = await res.json();
-            
-            select.innerHTML = '';
-            
-            if (data.products && data.products.length > 0) {
-                select.style.display = 'block';
-
-                // --- FIXED: Placeholder logic moved HERE ---
-                const placeholder = document.createElement('option');
-                placeholder.text = "Siyahıdan seçin...";
-                placeholder.value = "";
-                select.appendChild(placeholder);
-                // -----------------------------------------
-
-                data.products.forEach(p => {
-                    const opt = document.createElement('option');
-                    opt.value = p.productName;
-                    opt.text = p.productName;
-                    select.appendChild(opt);
-                });
-            } else {
-                select.style.display = 'none';
-            }
-        } catch (e) { console.error(e); }
-    });
-
-    // Handle Dropdown Selection
-    document.getElementById('productSearchResults').addEventListener('change', function() {
-        if(this.value) {
-            // Copy exact name to input
-            document.getElementById('productSearch').value = this.value; 
-            // Hide dropdown
-            this.style.display = 'none'; 
-        }
-    });
-
-    // Add To Cart
-    document.getElementById('btnAddProduct').addEventListener('click', async () => {
-        const select = document.getElementById('productSearchResults');
-        // Grab value from input box (which is now populated correctly)
-        const productName = document.getElementById('productSearch').value;
-        const qtyInput = document.getElementById('qtyInput');
-        const qty = parseInt(qtyInput.value);
-
-        if (!productName || qty < 1) {
-            alert("Zəhmət olmasa məhsul seçin.");
-            return;
-        }
-
-        toggleLoader(true);
-        
-        try {
-            const res = await fetch(`${PRODUCT_API}?action=getProductDetails&productName=${encodeURIComponent(productName)}`);
-            const data = await res.json();
-            
-            if (data.success) {
-                const price = parseFloat(data.product.salesPrice) || 0;
-                cart.push({
-                    productName: productName,
-                    quantity: qty,
-                    salesPrice: price
-                });
-                updateCartUI();
-                
-                // Reset Fields
-                document.getElementById('productSearch').value = '';
-                select.style.display = 'none';
-                qtyInput.value = 1;
-            } else {
-                alert("Məhsul detalları tapılmadı.");
-            }
-        } catch(e) {
-            alert("Xəta baş verdi.");
-        } finally {
-            toggleLoader(false);
-        }
-    });
-
-    function updateCartUI() {
-        const list = document.getElementById('cartList');
-        list.innerHTML = '';
-        let productTotal = 0;
-
-        cart.forEach((item, index) => {
-            productTotal += (item.salesPrice * item.quantity);
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <div>
-                    <strong>${item.productName}</strong> <br>
-                    <span style="color:var(--text-sec); font-size:12px;">${item.quantity} ədəd x ${item.salesPrice} ₼</span>
-                </div>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <span style="font-weight:600;">${(item.salesPrice * item.quantity).toFixed(2)} ₼</span>
-                    <button type="button" class="btn btn-danger" onclick="removeFromCart(${index})">X</button>
-                </div>
-            `;
-            list.appendChild(li);
-        });
-
-        const courier = parseFloat(document.getElementById('courierCost').value) || 0;
-        const grandTotal = productTotal + courier;
-
-        document.getElementById('displayTotal').innerText = grandTotal.toFixed(2) + " ₼";
-    }
-
-    window.removeFromCart = (index) => {
-        cart.splice(index, 1);
-        updateCartUI();
+  <script>
+    // GLOBAL STATE
+    const state = {
+      user: null, 
+      tasks: [], 
+      media: [], 
+      submissions: {}, 
+      withdrawals: [],
+      currentLevel: 1, 
+      selectedTask: null
     };
 
-    document.getElementById('courierCost').addEventListener('input', updateCartUI);
+    // UI CONTROLLER
+    const ui = {
+      el: (id) => document.getElementById(id),
+      
+      toggleLoader: (btnId, loaderId, show) => {
+        const btn = ui.el(btnId);
+        const loader = ui.el(loaderId);
+        const span = btn.querySelector('span');
+        if (show) {
+          span?.classList.add('hidden');
+          loader.classList.remove('hidden');
+          btn.disabled = true;
+        } else {
+          span?.classList.remove('hidden');
+          loader.classList.add('hidden');
+          btn.disabled = false;
+        }
+      },
 
-    // SUBMIT ORDER
-    document.getElementById('orderForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+      closeModals: () => {
+        ui.el('modal-detail').classList.add('hidden');
+        ui.el('modal-withdraw').classList.add('hidden');
+        // Stop any playing videos
+        document.querySelectorAll('video').forEach(v => v.pause());
+      },
+
+      openWithdrawModal: () => {
+        // Auto-fill name if we have it
+        ui.el('wd-name').value = state.user.name || '';
+        ui.el('modal-withdraw').classList.remove('hidden');
+      },
+
+      toast: (msg) => {
+        // Simple alert for reliability across mobile devices
+        alert(msg); 
+      }
+    };
+
+    // APP LOGIC
+    const app = {
+      // 1. LOGIN
+      login: async () => {
+        const phone = ui.el('inp-phone').value.trim();
+        if (!phone) return ui.toast('Zəhmət olmasa nömrə daxil edin');
         
-        if (cart.length === 0) return alert("Səbət boşdur.");
-        if (!currentUser && !confirm("İstifadəçi adı yoxdur. Admin kimi davam edilsin?")) return;
-
-        toggleLoader(true);
-
-        // Calculate Final Price
-        let calculatedTotal = 0;
-        cart.forEach(p => calculatedTotal += (p.salesPrice * p.quantity));
-        calculatedTotal += (parseFloat(document.getElementById('courierCost').value) || 0);
-        
-        const manualTotal = parseFloat(document.getElementById('manualTotal').value);
-        const finalTotal = isNaN(manualTotal) ? calculatedTotal : manualTotal;
-
-        const payload = {
-            action: 'createOrder',
-            customerName: document.getElementById('customerName').value,
-            contactInfo: document.getElementById('contactInfo').value,
-            deliveryAddress: document.getElementById('deliveryAddress').value,
-            orderDate: document.getElementById('orderDate').value,
-            specialInstructions: document.getElementById('specialInstructions').value,
-            paymentMethod: document.getElementById('paymentMethod').value,
-            salesSource: document.getElementById('salesSource').value,
-            staffUsername: currentUser,
-            addCourierPayment: document.getElementById('courierCost').value || 0,
-            products: JSON.stringify(cart),
-            totalSalesPrice: finalTotal.toFixed(2)
-        };
-
+        ui.toggleLoader('btn-login', 'btn-login-loader', true);
         try {
-            const formData = new URLSearchParams();
-            for (const key in payload) formData.append(key, payload[key]);
+          const res = await fetch(`${API_URL}?action=login&phone=${phone}`);
+          const data = await res.json();
+          
+          if (data.status === 'success') {
+            // Save Data to State
+            state.user = data.user;
+            state.tasks = data.tasks;
+            state.media = data.media;
+            state.submissions = data.submissions;
+            state.withdrawals = data.withdrawals || [];
+            
+            // Switch Screens
+            ui.el('view-login').classList.add('hidden');
+            ui.el('view-main').classList.remove('hidden');
+            
+            // Render Everything
+            app.renderUI();
+          } else {
+            ui.toast(data.message);
+          }
+        } catch (e) { 
+          console.error(e); 
+          ui.toast("Serverlə əlaqə yaradıla bilmədi. İnterneti yoxlayın."); 
+        }
+        ui.toggleLoader('btn-login', 'btn-login-loader', false);
+      },
 
-            const res = await fetch(API_URL, { method: 'POST', body: formData });
-            const data = await res.json();
+      // 2. RENDER UI
+    // 2. RENDER UI (UPDATED)
+      renderUI: () => {
+        // Header Info
+        ui.el('user-name').innerText = state.user.name;
+        ui.el('user-avatar').innerText = state.user.name.charAt(0).toUpperCase();
+        ui.el('user-points').innerText = state.user.points;
+        
+        // Initial Task Filter
+        app.filterLevel(1);
+        
+        // Wallet Info
+        app.renderWallet();
 
-            if (data.success) {
-                alert("Sifariş uğurla yaradıldı!");
-                document.getElementById('orderForm').reset();
-                cart = [];
-                updateCartUI();
-                fetchAllData();
-                const listBtn = document.querySelectorAll('.nav-item')[1];
-                switchTab('tab-list', listBtn);
-            } else {
-                alert("Xəta: " + data.message);
+        // --- NEW: CHECK LEVEL FOR PROFILE ICON ---
+        const maxLevel = app.getMaxUnlockedLevel(); // Uses the function we added earlier
+        const profileIcon = ui.el('icon-profile');
+        
+        if (maxLevel >= 2) {
+           // Unlock the icon
+           profileIcon.className = "fa-solid fa-store text-xl";
+        } else {
+           // Keep it locked
+           profileIcon.className = "fa-solid fa-lock text-xl";
+        }
+      },
+
+      // 3. RENDER WALLET
+      renderWallet: () => {
+        ui.el('wallet-balance').innerText = state.user.balance;
+        ui.el('wallet-withdrawn').innerText = state.user.totalWithdrawn;
+        ui.el('wallet-pending').innerText = state.user.pendingWithdrawal;
+        
+        const historyCont = ui.el('wallet-history');
+        if (state.withdrawals.length === 0) {
+          historyCont.innerHTML = `<p class="text-center text-gray-400 text-sm py-4">Hələ əməliyyat yoxdur</p>`;
+        } else {
+          historyCont.innerHTML = state.withdrawals.map(w => {
+            let color = "text-orange-500 bg-orange-50";
+            let label = "Gözləyir";
+            
+            if (w.status === 'Paid') { 
+              color = "text-green-600 bg-green-50"; 
+              label = "Ödənildi"; 
+            } else if (w.status === 'Rejected') { 
+              color = "text-red-600 bg-red-50"; 
+              label = "Ləğv"; 
             }
-        } catch (error) {
-            console.error(error);
-            alert("Server xətası.");
-        } finally {
-            toggleLoader(false);
-        }
-    });
-
-    // --- TAB 2: LIST LOGIC ---
-// --- TAB 2: LIST LOGIC ---
-function renderOrderList() {
-    const container = document.getElementById('ordersContainer');
-    const start = document.getElementById('filterStart').value;
-    const end = document.getElementById('filterEnd').value;
-    const today = new Date().toISOString().split('T')[0]; // Get today's date (yyyy-mm-dd)
-
-    container.innerHTML = '';
-    
-    const filtered = globalOrdersData.filter(o => o.date >= start && o.date <= end);
-    filtered.sort((a,b) => b.id - a.id); // Sort Newest First
-
-    let totalRev = 0;
-    let totalCnt = 0;
-
-    if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:20px; color:#8E8E93">Sifariş tapılmadı</div>';
-    } else {
-        filtered.forEach(o => {
-            totalCnt++;
-            totalRev += parseFloat(o.revenue || 0);
             
-            // 1. Badge Color Logic
-            let badgeClass = 'Pending';
-            if (o.status === 'Delivered') badgeClass = 'Delivered';
-            if (o.status === 'Deleted') badgeClass = 'Deleted';
+            const date = new Date(w.date).toLocaleDateString('az-AZ');
+            
+            return `
+              <div class="bg-white p-3 rounded-xl border border-gray-100 flex justify-between items-center">
+                <div>
+                  <p class="font-bold text-sm text-slate-800">Çıxarış</p>
+                  <p class="text-[10px] text-gray-400">${date}</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-bold text-slate-800">${w.amount} AZN</p>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded ${color}">${label}</span>
+                </div>
+              </div>`;
+          }).join('');
+        }
+      },
 
-            // 2. Editable Logic (Only Today or Future)
-            const isEditable = (o.date >= today); 
-            const disabledAttr = isEditable ? '' : 'disabled';
-            const btnDisplay = isEditable ? 'inline-block' : 'none';
-            const bgColor = isEditable ? '#fff' : '#f5f5f5';
-
-            // 3. Render Card
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                    <span style="font-weight:800; font-size:18px;">#${o.id}</span>
-                    <span class="badge ${badgeClass}">${o.status}</span>
-                </div>
-                
-                <div class="row-detail">
-                    <span class="label-detail">Müştəri:</span>
-                    <span class="val-detail">${o.name}</span>
-                </div>
-                <div class="row-detail">
-                    <span class="label-detail">Məbləğ:</span>
-                    <span class="val-detail" style="color:var(--primary); font-weight:700;">${parseFloat(o.revenue).toFixed(2)} ₼</span>
-                </div>
-                <div class="row-detail">
-                    <span class="label-detail">Ünvan:</span>
-                    <span class="val-detail">${o.address || '-'}</span>
-                </div>
-                <div class="row-detail">
-                    <span class="label-detail">Çatdırıcı:</span>
-                    <span class="val-detail">${o.courier || '-'}</span>
-                </div>
-                
-                <div style="margin-top:10px;">
-                    <span class="label-detail" style="display:block; margin-bottom:4px;">Məhsullar:</span>
-                    <div style="font-size:13px; color:#333; background:#f9f9f9; padding:8px; border-radius:8px;">${o.products}</div>
-                </div>
-
-                <div class="note-area">
-                    <label style="margin-bottom:5px;">Xüsusi Təlimatlar (Qeyd)</label>
-                    <textarea id="note-${o.id}" rows="2" class="note-textarea" style="background:${bgColor}" ${disabledAttr}>${o.note || ''}</textarea>
-                    <div style="text-align:right; margin-top:5px; display:${btnDisplay}">
-                        <button class="btn btn-primary btn-sm" onclick="saveNote('${o.id}')" style="padding:6px 15px; font-size:12px;">Yadda Saxla</button>
-                    </div>
-                </div>
-                
-                <div style="text-align:right; font-size:11px; color:#aaa; margin-top:8px;">${o.date}</div>
-            `;
-            container.appendChild(card);
+      // 4. NAVIGATION TAB SWITCH
+   // 4. NAVIGATION TAB SWITCH (UPDATED)
+      nav: (page) => {
+        // Reset all tabs to gray
+        ['home', 'wallet', 'profile'].forEach(p => {
+           const btn = ui.el('nav-' + p);
+           if(btn) {
+             btn.classList.remove('text-blue-600');
+             btn.classList.add('text-gray-400');
+           }
+           const view = ui.el('page-' + p);
+           if(view) view.classList.add('hidden');
         });
-    }
 
-    document.getElementById('listTotalCount').textContent = totalCnt;
-    document.getElementById('listTotalRevenue').textContent = totalRev.toFixed(2) + " ₼";
-}
- 
+        // LOCK CHECK for Profile
+        if (page === 'profile') {
+           if (app.getMaxUnlockedLevel() < 2) {
+             ui.toast("Bu bölmə 2-ci səviyyədə açılır!");
+             // Return to home if locked
+             app.nav('home'); 
+             return;
+           }
+        }
 
-// --- NEW FUNCTION: SAVE NOTE ---
-async function saveNote(orderId) {
-    const noteField = document.getElementById(`note-${orderId}`);
-    const newNote = noteField.value;
-    const btn = noteField.nextElementSibling.querySelector('button');
-    const originalText = btn.textContent;
+        // Activate selected tab
+        ui.el('nav-' + page).classList.add('text-blue-600');
+        ui.el('nav-' + page).classList.remove('text-gray-400');
+        ui.el('page-' + page).classList.remove('hidden');
+      },
 
-    // UI Loading State
-    btn.disabled = true;
-    btn.textContent = '...';
+      // NEW HELPER: Calculate max unlocked level
+      getMaxUnlockedLevel: () => {
+        let max = 1;
+        // Check levels 1 to 4 to see if we can unlock the next one
+        for (let l = 1; l < 5; l++) {
+          // Get all tasks for level 'l'
+          const tasksInLevel = state.tasks.filter(t => +t.level === l);
+          
+          // If level has no tasks, stop progression (or assume unlocked, but safer to stop)
+          if (tasksInLevel.length === 0) break;
 
-    const formData = new URLSearchParams();
-    formData.append('action', 'updateOrderNote');
-    formData.append('orderId', orderId);
-    formData.append('newNote', newNote);
+          // Check if ALL tasks in this level are APPROVED
+          const allApproved = tasksInLevel.every(t => state.submissions[t.id] === 'Approved');
+          
+          if (allApproved) {
+            max++;
+          } else {
+            break; // Stop checking if this level isn't finished
+          }
+        }
+        return max;
+      },
+   // 5. FILTER TASKS BY LEVEL (MODIFIED FOR LOCKING SYSTEM)
+      filterLevel: (lvl) => {
+        state.currentLevel = lvl;
+        
+        // 1. Determine Locking Status
+        const maxUnlocked = app.getMaxUnlockedLevel();
+        const isLevelLocked = lvl > maxUnlocked;
 
-    try {
-        const res = await fetch(API_URL, { method: 'POST', body: formData });
-        const data = await res.json();
+        // 2. Update Tab Styles (Show Locks)
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          const btnLevel = +b.dataset.level;
+          const isBtnLocked = btnLevel > maxUnlocked;
+          
+          let classes = "tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition-all flex items-center gap-2 ";
+          
+          if (btnLevel === lvl) {
+             classes += "bg-blue-600 text-white shadow-md border-blue-600";
+          } else {
+             classes += "bg-white text-gray-500 border-gray-200";
+          }
 
-        if (data.success) {
-            btn.textContent = '✓';
-            btn.style.background = 'var(--success)';
+          // Add visual lock indication to tab
+          if (isBtnLocked) {
+            b.innerHTML = `Səviyyə ${btnLevel} <i class="fa-solid fa-lock text-[10px]"></i>`;
+            b.classList.add('opacity-70');
+          } else {
+             b.innerHTML = `Səviyyə ${btnLevel}`;
+             b.classList.remove('opacity-70');
+          }
+          
+          b.className = classes;
+        });
+        
+        // 3. Filter Tasks
+        const tasks = state.tasks.filter(t => +t.level === lvl);
+        
+        // 4. Render Tasks
+        ui.el('task-container').innerHTML = tasks.length ? tasks.map(t => {
+          const status = state.submissions[t.id];
+          
+          // Default Styles
+          let icon = '<i class="fa-solid fa-chevron-right text-gray-300"></i>';
+          let bg = 'bg-white border-gray-100';
+          let opacity = 'opacity-100';
+          let clickAction = `app.openDetail('${t.id}')`;
+          
+          // Status Logic
+          if (status === 'Approved') {
+            icon = '<i class="fa-solid fa-check-circle text-green-500 text-lg"></i>';
+            bg = 'bg-green-50 border-green-200';
+          } else if (status === 'Pending') {
+            icon = '<i class="fa-solid fa-clock text-orange-400 text-lg"></i>';
+            bg = 'bg-orange-50 border-orange-200';
+          }
+
+          // LOCK LOGIC OVERRIDE
+          if (isLevelLocked) {
+             icon = '<i class="fa-solid fa-lock text-gray-400"></i>';
+             bg = 'bg-gray-100 border-gray-200 grayscale';
+             opacity = 'opacity-60 cursor-not-allowed';
+             clickAction = `ui.toast('Bu səviyyəni açmaq üçün əvvəlki səviyyəni tamamlayın!')`; // Block interaction
+          }
+          
+          return `
+            <div onclick="${clickAction}" class="${bg} ${opacity} p-4 rounded-xl shadow-sm border flex items-center gap-4 transition-transform ${isLevelLocked ? '' : 'active:scale-[0.98] cursor-pointer'}">
+               <div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-200">
+                 ${t.thumbnailURL ? `<img src="${t.thumbnailURL}" class="w-full h-full object-cover">` : '<i class="fa-solid fa-list-check text-gray-400"></i>'}
+               </div>
+               
+               <div class="flex-1 min-w-0">
+                 <h3 class="font-bold text-sm text-slate-800 truncate">${t.title}</h3>
+                 <p class="text-xs text-gray-500 truncate mt-0.5">${t.desc}</p>
+               </div>
+               
+               <div class="flex flex-col items-end gap-1">
+                 <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">+${t.points}</span>
+                 ${icon}
+               </div>
+            </div>`;
+        }).join('') : '<div class="text-center py-10"><i class="fa-regular fa-folder-open text-4xl text-gray-200 mb-2"></i><p class="text-gray-400 text-sm">Bu səviyyədə tapşırıq yoxdur</p></div>';
+      },
+
+      // 6. OPEN TASK DETAIL
+    // 6. OPEN TASK DETAIL (MODIFIED)
+      openDetail: (id) => {
+        const task = state.tasks.find(t => t.id === id);
+        state.selectedTask = task;
+        
+        ui.el('detail-title').innerText = task.title;
+        ui.el('detail-desc').innerText = task.desc;
+        
+     // --- MEDIA RENDERER ---
+        const media = state.media.filter(m => m.taskId === id);
+        
+        ui.el('detail-media').innerHTML = media.map(m => {
+           let content = '';
+           // Helper: Create a force-download link if it's Google Drive
+           let downloadUrl = m.url;
+           if (m.url.includes('drive.google.com') && m.url.includes('/file/d/')) {
+             const fileId = m.url.split('/file/d/')[1].split('/')[0];
+             downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+           }
+           
+           // 1. Determine Content Type
+           if(m.type === 'VIDEO') {
+             // Note: Google Drive videos might require 'preview' link to play, 
+             // but here we assume direct link or compatible player logic
+             content = `<div class="media-wrapper aspect-video flex items-center justify-center bg-black"><video controls class="w-full h-full" src="${m.url}"></video></div>`;
+           } else if(m.type === 'IMAGE') {
+             // For Images, we try to use the direct link for preview if possible, 
+             // otherwise just show the wrapper
+             content = `<div class="media-wrapper"><img src="${m.url}" class="w-full object-cover" onerror="this.src='https://placehold.co/600x400?text=Image+Preview'"></div>`;
+           } else if(m.type === 'PDF') {
+             content = `
+               <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl">
+                 <i class="fa-solid fa-file-pdf text-red-500 text-3xl"></i>
+                 <div>
+                   <h5 class="font-bold text-sm text-slate-800">PDF Sənəd</h5>
+                   <p class="text-xs text-red-400">Faylı aşağıdan yükləyin</p>
+                 </div>
+               </div>`;
+           }
+
+           // 2. Render Card with FIXED Download Button
+           return `
+             <div class="mb-6">
+               ${content}
+               <div class="flex justify-between items-start mt-2">
+                 <p class="text-xs text-gray-500 italic w-2/3 pt-1">${m.caption || ''}</p>
+                 
+                 <a href="${downloadUrl}" target="_blank" download class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors shadow-md active:scale-95">
+                   <i class="fa-solid fa-cloud-arrow-down"></i> Yüklə
+                 </a>
+               </div>
+             </div>`;
+        }).join('');
+
+        // Action Area Logic
+        const status = state.submissions[id];
+        const action = ui.el('detail-action');
+        
+        if (status === 'Approved') {
+          action.innerHTML = `
+            <div class="bg-green-50 text-green-700 p-5 rounded-xl text-center border border-green-200">
+              <i class="fa-solid fa-check-circle text-3xl mb-2"></i>
+              <p class="font-bold">Qəbul Edildi</p>
+            </div>`;
+        } else if (status === 'Pending') {
+          action.innerHTML = `
+            <div class="bg-orange-50 text-orange-600 p-5 rounded-xl text-center border border-orange-200">
+              <i class="fa-solid fa-clock text-3xl mb-2"></i>
+              <p class="font-bold">Yoxlanılır...</p>
+            </div>`;
+        } else {
+          // --- NEW: DISPLAY PROOF TYPE INSTRUCTION ---
+          const instruction = task.proofType ? task.proofType : "Şəkil";
+          
+          action.innerHTML = `
+            <div class="bg-blue-50 border border-blue-100 p-3 rounded-lg mb-4 flex items-start gap-3">
+              <i class="fa-solid fa-circle-info text-blue-500 mt-1"></i>
+              <div>
+                <p class="text-xs text-blue-400 font-bold uppercase">Tələb Olunan Sübut:</p>
+                <p class="text-sm text-blue-900 font-medium">${instruction}</p>
+              </div>
+            </div>
+
+            <h4 class="font-bold text-slate-800 mb-3">Sübut Yüklə</h4>
+            <label class="block w-full h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-all relative overflow-hidden group bg-gray-50">
+              <input type="file" id="inp-file" accept="image/*" class="hidden" onchange="app.previewImage()">
+              <div id="upload-placeholder" class="text-center p-4">
+                <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-300 mb-2"></i>
+                <p class="text-xs font-bold text-gray-500">Şəkil seçin</p>
+              </div>
+              <img id="upload-preview" class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
+            </label>
+            <button onclick="app.submitProof()" id="btn-submit" class="w-full mt-4 bg-slate-900 text-white py-3.5 rounded-xl font-bold flex justify-center items-center shadow-lg active:scale-95 transition-all">
+              <span id="btn-submit-text">Təsdiqlə və Göndər</span>
+              <div id="btn-submit-loader" class="loader hidden w-5 h-5 border-t-white"></div>
+            </button>
+          `;
+        }
+        
+        ui.el('modal-detail').classList.remove('hidden');
+      },
+
+      // 7. PREVIEW UPLOAD IMAGE
+      previewImage: () => {
+        const file = ui.el('inp-file').files[0];
+        if (file) {
+          if(file.size > 5 * 1024 * 1024) return ui.toast("Fayl çox böyükdür (Max 5MB)");
+          
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            ui.el('upload-preview').src = e.target.result;
+            ui.el('upload-preview').classList.remove('hidden');
+            ui.el('upload-placeholder').classList.add('hidden');
+          };
+          reader.readAsDataURL(file);
+        }
+      },
+
+      // 8. REQUEST WITHDRAWAL
+      requestWithdraw: async () => {
+        const name = ui.el('wd-name').value;
+        const card = ui.el('wd-card').value;
+        const amount = ui.el('wd-amount').value;
+        
+        if (!name || !card || !amount) return ui.toast("Bütün xanaları doldurun");
+        if (Number(amount) < 5) return ui.toast("Minimum məbləğ 5 AZN-dir");
+        if (Number(amount) > Number(state.user.balance)) return ui.toast("Balansda kifayət qədər vəsait yoxdur");
+
+        ui.toggleLoader('btn-withdraw', 'loader-wd', true);
+        try {
+          const res = await fetch(API_URL, {
+            method: 'POST', 
+            body: JSON.stringify({ 
+              action: 'requestWithdrawal', 
+              phone: state.user.phone, 
+              fullName: name, 
+              cardNumber: card, 
+              amount: amount 
+            })
+          });
+          const data = await res.json();
+          
+          if (data.status === 'success') {
+            ui.toast("Sorğu uğurla göndərildi!");
             
-            // Update local data cache so we don't need to reload
-            const order = globalOrdersData.find(o => o.id == orderId);
-            if(order) order.note = newNote;
+            // Update Local State instantly (Optimistic UI)
+            state.user.balance = (state.user.balance - amount).toFixed(2);
+            state.user.pendingWithdrawal = (Number(state.user.pendingWithdrawal) + Number(amount)).toFixed(2);
+            state.withdrawals.unshift({ date: new Date().toISOString(), amount: amount, status: 'Pending' });
+            
+            app.renderWallet();
+            ui.closeModals();
+          } else {
+            ui.toast(data.message);
+          }
+        } catch(e) { ui.toast("Xəta baş verdi"); }
+        ui.toggleLoader('btn-withdraw', 'loader-wd', false);
+      },
 
-            setTimeout(() => {
-                btn.textContent = originalText;
-                btn.style.background = '';
-                btn.disabled = false;
-            }, 2000);
-        } else {
-            alert('Xəta: ' + data.message);
-            btn.disabled = false;
-            btn.textContent = originalText;
-        }
-    } catch (e) {
-        console.error(e);
-        alert('İnternet xətası');
-        btn.disabled = false;
-        btn.textContent = originalText;
-    }
-}
-
-    // --- TAB 3: ANALYSIS LOGIC ---
-    function renderStats() {
-        const period = document.getElementById('statsPeriod').value;
-        const now = new Date();
-        let start, end;
-
-        if (period === 'today') {
-            start = end = now.toISOString().split('T')[0];
-        } else if (period === 'yesterday') {
-            const y = new Date(now); y.setDate(y.getDate() - 1);
-            start = end = y.toISOString().split('T')[0];
-        } else if (period === 'thisMonth') {
-            start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-            end = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-        } else if (period === 'lastMonth') {
-            start = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
-            end = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];
-        } else {
-            start = '2020-01-01'; end = '2030-12-31';
-        }
-
-        const relevantOrders = globalOrdersData.filter(o => 
-            o.date >= start && o.date <= end && o.status !== 'Deleted'
-        );
-
-        const count = relevantOrders.length;
-        const revenue = relevantOrders.reduce((acc, o) => acc + (parseFloat(o.revenue) || 0), 0);
-        const cost = relevantOrders.reduce((acc, o) => acc + (parseFloat(o.cost) || 0), 0);
-        const profit = 0; // Always show 0
-        const deliveredCount = relevantOrders.filter(o => o.status === 'Delivered').length;
-        const rate = count > 0 ? ((deliveredCount / count) * 100).toFixed(0) : 0;
-        const aov = count > 0 ? (revenue / count).toFixed(2) : 0;
-
-        animateValue("statRevenue", revenue.toFixed(2) + " ₼");
-        animateValue("statProfit", profit.toFixed(2) + " ₼");
-        animateValue("statCount", count);
-      animateValue("statRate", `${rate}% (${deliveredCount})`);
-      animateValue("statAOV", aov + " ₼");
-    }
-
-    function animateValue(id, endValue) {
-        document.getElementById(id).textContent = endValue;
-    }
-
-    function toggleLoader(show) {
-        document.getElementById('loader').style.display = show ? 'flex' : 'none';
-    }
+      // 9. SUBMIT TASK PROOF
+      submitProof: async () => {
+        const file = ui.el('inp-file').files[0];
+        if (!file) return ui.toast("Fayl seçin");
+        
+        ui.toggleLoader('btn-submit', 'btn-submit-loader', true);
+        
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async (e) => {
+           const payload = {
+             action: 'submitTask', 
+             phone: state.user.phone, 
+             taskId: state.selectedTask.id,
+             points: state.selectedTask.points, 
+             base64: e.target.result
+           };
+           
+           try {
+             const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+             const d = await res.json();
+             
+             if (d.status === 'success') {
+               ui.toast("Uğurla Yükləndi!");
+               state.submissions[state.selectedTask.id] = 'Pending';
+               app.openDetail(state.selectedTask.id); // Refresh modal
+               app.filterLevel(state.currentLevel);   // Refresh list
+             } else {
+               ui.toast(d.message);
+             }
+           } catch(err) { ui.toast("Xəta baş verdi"); }
+           
+           ui.toggleLoader('btn-submit', 'btn-submit-loader', false);
+        };
+      }
+      
+    };
   </script>
 </body>
 </html>
