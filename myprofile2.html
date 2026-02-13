@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="az" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Brendimo | Satış Partnyoru Olun</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Glassmorphism Utilities */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased overflow-x-hidden selection:bg-brand-500 selection:text-white">
+
+    <nav class="fixed w-full z-50 glass transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-gradient-to-br from-brand-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                    <i class="fa-solid fa-bolt text-lg"></i>
+                </div>
+                <span class="font-bold text-xl tracking-tight text-slate-900">Brendimo</span>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-semibold text-slate-600">
+                <a href="#benefits" class="hover:text-brand-600 transition-colors">Üstünlüklər</a>
+                <a href="#system" class="hover:text-brand-600 transition-colors">Sistem</a>
+                <a href="#calculator" class="hover:text-brand-600 transition-colors">Gəlir Hesabla</a>
+            </div>
+            <a href="#join" class="hidden md:flex items-center gap-2 bg-slate-900 text-white px-6 py-2.5 rounded-full font-bold text-sm hover:bg-slate-800 transition-all hover:shadow-lg transform hover:-translate-y-0.5">
+                Qoşul
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </nav>
+
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div class="absolute top-0 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+        <div class="absolute top-0 -right-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10 text-center">
+            <div data-aos="fade-up" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-50 border border-brand-100 text-brand-600 text-xs font-bold uppercase tracking-wider mb-8">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+                </span>
+                Yeni Partnyor Qəbulu Başladı
+            </div>
+            
+            <h1 data-aos="fade-up" data-aos-delay="100" class="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-8 leading-tight">
+                Gələcəyin Satış <br>
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-purple-600">Ekosisteminə</span> Qoşulun.
+            </h1>
+            
+            <p data-aos="fade-up" data-aos-delay="200" class="text-lg md:text-xl text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed">
+                Brendimo sizə sadəcə iş deyil, tam avtomatlaşdırılmış rəqəmsal karyera təklif edir. 
+                Sərmayəsiz başlayın, smartfonunuzla idarə edin.
+            </p>
+
+            <div data-aos="fade-up" data-aos-delay="300" class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#join" class="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold text-lg hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20 flex items-center justify-center gap-3">
+                    <i class="fa-brands fa-whatsapp text-2xl"></i>
+                    Komandaya Qoşul
+                </a>
+                <a href="#system" class="px-8 py-4 bg-white text-slate-700 border border-slate-200 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play text-brand-600"></i>
+                    Sistemi Kəşf Et
+                </a>
+            </div>
+
+            <div data-aos="fade-up" data-aos-delay="500" class="mt-20 relative mx-auto max-w-4xl">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-50 via-transparent to-transparent z-20 h-full w-full"></div>
+                <div class="bg-slate-900 rounded-[2rem] p-3 shadow-2xl shadow-brand-900/40 border border-slate-700 animate-float transform rotate-x-12 perspective-1000">
+                    <div class="bg-slate-800 rounded-3xl overflow-hidden border border-slate-700 relative">
+                        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700 bg-slate-800/50 backdrop-blur">
+                            <div class="flex gap-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            </div>
+                            <div class="text-xs font-mono text-slate-400">Brendimo_Dashboard_v2.0</div>
+                        </div>
+                        <div class="p-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-slate-700/50 p-6 rounded-2xl border border-slate-600">
+                                <div class="text-slate-400 text-xs uppercase font-bold mb-2">Cari Balans</div>
+                                <div class="text-3xl font-bold text-white">450.00 ₼</div>
+                                <div class="text-green-400 text-xs mt-2 flex items-center gap-1"><i class="fa-solid fa-arrow-up"></i> +120₼ bu həftə</div>
+                            </div>
+                            <div class="bg-slate-700/50 p-6 rounded-2xl border border-slate-600">
+                                <div class="text-slate-400 text-xs uppercase font-bold mb-2">Səviyyə</div>
+                                <div class="flex items-center gap-2">
+                                    <div class="text-2xl font-bold text-white">Level 3</div>
+                                    <i class="fa-solid fa-star text-yellow-400"></i>
+                                </div>
+                                <div class="w-full bg-slate-600 h-1.5 mt-3 rounded-full">
+                                    <div class="bg-brand-500 w-3/4 h-full rounded-full"></div>
+                                </div>
+                            </div>
+                            <div class="bg-brand-600 p-6 rounded-2xl flex items-center justify-center text-white font-bold cursor-pointer hover:bg-brand-500 transition-colors">
+                                <i class="fa-solid fa-plus mr-2"></i> Yeni Tapşırıq
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="benefits" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-12">
+                <div data-aos="fade-up" data-aos-delay="0" class="group">
+                    <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-brand-600 text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-solid fa-laptop-code"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Tam Rəqəmsal İdarəetmə</h3>
+                    <p class="text-slate-500 leading-relaxed">Kağız yox, ofis yox. Bütün işinizi, müştərilərinizi və qazancınızı xüsusi hazırlanmış panelimizdən idarə edin.</p>
+                </div>
+                <div data-aos="fade-up" data-aos-delay="100" class="group">
+                    <div class="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Səviyyə Sistemi </h3>
+                    <p class="text-slate-500 leading-relaxed">Sadəcə satış yox, həm də tapşırıqlar və hədəflət var. Satış etdikcə səviyyəniz qalxır (Lvl 1 - Lvl 5) və gəlir faiziniz artır.</p>
+                </div>
+                <div data-aos="fade-up" data-aos-delay="200" class="group">
+                    <div class="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Şəffaf və Sürətli Ödəniş</h3>
+                    <p class="text-slate-500 leading-relaxed">Qazancınızı anlıq olaraq panelinizdə görün. Rahatca bank kartınıza köçürün.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="system" class="py-24 bg-slate-50 border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Sistem Necə İşləyir?</h2>
+                <p class="text-slate-500 max-w-2xl mx-auto">Mürəkkəb prosesləri sadələşdirdik. Sizin işiniz 4 sadə addımdan ibarətdir.</p>
+            </div>
+
+            <div class="relative">
+                <div class="hidden md:block absolute top-1/2 left-0 w-full h-1 bg-slate-200 -translate-y-1/2 z-0"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative group hover:-translate-y-2 transition-transform duration-300">
+                        <div class="w-12 h-12 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold text-xl mb-6 absolute -top-6 left-8 shadow-lg border-4 border-slate-50">1</div>
+                        <h4 class="text-lg font-bold mt-4 mb-2">Panelə Giriş</h4>
+                        <p class="text-sm text-slate-500">Biz sizə şəxsi kabinet açırıq. Login və şifrənizlə daxil olursunuz.</p>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative group hover:-translate-y-2 transition-transform duration-300">
+                        <div class="w-12 h-12 bg-brand-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-6 absolute -top-6 left-8 shadow-lg border-4 border-slate-50">2</div>
+                        <h4 class="text-lg font-bold mt-4 mb-2">Tapşırığı Götür</h4>
+                        <p class="text-sm text-slate-500">"Tapşırıqlar" bölməsindən hazır reklam materiallarını və məhsul məlumatlarını yükləyin.</p>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative group hover:-translate-y-2 transition-transform duration-300">
+                        <div class="w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-6 absolute -top-6 left-8 shadow-lg border-4 border-slate-50">3</div>
+                        <h4 class="text-lg font-bold mt-4 mb-2">Paylaş və Sat</h4>
+                        <p class="text-sm text-slate-500">Sosial şəbəkələrdə paylaşın. Müştəri yazdıqda sifarişi qəbul edin.</p>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 relative group hover:-translate-y-2 transition-transform duration-300">
+                        <div class="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-xl mb-6 absolute -top-6 left-8 shadow-lg border-4 border-slate-50">4</div>
+                        <h4 class="text-lg font-bold mt-4 mb-2">Qazancı Çıxar</h4>
+                        <p class="text-sm text-slate-500">Hər satışdan bonus balansınıza oturur. "Pul Çıxar" düyməsi ilə nağdlaşdırın.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="calculator" class="py-24 bg-slate-900 text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-600 rounded-full mix-blend-overlay filter blur-[100px] opacity-20"></div>
+
+        <div class="max-w-5xl mx-auto px-6 relative z-10" x-data="{ sales: 1, price: 50, commission: 10 }">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-5xl font-bold mb-6">Gəlirini İndidən Hesabla</h2>
+                    <p class="text-slate-300 text-lg mb-8">
+                        Limitsiz imkanlar dünyasına xoş gəldiniz. Nə qədər aktiv olsanız, o qədər çox qazanırsınız. Riyaziyyat sadədir.
+                    </p>
+                    
+                    <ul class="space-y-4 text-sm text-slate-400">
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-green-400"></i>
+                            Fix maaş yoxdur, artan faizlər var.
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-green-400"></i>
+                            Bonuslar və hədiyyələr əlavə olunur.
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-green-400"></i>
+                            Gündəlik ödəniş imkanı.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-lg border border-white/10 p-8 rounded-3xl shadow-2xl">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Gündəlik Satış Sayı</label>
+                            <input type="range" x-model="sales" min="1" max="20" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-brand-500">
+                            <div class="flex justify-between mt-2 font-bold text-xl">
+                                <span x-text="sales"></span> <span>Məhsul</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Ortalama Məhsul Qiyməti (AZN)</label>
+                            <div class="relative">
+                                <input type="number" x-model="price" class="w-full bg-slate-800 border border-slate-600 rounded-xl p-3 text-white font-bold focus:ring-2 focus:ring-brand-500 outline-none">
+                            </div>
+                        </div>
+
+                        <div class="pt-6 border-t border-white/10">
+                            <p class="text-center text-slate-400 text-xs font-bold uppercase mb-2">Təxmini Aylıq Gəliriniz</p>
+                            <div class="text-center">
+                                <span class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-500" x-text="(sales * price * (commission/100) * 30).toFixed(0)">0</span>
+                                <span class="text-2xl font-bold text-green-500"> AZN</span>
+                            </div>
+                            <p class="text-center text-xs text-slate-500 mt-2">* 10% komissiya ilə hesablanıb</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 bg-white">
+        <div class="max-w-3xl mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12">Çox Verilən Suallar</h2>
+            
+            <div class="space-y-4" x-data="{ active: null }">
+                <div class="border border-slate-200 rounded-2xl overflow-hidden transition-all duration-300" :class="active === 1 ? 'bg-slate-50 ring-2 ring-brand-100' : 'bg-white'">
+                    <button @click="active = active === 1 ? null : 1" class="w-full p-6 text-left flex justify-between items-center">
+                        <span class="font-bold text-slate-800">Qoşulmaq üçün təcrübə vacibdir?</span>
+                        <i class="fa-solid fa-chevron-down transition-transform duration-300 text-slate-400" :class="active === 1 ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="active === 1" x-collapse class="px-6 pb-6 text-slate-500 text-sm leading-relaxed">
+                        Xeyr. Bizim sistemimiz elə qurulub ki, sıfırdan başlayan biri belə panel daxilindəki təlimat videoları və hazır tapşırıqlar sayəsində ilk gündən satış edə bilər.
+                    </div>
+                </div>
+
+                <div class="border border-slate-200 rounded-2xl overflow-hidden transition-all duration-300" :class="active === 2 ? 'bg-slate-50 ring-2 ring-brand-100' : 'bg-white'">
+                    <button @click="active = active === 2 ? null : 2" class="w-full p-6 text-left flex justify-between items-center">
+                        <span class="font-bold text-slate-800">Ödənişli nə isə var?</span>
+                        <i class="fa-solid fa-chevron-down transition-transform duration-300 text-slate-400" :class="active === 2 ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="active === 2" x-collapse class="px-6 pb-6 text-slate-500 text-sm leading-relaxed">
+                        Qətiyyən. Brendimo partnyor proqramı tamamilə pulsuzdur. Biz sizdən pul istəmirik, əksinə, siz satış etdikcə biz sizə ödəniş edirik.
+                    </div>
+                </div>
+
+                <div class="border border-slate-200 rounded-2xl overflow-hidden transition-all duration-300" :class="active === 3 ? 'bg-slate-50 ring-2 ring-brand-100' : 'bg-white'">
+                    <button @click="active = active === 3 ? null : 3" class="w-full p-6 text-left flex justify-between items-center">
+                        <span class="font-bold text-slate-800">Nə satacağıq?</span>
+                        <i class="fa-solid fa-chevron-down transition-transform duration-300 text-slate-400" :class="active === 3 ? 'rotate-180' : ''"></i>
+                    </button>
+                    <div x-show="active === 3" x-collapse class="px-6 pb-6 text-slate-500 text-sm leading-relaxed">
+                        Brendimo-nun kataloqunda olan ən çox tələbat görən məhsulları (Geyim, Aksessuar, Elektronika və s.). Bütün məhsulların şəkli və videosu sizə verilir.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="join" class="py-20 bg-slate-50 border-t border-slate-200 text-center px-6">
+        <div class="max-w-2xl mx-auto">
+            <div class="w-20 h-20 bg-green-100 text-green-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl shadow-sm">
+                <i class="fa-brands fa-whatsapp"></i>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6">Komandaya Qoşulmağa Hazırsınız?</h2>
+            <p class="text-slate-500 mb-10 text-lg">
+                Əgər sistemlə tanış oldunuzsa və şərtlər sizi qane edirsə, aşağıdakı düyməyə sıxaraq bizə WhatsApp-dan yazın. 
+                <br><br>
+                <span class="font-bold text-slate-800">Qeyd:</span> Menecerlərimiz sizi qeydiyyata alıb Panelə giriş məlumatlarını təqdim edəcəklər.
+            </p>
+            
+            <a href="https://wa.me/994707260429?text=Salam,%20Mən%20Brendimo%20sistemi%20ilə%20tanış%20oldum%20və%20qeydiyyatdan%20keçmək%20istəyirəm." 
+               class="inline-flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white px-10 py-5 rounded-2xl font-bold text-xl shadow-xl shadow-green-200 transition-all hover:-translate-y-1 active:scale-95 w-full sm:w-auto">
+               <i class="fa-brands fa-whatsapp"></i>
+               Müraciət Et və Başla
+            </a>
+            
+            <p class="mt-8 text-xs text-slate-400">&copy; 2026 Brendimo. Bütün hüquqlar qorunur.</p>
+        </div>
+    </footer>
+
+    <div class="fixed bottom-0 left-0 w-full p-4 bg-white/80 backdrop-blur-md border-t border-slate-200 md:hidden z-40">
+        <a href="https://wa.me/994500000000?text=Salam,%20Mən%20satış%20komandasına%20qoşulmaq%20istəyirəm" class="block w-full bg-slate-900 text-white text-center py-4 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2">
+            <i class="fa-brands fa-whatsapp"></i> İndi Qoşul
+        </a>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 50,
+            easing: 'ease-out-cubic'
+        });
+
+        // Sticky Navbar Effect
+        window.addEventListener('scroll', function() {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-sm');
+                nav.classList.replace('bg-transparent', 'glass');
+            } else {
+                nav.classList.remove('shadow-sm');
+            }
+        });
+    </script>
+</body>
+</html>
