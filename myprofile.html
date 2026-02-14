@@ -57,7 +57,7 @@
 
   <script>
     // ⚠️ REPLACE THIS URL WITH YOUR GOOGLE SCRIPT WEB APP URL ⚠️
-    const API_URL = "https://script.google.com/macros/s/AKfycbx2hT0F9dWLATCP87XtT5oYvpSiiZzAVzEn8zqgQFtPiqBi6bRJ8DVP-TQDv2WU3_iR/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbwJoMAwjUlYRA4GBthfCbsvClKxYufbeMFO36d4aNGo4tHhJsX_4O1-2fg-awfUfWpt/exec"; 
   </script>
 
   <div id="view-login" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 transition-transform duration-500">
@@ -359,11 +359,68 @@
       },
 
       // 3. RENDER WALLET
+// 3. RENDER WALLET (UPDATED FOR AFFILIATE & SALES)
       renderWallet: () => {
+        // Main Balance
         ui.el('wallet-balance').innerText = state.user.balance;
+        
+        // Populate Pending/Withdrawn header stats
         ui.el('wallet-withdrawn').innerText = state.user.totalWithdrawn;
         ui.el('wallet-pending').innerText = state.user.pendingWithdrawal;
+
+        // --- NEW: AFFILIATE STATISTICS SECTION ---
+        // Ensure state.user.affiliate exists (fallback for safety)
+        const aff = state.user.affiliate || { totalSales: "0.00", pendingCommission: "0.00", matureCommission: "0.00" };
+
+        const statsHtml = `
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 col-span-2">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                  <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+                <div>
+                  <p class="text-[10px] text-gray-400 font-bold uppercase">Ümumi Satış</p>
+                  <p class="text-xl font-bold text-slate-800">${aff.totalSales} AZN</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
+               <div class="absolute top-0 right-0 w-2 h-2 bg-orange-400 rounded-bl-lg"></div>
+               <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Gözləyən (14 gün)</p>
+               <h4 class="text-lg font-bold text-orange-500">${aff.pendingCommission} AZN</h4>
+               <p class="text-[9px] text-gray-300 mt-1">10% komissiya</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
+               <div class="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-bl-lg"></div>
+               <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Balansa Əlavə</p>
+               <h4 class="text-lg font-bold text-green-600">${aff.matureCommission} AZN</h4>
+               <p class="text-[9px] text-gray-300 mt-1">Təsdiqlənən</p>
+            </div>
+          </div>
+        `;
         
+        // Insert this HTML before the "Funds Withdraw" button
+        // We look for the gradient-card, and insert this after it.
+        const walletPage = ui.el('page-wallet');
+        
+        // Clean previous stats if any to prevent duplication on re-render
+        const existingStats = document.getElementById('affiliate-stats-grid');
+        if(existingStats) existingStats.remove();
+
+        // Create container
+        const statsContainer = document.createElement('div');
+        statsContainer.id = 'affiliate-stats-grid';
+        statsContainer.innerHTML = statsHtml;
+        
+        // Insert after the gradient card (first child of page-wallet)
+        const gradientCard = walletPage.querySelector('.gradient-card');
+        gradientCard.parentNode.insertBefore(statsContainer, gradientCard.nextSibling);
+
+
+        // --- Render History ---
         const historyCont = ui.el('wallet-history');
         if (state.withdrawals.length === 0) {
           historyCont.innerHTML = `<p class="text-center text-gray-400 text-sm py-4">Hələ əməliyyat yoxdur</p>`;
