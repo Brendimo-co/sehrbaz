@@ -106,12 +106,13 @@
             transform: translateY(-5px);
         }
 
-        .product-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background-color: #eee;
-        }
+      .product-image {
+    width: 100%;
+    height: 200px; /* Keeps the grid aligned */
+    object-fit: contain; /* <--- SHOWS FULL IMAGE */
+    background-color: #ffffff; /* White background looks better for products */
+    padding: 10px; /* Adds space so the image doesn't touch edges */
+}
 
         .product-info {
             padding: 20px;
@@ -353,6 +354,30 @@
             transition: opacity 0.3s;
             pointer-events: none;
         }
+
+        /* Add this to your existing CSS */
+
+/* 1. Make the product image look clickable */
+.product-image {
+    cursor: zoom-in; /* Shows a magnifying glass cursor */
+}
+
+/* 2. Styles for the Full Image Modal */
+.image-modal-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 90vh; /* Keeps it within the screen height */
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    animation: zoom 0.3s;
+}
+
+@keyframes zoom {
+    from {transform:scale(0)} 
+    to {transform:scale(1)}
+}
+        
     </style>
 </head>
 <body>
@@ -406,7 +431,11 @@
     </div>
 
     <div class="notification" id="notification">Məhsul əlavə edildi</div>
-
+    
+<div id="fullImageModal" class="modal" onclick="closeImageModal()">
+    <span class="close-modal" style="color: white; right: 30px; top: 20px;">&times;</span>
+    <img class="image-modal-content" id="img01">
+</div>
  
     <script>
         // --- CONFIGURATION ---
@@ -517,8 +546,8 @@
                 const card = document.createElement('div');
                 card.className = 'product-card';
                 card.innerHTML = `
-                    <img src="${p.image}" alt="${p.name}" class="product-image">
-                    <div class="product-info">
+<img src="${p.image}" alt="${p.name}" class="product-image" onclick="openImageModal('${p.image}')">
+    <div class="product-info">
                         <div class="product-brand">${p.brand}</div>
                         <h3 class="product-name">${p.name}</h3>
                         <button class="add-btn" onclick="addToBox(${p.id})">Qutuya əlavə et</button>
@@ -714,6 +743,23 @@ function checkout() {
     updateBoxUI();
     closeModal();
 }
+
+        // --- IMAGE ZOOM LOGIC ---
+function openImageModal(src) {
+    const modal = document.getElementById('fullImageModal');
+    const modalImg = document.getElementById('img01');
+    
+    modal.style.display = "flex"; // Make it visible
+    modal.style.backgroundColor = "rgba(0,0,0,0.9)"; // Darker background for photos
+    modalImg.src = src; // Set the image source
+}
+
+function closeImageModal() {
+    document.getElementById('fullImageModal').style.display = "none";
+}
+
+        
+        
     </script>
 </body>
 </html>
