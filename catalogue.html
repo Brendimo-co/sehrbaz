@@ -874,14 +874,39 @@
       });
     }
 
+    /**
+     * ==========================================
+     * SMART SEARCH FILTER
+     * ==========================================
+     */
     function filterProducts(query) {
+      // 1. Clean the input and split into individual words
       const lowerQuery = query.toLowerCase().trim();
-      if (!lowerQuery) { renderProducts(allProducts); return; }
+      
+      // If search is empty, show everything
+      if (!lowerQuery) { 
+        renderProducts(allProducts); 
+        return; 
+      }
+      
+      // Split "Lacoste qolbaq" into ["lacoste", "qolbaq"]
+      // We filter out empty spaces to avoid bugs if user types double spaces
+      const searchTerms = lowerQuery.split(/\s+/).filter(word => word.length > 0);
+
       const filtered = allProducts.filter(p => {
+        // Prepare product data for searching
         const name = (p.name || "").toLowerCase();
         const code = (p.productcode || p.code || p.id || "").toString().toLowerCase();
-        return name.includes(lowerQuery) || code.includes(lowerQuery);
+        
+        // 2. LOGIC: Product must contain ALL typed words
+        // Check if EVERY word in searchTerms exists in either Name OR Code
+        const matchesAllWords = searchTerms.every(term => {
+          return name.includes(term) || code.includes(term);
+        });
+
+        return matchesAllWords;
       });
+
       renderProducts(filtered);
     }
   </script>
