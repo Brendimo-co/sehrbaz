@@ -169,7 +169,8 @@
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
+.leaflet-container { font-family: inherit; }
+    
   </style>
 </head>
 <body>
@@ -192,6 +193,10 @@
         <h3><i class="fa-regular fa-comments"></i> Kiminlə Danışırsınız?</h3>
         <p style="font-size:12px; color:#888; margin-top:-10px; margin-bottom:15px;">Sizə kömək edən xanımı seçin:</p>
         <div class="rep-grid">
+           <div class="rep-option" onclick="selectRep('Kanan', this)">
+            <span class="rep-icon"> </span>
+            <div class="rep-name">Kənan b.</div>
+          </div>
           <div class="rep-option" onclick="selectRep('hayat', this)">
             <span class="rep-icon">👩🏻‍💼</span>
             <div class="rep-name">Həyat x.</div>
@@ -269,35 +274,32 @@
           </select>
         </div>
 
-        <div id="loc-landmark" class="loc-content">
-          <label>Məşhur Yer / Nişangah</label>
-          <select id="landmarkSelect">
-            <option value="">Nişangahı seçin...</option>
-            <option value="Park Bulvar">Park Bulvar</option>
-            <option value="Dəniz Mall">Dəniz Mall</option>
-            <option value="28 Mall">28 Mall</option>
-            <option value="Gənclik Mall">Gənclik Mall</option>
-            <option value="Port Baku">Port Baku</option>
-            <option value="ADA Universiteti">ADA Universiteti</option>
-            <option value="BDU">Bakı Dövlət Universiteti</option>
-            <option value="Neft Akademiyası">ADNSU (Neft Akademiyası)</option>
-          </select>
-        </div>
+<div id="loc-landmark" class="loc-content">
+  <label>Məşhur Yer / Nişangah</label>
+  <select id="landmarkSelect">
+    <option value="">Nişangahı seçin...</option>
+    </select>
+</div>
 
-        <div id="loc-map" class="loc-content">
-          <label>Mövqeyinizi Paylaşın</label>
-          <p style="font-size:12px; color:#888;">Dəqiq çatdırılma üçün cari mövqeyinizi göndərin.</p>
-          <button type="button" class="btn btn-map" onclick="getCurrentLocation()">
-            <i class="fa-solid fa-location-crosshairs"></i> Cari Mövqeyimi Göndər
-          </button>
-          <div id="locationStatus" style="margin-top:10px; font-size:13px; font-weight:600; color:var(--success); display:none;">
-            <i class="fa-solid fa-check"></i> Mövqe qeydə alındı!
-          </div>
-          <input type="hidden" id="mapCoordinatesLink">
-        </div>
+     <div id="loc-map" class="loc-content">
+  <label>Xəritədə Seçin</label>
+  <p style="font-size:12px; color:#888;">Pin-i (📍) sürüşdürərək dəqiq qapınızı seçin.</p>
+  
+  <div id="map" style="height: 300px; width: 100%; border-radius: 12px; margin-bottom: 15px; border: 1px solid #ddd; z-index: 1;"></div>
+  
+  <button type="button" class="btn btn-map" onclick="getCurrentLocation()">
+    <i class="fa-solid fa-location-crosshairs"></i> Cari Mövqeyimi Tap
+  </button>
+  
+  <div id="locationStatus" style="margin-top:10px; font-size:13px; font-weight:600; color:var(--success); display:none; text-align:center;">
+    <i class="fa-solid fa-check"></i> Ünvan seçildi!
+  </div>
+  
+  <input type="hidden" id="mapCoordinatesLink">
+</div>
 
-        <label style="margin-top:15px;">Əlavə Qeyd (Bina, Blok, Mərtəbə)</label>
-        <input type="text" id="addressDetails" placeholder="Məs: Blok 2, Mərtəbə 5, Qapı 24">
+        <label style="margin-top:15px;">Əlavə Qeyd (Məhsul Kodu, Məhsul adı və ya Address, bu məlumatlar sifarişinizin sürətli əlavə edilməsi üçün bizə kömək edəcək)</label>
+        <input type="text" id="addressDetails" placeholder="Məs: 1009, Armani iki tərəfli kəmər, Küçə 45, Qapı 24">
       </div>
 
       <div class="card">
@@ -374,43 +376,128 @@
       <span>İzləmə</span>
     </button>
   </nav>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  // ==========================================
+  // 1. CONFIGURATION & DATA
+  // ==========================================
+  
+  // PASTE YOUR DEPLOYED WEB APP URL HERE
+  const API_URL = 'https://script.google.com/macros/s/AKfycbycvE61IqsT75PswnqjZK5kC4319AXpo_lrOs8-hBD_Heik36e_95v0WsfGIf8W85qw/exec'; 
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    // --- CONFIGURATION ---
-    // PASTE YOUR WEB APP URL HERE AFTER DEPLOYMENT
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzwf5wUMTWQtE6xKKCA9h7ejXOXjLzDrLJr47pJtT-1m3VDo_WbY16kRNB6fUZ2XveI/exec'; 
+  // List of Landmarks and their additional costs (AZN)
+  const landmarkData = [
+    { name: "Park Bulvar", price: 1.00 },
+    { name: "Dəniz Mall", price: 2.00 },
+    { name: "28 Mall", price: 1.00 },
+    { name: "Gənclik Mall", price: 1.50 },
+    { name: "Port Baku", price: 2.00 },
+    { name: "ADA Universiteti", price: 2.00 },
+    { name: "BDU", price: 1.00 },
+    { name: "Neft Akademiyası", price: 1.00 }
+  ];
+    let mapInstance = null;
+    let markerInstance = null;
+  // ==========================================
+  // 2. INITIALIZATION (ON LOAD)
+  // ==========================================
+  window.onload = () => {
+    // A. Set Date to Tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('deliveryDate').valueAsDate = tomorrow;
 
-    // --- INITIALIZATION ---
-    window.onload = () => {
-      // Set default date to tomorrow
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      document.getElementById('deliveryDate').valueAsDate = tomorrow;
-    };
+    // B. Populate Landmark Dropdown dynamically
+    const select = document.getElementById('landmarkSelect');
+    
+    landmarkData.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item.name; // This sends just the name (e.g., "Park Bulvar")
+      opt.text = `${item.name} (+${item.price.toFixed(2)} ₼)`; // User sees name + price
+      select.appendChild(opt);
+    });
+  };
 
-    // --- TABS & UI LOGIC ---
-    function switchTab(tabId, btn) {
-      document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      btn.classList.add('active');
+
+  // --- PASTE THIS NEW FUNCTION ---
+    function initMap() {
+      // If map is already created, stop here (prevents errors)
+      if (mapInstance) return; 
+
+      // 1. Create Map centered on Baku (Coordinates: 40.4093, 49.8671)
+      mapInstance = L.map('map').setView([40.4093, 49.8671], 12);
+
+      // 2. Add the Visual Tiles (The actual map image)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap',
+        maxZoom: 19
+      }).addTo(mapInstance);
+
+      // 3. Add a Draggable Pin (Marker)
+      markerInstance = L.marker([40.4093, 49.8671], {draggable: true}).addTo(mapInstance);
+
+      // 4. Listen: When user drags the pin, save location
+      markerInstance.on('dragend', function (e) {
+        saveMapLocation(markerInstance.getLatLng());
+      });
+
+      // 5. Listen: When user clicks map, move pin there
+      mapInstance.on('click', function(e) {
+        markerInstance.setLatLng(e.latlng);
+        saveMapLocation(e.latlng);
+      });
     }
 
-    function selectRep(code, el) {
-      document.getElementById('salesRep').value = code;
-      document.querySelectorAll('.rep-option').forEach(opt => opt.classList.remove('selected'));
-      el.classList.add('selected');
+    // Helper to save the link to the hidden input
+    function saveMapLocation(latlng) {
+      const link = `http://maps.google.com/maps?q=${latlng.lat},${latlng.lng}`;
+      document.getElementById('mapCoordinatesLink').value = link;
+      
+      // Show success message
+      const statusDiv = document.getElementById('locationStatus');
+      statusDiv.style.display = 'block';
+      statusDiv.innerHTML = '<i class="fa-solid fa-check"></i> Ünvan seçildi!';
     }
+  // ==========================================
+  // 3. UI INTERACTION FUNCTIONS
+  // ==========================================
 
+  // Switch between "New Order" and "Tracking" tabs
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // Select Sales Representative (Highlight effect)
+  function selectRep(code, el) {
+    document.getElementById('salesRep').value = code;
+    document.querySelectorAll('.rep-option').forEach(opt => opt.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+// --- REPLACE YOUR OLD 'switchLoc' WITH THIS ---
     function switchLoc(type, btn) {
+      // 1. Standard Tab Switching (Hide all, show one)
       document.querySelectorAll('.loc-content').forEach(el => el.classList.remove('active'));
       document.getElementById('loc-' + type).classList.add('active');
       document.querySelectorAll('.loc-tab').forEach(el => el.classList.remove('active'));
       btn.classList.add('active');
+
+      // 2. IF user clicked "Xəritə", load the map
+      if (type === 'map') {
+        // Wait 300ms for the div to become visible, then load map
+        setTimeout(() => {
+          initMap(); 
+          if(mapInstance) mapInstance.invalidateSize(); // Fixes "grey map" bug
+        }, 300);
+      }
     }
 
-    // --- GEOLOCATION LOGIC ---
+    // --- REPLACE YOUR OLD 'getCurrentLocation' WITH THIS ---
     function getCurrentLocation() {
       if (!navigator.geolocation) {
         Swal.fire('Xəta', 'Brauzeriniz mövqe təyini dəstəkləmir.', 'error');
@@ -425,148 +512,198 @@
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
-          const link = `https://www.google.com/maps?q=${lat},${lng}`;
-          
-          document.getElementById('mapCoordinatesLink').value = link;
-          document.getElementById('locationStatus').style.display = 'block';
+
+          // A. If Map is loaded, move the Pin to the user
+          if (mapInstance && markerInstance) {
+            const newLatLng = new L.LatLng(lat, lng);
+            markerInstance.setLatLng(newLatLng);
+            mapInstance.setView(newLatLng, 16); // Zoom in
+            saveMapLocation(newLatLng);
+          }
+          // B. If map isn't loaded yet, just save the link
+          else {
+             const link = `http://maps.google.com/maps?q=${lat},${lng}`;
+             document.getElementById('mapCoordinatesLink').value = link;
+          }
+
           btn.innerHTML = originalText;
           btn.style.background = '#e6fffa';
           btn.style.borderColor = '#34C759';
         },
         (error) => {
           btn.innerHTML = originalText;
-          Swal.fire('Xəta', 'Mövqe götürülə bilmədi. Zəhmət olmasa icazə verin.', 'error');
+          Swal.fire('Xəta', 'Mövqe götürülə bilmədi. İcazə verin.', 'error');
         }
       );
     }
 
-    // --- SUBMIT ORDER ---
-    document.getElementById('customerOrderForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+  // ==========================================
+  // 5. SUBMIT ORDER (MAIN LOGIC)
+  // ==========================================
+  document.getElementById('customerOrderForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      // 1. Validation
-      const rep = document.getElementById('salesRep').value;
-      if (!rep) return Swal.fire('Diqqət', 'Zəhmət olmasa danışdığınız xanımı seçin.', 'warning');
+    // --- A. VALIDATION ---
+    const rep = document.getElementById('salesRep').value;
+    if (!rep) {
+      return Swal.fire('Diqqət', 'Zəhmət olmasa danışdığınız xanımı seçin.', 'warning');
+    }
 
-      // 2. Prepare Address
-      let finalAddress = "";
-      const metro = document.getElementById('metroSelect').value;
-      const landmark = document.getElementById('landmarkSelect').value;
-      const details = document.getElementById('addressDetails').value;
+    // --- B. ADDRESS & COST CALCULATION ---
+    let finalAddress = "";
+    let calculatedCost = 0; // Default cost is 0 (for Metro)
+
+    // Get values from inputs
+    const metro = document.getElementById('metroSelect').value;
+    const landmark = document.getElementById('landmarkSelect').value;
+    const details = document.getElementById('addressDetails').value; // Contains "Əlavə Qeyd"
+    
+    // Check which tab is currently visible
+    const isMetroActive = document.getElementById('loc-metro').classList.contains('active');
+    const isLandmarkActive = document.getElementById('loc-landmark').classList.contains('active');
+
+    if (isMetroActive && metro) {
+      // Logic for Metro: Address set, Cost remains 0
+      finalAddress = `Metro: ${metro}`;
+      calculatedCost = 0; 
+
+    } else if (isLandmarkActive && landmark) {
+      // Logic for Landmark: Address set, Cost calculated from array
+      finalAddress = `Nişangah: ${landmark}`;
       
-      if (document.getElementById('loc-metro').classList.contains('active') && metro) {
-        finalAddress = `Metro: ${metro}`;
-      } else if (document.getElementById('loc-landmark').classList.contains('active') && landmark) {
-        finalAddress = `Nişangah: ${landmark}`;
-      }
-      
-
-      if (!finalAddress && !document.getElementById('mapCoordinatesLink').value) {
-        return Swal.fire('Diqqət', 'Zəhmət olmasa ünvan qeyd edin (Metro, Nişangah və ya Xəritə).', 'warning');
-      }
-
-      // 3. Show Loader
-      document.getElementById('loader').style.display = 'flex';
-
-      // 4. Build Payload
-      const payload = {
-        action: 'createCustomerOrder',
-        customerName: document.getElementById('custName').value,
-        contactInfo: document.getElementById('custPhone').value,
-        deliveryDate: document.getElementById('deliveryDate').value,
-        timeSlot: document.getElementById('timeSlot').value,
-        address: finalAddress,
-        specialInstructions: details, // Sends the "Əlavə Qeyd" separately
-        mapLink: document.getElementById('mapCoordinatesLink').value, // Goes to Col V
-        paymentMethod: document.getElementById('payMethod').value,
-        salesRep: rep, // Goes to Col Q
-      };
-
-      try {
-        const formData = new URLSearchParams();
-        for (const key in payload) formData.append(key, payload[key]);
-
-        const res = await fetch(API_URL, { method: 'POST', body: formData });
-        const data = await res.json();
-
-        if (data.success) {
-          Swal.fire({
-            title: 'Təbrik edirik!',
-            text: `Sifarişiniz qəbul olundu! Kodunuz: #${data.orderId}`,
-            icon: 'success',
-            confirmButtonColor: '#FF2D55'
-          });
-          document.getElementById('customerOrderForm').reset();
-          document.getElementById('locationStatus').style.display = 'none';
-        } else {
-          Swal.fire('Xəta', data.message, 'error');
-        }
-      } catch (err) {
-        Swal.fire('Xəta', 'İnternet əlaqəsini yoxlayın.', 'error');
-      } finally {
-        document.getElementById('loader').style.display = 'none';
-      }
-    });
-
-    // --- TRACK ORDER ---
-    async function trackOrder() {
-      const id = document.getElementById('trackId').value;
-      const phone = document.getElementById('trackPhone').value;
-
-      if (!id || !phone) return Swal.fire('Diqqət', 'Kod və Nömrəni daxil edin.', 'warning');
-
-      document.getElementById('loader').style.display = 'flex';
-      document.getElementById('trackResult').style.display = 'none';
-
-      try {
-        const res = await fetch(`${API_URL}?action=trackOrder&orderId=${id}&phone=${phone}`);
-        const data = await res.json();
-
-        if (data.success) {
-          const o = data.order;
-          
-          // Populate UI
-          document.getElementById('resId').innerText = o.id;
-          
-          // Status Logic
-          const statusEl = document.getElementById('resStatus');
-          statusEl.innerText = o.status;
-          statusEl.className = `status-badge status-${o.status}`;
-          if(o.status === 'Preparing') statusEl.innerText = "Hazırlanır";
-          if(o.status === 'Delivered') statusEl.innerText = "Təhvil Verildi";
-
-          document.getElementById('resDate').innerText = o.date;
-          document.getElementById('resTime').innerText = o.timeSlot || 'Gün ərzində';
-          document.getElementById('resPrice').innerText = (o.price || 0) + ' ₼';
-          document.getElementById('resPayment').innerText = o.payment === 'cash' ? 'Nağd' : 'Kart';
-
-          // Courier Info
-          const courierName = document.getElementById('resCourierName');
-          const courierBtn = document.getElementById('resCourierBtn');
-          
-          if (o.courier && o.courier !== '') {
-            courierName.innerText = o.courier; // We will format this in GAS to be capitalized
-            if (o.courierPhone) {
-              courierBtn.style.display = 'inline-block';
-              courierBtn.href = `tel:${o.courierPhone}`;
-            } else {
-              courierBtn.style.display = 'none';
-            }
-          } else {
-            courierName.innerText = "Təyin olunmayıb";
-            courierBtn.style.display = 'none';
-          }
-
-          document.getElementById('trackResult').style.display = 'block';
-        } else {
-          Swal.fire('Tapılmadı', 'Sifariş kodu və ya nömrə yanlışdır.', 'error');
-        }
-      } catch (err) {
-        Swal.fire('Xəta', 'Server ilə əlaqə kəsildi.', 'error');
-      } finally {
-        document.getElementById('loader').style.display = 'none';
+      const selectedItem = landmarkData.find(i => i.name === landmark);
+      if (selectedItem) {
+        calculatedCost = selectedItem.price; // e.g., 1.00 or 2.00
       }
     }
-  </script>
+
+    // --- C. FINAL CHECK ---
+    // If no address selected AND no map link provided
+    if (!finalAddress && !document.getElementById('mapCoordinatesLink').value) {
+       return Swal.fire('Diqqət', 'Zəhmət olmasa Metro, Nişangah seçin və ya Xəritədə yerinizi göndərin.', 'warning');
+    }
+
+    // --- D. PREPARE DATA FOR GOOGLE SHEET ---
+    const payload = {
+      action: 'createCustomerOrder',
+      
+      // Basic Info
+      customerName: document.getElementById('custName').value,
+      contactInfo: document.getElementById('custPhone').value,
+      deliveryDate: document.getElementById('deliveryDate').value,
+      timeSlot: document.getElementById('timeSlot').value, // Column W
+      
+      // Location Info
+      address: finalAddress,          // Column D (Metro or Landmark Name)
+      specialInstructions: details,   // Column F (Building/Block/Floor Note)
+      courieradditional: calculatedCost,    // Column T (The calculated extra cost)
+      mapLink: document.getElementById('mapCoordinatesLink').value, // Column V
+      
+      // Other Info
+      paymentMethod: document.getElementById('payMethod').value,
+      salesRep: rep // Column Q
+    };
+
+    // --- E. SEND TO SERVER ---
+    document.getElementById('loader').style.display = 'flex';
+
+    try {
+      const formData = new URLSearchParams();
+      for (const key in payload) formData.append(key, payload[key]);
+
+      const res = await fetch(API_URL, { method: 'POST', body: formData });
+      const data = await res.json();
+
+      if (data.success) {
+        Swal.fire({
+          title: 'Təşəkkür edirik!',
+          text: `Sifarişiniz qəbul olundu! Kodunuz: #${data.orderId}`,
+          icon: 'success',
+          confirmButtonColor: '#FF2D55'
+        });
+        
+        // Reset Form
+        document.getElementById('customerOrderForm').reset();
+        document.getElementById('locationStatus').style.display = 'none';
+        document.querySelectorAll('.rep-option').forEach(opt => opt.classList.remove('selected'));
+        
+      } else {
+        Swal.fire('Xəta', data.message, 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire('Xəta', 'İnternet əlaqəsini yoxlayın.', 'error');
+    } finally {
+      document.getElementById('loader').style.display = 'none';
+    }
+  });
+
+  // ==========================================
+  // 6. TRACK ORDER LOGIC
+  // ==========================================
+  async function trackOrder() {
+    const id = document.getElementById('trackId').value;
+    const phone = document.getElementById('trackPhone').value;
+
+    if (!id || !phone) {
+      return Swal.fire('Diqqət', 'Kod və Nömrəni daxil edin.', 'warning');
+    }
+
+    document.getElementById('loader').style.display = 'flex';
+    document.getElementById('trackResult').style.display = 'none';
+
+    try {
+      const res = await fetch(`${API_URL}?action=trackOrder&orderId=${id}&phone=${phone}`);
+      const data = await res.json();
+
+      if (data.success) {
+        const o = data.order;
+        
+        // Populate Tracking UI
+        document.getElementById('resId').innerText = o.id;
+        
+        // Handle Status Badges
+        const statusEl = document.getElementById('resStatus');
+        statusEl.innerText = o.status;
+        statusEl.className = `status-badge status-${o.status}`;
+        
+        // Translate Status
+        if(o.status === 'Preparing' || o.status === 'New') statusEl.innerText = "Hazırlanır";
+        if(o.status === 'Delivered') statusEl.innerText = "Təhvil Verildi";
+        if(o.status === 'OnWay') statusEl.innerText = "Yoldadır";
+
+        document.getElementById('resDate').innerText = o.date;
+        document.getElementById('resTime').innerText = o.timeSlot || 'Gün ərzində';
+        document.getElementById('resPrice').innerText = (o.price || 0) + ' ₼';
+        document.getElementById('resPayment').innerText = o.payment === 'cash' ? 'Nağd' : 'Kart';
+
+        // Handle Courier Info
+        const courierName = document.getElementById('resCourierName');
+        const courierBtn = document.getElementById('resCourierBtn');
+        
+        if (o.courier && o.courier !== '') {
+          courierName.innerText = o.courier.toUpperCase(); 
+          if (o.courierPhone) {
+            courierBtn.style.display = 'inline-block';
+            courierBtn.href = `tel:${o.courierPhone}`;
+          } else {
+            courierBtn.style.display = 'none';
+          }
+        } else {
+          courierName.innerText = "Təyin olunmayıb";
+          courierBtn.style.display = 'none';
+        }
+
+        document.getElementById('trackResult').style.display = 'block';
+      } else {
+        Swal.fire('Tapılmadı', 'Sifariş kodu və ya nömrə yanlışdır.', 'error');
+      }
+    } catch (err) {
+      Swal.fire('Xəta', 'Server ilə əlaqə kəsildi.', 'error');
+    } finally {
+      document.getElementById('loader').style.display = 'none';
+    }
+  }
+</script>
 </body>
 </html>
