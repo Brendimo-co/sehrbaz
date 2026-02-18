@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hədiyyə Sehrbazı | Brendimo</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* --- CSS VARIABLES & RESET --- */
+    :root {
+      --primary: #FF2D55; /* Gift/Magic Red-Pink */
+      --primary-dark: #D61F44;
+      --accent: #5856D6; /* Magic Purple */
+      --success: #34C759;
+      --bg: #F2F2F7;
+      --card-bg: #FFFFFF;
+      --text-main: #1C1C1E;
+      --text-sec: #8E8E93;
+      --border: #E5E5EA;
+      --radius: 16px;
+      --shadow: 0 4px 20px rgba(0,0,0,0.06);
+      --nav-height: 80px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+    
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* --- HEADER --- */
+    header {
+      background: var(--card-bg);
+      padding: 15px 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      background: -webkit-linear-gradient(45deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+    }
+    .brand-subtitle { font-size: 11px; color: var(--text-sec); font-weight: 500; letter-spacing: 1px; }
+
+    /* --- VIEW CONTAINER --- */
+    .view-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 20px 100px 20px;
+      display: none;
+      animation: fadeIn 0.3s ease-out;
+    }
+    .view-container.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* --- CARDS & FORMS --- */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    h3 { margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #333; }
+    label { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-sec); margin-bottom: 8px; margin-left: 4px; }
+    
+    input, select, textarea {
+      width: 100%; padding: 16px; background: #F9F9F9;
+      border: 1px solid var(--border); border-radius: 12px;
+      font-size: 16px; color: var(--text-main); font-family: inherit;
+      margin-bottom: 15px; transition: 0.2s;
+      -webkit-appearance: none;
+    }
+    input:focus, select:focus, textarea:focus { background: #fff; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 45, 85, 0.1); }
+
+    /* --- SALES REP SELECTOR --- */
+    .rep-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .rep-option {
+      background: #fff; border: 2px solid var(--border);
+      border-radius: 12px; padding: 10px 5px;
+      text-align: center; cursor: pointer; transition: 0.2s;
+    }
+    .rep-option.selected { border-color: var(--primary); background: rgba(255, 45, 85, 0.05); }
+    .rep-icon { font-size: 24px; margin-bottom: 5px; display: block; }
+    .rep-name { font-size: 13px; font-weight: 600; }
+
+    /* --- LOCATION TABS --- */
+    .loc-tabs { display: flex; background: #EFEFF4; border-radius: 10px; padding: 4px; margin-bottom: 15px; }
+    .loc-tab {
+      flex: 1; text-align: center; padding: 8px;
+      font-size: 13px; font-weight: 600; color: var(--text-sec);
+      border-radius: 8px; cursor: pointer;
+    }
+    .loc-tab.active { background: #fff; color: #000; shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    
+    .loc-content { display: none; }
+    .loc-content.active { display: block; }
+
+    /* --- BUTTONS --- */
+    .btn {
+      width: 100%; padding: 18px; border-radius: 14px; border: none;
+      font-weight: 700; font-size: 17px; cursor: pointer;
+      display: flex; justify-content: center; align-items: center; gap: 10px;
+      transition: transform 0.1s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; box-shadow: 0 4px 15px rgba(255, 45, 85, 0.3); }
+    .btn-map { background: #E8F0FE; color: #1a73e8; border: 1px solid #d2e3fc; }
+    .btn-call { background: var(--success); color: white; width: auto; padding: 8px 16px; font-size: 14px; border-radius: 20px;}
+
+    /* --- BOTTOM NAV --- */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.95);
+      border-top: 1px solid var(--border);
+      height: var(--nav-height);
+      display: flex; justify-content: space-around;
+      padding-bottom: 20px; z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+    .nav-item {
+      background: none; border: none; flex: 1;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: #C7C7CC; font-size: 10px; font-weight: 600;
+      cursor: pointer; transition: 0.2s;
+    }
+    .nav-item i { font-size: 22px; margin-bottom: 4px; }
+    .nav-item.active { color: var(--primary); }
+
+    /* --- TRACKING RESULTS --- */
+    .track-result { display: none; animation: slideUp 0.3s ease-out; }
+    .status-badge {
+      display: inline-block; padding: 6px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 800; text-transform: uppercase;
+      background: #eee; color: #555; margin-bottom: 10px;
+    }
+    .status-Delivered { background: #E0F8E5; color: var(--success); }
+    .status-Preparing { background: #FFF4E5; color: #FF9500; }
+    
+    .detail-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 12px 0; font-size: 14px; }
+    .detail-row:last-child { border: none; }
+    .detail-label { color: var(--text-sec); }
+    .detail-val { font-weight: 600; text-align: right; }
+
+    /* --- LOADER --- */
+    #loader {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.9); z-index: 2000;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      display: none;
+    }
+    .spinner {
+      width: 50px; height: 50px; border: 5px solid var(--border);
+      border-top-color: var(--primary); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+  </style>
+</head>
+<body>
+
+  <div id="loader">
+    <div class="spinner"></div>
+    <p style="margin-top: 15px; font-weight: 600; color: var(--text-sec);">Sehr edilir...</p>
+  </div>
+
+  <header>
+    <div class="brand-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Hədiyyə Sehrbazı</div>
+    <div class="brand-subtitle">BRENDIMO TARƏFİNDƏN</div>
+  </header>
+
+  <div id="tab-order" class="view-container active">
+    
+    <form id="customerOrderForm">
+      
+      <div class="card">
+        <h3><i class="fa-regular fa-comments"></i> Kiminlə Danışırsınız?</h3>
+        <p style="font-size:12px; color:#888; margin-top:-10px; margin-bottom:15px;">Sizə kömək edən xanımı seçin:</p>
+        <div class="rep-grid">
+          <div class="rep-option" onclick="selectRep('hayat', this)">
+            <span class="rep-icon">👩🏻‍💼</span>
+            <div class="rep-name">Həyat x.</div>
+          </div>
+          <div class="rep-option" onclick="selectRep('zamina', this)">
+            <span class="rep-icon">👩🏼‍💼</span>
+            <div class="rep-name">Zəminə x.</div>
+          </div>
+          <div class="rep-option" onclick="selectRep('tarana', this)">
+            <span class="rep-icon">👩🏽‍💼</span>
+            <div class="rep-name">Təranə x.</div>
+          </div>
+        </div>
+        <input type="hidden" id="salesRep" required>
+      </div>
+
+      <div class="card">
+        <h3><i class="fa-regular fa-id-card"></i> Sizin Məlumatlar</h3>
+        <label>Ad və Soyad</label>
+        <input type="text" id="custName" placeholder="Məs: Əli Vəliyev" required>
+        
+        <label>Əlaqə Nömrəsi</label>
+        <input type="tel" id="custPhone" placeholder="050 000 00 00" required>
+      </div>
+
+      <div class="card">
+        <h3><i class="fa-regular fa-clock"></i> Çatdırılma Zamanı</h3>
+        <div style="display: flex; gap: 10px;">
+          <div style="flex:1;">
+            <label>Tarix</label>
+            <input type="date" id="deliveryDate" required>
+          </div>
+          <div style="flex:1;">
+            <label>Saat Aralığı</label>
+            <select id="timeSlot" required>
+              <option value="">Seçin...</option>
+              <option value="12:00 - 14:00">12:00 - 14:00</option>
+              <option value="14:00 - 16:00">14:00 - 16:00</option>
+              <option value="16:00 - 18:00">16:00 - 18:00</option>
+              <option value="18:00 - 20:00">18:00 - 20:00</option>
+              <option value="20:00 - 21:00">20:00 - 21:00</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fa-solid fa-map-location-dot"></i> Ünvan</h3>
+        
+        <div class="loc-tabs">
+          <div class="loc-tab active" onclick="switchLoc('metro', this)">Metro</div>
+          <div class="loc-tab" onclick="switchLoc('landmark', this)">Nişangah</div>
+          <div class="loc-tab" onclick="switchLoc('map', this)">Xəritə</div>
+        </div>
+
+        <div id="loc-metro" class="loc-content active">
+          <label>Metro Stansiyası</label>
+          <select id="metroSelect">
+            <option value="">Stansiyanı seçin...</option>
+            <option value="28 May">28 May</option>
+            <option value="Gənclik">Gənclik</option>
+            <option value="Nərimanov">Nəriman Nərimanov</option>
+            <option value="Elmlər">Elmlər Akademiyası</option>
+            <option value="Nizami">Nizami</option>
+            <option value="İçərişəhər">İçərişəhər</option>
+            <option value="Sahil">Sahil</option>
+            <option value="Koroğlu">Koroğlu</option>
+            <option value="Neftçilər">Neftçilər</option>
+            <option value="Xalqlar">Xalqlar Dostluğu</option>
+            <option value="Əhmədli">Əhmədli</option>
+            <option value="Həzi Aslanov">Həzi Aslanov</option>
+            <option value="Memar Əcəmi">Memar Əcəmi</option>
+            <option value="20 Yanvar">20 Yanvar</option>
+            <option value="İnşaatçılar">İnşaatçılar</option>
+          </select>
+        </div>
+
+        <div id="loc-landmark" class="loc-content">
+          <label>Məşhur Yer / Nişangah</label>
+          <select id="landmarkSelect">
+            <option value="">Nişangahı seçin...</option>
+            <option value="Park Bulvar">Park Bulvar</option>
+            <option value="Dəniz Mall">Dəniz Mall</option>
+            <option value="28 Mall">28 Mall</option>
+            <option value="Gənclik Mall">Gənclik Mall</option>
+            <option value="Port Baku">Port Baku</option>
+            <option value="ADA Universiteti">ADA Universiteti</option>
+            <option value="BDU">Bakı Dövlət Universiteti</option>
+            <option value="Neft Akademiyası">ADNSU (Neft Akademiyası)</option>
+          </select>
+        </div>
+
+        <div id="loc-map" class="loc-content">
+          <label>Mövqeyinizi Paylaşın</label>
+          <p style="font-size:12px; color:#888;">Dəqiq çatdırılma üçün cari mövqeyinizi göndərin.</p>
+          <button type="button" class="btn btn-map" onclick="getCurrentLocation()">
+            <i class="fa-solid fa-location-crosshairs"></i> Cari Mövqeyimi Göndər
+          </button>
+          <div id="locationStatus" style="margin-top:10px; font-size:13px; font-weight:600; color:var(--success); display:none;">
+            <i class="fa-solid fa-check"></i> Mövqe qeydə alındı!
+          </div>
+          <input type="hidden" id="mapCoordinatesLink">
+        </div>
+
+        <label style="margin-top:15px;">Əlavə Qeyd (Bina, Blok, Mərtəbə)</label>
+        <input type="text" id="addressDetails" placeholder="Məs: Blok 2, Mərtəbə 5, Qapı 24">
+      </div>
+
+      <div class="card">
+        <h3><i class="fa-regular fa-credit-card"></i> Ödəniş Üsulu</h3>
+        <select id="payMethod">
+          <option value="cash">Nağd (Qapıda)</option>
+          <option value="card">Kart (Köçürmə)</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary">
+        Sifarişi Təsdiqlə <i class="fa-solid fa-arrow-right"></i>
+      </button>
+
+    </form>
+  </div>
+
+  <div id="tab-track" class="view-container">
+    <div class="card" style="text-align:center;">
+      <h3><i class="fa-solid fa-magnifying-glass"></i> Sifarişi İzlə</h3>
+      <p style="color:#888; font-size:13px;">Sifariş kodu və nömrənizi daxil edin.</p>
+      
+      <input type="number" id="trackId" placeholder="Sifariş Kodu (Məs: 1045)">
+      <input type="tel" id="trackPhone" placeholder="Mobil Nömrəniz">
+      
+      <button class="btn btn-primary" onclick="trackOrder()">Axtar</button>
+    </div>
+
+    <div id="trackResult" class="card track-result">
+      <div style="text-align:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:15px;">
+        <div style="font-size:24px; font-weight:800; color:var(--text-main);">#<span id="resId"></span></div>
+        <div id="resStatus" class="status-badge"></div>
+      </div>
+
+      <div class="detail-row">
+        <span class="detail-label">Tarix:</span>
+        <span class="detail-val" id="resDate"></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Zaman:</span>
+        <span class="detail-val" id="resTime"></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Məbləğ:</span>
+        <span class="detail-val" id="resPrice" style="color:var(--primary);"></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Ödəniş:</span>
+        <span class="detail-val" id="resPayment"></span>
+      </div>
+
+      <div style="background:#F9F9F9; padding:15px; border-radius:12px; margin-top:15px;">
+        <h4 style="margin:0 0 10px; font-size:14px;"><i class="fa-solid fa-motorcycle"></i> Çatdırılma Məlumatı</h4>
+        <div id="courierInfo" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div id="resCourierName" style="font-weight:700;">Təyin olunmayıb</div>
+            <div style="font-size:12px; color:#888;">Kuriyer</div>
+          </div>
+          <a id="resCourierBtn" href="#" class="btn btn-call" style="display:none; text-decoration:none;">
+            <i class="fa-solid fa-phone"></i> Zəng Et
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('tab-order', this)">
+      <i class="fa-solid fa-plus-circle"></i>
+      <span>Yeni Sifariş</span>
+    </button>
+    <button class="nav-item" onclick="switchTab('tab-track', this)">
+      <i class="fa-solid fa-box-open"></i>
+      <span>İzləmə</span>
+    </button>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    // --- CONFIGURATION ---
+    // PASTE YOUR WEB APP URL HERE AFTER DEPLOYMENT
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzwf5wUMTWQtE6xKKCA9h7ejXOXjLzDrLJr47pJtT-1m3VDo_WbY16kRNB6fUZ2XveI/exec'; 
+
+    // --- INITIALIZATION ---
+    window.onload = () => {
+      // Set default date to tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      document.getElementById('deliveryDate').valueAsDate = tomorrow;
+    };
+
+    // --- TABS & UI LOGIC ---
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function selectRep(code, el) {
+      document.getElementById('salesRep').value = code;
+      document.querySelectorAll('.rep-option').forEach(opt => opt.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function switchLoc(type, btn) {
+      document.querySelectorAll('.loc-content').forEach(el => el.classList.remove('active'));
+      document.getElementById('loc-' + type).classList.add('active');
+      document.querySelectorAll('.loc-tab').forEach(el => el.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    // --- GEOLOCATION LOGIC ---
+    function getCurrentLocation() {
+      if (!navigator.geolocation) {
+        Swal.fire('Xəta', 'Brauzeriniz mövqe təyini dəstəkləmir.', 'error');
+        return;
+      }
+      
+      const btn = document.querySelector('.btn-map');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Təyin edilir...';
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const link = `https://www.google.com/maps?q=${lat},${lng}`;
+          
+          document.getElementById('mapCoordinatesLink').value = link;
+          document.getElementById('locationStatus').style.display = 'block';
+          btn.innerHTML = originalText;
+          btn.style.background = '#e6fffa';
+          btn.style.borderColor = '#34C759';
+        },
+        (error) => {
+          btn.innerHTML = originalText;
+          Swal.fire('Xəta', 'Mövqe götürülə bilmədi. Zəhmət olmasa icazə verin.', 'error');
+        }
+      );
+    }
+
+    // --- SUBMIT ORDER ---
+    document.getElementById('customerOrderForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // 1. Validation
+      const rep = document.getElementById('salesRep').value;
+      if (!rep) return Swal.fire('Diqqət', 'Zəhmət olmasa danışdığınız xanımı seçin.', 'warning');
+
+      // 2. Prepare Address
+      let finalAddress = "";
+      const metro = document.getElementById('metroSelect').value;
+      const landmark = document.getElementById('landmarkSelect').value;
+      const details = document.getElementById('addressDetails').value;
+      
+      if (document.getElementById('loc-metro').classList.contains('active') && metro) {
+        finalAddress = `Metro: ${metro}`;
+      } else if (document.getElementById('loc-landmark').classList.contains('active') && landmark) {
+        finalAddress = `Nişangah: ${landmark}`;
+      }
+      
+
+      if (!finalAddress && !document.getElementById('mapCoordinatesLink').value) {
+        return Swal.fire('Diqqət', 'Zəhmət olmasa ünvan qeyd edin (Metro, Nişangah və ya Xəritə).', 'warning');
+      }
+
+      // 3. Show Loader
+      document.getElementById('loader').style.display = 'flex';
+
+      // 4. Build Payload
+      const payload = {
+        action: 'createCustomerOrder',
+        customerName: document.getElementById('custName').value,
+        contactInfo: document.getElementById('custPhone').value,
+        deliveryDate: document.getElementById('deliveryDate').value,
+        timeSlot: document.getElementById('timeSlot').value,
+        address: finalAddress,
+        specialInstructions: details, // Sends the "Əlavə Qeyd" separately
+        mapLink: document.getElementById('mapCoordinatesLink').value, // Goes to Col V
+        paymentMethod: document.getElementById('payMethod').value,
+        salesRep: rep, // Goes to Col Q
+      };
+
+      try {
+        const formData = new URLSearchParams();
+        for (const key in payload) formData.append(key, payload[key]);
+
+        const res = await fetch(API_URL, { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.success) {
+          Swal.fire({
+            title: 'Təbrik edirik!',
+            text: `Sifarişiniz qəbul olundu! Kodunuz: #${data.orderId}`,
+            icon: 'success',
+            confirmButtonColor: '#FF2D55'
+          });
+          document.getElementById('customerOrderForm').reset();
+          document.getElementById('locationStatus').style.display = 'none';
+        } else {
+          Swal.fire('Xəta', data.message, 'error');
+        }
+      } catch (err) {
+        Swal.fire('Xəta', 'İnternet əlaqəsini yoxlayın.', 'error');
+      } finally {
+        document.getElementById('loader').style.display = 'none';
+      }
+    });
+
+    // --- TRACK ORDER ---
+    async function trackOrder() {
+      const id = document.getElementById('trackId').value;
+      const phone = document.getElementById('trackPhone').value;
+
+      if (!id || !phone) return Swal.fire('Diqqət', 'Kod və Nömrəni daxil edin.', 'warning');
+
+      document.getElementById('loader').style.display = 'flex';
+      document.getElementById('trackResult').style.display = 'none';
+
+      try {
+        const res = await fetch(`${API_URL}?action=trackOrder&orderId=${id}&phone=${phone}`);
+        const data = await res.json();
+
+        if (data.success) {
+          const o = data.order;
+          
+          // Populate UI
+          document.getElementById('resId').innerText = o.id;
+          
+          // Status Logic
+          const statusEl = document.getElementById('resStatus');
+          statusEl.innerText = o.status;
+          statusEl.className = `status-badge status-${o.status}`;
+          if(o.status === 'Preparing') statusEl.innerText = "Hazırlanır";
+          if(o.status === 'Delivered') statusEl.innerText = "Təhvil Verildi";
+
+          document.getElementById('resDate').innerText = o.date;
+          document.getElementById('resTime').innerText = o.timeSlot || 'Gün ərzində';
+          document.getElementById('resPrice').innerText = (o.price || 0) + ' ₼';
+          document.getElementById('resPayment').innerText = o.payment === 'cash' ? 'Nağd' : 'Kart';
+
+          // Courier Info
+          const courierName = document.getElementById('resCourierName');
+          const courierBtn = document.getElementById('resCourierBtn');
+          
+          if (o.courier && o.courier !== '') {
+            courierName.innerText = o.courier; // We will format this in GAS to be capitalized
+            if (o.courierPhone) {
+              courierBtn.style.display = 'inline-block';
+              courierBtn.href = `tel:${o.courierPhone}`;
+            } else {
+              courierBtn.style.display = 'none';
+            }
+          } else {
+            courierName.innerText = "Təyin olunmayıb";
+            courierBtn.style.display = 'none';
+          }
+
+          document.getElementById('trackResult').style.display = 'block';
+        } else {
+          Swal.fire('Tapılmadı', 'Sifariş kodu və ya nömrə yanlışdır.', 'error');
+        }
+      } catch (err) {
+        Swal.fire('Xəta', 'Server ilə əlaqə kəsildi.', 'error');
+      } finally {
+        document.getElementById('loader').style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
