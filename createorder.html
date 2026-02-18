@@ -193,10 +193,9 @@
         <h3><i class="fa-regular fa-comments"></i> Kiminlə Danışırsınız?</h3>
         <p style="font-size:12px; color:#888; margin-top:-10px; margin-bottom:15px;">Sizə kömək edən xanımı seçin:</p>
         <div class="rep-grid">
-           <div class="rep-option" onclick="selectRep('Kanan', this)">
-            <span class="rep-icon"> </span>
-            <div class="rep-name">Kənan b.</div>
-          </div>
+          <div class="rep-option" onclick="selectRep('Kanan', this)">
+    <span class="rep-icon">👨🏻‍💼</span> <div class="rep-name">Kənan b.</div>
+</div>
           <div class="rep-option" onclick="selectRep('hayat', this)">
             <span class="rep-icon">👩🏻‍💼</span>
             <div class="rep-name">Həyat x.</div>
@@ -246,9 +245,10 @@
       <div class="card">
         <h3><i class="fa-solid fa-map-location-dot"></i> Ünvan</h3>
         
-        <div class="loc-tabs">
+      <div class="loc-tabs">
           <div class="loc-tab active" onclick="switchLoc('metro', this)">Metro</div>
           <div class="loc-tab" onclick="switchLoc('landmark', this)">Nişangah</div>
+          <div class="loc-tab" onclick="switchLoc('rayon', this)">Rayonlar</div>
           <div class="loc-tab" onclick="switchLoc('map', this)">Xəritə</div>
         </div>
 
@@ -281,6 +281,13 @@
     </select>
 </div>
 
+<div id="loc-rayon" class="loc-content">
+  <label>Rayon / Şəhər Seçin (+4.00 ₼)</label>
+  <select id="rayonSelect">
+    <option value="">Siyahıdan seçin...</option>
+    </select>
+</div>
+        
      <div id="loc-map" class="loc-content">
   <label>Xəritədə Seçin</label>
   <p style="font-size:12px; color:#888;">Pin-i (📍) sürüşdürərək dəqiq qapınızı seçin.</p>
@@ -387,84 +394,156 @@
   // PASTE YOUR DEPLOYED WEB APP URL HERE
   const API_URL = 'https://script.google.com/macros/s/AKfycbycvE61IqsT75PswnqjZK5kC4319AXpo_lrOs8-hBD_Heik36e_95v0WsfGIf8W85qw/exec'; 
 
-  // List of Landmarks and their additional costs (AZN)
+  // --- Landmark Data (Nişangah) ---
   const landmarkData = [
     { name: "Park Bulvar", price: 1.00 },
     { name: "Dəniz Mall", price: 2.00 },
-    { name: "28 Mall", price: 1.00 },
-    { name: "Gənclik Mall", price: 1.50 },
-    { name: "Port Baku", price: 2.00 },
-    { name: "ADA Universiteti", price: 2.00 },
-    { name: "BDU", price: 1.00 },
-    { name: "Neft Akademiyası", price: 1.00 }
+    { name: "Port Baku", price: 1.00 },
+    { name: "Badamdar", price: 2.00 },
+    { name: "Bakıxanov (Razin)", price: 2.00 },
+    { name: "Balaxanı", price: 3.00 },
+    { name: "Zığ", price: 8.00 },
+    { name: "Heydər Əliyev Liseyi", price: 5.00 },
+    { name: "Sulutəpə", price: 2.00 },
+    { name: "Hökməli", price: 5.00 },
+    { name: "Qobu", price: 8.00 },
+    { name: "Babək prospekti", price: 1.00 },
+    { name: "8 noyabr prospekti", price: 3.00 },
+    { name: "Günəşli", price: 2.00 },
+    { name: "Xırdalan", price: 2.00 },
+    { name: "Zirə", price: 8.00 },
+    { name: "Zabrat", price: 8.00 },
+    { name: "Türkan", price: 8.00 },
+    { name: "Şüvəlan", price: 10.00 },
+    { name: "Şağan", price: 8.00 },
+    { name: "Suraxanı", price: 3.00 },
+    { name: "Yeni Suraxanı", price: 3.00 },
+    { name: "Saray", price: 6.00 },
+    { name: "Sabunçu", price: 2.00 },
+    { name: "Ramana", price: 2.00 },
+    { name: "Qaraçuxur", price: 2.00 },
+    { name: "Qala", price: 8.00 },
+    { name: "Pirşağı", price: 6.00 },
+    { name: "Novxanı", price: 10.00 },
+    { name: "Nardaran", price: 10.00 },
+    { name: "Mərdəkan", price: 10.00 },
+    { name: "Məhəmmədi", price: 1.00 },
+    { name: "Mehdiabad", price: 6.00 },
+    { name: "Maştağa", price: 10.00 },
+    { name: "Masazır", price: 2.00 },
+    { name: "Lökbatan", price: 10.00 },
+    { name: "Kürdəxanı", price: 10.00 },
+    { name: "Hövsan", price: 10.00 },
+    { name: "Görədil", price: 10.00 },
+    { name: "Fatmayı", price: 10.00 },
+    { name: "Əmircan", price: 10.00 },
+    { name: "Əhmədli (Kənd)", price: 10.00 },
+    { name: "Digah", price: 10.00 },
+    { name: "Buzovna", price: 10.00 },
+    { name: "Binəqədi", price: 6.00 },
+    { name: "Binə", price: 8.00 },
+    { name: "Bilgəh", price: 10.00 },
+    { name: "Biləcəri", price: 2.00 },
+    { name: "Bibiheybət", price: 10.00 },
+    { name: "Bayıl", price: 3.00 },
+    { name: "Lökbatan Dairəsi", price: 5.00 },
+    { name: "Şıxov", price: 5.00 },
+    { name: "Baksol Yolu", price: 2.00 },
+    { name: "Müşviq", price: 10.00 },
+    { name: "Keşlə", price: 2.00 }
   ];
-    let mapInstance = null;
-    let markerInstance = null;
+
+  // --- Rayon Data (Cities & Settlements) ---
+  const rayonData = [
+    "Abşeron", "Ağcabədi", "Ağdam", "Ağdaş", "Ağstafa", "Ağsu", "Astara", 
+    "Babək", "Balakən", "Beyləqan", "Bərdə", "Biləsuvar", 
+    "Cəbrayıl", "Cəlilabad", "Culfa", 
+    "Daşkəsən", "Füzuli", 
+    "Gədəbəy", "Gəncə", "Goranboy", "Göyçay", "Göygöl", 
+    "Hacıqabul", "Xaçmaz", "Xankəndi", "Xocavənd", "Xocalı", "Xızı",
+    "İmişli", "İsmayıllı", 
+    "Kəlbəcər", "Kəngərli", "Kürdəmir", 
+    "Qax", "Qazax", "Qəbələ", "Qobustan", "Quba", "Qubadlı", "Qusar", 
+    "Laçın", "Lerik", "Lənkəran", 
+    "Masallı", "Mingəçevir", 
+    "Naftalan", "Naxçıvan", "Neftçala", 
+    "Oğuz", "Ordubad", 
+    "Saatlı", "Sabirabad", "Salyan", "Samux", "Sədərək", "Siyəzən", "Sumqayıt",
+    "Şabran", "Şahbuz", "Şamaxı", "Şəki", "Şəmkir", "Şərur", "Şirvan", "Şuşa", 
+    "Tərtər", "Tovuz", "Ucar", 
+    "Yardımlı", "Yevlax", "Zaqatala", "Zəngilan", "Zərdab"
+  ];
+
+  // Map Variables
+  let mapInstance = null;
+  let markerInstance = null;
+
   // ==========================================
   // 2. INITIALIZATION (ON LOAD)
   // ==========================================
   window.onload = () => {
-    // A. Set Date to Tomorrow
+    // A. Set Date
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     document.getElementById('deliveryDate').valueAsDate = tomorrow;
 
-    // B. Populate Landmark Dropdown dynamically
+    // B. Populate Landmark Dropdown
     const select = document.getElementById('landmarkSelect');
-    
     landmarkData.forEach(item => {
       const opt = document.createElement('option');
-      opt.value = item.name; // This sends just the name (e.g., "Park Bulvar")
-      opt.text = `${item.name} (+${item.price.toFixed(2)} ₼)`; // User sees name + price
+      opt.value = item.name;
+      opt.text = `${item.name} (+${item.price.toFixed(2)} ₼)`;
       select.appendChild(opt);
+    });
+
+    // C. Populate Rayon Dropdown
+    const rayonSelect = document.getElementById('rayonSelect');
+    rayonData.sort(); 
+    rayonData.forEach(city => {
+      const opt = document.createElement('option');
+      opt.value = city;
+      opt.text = `${city} (+4.00 ₼)`;
+      rayonSelect.appendChild(opt);
     });
   };
 
-
-  // --- PASTE THIS NEW FUNCTION ---
-    function initMap() {
-      // If map is already created, stop here (prevents errors)
-      if (mapInstance) return; 
-
-      // 1. Create Map centered on Baku (Coordinates: 40.4093, 49.8671)
-      mapInstance = L.map('map').setView([40.4093, 49.8671], 12);
-
-      // 2. Add the Visual Tiles (The actual map image)
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap',
-        maxZoom: 19
-      }).addTo(mapInstance);
-
-      // 3. Add a Draggable Pin (Marker)
-      markerInstance = L.marker([40.4093, 49.8671], {draggable: true}).addTo(mapInstance);
-
-      // 4. Listen: When user drags the pin, save location
-      markerInstance.on('dragend', function (e) {
-        saveMapLocation(markerInstance.getLatLng());
-      });
-
-      // 5. Listen: When user clicks map, move pin there
-      mapInstance.on('click', function(e) {
-        markerInstance.setLatLng(e.latlng);
-        saveMapLocation(e.latlng);
-      });
-    }
-
-    // Helper to save the link to the hidden input
-    function saveMapLocation(latlng) {
-      const link = `http://maps.google.com/maps?q=${latlng.lat},${latlng.lng}`;
-      document.getElementById('mapCoordinatesLink').value = link;
-      
-      // Show success message
-      const statusDiv = document.getElementById('locationStatus');
-      statusDiv.style.display = 'block';
-      statusDiv.innerHTML = '<i class="fa-solid fa-check"></i> Ünvan seçildi!';
-    }
   // ==========================================
-  // 3. UI INTERACTION FUNCTIONS
+  // 3. MAP LOGIC
   // ==========================================
+  function initMap() {
+    if (mapInstance) return; 
+    
+    // Default Center: Baku
+    mapInstance = L.map('map').setView([40.4093, 49.8671], 12);
 
-  // Switch between "New Order" and "Tracking" tabs
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
+      maxZoom: 19
+    }).addTo(mapInstance);
+
+    markerInstance = L.marker([40.4093, 49.8671], {draggable: true}).addTo(mapInstance);
+
+    markerInstance.on('dragend', function (e) {
+      saveMapLocation(markerInstance.getLatLng());
+    });
+
+    mapInstance.on('click', function(e) {
+      markerInstance.setLatLng(e.latlng);
+      saveMapLocation(e.latlng);
+    });
+  }
+
+  function saveMapLocation(latlng) {
+    const link = `http://googleusercontent.com/maps.google.com/?q=${latlng.lat},${latlng.lng}`;
+    document.getElementById('mapCoordinatesLink').value = link;
+    const statusDiv = document.getElementById('locationStatus');
+    statusDiv.style.display = 'block';
+    statusDiv.innerHTML = '<i class="fa-solid fa-check"></i> Ünvan seçildi!';
+  }
+
+  // ==========================================
+  // 4. UI INTERACTION
+  // ==========================================
   function switchTab(tabId, btn) {
     document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
@@ -472,139 +551,129 @@
     btn.classList.add('active');
   }
 
-  // Select Sales Representative (Highlight effect)
   function selectRep(code, el) {
     document.getElementById('salesRep').value = code;
     document.querySelectorAll('.rep-option').forEach(opt => opt.classList.remove('selected'));
     el.classList.add('selected');
   }
 
-// --- REPLACE YOUR OLD 'switchLoc' WITH THIS ---
-    function switchLoc(type, btn) {
-      // 1. Standard Tab Switching (Hide all, show one)
-      document.querySelectorAll('.loc-content').forEach(el => el.classList.remove('active'));
-      document.getElementById('loc-' + type).classList.add('active');
-      document.querySelectorAll('.loc-tab').forEach(el => el.classList.remove('active'));
-      btn.classList.add('active');
+  function switchLoc(type, btn) {
+    document.querySelectorAll('.loc-content').forEach(el => el.classList.remove('active'));
+    document.getElementById('loc-' + type).classList.add('active');
+    document.querySelectorAll('.loc-tab').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
 
-      // 2. IF user clicked "Xəritə", load the map
-      if (type === 'map') {
-        // Wait 300ms for the div to become visible, then load map
-        setTimeout(() => {
-          initMap(); 
-          if(mapInstance) mapInstance.invalidateSize(); // Fixes "grey map" bug
-        }, 300);
-      }
+    if (type === 'map') {
+      setTimeout(() => {
+        initMap(); 
+        if(mapInstance) mapInstance.invalidateSize();
+      }, 300);
     }
+  }
 
-    // --- REPLACE YOUR OLD 'getCurrentLocation' WITH THIS ---
-    function getCurrentLocation() {
-      if (!navigator.geolocation) {
-        Swal.fire('Xəta', 'Brauzeriniz mövqe təyini dəstəkləmir.', 'error');
-        return;
-      }
-      
-      const btn = document.querySelector('.btn-map');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Təyin edilir...';
+  function getCurrentLocation() {
+    if (!navigator.geolocation) {
+      Swal.fire('Xəta', 'Brauzeriniz mövqe təyini dəstəkləmir.', 'error');
+      return;
+    }
+    
+    const btn = document.querySelector('.btn-map');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Təyin edilir...';
 
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
 
-          // A. If Map is loaded, move the Pin to the user
-          if (mapInstance && markerInstance) {
-            const newLatLng = new L.LatLng(lat, lng);
-            markerInstance.setLatLng(newLatLng);
-            mapInstance.setView(newLatLng, 16); // Zoom in
-            saveMapLocation(newLatLng);
-          }
-          // B. If map isn't loaded yet, just save the link
-          else {
-             const link = `http://maps.google.com/maps?q=${lat},${lng}`;
-             document.getElementById('mapCoordinatesLink').value = link;
-          }
-
-          btn.innerHTML = originalText;
-          btn.style.background = '#e6fffa';
-          btn.style.borderColor = '#34C759';
-        },
-        (error) => {
-          btn.innerHTML = originalText;
-          Swal.fire('Xəta', 'Mövqe götürülə bilmədi. İcazə verin.', 'error');
+        if (mapInstance && markerInstance) {
+          const newLatLng = new L.LatLng(lat, lng);
+          markerInstance.setLatLng(newLatLng);
+          mapInstance.setView(newLatLng, 16); 
+          saveMapLocation(newLatLng);
+        } else {
+           const link = `http://googleusercontent.com/maps.google.com/?q=${lat},${lng}`;
+           document.getElementById('mapCoordinatesLink').value = link;
         }
-      );
-    }
+
+        btn.innerHTML = originalText;
+        btn.style.background = '#e6fffa';
+        btn.style.borderColor = '#34C759';
+      },
+      (error) => {
+        btn.innerHTML = originalText;
+        Swal.fire('Xəta', 'Mövqe götürülə bilmədi.', 'error');
+      }
+    );
+  }
 
   // ==========================================
   // 5. SUBMIT ORDER (MAIN LOGIC)
   // ==========================================
-  document.getElementById('customerOrderForm').addEventListener('submit', async (e) => {
+document.getElementById('customerOrderForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // --- A. VALIDATION ---
+    // A. Validation
     const rep = document.getElementById('salesRep').value;
     if (!rep) {
-      return Swal.fire('Diqqət', 'Zəhmət olmasa danışdığınız xanımı seçin.', 'warning');
+      return Swal.fire('Diqqət', 'Zəhmət olmasa danışdığınız Satış Təmsilçisini seçin.', 'warning');
     }
 
-    // --- B. ADDRESS & COST CALCULATION ---
+    // B. Address & Cost Calculation
     let finalAddress = "";
-    let calculatedCost = 0; // Default cost is 0 (for Metro)
+    let calculatedCost = 0; 
 
-    // Get values from inputs
     const metro = document.getElementById('metroSelect').value;
     const landmark = document.getElementById('landmarkSelect').value;
-    const details = document.getElementById('addressDetails').value; // Contains "Əlavə Qeyd"
+    const rayon = document.getElementById('rayonSelect').value;
+    const details = document.getElementById('addressDetails').value;
     
-    // Check which tab is currently visible
+    // Check which tab is active (Class check is safest)
     const isMetroActive = document.getElementById('loc-metro').classList.contains('active');
     const isLandmarkActive = document.getElementById('loc-landmark').classList.contains('active');
+    const isRayonActive = document.getElementById('loc-rayon').classList.contains('active');
 
     if (isMetroActive && metro) {
-      // Logic for Metro: Address set, Cost remains 0
+      // 1. Metro (Cost = 0)
       finalAddress = `Metro: ${metro}`;
       calculatedCost = 0; 
 
     } else if (isLandmarkActive && landmark) {
-      // Logic for Landmark: Address set, Cost calculated from array
+      // 2. Landmark (Cost = Dynamic from List)
       finalAddress = `Nişangah: ${landmark}`;
-      
       const selectedItem = landmarkData.find(i => i.name === landmark);
-      if (selectedItem) {
-        calculatedCost = selectedItem.price; // e.g., 1.00 or 2.00
-      }
+      if (selectedItem) calculatedCost = selectedItem.price;
+
+    } else if (isRayonActive && rayon) {
+      // 3. Rayon (Cost = 4.00)
+      finalAddress = `Rayon: ${rayon}`;
+      calculatedCost = 4.00;
     }
 
-    // --- C. FINAL CHECK ---
-    // If no address selected AND no map link provided
+    // C. Final Check (Must have address OR map link)
     if (!finalAddress && !document.getElementById('mapCoordinatesLink').value) {
-       return Swal.fire('Diqqət', 'Zəhmət olmasa Metro, Nişangah seçin və ya Xəritədə yerinizi göndərin.', 'warning');
+       return Swal.fire('Diqqət', 'Zəhmət olmasa Metro, Nişangah və ya Rayon seçin.', 'warning');
     }
 
-    // --- D. PREPARE DATA FOR GOOGLE SHEET ---
+    // D. Prepare Payload
+    // CRITICAL: We use 'courierCost' because that is what the Google Apps Script expects for Column T
     const payload = {
       action: 'createCustomerOrder',
-      
-      // Basic Info
       customerName: document.getElementById('custName').value,
       contactInfo: document.getElementById('custPhone').value,
       deliveryDate: document.getElementById('deliveryDate').value,
-      timeSlot: document.getElementById('timeSlot').value, // Column W
+      timeSlot: document.getElementById('timeSlot').value,
       
-      // Location Info
-      address: finalAddress,          // Column D (Metro or Landmark Name)
-      specialInstructions: details,   // Column F (Building/Block/Floor Note)
-      courieradditional: calculatedCost,    // Column T (The calculated extra cost)
+      address: finalAddress,          // Column D
+      specialInstructions: details,   // Column F
+      courieradditional: calculatedCost,    // Column T (Important!)
+      
       mapLink: document.getElementById('mapCoordinatesLink').value, // Column V
-      
-      // Other Info
       paymentMethod: document.getElementById('payMethod').value,
       salesRep: rep // Column Q
     };
 
-    // --- E. SEND TO SERVER ---
+    // E. Send to Server
     document.getElementById('loader').style.display = 'flex';
 
     try {
@@ -622,7 +691,7 @@
           confirmButtonColor: '#FF2D55'
         });
         
-        // Reset Form
+        // Reset Form and State
         document.getElementById('customerOrderForm').reset();
         document.getElementById('locationStatus').style.display = 'none';
         document.querySelectorAll('.rep-option').forEach(opt => opt.classList.remove('selected'));
@@ -659,15 +728,13 @@
       if (data.success) {
         const o = data.order;
         
-        // Populate Tracking UI
+        // Populate UI
         document.getElementById('resId').innerText = o.id;
         
-        // Handle Status Badges
         const statusEl = document.getElementById('resStatus');
         statusEl.innerText = o.status;
         statusEl.className = `status-badge status-${o.status}`;
         
-        // Translate Status
         if(o.status === 'Preparing' || o.status === 'New') statusEl.innerText = "Hazırlanır";
         if(o.status === 'Delivered') statusEl.innerText = "Təhvil Verildi";
         if(o.status === 'OnWay') statusEl.innerText = "Yoldadır";
@@ -677,7 +744,7 @@
         document.getElementById('resPrice').innerText = (o.price || 0) + ' ₼';
         document.getElementById('resPayment').innerText = o.payment === 'cash' ? 'Nağd' : 'Kart';
 
-        // Handle Courier Info
+        // Courier Info
         const courierName = document.getElementById('resCourierName');
         const courierBtn = document.getElementById('resCourierBtn');
         
@@ -693,7 +760,7 @@
           courierName.innerText = "Təyin olunmayıb";
           courierBtn.style.display = 'none';
         }
-
+        
         document.getElementById('trackResult').style.display = 'block';
       } else {
         Swal.fire('Tapılmadı', 'Sifariş kodu və ya nömrə yanlışdır.', 'error');
