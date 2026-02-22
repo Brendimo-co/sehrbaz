@@ -6,24 +6,24 @@
   <title>Hədiyyə Sehrbazı | Brendimo</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* --- CSS VARIABLES & RESET --- */
+    /* ══════════════════════════════════════════════════
+       CSS VARIABLES & RESET
+    ══════════════════════════════════════════════════ */
     :root {
-      --primary: #FF2D55; /* Gift/Magic Red-Pink */
+      --primary:      #FF2D55;
       --primary-dark: #D61F44;
-      --accent: #5856D6; /* Magic Purple */
-      --success: #34C759;
-      --bg: #F2F2F7;
-      --card-bg: #FFFFFF;
-      --text-main: #1C1C1E;
-      --text-sec: #8E8E93;
-      --border: #E5E5EA;
-      --radius: 16px;
-      --shadow: 0 4px 20px rgba(0,0,0,0.06);
-      --nav-height: 80px;
+      --accent:       #5856D6;
+      --success:      #34C759;
+      --bg:           #F2F2F7;
+      --card-bg:      #FFFFFF;
+      --text-main:    #1C1C1E;
+      --text-sec:     #8E8E93;
+      --border:       #E5E5EA;
+      --radius:       16px;
+      --shadow:       0 4px 20px rgba(0,0,0,0.06);
+      --nav-height:   80px;
     }
-
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-    
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -35,13 +35,16 @@
       overflow: hidden;
     }
 
-    /* --- HEADER --- */
+    /* ══════════════════════════════════════════════════
+       HEADER
+    ══════════════════════════════════════════════════ */
     header {
       background: var(--card-bg);
       padding: 15px 20px;
       text-align: center;
       border-bottom: 1px solid var(--border);
       z-index: 100;
+      flex-shrink: 0;
     }
     .brand-title {
       font-size: 20px;
@@ -53,7 +56,9 @@
     }
     .brand-subtitle { font-size: 11px; color: var(--text-sec); font-weight: 500; letter-spacing: 1px; }
 
-    /* --- VIEW CONTAINER --- */
+    /* ══════════════════════════════════════════════════
+       VIEW CONTAINER
+    ══════════════════════════════════════════════════ */
     .view-container {
       flex: 1;
       overflow-y: auto;
@@ -62,9 +67,14 @@
       animation: fadeIn 0.3s ease-out;
     }
     .view-container.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-    /* --- CARDS & FORMS --- */
+    /* ══════════════════════════════════════════════════
+       CARDS & FORMS
+    ══════════════════════════════════════════════════ */
     .card {
       background: var(--card-bg);
       border-radius: var(--radius);
@@ -73,75 +83,272 @@
       margin-bottom: 20px;
       position: relative;
     }
-
     h3 { margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #333; }
-    label { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--text-sec); margin-bottom: 8px; margin-left: 4px; }
-    
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-sec);
+      margin-bottom: 8px;
+      margin-left: 4px;
+    }
     input, select, textarea {
       width: 100%; padding: 16px; background: #F9F9F9;
       border: 1px solid var(--border); border-radius: 12px;
       font-size: 16px; color: var(--text-main); font-family: inherit;
-      margin-bottom: 15px; transition: 0.2s;
-      -webkit-appearance: none;
+      margin-bottom: 15px; transition: 0.2s; -webkit-appearance: none;
     }
-    input:focus, select:focus, textarea:focus { background: #fff; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 45, 85, 0.1); }
+    input:focus, select:focus, textarea:focus {
+      background: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255,45,85,0.1);
+    }
 
-    /* --- SALES REP SELECTOR --- */
-    .rep-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    /* ══════════════════════════════════════════════════
+       SALES REP SELECTOR
+    ══════════════════════════════════════════════════ */
+    .rep-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
     .rep-option {
       background: #fff; border: 2px solid var(--border);
-      border-radius: 12px; padding: 10px 5px;
+      border-radius: 12px; padding: 12px 8px;
       text-align: center; cursor: pointer; transition: 0.2s;
     }
-    .rep-option.selected { border-color: var(--primary); background: rgba(255, 45, 85, 0.05); }
-    .rep-icon { font-size: 24px; margin-bottom: 5px; display: block; }
-    .rep-name { font-size: 13px; font-weight: 600; }
+    .rep-option.selected { border-color: var(--primary); background: rgba(255,45,85,0.05); }
+    .rep-icon { font-size: 26px; margin-bottom: 5px; display: block; }
+    .rep-name { font-size: 13px; font-weight: 700; }
 
-    /* --- LOCATION TABS --- */
-    .loc-tabs { display: flex; background: #EFEFF4; border-radius: 10px; padding: 4px; margin-bottom: 15px; }
+    /* ══════════════════════════════════════════════════
+       PRODUCT SEARCH
+    ══════════════════════════════════════════════════ */
+    .product-search-wrapper { position: relative; }
+    .product-search-icon {
+      position: absolute; left: 16px; top: 50%;
+      transform: translateY(-55%);
+      color: var(--text-sec); font-size: 15px; pointer-events: none;
+    }
+    #productSearch { padding-left: 44px; margin-bottom: 0; }
+
+    .products-loading-note {
+      font-size: 12px; color: var(--text-sec);
+      text-align: center; padding: 8px 0 0; display: none;
+    }
+
+    .product-results-list {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 12px; max-height: 260px; overflow-y: auto;
+      margin-top: 8px; display: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+      z-index: 50; position: relative;
+    }
+    .product-result-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.15s;
+    }
+    .product-result-item:last-child { border-bottom: none; }
+    .product-result-item:hover { background: #FFF5F7; }
+    .product-result-img {
+      width: 52px; height: 52px; border-radius: 10px;
+      object-fit: cover; background: #F2F2F7; flex-shrink: 0;
+    }
+    .product-result-img-placeholder {
+      width: 52px; height: 52px; border-radius: 10px; background: #F2F2F7;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; color: #ccc; font-size: 20px;
+    }
+    .product-result-name  { font-size: 14px; font-weight: 700; color: var(--text-main); }
+    .product-result-meta  { font-size: 12px; color: var(--text-sec); margin-top: 2px; }
+    .product-result-price { font-size: 14px; font-weight: 800; color: var(--primary); margin-top: 2px; }
+
+    .product-not-found-row { padding: 14px; text-align: center; }
+    .product-not-found-row p { margin: 0 0 10px; font-size: 13px; color: var(--text-sec); }
+    .btn-custom-product {
+      background: #F2F2F7; border: 1.5px dashed #ccc; border-radius: 10px;
+      padding: 10px 18px; font-size: 13px; font-weight: 700;
+      color: var(--accent); cursor: pointer; width: 100%;
+    }
+
+    /* Selected Product Card */
+    .selected-product-card {
+      display: none;
+      background: linear-gradient(135deg, #FFF5F7, #F5F5FF);
+      border: 1.5px solid #FFD6E0;
+      border-radius: 14px; padding: 14px; margin-top: 12px; position: relative;
+    }
+    .selected-product-inner { display: flex; align-items: center; gap: 14px; }
+    .selected-product-img {
+      width: 70px; height: 70px; border-radius: 12px;
+      object-fit: cover; flex-shrink: 0;
+    }
+    .selected-product-img-placeholder {
+      width: 70px; height: 70px; border-radius: 12px; background: #F2F2F7;
+      display: flex; align-items: center; justify-content: center;
+      color: #bbb; font-size: 28px; flex-shrink: 0;
+    }
+    .selected-product-info { flex: 1; min-width: 0; }
+    .selected-product-name  { font-size: 15px; font-weight: 700; color: var(--text-main); }
+    .selected-product-code  { font-size: 11px; color: var(--text-sec); margin-top: 2px; }
+    .selected-product-price { font-size: 17px; font-weight: 800; color: var(--primary); margin-top: 4px; }
+    .clear-product-btn {
+      position: absolute; top: 10px; right: 10px;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 50%; width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 13px; color: var(--text-sec);
+    }
+
+    /* Custom Product Section */
+    .custom-product-section {
+      display: none; margin-top: 12px; padding: 16px;
+      background: #F9F5FF; border: 1.5px dashed #C7C5F4; border-radius: 14px;
+    }
+    .custom-product-section h4 { margin: 0 0 12px; font-size: 14px; font-weight: 700; color: var(--accent); }
+    .custom-product-section input { margin-bottom: 10px; }
+
+    /* ══════════════════════════════════════════════════
+       IMAGE UPLOAD AREAS
+    ══════════════════════════════════════════════════ */
+    .image-upload-area {
+      border: 2px dashed var(--border); border-radius: 12px;
+      padding: 20px; text-align: center; cursor: pointer;
+      transition: 0.2s; background: #F9F9F9;
+      position: relative; overflow: hidden;
+    }
+    .image-upload-area:hover { border-color: var(--primary); background: #FFF5F7; }
+    .image-upload-area.has-image { border-style: solid; border-color: var(--success); background: #F0FFF4; }
+    .image-upload-area input[type="file"] {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      opacity: 0; cursor: pointer; margin: 0; padding: 0; border: none;
+    }
+    .image-upload-icon  { font-size: 28px; margin-bottom: 6px; }
+    .image-upload-text  { font-size: 13px; color: var(--text-sec); font-weight: 500; }
+    .image-preview-thumb {
+      width: 80px; height: 80px; border-radius: 10px;
+      object-fit: cover; margin: 0 auto 6px; display: block;
+    }
+
+    /* ══════════════════════════════════════════════════
+       LOCATION TABS
+    ══════════════════════════════════════════════════ */
+    .loc-tabs {
+      display: flex; background: #EFEFF4;
+      border-radius: 10px; padding: 4px; margin-bottom: 15px;
+    }
     .loc-tab {
       flex: 1; text-align: center; padding: 8px;
       font-size: 13px; font-weight: 600; color: var(--text-sec);
-      border-radius: 8px; cursor: pointer;
+      border-radius: 8px; cursor: pointer; transition: 0.2s;
     }
-    .loc-tab.active { background: #fff; color: #000; shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    
+    .loc-tab.active { background: #fff; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .loc-content { display: none; }
     .loc-content.active { display: block; }
 
-    /* --- BUTTONS --- */
+    /* Optional Map Toggle */
+    .map-toggle-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 10px; padding: 12px 14px; background: #F0F4FF;
+      border-radius: 12px; cursor: pointer; border: 1.5px solid #D2E3FC;
+    }
+    .map-toggle-icon  { font-size: 18px; color: #1a73e8; }
+    .map-toggle-label { flex: 1; font-size: 13px; font-weight: 600; color: #1a73e8; }
+    .map-toggle-check {
+      width: 22px; height: 22px; border-radius: 6px;
+      border: 2px solid #D2E3FC; background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 12px; color: transparent;
+    }
+    .map-toggle-check.checked { background: #1a73e8; border-color: #1a73e8; color: white; }
+    .map-optional-section { display: none; margin-top: 12px; }
+    .leaflet-container { font-family: inherit; }
+
+    /* ══════════════════════════════════════════════════
+       PAYMENT SECTION
+    ══════════════════════════════════════════════════ */
+    .deposit-offer-box {
+      display: none;
+      background: linear-gradient(135deg, #FFF8E1, #FFFBF0);
+      border: 1.5px solid #FFD600; border-radius: 14px;
+      padding: 16px; margin-top: 12px;
+    }
+    .deposit-offer-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .deposit-offer-icon  { font-size: 22px; }
+    .deposit-offer-title { font-size: 15px; font-weight: 800; color: #B8860B; }
+    .deposit-offer-sub   { font-size: 12px; color: #9A7200; margin-top: 1px; }
+
+    .deposit-checkbox-row {
+      display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 0;
+    }
+    .deposit-checkbox {
+      width: 22px; height: 22px; border-radius: 6px; border: 2px solid #ccc;
+      background: #fff; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: 0.2s; font-size: 12px; color: transparent;
+    }
+    .deposit-checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
+    .deposit-checkbox-label { font-size: 14px; font-weight: 600; color: var(--text-main); flex: 1; }
+
+    .discount-badge {
+      display: none; align-items: center; gap: 8px;
+      background: #E0F8E5; border: 1px solid var(--success);
+      border-radius: 10px; padding: 10px 14px; margin-top: 8px;
+    }
+    .discount-badge-icon { font-size: 18px; }
+    .discount-badge-text { font-size: 13px; font-weight: 700; color: #1E7E34; }
+
+    .card-receipt-box {
+      display: none; background: #F0F4FF;
+      border: 1.5px solid #D2E3FC; border-radius: 14px;
+      padding: 16px; margin-top: 12px;
+    }
+    .receipt-required-label {
+      font-size: 13px; font-weight: 700; color: var(--accent);
+      margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+    }
+    .receipt-upload-section { display: none; margin-top: 10px; }
+
+    /* ══════════════════════════════════════════════════
+       BUTTONS
+    ══════════════════════════════════════════════════ */
     .btn {
       width: 100%; padding: 18px; border-radius: 14px; border: none;
       font-weight: 700; font-size: 17px; cursor: pointer;
-      display: flex; justify-content: center; align-items: center; gap: 10px;
-      transition: transform 0.1s;
+      display: flex; justify-content: center; align-items: center;
+      gap: 10px; transition: transform 0.1s;
     }
     .btn:active { transform: scale(0.98); }
-    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; box-shadow: 0 4px 15px rgba(255, 45, 85, 0.3); }
-    .btn-map { background: #E8F0FE; color: #1a73e8; border: 1px solid #d2e3fc; }
-    .btn-call { background: var(--success); color: white; width: auto; padding: 8px 16px; font-size: 14px; border-radius: 20px;}
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white; box-shadow: 0 4px 15px rgba(255,45,85,0.3);
+    }
+    .btn-map  { background: #E8F0FE; color: #1a73e8; border: 1px solid #d2e3fc; }
+    .btn-call { background: var(--success); color: white; width: auto; padding: 8px 16px; font-size: 14px; border-radius: 20px; }
 
-    /* --- BOTTOM NAV --- */
+    /* ══════════════════════════════════════════════════
+       BOTTOM NAV
+    ══════════════════════════════════════════════════ */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(255,255,255,0.95);
-      border-top: 1px solid var(--border);
-      height: var(--nav-height);
-      display: flex; justify-content: space-around;
+      background: rgba(255,255,255,0.95); border-top: 1px solid var(--border);
+      height: var(--nav-height); display: flex; justify-content: space-around;
       padding-bottom: 20px; z-index: 1000;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px); flex-shrink: 0;
     }
     .nav-item {
       background: none; border: none; flex: 1;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      color: #C7C7CC; font-size: 10px; font-weight: 600;
-      cursor: pointer; transition: 0.2s;
+      color: #C7C7CC; font-size: 10px; font-weight: 600; cursor: pointer; transition: 0.2s;
     }
     .nav-item i { font-size: 22px; margin-bottom: 4px; }
     .nav-item.active { color: var(--primary); }
 
-    /* --- TRACKING RESULTS --- */
+    /* ══════════════════════════════════════════════════
+       TRACKING RESULTS
+    ══════════════════════════════════════════════════ */
     .track-result { display: none; animation: slideUp 0.3s ease-out; }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
     .status-badge {
       display: inline-block; padding: 6px 12px; border-radius: 20px;
       font-size: 12px; font-weight: 800; text-transform: uppercase;
@@ -149,19 +356,24 @@
     }
     .status-Delivered { background: #E0F8E5; color: var(--success); }
     .status-Preparing { background: #FFF4E5; color: #FF9500; }
-    
-    .detail-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 12px 0; font-size: 14px; }
+    .status-New       { background: #EEF2FF; color: var(--accent); }
+    .status-OnWay     { background: #E8F5E9; color: #2E7D32; }
+    .detail-row {
+      display: flex; justify-content: space-between;
+      border-bottom: 1px dashed #eee; padding: 12px 0; font-size: 14px;
+    }
     .detail-row:last-child { border: none; }
     .detail-label { color: var(--text-sec); }
-    .detail-val { font-weight: 600; text-align: right; }
+    .detail-val   { font-weight: 600; text-align: right; }
 
-    /* --- LOADER --- */
+    /* ══════════════════════════════════════════════════
+       LOADER
+    ══════════════════════════════════════════════════ */
     #loader {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255,255,255,0.9); z-index: 2000;
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-      display: none;
+      background: rgba(255,255,255,0.92); z-index: 2000;
+      flex-direction: column; justify-content: center;
+      align-items: center; display: none;
     }
     .spinner {
       width: 50px; height: 50px; border: 5px solid var(--border);
@@ -169,33 +381,40 @@
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-.leaflet-container { font-family: inherit; }
-    
+    .loader-text { margin-top: 15px; font-weight: 600; color: var(--text-sec); }
   </style>
 </head>
 <body>
 
+  <!-- LOADER -->
   <div id="loader">
     <div class="spinner"></div>
-    <p style="margin-top: 15px; font-weight: 600; color: var(--text-sec);">Sehr edilir...</p>
+    <p class="loader-text" id="loaderText">Sehr edilir...</p>
   </div>
 
+  <!-- HEADER -->
   <header>
     <div class="brand-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Hədiyyə Sehrbazı</div>
     <div class="brand-subtitle">BRENDIMO TARƏFİNDƏN</div>
   </header>
 
+  <!-- ══════════════════════════════════
+       ORDER TAB
+  ══════════════════════════════════ -->
   <div id="tab-order" class="view-container active">
-    
-    <form id="customerOrderForm">
-      
+    <form id="customerOrderForm" novalidate>
+
+      <!-- 1. SALES REP -->
       <div class="card">
         <h3><i class="fa-regular fa-comments"></i> Kiminlə Danışırsınız?</h3>
-        <p style="font-size:12px; color:#888; margin-top:-10px; margin-bottom:15px;">Sizə kömək edən xanımı seçin:</p>
+        <p style="font-size:12px;color:#888;margin-top:-10px;margin-bottom:15px;">
+          Sizə kömək edən nümayəndəni seçin:
+        </p>
         <div class="rep-grid">
           <div class="rep-option" onclick="selectRep('Kanan', this)">
-    <span class="rep-icon">👨🏻‍💼</span> <div class="rep-name">Kənan b.</div>
-</div>
+            <span class="rep-icon">👨🏻‍💼</span>
+            <div class="rep-name">Kənan b.</div>
+          </div>
           <div class="rep-option" onclick="selectRep('hayat', this)">
             <span class="rep-icon">👩🏻‍💼</span>
             <div class="rep-name">Həyat x.</div>
@@ -209,21 +428,33 @@
             <div class="rep-name">Təranə x.</div>
           </div>
         </div>
-        <input type="hidden" id="salesRep" required>
+        <input type="hidden" id="salesRep">
       </div>
 
+      <!-- 2. CUSTOMER INFO -->
       <div class="card">
         <h3><i class="fa-regular fa-id-card"></i> Sizin Məlumatlar</h3>
+
         <label>Ad və Soyad</label>
         <input type="text" id="custName" placeholder="Məs: Əli Vəliyev" required>
-        
+
         <label>Əlaqə Nömrəsi</label>
         <input type="tel" id="custPhone" placeholder="050 000 00 00" required>
+
+        <label>Instagram Profil Adı
+          <span style="font-weight:400;text-transform:none;color:#aaa;"> — istəyə bağlı</span>
+        </label>
+        <div style="position:relative;">
+          <span style="position:absolute;left:16px;top:50%;transform:translateY(-55%);
+                       color:var(--text-sec);font-size:15px;pointer-events:none;">@</span>
+          <input type="text" id="instagramHandle" placeholder="username" style="padding-left:36px;">
+        </div>
       </div>
 
+      <!-- 3. DELIVERY TIME -->
       <div class="card">
         <h3><i class="fa-regular fa-clock"></i> Çatdırılma Zamanı</h3>
-        <div style="display: flex; gap: 10px;">
+        <div style="display:flex;gap:10px;">
           <div style="flex:1;">
             <label>Tarix</label>
             <input type="date" id="deliveryDate" required>
@@ -242,14 +473,68 @@
         </div>
       </div>
 
+      <!-- 4. PRODUCT SELECTION -->
+      <div class="card">
+        <h3><i class="fa-solid fa-box-open"></i> Məhsul Seçimi</h3>
+        <p style="font-size:12px;color:#888;margin-top:-10px;margin-bottom:15px;">
+          Məhsul kodu və ya adı ilə axtarın:
+        </p>
+
+        <div class="product-search-wrapper">
+          <i class="fa-solid fa-magnifying-glass product-search-icon"></i>
+          <input type="text" id="productSearch"
+            placeholder="Məs: Armani kəmər, Kod: 1009..."
+            autocomplete="off"
+            oninput="searchProducts()"
+            onfocus="searchProducts()">
+        </div>
+
+        <div class="products-loading-note" id="productsLoadingNote">
+          <i class="fa-solid fa-circle-notch fa-spin"></i> Məhsullar yüklənir...
+        </div>
+
+        <div class="product-results-list" id="productResults"></div>
+
+        <!-- Selected product preview -->
+        <div class="selected-product-card" id="selectedProductCard">
+          <div class="selected-product-inner" id="selectedProductInner"></div>
+          <button type="button" class="clear-product-btn" onclick="clearProduct()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Custom product entry -->
+        <div class="custom-product-section" id="customProductSection">
+          <h4><i class="fa-solid fa-pencil"></i> Məhsul siyahıda yoxdur — əl ilə daxil edin</h4>
+
+          <label>Məhsulun adı</label>
+          <input type="text" id="customProductName" placeholder="Məhsulun adını yazın...">
+
+          <label>Məhsulun şəkli
+            <span style="font-weight:400;text-transform:none;color:#aaa;"> — daha dəqiq sifarişə kömək edir</span>
+          </label>
+          <div class="image-upload-area" id="customProductUploadArea">
+            <input type="file" id="customProductImageInput" accept="image/*"
+              onchange="handleCustomProductImageChange(event)">
+            <div id="customProductUploadContent">
+              <div class="image-upload-icon">📷</div>
+              <div class="image-upload-text">Şəkil əlavə et</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. ADDRESS -->
       <div class="card">
         <h3><i class="fa-solid fa-map-location-dot"></i> Ünvan</h3>
-        
-      <div class="loc-tabs">
+        <p style="font-size:12px;color:var(--primary);font-weight:600;margin-top:-10px;margin-bottom:12px;">
+          <i class="fa-solid fa-circle-info"></i> Aşağıdakı seçimlərdən MÜTLƏQBİRİNİ seçin:
+        </p>
+
+        <div class="loc-tabs">
           <div class="loc-tab active" onclick="switchLoc('metro', this)">Metro</div>
           <div class="loc-tab" onclick="switchLoc('landmark', this)">Nişangah</div>
           <div class="loc-tab" onclick="switchLoc('rayon', this)">Rayonlar</div>
-          <div class="loc-tab" onclick="switchLoc('map', this)">Xəritə</div>
         </div>
 
         <div id="loc-metro" class="loc-content active">
@@ -274,49 +559,114 @@
           </select>
         </div>
 
-<div id="loc-landmark" class="loc-content">
-  <label>Məşhur Yer / Nişangah</label>
-  <select id="landmarkSelect">
-    <option value="">Nişangahı seçin...</option>
-    </select>
-</div>
+        <div id="loc-landmark" class="loc-content">
+          <label>Məşhur Yer / Nişangah</label>
+          <select id="landmarkSelect">
+            <option value="">Nişangahı seçin...</option>
+          </select>
+        </div>
 
-<div id="loc-rayon" class="loc-content">
-  <label>Rayon / Şəhər Seçin (+4.00 ₼)</label>
-  <select id="rayonSelect">
-    <option value="">Siyahıdan seçin...</option>
-    </select>
-</div>
-        
-     <div id="loc-map" class="loc-content">
-  <label>Xəritədə Seçin</label>
-  <p style="font-size:12px; color:#888;">Pin-i (📍) sürüşdürərək dəqiq qapınızı seçin.</p>
-  
-  <div id="map" style="height: 300px; width: 100%; border-radius: 12px; margin-bottom: 15px; border: 1px solid #ddd; z-index: 1;"></div>
-  
-  <button type="button" class="btn btn-map" onclick="getCurrentLocation()">
-    <i class="fa-solid fa-location-crosshairs"></i> Cari Mövqeyimi Tap
-  </button>
-  
-  <div id="locationStatus" style="margin-top:10px; font-size:13px; font-weight:600; color:var(--success); display:none; text-align:center;">
-    <i class="fa-solid fa-check"></i> Ünvan seçildi!
-  </div>
-  
-  <input type="hidden" id="mapCoordinatesLink">
-</div>
+        <div id="loc-rayon" class="loc-content">
+          <label>Rayon / Şəhər Seçin (+4.00 ₼)</label>
+          <select id="rayonSelect">
+            <option value="">Siyahıdan seçin...</option>
+          </select>
+        </div>
 
-        <label style="margin-top:15px;">Əlavə Qeyd (Məhsul Kodu, Məhsul adı və ya Address, bu məlumatlar sifarişinizin sürətli əlavə edilməsi üçün bizə kömək edəcək)</label>
-        <input type="text" id="addressDetails" placeholder="Məs: 1009, Armani iki tərəfli kəmər, Küçə 45, Qapı 24">
+        <!-- Optional map toggle -->
+        <div class="map-toggle-row" onclick="toggleMapSection()">
+          <span class="map-toggle-icon"><i class="fa-solid fa-location-crosshairs"></i></span>
+          <span class="map-toggle-label">
+            Dəqiq ünvanı xəritədə göstər
+            <span style="font-weight:400;color:#888;"> — istəyə bağlı</span>
+          </span>
+          <div class="map-toggle-check" id="mapToggleCheck"></div>
+        </div>
+
+        <div class="map-optional-section" id="mapOptionalSection">
+          <div style="height:12px;"></div>
+          <p style="font-size:12px;color:#888;margin:0 0 8px;">
+            Pin-i (📍) sürüşdürərək dəqiq qapınızı seçin.
+          </p>
+          <div id="map" style="height:280px;width:100%;border-radius:12px;border:1px solid #ddd;z-index:1;"></div>
+          <div style="height:10px;"></div>
+          <button type="button" class="btn btn-map" onclick="getCurrentLocation()">
+            <i class="fa-solid fa-location-crosshairs"></i> Cari Mövqeyimi Tap
+          </button>
+          <div id="locationStatus"
+               style="margin-top:10px;font-size:13px;font-weight:600;color:var(--success);display:none;text-align:center;">
+            <i class="fa-solid fa-check"></i> Ünvan seçildi!
+          </div>
+          <input type="hidden" id="mapCoordinatesLink">
+        </div>
+
+        <div style="height:16px;"></div>
+        <label>Əlavə Ünvan Qeydi</label>
+        <input type="text" id="addressDetails"
+          placeholder="Məs: Küçə 45, Mənzil 12, 3-cü mərtəbə">
       </div>
 
+      <!-- 6. PAYMENT -->
       <div class="card">
         <h3><i class="fa-regular fa-credit-card"></i> Ödəniş Üsulu</h3>
-        <select id="payMethod">
+
+        <label>Ödəniş növü seçin</label>
+        <select id="payMethod" onchange="handlePaymentChange()">
           <option value="cash">Nağd (Qapıda)</option>
           <option value="card">Kart (Köçürmə)</option>
         </select>
+
+        <!-- CASH: Deposit offer -->
+        <div class="deposit-offer-box" id="depositOfferBox">
+          <div class="deposit-offer-header">
+            <span class="deposit-offer-icon">🎁</span>
+            <div>
+              <div class="deposit-offer-title">4 ₼ Endirim Qazanın!</div>
+              <div class="deposit-offer-sub">10 ₼ beh ödəyin → 4 ₼ endirim əldə edin</div>
+            </div>
+          </div>
+
+          <div class="deposit-checkbox-row" onclick="toggleDeposit()">
+            <div class="deposit-checkbox" id="depositCheckbox"></div>
+            <span class="deposit-checkbox-label">Bəli, 10 ₼ beh ödəmək istəyirəm</span>
+          </div>
+
+          <div class="discount-badge" id="discountBadge">
+            <span class="discount-badge-icon">✅</span>
+            <span class="discount-badge-text">4 ₼ endirim tətbiq ediləcək!</span>
+          </div>
+
+          <div class="receipt-upload-section" id="depositReceiptSection">
+            <label style="margin-top:4px;">Beh Ödəniş Qəbzi</label>
+            <div class="image-upload-area" id="depositReceiptUploadArea">
+              <input type="file" id="depositReceiptInput" accept="image/*,application/pdf"
+                onchange="handleReceiptImageChange(event,'deposit')">
+              <div id="depositReceiptContent">
+                <div class="image-upload-icon">🧾</div>
+                <div class="image-upload-text">Ödəniş qəbzini əlavə et</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD: Required receipt -->
+        <div class="card-receipt-box" id="cardReceiptBox">
+          <div class="receipt-required-label">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            Kart ilə ödəniş üçün qəbz mütləqdir
+          </div>
+          <div class="image-upload-area" id="cardReceiptUploadArea">
+            <input type="file" id="cardReceiptInput" accept="image/*,application/pdf"
+              onchange="handleReceiptImageChange(event,'card')">
+            <div id="cardReceiptContent">
+              <div class="image-upload-icon">🧾</div>
+              <div class="image-upload-text">Bank köçürmə qəbzini əlavə et</div>
+            </div>
+          </div>
+        </div>
       </div>
 
+      <!-- 7. SUBMIT -->
       <button type="submit" class="btn btn-primary">
         Sifarişi Təsdiqlə <i class="fa-solid fa-arrow-right"></i>
       </button>
@@ -324,23 +674,23 @@
     </form>
   </div>
 
+  <!-- ══════════════════════════════════
+       TRACK TAB
+  ══════════════════════════════════ -->
   <div id="tab-track" class="view-container">
     <div class="card" style="text-align:center;">
       <h3><i class="fa-solid fa-magnifying-glass"></i> Sifarişi İzlə</h3>
-      <p style="color:#888; font-size:13px;">Sifariş kodu və nömrənizi daxil edin.</p>
-      
-      <input type="number" id="trackId" placeholder="Sifariş Kodu (Məs: 1045)">
-      <input type="tel" id="trackPhone" placeholder="Mobil Nömrəniz">
-      
-      <button class="btn btn-primary" onclick="trackOrder()">Axtar</button>
+      <p style="color:#888;font-size:13px;">Sifariş kodu və nömrənizi daxil edin.</p>
+      <input type="number" id="trackId"    placeholder="Sifariş Kodu (Məs: 1045)">
+      <input type="tel"    id="trackPhone" placeholder="Mobil Nömrəniz">
+      <button class="btn btn-primary" onclick="runTrackOrder()">Axtar</button>
     </div>
 
     <div id="trackResult" class="card track-result">
-      <div style="text-align:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:15px;">
-        <div style="font-size:24px; font-weight:800; color:var(--text-main);">#<span id="resId"></span></div>
+      <div style="text-align:center;border-bottom:1px solid #eee;padding-bottom:15px;margin-bottom:15px;">
+        <div style="font-size:24px;font-weight:800;color:var(--text-main);">#<span id="resId"></span></div>
         <div id="resStatus" class="status-badge"></div>
       </div>
-
       <div class="detail-row">
         <span class="detail-label">Tarix:</span>
         <span class="detail-val" id="resDate"></span>
@@ -357,15 +707,16 @@
         <span class="detail-label">Ödəniş:</span>
         <span class="detail-val" id="resPayment"></span>
       </div>
-
-      <div style="background:#F9F9F9; padding:15px; border-radius:12px; margin-top:15px;">
-        <h4 style="margin:0 0 10px; font-size:14px;"><i class="fa-solid fa-motorcycle"></i> Çatdırılma Məlumatı</h4>
-        <div id="courierInfo" style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="background:#F9F9F9;padding:15px;border-radius:12px;margin-top:15px;">
+        <h4 style="margin:0 0 10px;font-size:14px;">
+          <i class="fa-solid fa-motorcycle"></i> Çatdırılma Məlumatı
+        </h4>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
             <div id="resCourierName" style="font-weight:700;">Təyin olunmayıb</div>
-            <div style="font-size:12px; color:#888;">Kuriyer</div>
+            <div style="font-size:12px;color:#888;">Kuriyer</div>
           </div>
-          <a id="resCourierBtn" href="#" class="btn btn-call" style="display:none; text-decoration:none;">
+          <a id="resCourierBtn" href="#" class="btn btn-call" style="display:none;text-decoration:none;">
             <i class="fa-solid fa-phone"></i> Zəng Et
           </a>
         </div>
@@ -373,6 +724,7 @@
     </div>
   </div>
 
+  <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-item active" onclick="switchTab('tab-order', this)">
       <i class="fa-solid fa-plus-circle"></i>
@@ -383,167 +735,699 @@
       <span>İzləmə</span>
     </button>
   </nav>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  // ==========================================
-  // 1. CONFIGURATION & DATA
-  // ==========================================
-  
-  // PASTE YOUR DEPLOYED WEB APP URL HERE
-  const API_URL = 'https://script.google.com/macros/s/AKfycbycvE61IqsT75PswnqjZK5kC4319AXpo_lrOs8-hBD_Heik36e_95v0WsfGIf8W85qw/exec'; 
 
-  // --- Landmark Data (Nişangah) ---
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+  // ═══════════════════════════════════════════════════════════════════
+  // 1. API ENDPOINTS
+  //
+  //  TWO separate deployed web app URLs — one per Apps Script backend.
+  //
+  //  ORDERS_API  → Backend 2 (Code.gs)
+  //                Handles: createCustomerOrder, trackOrder
+  //
+  //  CATALOG_API → Backend 1 (Catalog v7.0 API)
+  //                Handles: getProductList, getDriveMedia, etc.
+  //
+  //  ⚠️  Replace CATALOG_API with your actual Backend 1 deployment URL.
+  //      It is a different URL from ORDERS_API.
+  // ═══════════════════════════════════════════════════════════════════
+
+  const ORDERS_API  = 'https://script.google.com/macros/s/AKfycbzXzKPYagW6FPncTr1zfluTiS66dyUH0vXMuQQyw1VTeFLjEQszF1OhAlFSrNd9KoJu/exec';
+  const CATALOG_API = 'https://script.google.com/macros/s/AKfycbzgGiOg7Rp3Y7bDmNNhlbK2PZDl-qwlU8oecz0lGrVouKigoLzlfWleg02H83chkXt53g/exec';
+  //                   ↑ Replace this with your Backend 1 (v7.0 Catalog API) deployment URL
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 2. STATIC LOCATION DATA
+  // ═══════════════════════════════════════════════════════════════════
+
   const landmarkData = [
-    { name: "Park Bulvar", price: 1.00 },
-    { name: "Dəniz Mall", price: 2.00 },
-    { name: "Port Baku", price: 1.00 },
-    { name: "Badamdar", price: 2.00 },
-    { name: "Bakıxanov (Razin)", price: 2.00 },
-    { name: "Balaxanı", price: 3.00 },
-    { name: "Zığ", price: 8.00 },
+    { name: "Park Bulvar",          price: 1.00 },
+    { name: "Dəniz Mall",           price: 2.00 },
+    { name: "Port Baku",            price: 1.00 },
+    { name: "Badamdar",             price: 2.00 },
+    { name: "Bakıxanov (Razin)",    price: 2.00 },
+    { name: "Balaxanı",             price: 3.00 },
+    { name: "Zığ",                  price: 8.00 },
     { name: "Heydər Əliyev Liseyi", price: 5.00 },
-    { name: "Sulutəpə", price: 2.00 },
-    { name: "Hökməli", price: 5.00 },
-    { name: "Qobu", price: 8.00 },
-    { name: "Babək prospekti", price: 1.00 },
-    { name: "8 noyabr prospekti", price: 3.00 },
-    { name: "Günəşli", price: 2.00 },
-    { name: "Xırdalan", price: 2.00 },
-    { name: "Zirə", price: 8.00 },
-    { name: "Zabrat", price: 8.00 },
-    { name: "Türkan", price: 8.00 },
-    { name: "Şüvəlan", price: 10.00 },
-    { name: "Şağan", price: 8.00 },
-    { name: "Suraxanı", price: 3.00 },
-    { name: "Yeni Suraxanı", price: 3.00 },
-    { name: "Saray", price: 6.00 },
-    { name: "Sabunçu", price: 2.00 },
-    { name: "Ramana", price: 2.00 },
-    { name: "Qaraçuxur", price: 2.00 },
-    { name: "Qala", price: 8.00 },
-    { name: "Pirşağı", price: 6.00 },
-    { name: "Novxanı", price: 10.00 },
-    { name: "Nardaran", price: 10.00 },
-    { name: "Mərdəkan", price: 10.00 },
-    { name: "Məhəmmədi", price: 1.00 },
-    { name: "Mehdiabad", price: 6.00 },
-    { name: "Maştağa", price: 10.00 },
-    { name: "Masazır", price: 2.00 },
-    { name: "Lökbatan", price: 10.00 },
-    { name: "Kürdəxanı", price: 10.00 },
-    { name: "Hövsan", price: 10.00 },
-    { name: "Görədil", price: 10.00 },
-    { name: "Fatmayı", price: 10.00 },
-    { name: "Əmircan", price: 10.00 },
-    { name: "Əhmədli (Kənd)", price: 10.00 },
-    { name: "Digah", price: 10.00 },
-    { name: "Buzovna", price: 10.00 },
-    { name: "Binəqədi", price: 6.00 },
-    { name: "Binə", price: 8.00 },
-    { name: "Bilgəh", price: 10.00 },
-    { name: "Biləcəri", price: 2.00 },
-    { name: "Bibiheybət", price: 10.00 },
-    { name: "Bayıl", price: 3.00 },
-    { name: "Lökbatan Dairəsi", price: 5.00 },
-    { name: "Şıxov", price: 5.00 },
-    { name: "Baksol Yolu", price: 2.00 },
-    { name: "Müşviq", price: 10.00 },
-    { name: "Keşlə", price: 2.00 }
+    { name: "Sulutəpə",             price: 2.00 },
+    { name: "Hökməli",              price: 5.00 },
+    { name: "Qobu",                 price: 8.00 },
+    { name: "Babək prospekti",      price: 1.00 },
+    { name: "8 noyabr prospekti",   price: 3.00 },
+    { name: "Günəşli",              price: 2.00 },
+    { name: "Xırdalan",             price: 2.00 },
+    { name: "Zirə",                 price: 8.00 },
+    { name: "Zabrat",               price: 8.00 },
+    { name: "Türkan",               price: 8.00 },
+    { name: "Şüvəlan",              price: 10.00 },
+    { name: "Şağan",                price: 8.00 },
+    { name: "Suraxanı",             price: 3.00 },
+    { name: "Yeni Suraxanı",        price: 3.00 },
+    { name: "Saray",                price: 6.00 },
+    { name: "Sabunçu",              price: 2.00 },
+    { name: "Ramana",               price: 2.00 },
+    { name: "Qaraçuxur",            price: 2.00 },
+    { name: "Qala",                 price: 8.00 },
+    { name: "Pirşağı",              price: 6.00 },
+    { name: "Novxanı",              price: 10.00 },
+    { name: "Nardaran",             price: 10.00 },
+    { name: "Mərdəkan",             price: 10.00 },
+    { name: "Məhəmmədi",            price: 1.00 },
+    { name: "Mehdiabad",            price: 6.00 },
+    { name: "Maştağa",              price: 10.00 },
+    { name: "Masazır",              price: 2.00 },
+    { name: "Lökbatan",             price: 10.00 },
+    { name: "Kürdəxanı",            price: 10.00 },
+    { name: "Hövsan",               price: 10.00 },
+    { name: "Görədil",              price: 10.00 },
+    { name: "Fatmayı",              price: 10.00 },
+    { name: "Əmircan",              price: 10.00 },
+    { name: "Əhmədli (Kənd)",       price: 10.00 },
+    { name: "Digah",                price: 10.00 },
+    { name: "Buzovna",              price: 10.00 },
+    { name: "Binəqədi",             price: 6.00 },
+    { name: "Binə",                 price: 8.00 },
+    { name: "Bilgəh",               price: 10.00 },
+    { name: "Biləcəri",             price: 2.00 },
+    { name: "Bibiheybət",           price: 10.00 },
+    { name: "Bayıl",                price: 3.00 },
+    { name: "Lökbatan Dairəsi",     price: 5.00 },
+    { name: "Şıxov",                price: 5.00 },
+    { name: "Baksol Yolu",          price: 2.00 },
+    { name: "Müşviq",               price: 10.00 },
+    { name: "Keşlə",                price: 2.00 }
   ];
 
-  // --- Rayon Data (Cities & Settlements) ---
   const rayonData = [
-    "Abşeron", "Ağcabədi", "Ağdam", "Ağdaş", "Ağstafa", "Ağsu", "Astara", 
-    "Babək", "Balakən", "Beyləqan", "Bərdə", "Biləsuvar", 
-    "Cəbrayıl", "Cəlilabad", "Culfa", 
-    "Daşkəsən", "Füzuli", 
-    "Gədəbəy", "Gəncə", "Goranboy", "Göyçay", "Göygöl", 
-    "Hacıqabul", "Xaçmaz", "Xankəndi", "Xocavənd", "Xocalı", "Xızı",
-    "İmişli", "İsmayıllı", 
-    "Kəlbəcər", "Kəngərli", "Kürdəmir", 
-    "Qax", "Qazax", "Qəbələ", "Qobustan", "Quba", "Qubadlı", "Qusar", 
-    "Laçın", "Lerik", "Lənkəran", 
-    "Masallı", "Mingəçevir", 
-    "Naftalan", "Naxçıvan", "Neftçala", 
-    "Oğuz", "Ordubad", 
-    "Saatlı", "Sabirabad", "Salyan", "Samux", "Sədərək", "Siyəzən", "Sumqayıt",
-    "Şabran", "Şahbuz", "Şamaxı", "Şəki", "Şəmkir", "Şərur", "Şirvan", "Şuşa", 
-    "Tərtər", "Tovuz", "Ucar", 
-    "Yardımlı", "Yevlax", "Zaqatala", "Zəngilan", "Zərdab"
+    "Abşeron","Ağcabədi","Ağdam","Ağdaş","Ağstafa","Ağsu","Astara",
+    "Babək","Balakən","Beyləqan","Bərdə","Biləsuvar",
+    "Cəbrayıl","Cəlilabad","Culfa",
+    "Daşkəsən","Füzuli",
+    "Gədəbəy","Gəncə","Goranboy","Göyçay","Göygöl",
+    "Hacıqabul","Xaçmaz","Xankəndi","Xocavənd","Xocalı","Xızı",
+    "İmişli","İsmayıllı",
+    "Kəlbəcər","Kəngərli","Kürdəmir",
+    "Qax","Qazax","Qəbələ","Qobustan","Quba","Qubadlı","Qusar",
+    "Laçın","Lerik","Lənkəran",
+    "Masallı","Mingəçevir",
+    "Naftalan","Naxçıvan","Neftçala",
+    "Oğuz","Ordubad",
+    "Saatlı","Sabirabad","Salyan","Samux","Sədərək","Siyəzən","Sumqayıt",
+    "Şabran","Şahbuz","Şamaxı","Şəki","Şəmkir","Şərur","Şirvan","Şuşa",
+    "Tərtər","Tovuz","Ucar",
+    "Yardımlı","Yevlax","Zaqatala","Zəngilan","Zərdab"
   ];
 
-  // Map Variables
-  let mapInstance = null;
+  // ═══════════════════════════════════════════════════════════════════
+  // 3. APPLICATION STATE
+  // ═══════════════════════════════════════════════════════════════════
+
+  let mapInstance  = null;
   let markerInstance = null;
+  let mapOpen      = false;
 
-  // ==========================================
-  // 2. INITIALIZATION (ON LOAD)
-  // ==========================================
-  window.onload = () => {
-    // A. Set Date
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    document.getElementById('deliveryDate').valueAsDate = tomorrow;
+  let productsCache   = [];    // Populated by loadProducts() from CATALOG_API
+  let selectedProduct = null;  // Product object chosen from the catalog search
+  let isCustomProduct = false; // True if user chose to type a custom product
 
-    // B. Populate Landmark Dropdown
-    const select = document.getElementById('landmarkSelect');
+  let depositChecked        = false; // Whether the 10 AZN deposit offer was accepted
+  let receiptImageB64       = '';    // Base64 of payment receipt (card or deposit)
+  let customProductImageB64 = '';    // Base64 of custom product clarification photo
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 4. INITIALIZATION
+  // ═══════════════════════════════════════════════════════════════════
+
+  window.onload = async () => {
+
+    // Default date = tomorrow
+    const tom = new Date();
+    tom.setDate(tom.getDate() + 1);
+    document.getElementById('deliveryDate').valueAsDate = tom;
+
+    // Populate landmark dropdown
+    const lmSel = document.getElementById('landmarkSelect');
     landmarkData.forEach(item => {
       const opt = document.createElement('option');
       opt.value = item.name;
-      opt.text = `${item.name} (+${item.price.toFixed(2)} ₼)`;
-      select.appendChild(opt);
+      opt.text  = `${item.name} (+${item.price.toFixed(2)} ₼)`;
+      lmSel.appendChild(opt);
     });
 
-    // C. Populate Rayon Dropdown
-    const rayonSelect = document.getElementById('rayonSelect');
-    rayonData.sort(); 
-    rayonData.forEach(city => {
+    // Populate rayon dropdown (sorted)
+    const raySel = document.getElementById('rayonSelect');
+    [...rayonData].sort().forEach(city => {
       const opt = document.createElement('option');
       opt.value = city;
-      opt.text = `${city} (+4.00 ₼)`;
-      rayonSelect.appendChild(opt);
+      opt.text  = `${city} (+4.00 ₼)`;
+      raySel.appendChild(opt);
     });
+
+    // Trigger payment UI for default (cash) selection
+    handlePaymentChange();
+
+    // Fetch product list from Backend 1 (non-blocking)
+    await loadProducts();
   };
 
-  // ==========================================
-  // 3. MAP LOGIC
-  // ==========================================
+  // ═══════════════════════════════════════════════════════════════════
+  // 5. PRODUCT CATALOG  — calls CATALOG_API (Backend 1)
+  //
+  //  Backend 1's getProductList() reads from its OWN spreadsheet's
+  //  Products sheet using SpreadsheetApp.getActiveSpreadsheet().
+  //  Column B = Name, Column E = Price, Column F = Image, Column V = Code.
+  //
+  //  If CATALOG_API is unreachable, the form still works — the user
+  //  just uses the "Əl ilə daxil et" (custom entry) option instead.
+  // ═══════════════════════════════════════════════════════════════════
+
+  async function loadProducts() {
+    const noteEl = document.getElementById('productsLoadingNote');
+    noteEl.style.display = 'block';
+    try {
+      const res  = await fetch(`${CATALOG_API}?action=getProductList`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.products)) {
+        productsCache = data.products;
+      }
+    } catch (err) {
+      // Non-critical — form remains fully functional without catalog
+      console.warn('Product catalog unavailable:', err.message);
+    } finally {
+      noteEl.style.display = 'none';
+    }
+  }
+
+  function searchProducts() {
+    const query = document.getElementById('productSearch').value.toLowerCase().trim();
+    const list  = document.getElementById('productResults');
+
+    if (!query) { list.style.display = 'none'; return; }
+
+    const matches = productsCache
+      .filter(p =>
+        (p.name && p.name.toLowerCase().includes(query)) ||
+        (p.code && String(p.code).toLowerCase().includes(query))
+      )
+      .slice(0, 10);
+
+    let html = '';
+
+    if (matches.length > 0) {
+      html = matches.map(p => {
+        // JSON-encode and URI-encode so special characters in product names
+        // are safely passed through the onclick attribute
+        const safeData = encodeURIComponent(JSON.stringify(p));
+        const imgTag   = p.image
+          ? `<img src="${escapeHtml(p.image)}" class="product-result-img"
+                  onerror="this.style.display='none'">`
+          : `<div class="product-result-img-placeholder"><i class="fa-solid fa-box"></i></div>`;
+
+        return `
+          <div class="product-result-item"
+               onclick="selectProduct(JSON.parse(decodeURIComponent('${safeData}')))">
+            ${imgTag}
+            <div style="min-width:0;flex:1;">
+              <div class="product-result-name">${escapeHtml(p.name || '')}</div>
+              <div class="product-result-meta">Kod: ${escapeHtml(String(p.code || '—'))}</div>
+              <div class="product-result-price">${parseFloat(p.price || 0).toFixed(2)} ₼</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // Always show "not found" fallback at the bottom
+    html += `
+      <div class="product-not-found-row">
+        <p>${matches.length > 0 ? 'Başqa məhsul axtarırsınız?' : 'Məhsul tapılmadı.'}</p>
+        <button type="button" class="btn-custom-product" onclick="showCustomProduct()">
+          <i class="fa-solid fa-plus"></i> Əl ilə daxil et
+        </button>
+      </div>`;
+
+    list.innerHTML     = html;
+    list.style.display = 'block';
+  }
+
+  function selectProduct(product) {
+    selectedProduct = product;
+    isCustomProduct = false;
+
+    document.getElementById('productResults').style.display      = 'none';
+    document.getElementById('productSearch').value                = product.name || '';
+    document.getElementById('customProductSection').style.display = 'none';
+
+    const imgHtml = product.image
+      ? `<img src="${escapeHtml(product.image)}" class="selected-product-img"
+              onerror="this.style.display='none'">`
+      : `<div class="selected-product-img-placeholder"><i class="fa-solid fa-box"></i></div>`;
+
+    document.getElementById('selectedProductInner').innerHTML = `
+      ${imgHtml}
+      <div class="selected-product-info">
+        <div class="selected-product-name">${escapeHtml(product.name || '')}</div>
+        <div class="selected-product-code">Kod: ${escapeHtml(String(product.code || '—'))}</div>
+        <div class="selected-product-price">${parseFloat(product.price || 0).toFixed(2)} ₼</div>
+      </div>`;
+    document.getElementById('selectedProductCard').style.display = 'block';
+  }
+
+  function showCustomProduct() {
+    isCustomProduct = true;
+    selectedProduct = null;
+    document.getElementById('productResults').style.display       = 'none';
+    document.getElementById('selectedProductCard').style.display  = 'none';
+    document.getElementById('customProductSection').style.display = 'block';
+  }
+
+  function clearProduct() {
+    selectedProduct = null;
+    isCustomProduct = false;
+    customProductImageB64 = '';
+    document.getElementById('selectedProductCard').style.display  = 'none';
+    document.getElementById('customProductSection').style.display  = 'none';
+    document.getElementById('productSearch').value                 = '';
+    document.getElementById('customProductName').value             = '';
+    document.getElementById('customProductImageInput').value       = '';
+    resetUploadArea('customProductUploadArea', 'customProductUploadContent', '📷', 'Şəkil əlavə et');
+  }
+
+  function handleCustomProductImageChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    compressImage(file, (b64, preview) => {
+      customProductImageB64 = b64;
+      updateUploadArea('customProductUploadArea', 'customProductUploadContent', preview);
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 6. LOCATION / MAP
+  // ═══════════════════════════════════════════════════════════════════
+
+  function switchLoc(type, btn) {
+    document.querySelectorAll('.loc-content').forEach(el => el.classList.remove('active'));
+    document.getElementById('loc-' + type).classList.add('active');
+    document.querySelectorAll('.loc-tab').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function toggleMapSection() {
+    mapOpen = !mapOpen;
+    const sec   = document.getElementById('mapOptionalSection');
+    const check = document.getElementById('mapToggleCheck');
+    if (mapOpen) {
+      sec.style.display = 'block';
+      check.classList.add('checked');
+      check.innerHTML = '<i class="fa-solid fa-check" style="font-size:11px;"></i>';
+      setTimeout(() => { initMap(); if (mapInstance) mapInstance.invalidateSize(); }, 300);
+    } else {
+      sec.style.display = 'none';
+      check.classList.remove('checked');
+      check.innerHTML = '';
+      document.getElementById('mapCoordinatesLink').value     = '';
+      document.getElementById('locationStatus').style.display = 'none';
+    }
+  }
+
   function initMap() {
-    if (mapInstance) return; 
-    
-    // Default Center: Baku
+    if (mapInstance) return;
     mapInstance = L.map('map').setView([40.4093, 49.8671], 12);
-
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap',
-      maxZoom: 19
+      attribution: '© OpenStreetMap', maxZoom: 19
     }).addTo(mapInstance);
-
-    markerInstance = L.marker([40.4093, 49.8671], {draggable: true}).addTo(mapInstance);
-
-    markerInstance.on('dragend', function (e) {
-      saveMapLocation(markerInstance.getLatLng());
-    });
-
-    mapInstance.on('click', function(e) {
-      markerInstance.setLatLng(e.latlng);
-      saveMapLocation(e.latlng);
-    });
+    markerInstance = L.marker([40.4093, 49.8671], { draggable: true }).addTo(mapInstance);
+    markerInstance.on('dragend', () => saveMapLoc(markerInstance.getLatLng()));
+    mapInstance.on('click', e => { markerInstance.setLatLng(e.latlng); saveMapLoc(e.latlng); });
   }
 
-  function saveMapLocation(latlng) {
-    const link = `http://googleusercontent.com/maps.google.com/?q=${latlng.lat},${latlng.lng}`;
-    document.getElementById('mapCoordinatesLink').value = link;
-    const statusDiv = document.getElementById('locationStatus');
-    statusDiv.style.display = 'block';
-    statusDiv.innerHTML = '<i class="fa-solid fa-check"></i> Ünvan seçildi!';
+  function saveMapLoc(latlng) {
+    document.getElementById('mapCoordinatesLink').value    = `https://maps.google.com/?q=${latlng.lat},${latlng.lng}`;
+    document.getElementById('locationStatus').style.display = 'block';
   }
 
-  // ==========================================
-  // 4. UI INTERACTION
-  // ==========================================
+  function getCurrentLocation() {
+    if (!navigator.geolocation) return Swal.fire('Xəta', 'Brauzeriniz mövqe dəstəkləmir.', 'error');
+    const btn  = document.querySelector('.btn-map');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Təyin edilir...';
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const ll = new L.LatLng(pos.coords.latitude, pos.coords.longitude);
+        if (markerInstance) { markerInstance.setLatLng(ll); mapInstance.setView(ll, 16); }
+        saveMapLoc(ll);
+        btn.innerHTML = orig;
+      },
+      () => { btn.innerHTML = orig; Swal.fire('Xəta', 'Mövqe götürülə bilmədi.', 'error'); }
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 7. PAYMENT UI
+  // ═══════════════════════════════════════════════════════════════════
+
+  function handlePaymentChange() {
+    const method     = document.getElementById('payMethod').value;
+    const depositBox = document.getElementById('depositOfferBox');
+    const cardBox    = document.getElementById('cardReceiptBox');
+
+    if (method === 'cash') {
+      depositBox.style.display = 'block';
+      cardBox.style.display    = 'none';
+      receiptImageB64 = '';
+      document.getElementById('cardReceiptInput').value = '';
+      resetUploadArea('cardReceiptUploadArea', 'cardReceiptContent', '🧾', 'Bank köçürmə qəbzini əlavə et');
+    } else {
+      depositBox.style.display = 'none';
+      cardBox.style.display    = 'block';
+      if (depositChecked) toggleDeposit(); // reset deposit checkbox if switching away
+    }
+  }
+
+  function toggleDeposit() {
+    depositChecked = !depositChecked;
+    const cb    = document.getElementById('depositCheckbox');
+    const badge = document.getElementById('discountBadge');
+    const sec   = document.getElementById('depositReceiptSection');
+
+    if (depositChecked) {
+      cb.classList.add('checked');
+      cb.innerHTML = '<i class="fa-solid fa-check" style="font-size:11px;"></i>';
+      badge.style.display = 'flex';
+      sec.style.display   = 'block';
+    } else {
+      cb.classList.remove('checked');
+      cb.innerHTML        = '';
+      badge.style.display = 'none';
+      sec.style.display   = 'none';
+      receiptImageB64     = '';
+      document.getElementById('depositReceiptInput').value = '';
+      resetUploadArea('depositReceiptUploadArea', 'depositReceiptContent', '🧾', 'Ödəniş qəbzini əlavə et');
+    }
+  }
+
+  function handleReceiptImageChange(event, type) {
+    const file      = event.target.files[0];
+    if (!file) return;
+    const areaId    = type === 'deposit' ? 'depositReceiptUploadArea' : 'cardReceiptUploadArea';
+    const contentId = type === 'deposit' ? 'depositReceiptContent'    : 'cardReceiptContent';
+
+    if (file.type === 'application/pdf') {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        receiptImageB64 = ev.target.result;
+        document.getElementById(areaId).classList.add('has-image');
+        document.getElementById(contentId).innerHTML = `
+          <div style="font-size:36px;">📄</div>
+          <div class="image-upload-text" style="color:var(--success);font-weight:700;">${escapeHtml(file.name)}</div>`;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      compressImage(file, (b64, preview) => {
+        receiptImageB64 = b64;
+        updateUploadArea(areaId, contentId, preview);
+      });
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 8. IMAGE HELPERS
+  // ═══════════════════════════════════════════════════════════════════
+
+  function compressImage(file, callback) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else        { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const cvs = document.createElement('canvas');
+        cvs.width = w; cvs.height = h;
+        cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+        const b64 = cvs.toDataURL('image/jpeg', 0.75);
+        callback(b64, b64);
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function updateUploadArea(areaId, contentId, previewUrl) {
+    document.getElementById(areaId).classList.add('has-image');
+    document.getElementById(contentId).innerHTML = `
+      <img src="${previewUrl}" class="image-preview-thumb">
+      <div class="image-upload-text" style="color:var(--success);font-weight:700;">
+        <i class="fa-solid fa-check"></i> Əlavə olundu
+      </div>`;
+  }
+
+  function resetUploadArea(areaId, contentId, icon, text) {
+    const area = document.getElementById(areaId);
+    const cont = document.getElementById(contentId);
+    if (area) area.classList.remove('has-image');
+    if (cont) cont.innerHTML = `
+      <div class="image-upload-icon">${icon}</div>
+      <div class="image-upload-text">${text}</div>`;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 9. FORM SUBMISSION  — sends POST to ORDERS_API (Backend 2)
+  // ═══════════════════════════════════════════════════════════════════
+
+  document.getElementById('customerOrderForm').addEventListener('submit', async e => {
+    e.preventDefault();
+
+    // — Sales rep —
+    if (!document.getElementById('salesRep').value) {
+      return Swal.fire('Diqqət', 'Zəhmət olmasa Satış Nümayəndəsini seçin.', 'warning');
+    }
+    // — Name & phone —
+    if (!document.getElementById('custName').value.trim()) {
+      return Swal.fire('Diqqət', 'Ad və Soyadı daxil edin.', 'warning');
+    }
+    if (!document.getElementById('custPhone').value.trim()) {
+      return Swal.fire('Diqqət', 'Əlaqə nömrəsini daxil edin.', 'warning');
+    }
+    // — Time slot —
+    if (!document.getElementById('timeSlot').value) {
+      return Swal.fire('Diqqət', 'Çatdırılma saat aralığını seçin.', 'warning');
+    }
+    // — Product —
+    if (!selectedProduct && !isCustomProduct) {
+      return Swal.fire('Diqqət', 'Məhsul seçin və ya əl ilə daxil edin.', 'warning');
+    }
+    if (isCustomProduct && !document.getElementById('customProductName').value.trim()) {
+      return Swal.fire('Diqqət', 'Məhsulun adını yazın.', 'warning');
+    }
+
+    // — Address (one of the 3 tabs must have a value selected) —
+    const isMetro    = document.getElementById('loc-metro').classList.contains('active');
+    const isLandmark = document.getElementById('loc-landmark').classList.contains('active');
+    const isRayon    = document.getElementById('loc-rayon').classList.contains('active');
+
+    const metro    = document.getElementById('metroSelect').value;
+    const landmark = document.getElementById('landmarkSelect').value;
+    const rayon    = document.getElementById('rayonSelect').value;
+
+    let finalAddress = '';
+    let deliveryCost = 0;
+
+    if (isMetro) {
+      if (!metro) return Swal.fire('Diqqət', 'Metro stansiyasını seçin.', 'warning');
+      finalAddress = `Metro: ${metro}`;
+    } else if (isLandmark) {
+      if (!landmark) return Swal.fire('Diqqət', 'Nişangahı seçin.', 'warning');
+      finalAddress = `Nişangah: ${landmark}`;
+      const lm = landmarkData.find(i => i.name === landmark);
+      if (lm) deliveryCost = lm.price;
+    } else if (isRayon) {
+      if (!rayon) return Swal.fire('Diqqət', 'Rayon/şəhər seçin.', 'warning');
+      finalAddress = `Rayon: ${rayon}`;
+      deliveryCost = 4.00;
+    }
+
+    // — Payment receipt —
+    const payMethod = document.getElementById('payMethod').value;
+    if (payMethod === 'card' && !receiptImageB64) {
+      return Swal.fire('Diqqət', 'Kart ilə ödəniş üçün bank köçürmə qəbzini əlavə edin.', 'warning');
+    }
+    if (payMethod === 'cash' && depositChecked && !receiptImageB64) {
+      return Swal.fire('Diqqət', 'Beh ödənişinin qəbzini əlavə edin.', 'warning');
+    }
+
+    // — Build product fields —
+    let productName  = '';
+    let productCode  = '';
+    let productPrice = 0;
+    if (selectedProduct) {
+      productName  = selectedProduct.name  || '';
+      productCode  = selectedProduct.code  || '';
+      productPrice = parseFloat(selectedProduct.price) || 0;
+    } else {
+      productName = document.getElementById('customProductName').value.trim();
+      productCode = 'CUSTOM';
+    }
+
+    const discountApplied = (payMethod === 'cash' && depositChecked) ? 4 : 0;
+    const depositPaid     = (payMethod === 'cash' && depositChecked) ? 10 : 0;
+
+    // — Payload —
+    const payload = {
+      action:              'createCustomerOrder',
+      customerName:        document.getElementById('custName').value.trim(),
+      contactInfo:         document.getElementById('custPhone').value.trim(),
+      instagramHandle:     document.getElementById('instagramHandle').value.trim(),
+      deliveryDate:        document.getElementById('deliveryDate').value,
+      timeSlot:            document.getElementById('timeSlot').value,
+      address:             finalAddress,
+      specialInstructions: document.getElementById('addressDetails').value.trim(),
+      courieradditional:   deliveryCost,
+      mapLink:             document.getElementById('mapCoordinatesLink').value,
+      paymentMethod:       payMethod,
+      salesRep:            document.getElementById('salesRep').value,
+      productName,
+      productCode,
+      productPrice,
+      discountApplied,
+      depositPaid,
+      receiptImage:        receiptImageB64,
+      customProductImage:  customProductImageB64
+    };
+
+    setLoader(true, 'Sifariş göndərilir...');
+
+try {
+      const form = new URLSearchParams();
+      for (const k in payload) {
+        if (payload[k] !== '' && payload[k] !== null && payload[k] !== undefined) {
+          form.append(k, payload[k]);
+        }
+      }
+
+      const res  = await fetch(ORDERS_API, { method: 'POST', body: form });
+      const data = await res.json();
+
+      // DÜZƏLİŞ 1: Pop-up açılmazdan əvvəl yüklənmə ekranını mütləq bağlayırıq
+      setLoader(false); 
+
+      if (data.success) {
+        await Swal.fire({
+          title: 'Təşəkkür edirik! 🎉',
+          html:  `Sifarişiniz qəbul olundu!<br><b>Sifariş Kodunuz: #${data.orderId}</b>`,
+          icon:  'success',
+          confirmButtonColor: '#FF2D55'
+        });
+        resetForm();
+      } else {
+        Swal.fire('Xəta', data.message || 'Xəta baş verdi.', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      // DÜZƏLİŞ 2: Xəta baş verdikdə də yüklənmə ekranını bağlayırıq
+      setLoader(false); 
+      Swal.fire('Xəta', 'İnternet əlaqəsini yoxlayın.', 'error');
+    }
+    // DÜZƏLİŞ 3: "finally" blokunu tamamilə sildik, çünki artıq ehtiyac qalmadı
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 10. TRACK ORDER  — GET request to ORDERS_API (Backend 2)
+  // ═══════════════════════════════════════════════════════════════════
+
+  async function runTrackOrder() {
+    const id    = document.getElementById('trackId').value.trim();
+    const phone = document.getElementById('trackPhone').value.trim();
+
+    if (!id || !phone) return Swal.fire('Diqqət', 'Kod və Nömrəni daxil edin.', 'warning');
+
+    setLoader(true, 'Axtarılır...');
+    document.getElementById('trackResult').style.display = 'none';
+
+    try {
+      const res  = await fetch(
+        `${ORDERS_API}?action=trackOrder&orderId=${encodeURIComponent(id)}&phone=${encodeURIComponent(phone)}`
+      );
+      const data = await res.json();
+
+      if (data.success) {
+        const o      = data.order;
+        const labels = { New:'Yeni', Preparing:'Hazırlanır', OnWay:'Yoldadır', Delivered:'Təhvil Verildi', Deleted:'Ləğv Edildi' };
+
+        document.getElementById('resId').innerText      = o.id;
+        const statusEl  = document.getElementById('resStatus');
+        statusEl.innerText = labels[o.status] || o.status;
+        statusEl.className = `status-badge status-${o.status}`;
+
+        document.getElementById('resDate').innerText    = o.date    || '—';
+        document.getElementById('resTime').innerText    = o.timeSlot || 'Gün ərzində';
+        document.getElementById('resPrice').innerText   = (o.price  || 0) + ' ₼';
+        document.getElementById('resPayment').innerText = o.payment === 'cash' ? 'Nağd' : 'Kart';
+
+        const nameEl = document.getElementById('resCourierName');
+        const btnEl  = document.getElementById('resCourierBtn');
+        if (o.courier && String(o.courier).trim()) {
+          nameEl.innerText = String(o.courier).toUpperCase();
+          if (o.courierPhone) { btnEl.style.display = 'inline-block'; btnEl.href = `tel:${o.courierPhone}`; }
+          else                  btnEl.style.display = 'none';
+        } else {
+          nameEl.innerText    = 'Təyin olunmayıb';
+          btnEl.style.display = 'none';
+        }
+
+        document.getElementById('trackResult').style.display = 'block';
+      } else {
+        Swal.fire('Tapılmadı', 'Sifariş kodu və ya nömrə yanlışdır.', 'error');
+      }
+    } catch (err) {
+      Swal.fire('Xəta', 'Server ilə əlaqə kəsildi.', 'error');
+    } finally {
+      setLoader(false);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 11. FORM RESET
+  // ═══════════════════════════════════════════════════════════════════
+
+  function resetForm() {
+    document.getElementById('customerOrderForm').reset();
+    document.querySelectorAll('.rep-option').forEach(o => o.classList.remove('selected'));
+    document.getElementById('salesRep').value = '';
+    clearProduct();
+
+    switchLoc('metro', document.querySelector('.loc-tab'));
+    document.getElementById('locationStatus').style.display   = 'none';
+    document.getElementById('mapCoordinatesLink').value        = '';
+    if (mapOpen) toggleMapSection();
+
+    depositChecked = false;
+    receiptImageB64 = '';
+    customProductImageB64 = '';
+    const cb = document.getElementById('depositCheckbox');
+    cb.classList.remove('checked'); cb.innerHTML = '';
+    document.getElementById('discountBadge').style.display         = 'none';
+    document.getElementById('depositReceiptSection').style.display = 'none';
+    resetUploadArea('depositReceiptUploadArea', 'depositReceiptContent', '🧾', 'Ödəniş qəbzini əlavə et');
+    resetUploadArea('cardReceiptUploadArea',    'cardReceiptContent',    '🧾', 'Bank köçürmə qəbzini əlavə et');
+    handlePaymentChange();
+
+    const tom = new Date();
+    tom.setDate(tom.getDate() + 1);
+    document.getElementById('deliveryDate').valueAsDate = tom;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // 12. GENERAL UI HELPERS
+  // ═══════════════════════════════════════════════════════════════════
+
   function switchTab(tabId, btn) {
     document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
@@ -553,224 +1437,27 @@
 
   function selectRep(code, el) {
     document.getElementById('salesRep').value = code;
-    document.querySelectorAll('.rep-option').forEach(opt => opt.classList.remove('selected'));
+    document.querySelectorAll('.rep-option').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
   }
 
-  function switchLoc(type, btn) {
-    document.querySelectorAll('.loc-content').forEach(el => el.classList.remove('active'));
-    document.getElementById('loc-' + type).classList.add('active');
-    document.querySelectorAll('.loc-tab').forEach(el => el.classList.remove('active'));
-    btn.classList.add('active');
-
-    if (type === 'map') {
-      setTimeout(() => {
-        initMap(); 
-        if(mapInstance) mapInstance.invalidateSize();
-      }, 300);
-    }
+  function setLoader(visible, text) {
+    document.getElementById('loader').style.display = visible ? 'flex' : 'none';
+    if (text) document.getElementById('loaderText').textContent = text;
   }
 
-  function getCurrentLocation() {
-    if (!navigator.geolocation) {
-      Swal.fire('Xəta', 'Brauzeriniz mövqe təyini dəstəkləmir.', 'error');
-      return;
-    }
-    
-    const btn = document.querySelector('.btn-map');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Təyin edilir...';
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-
-        if (mapInstance && markerInstance) {
-          const newLatLng = new L.LatLng(lat, lng);
-          markerInstance.setLatLng(newLatLng);
-          mapInstance.setView(newLatLng, 16); 
-          saveMapLocation(newLatLng);
-        } else {
-           const link = `http://googleusercontent.com/maps.google.com/?q=${lat},${lng}`;
-           document.getElementById('mapCoordinatesLink').value = link;
-        }
-
-        btn.innerHTML = originalText;
-        btn.style.background = '#e6fffa';
-        btn.style.borderColor = '#34C759';
-      },
-      (error) => {
-        btn.innerHTML = originalText;
-        Swal.fire('Xəta', 'Mövqe götürülə bilmədi.', 'error');
-      }
-    );
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
-  // ==========================================
-  // 5. SUBMIT ORDER (MAIN LOGIC)
-  // ==========================================
-document.getElementById('customerOrderForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // A. Validation
-    const rep = document.getElementById('salesRep').value;
-    if (!rep) {
-      return Swal.fire('Diqqət', 'Zəhmət olmasa danışdığınız Satış Təmsilçisini seçin.', 'warning');
-    }
-
-    // B. Address & Cost Calculation
-    let finalAddress = "";
-    let calculatedCost = 0; 
-
-    const metro = document.getElementById('metroSelect').value;
-    const landmark = document.getElementById('landmarkSelect').value;
-    const rayon = document.getElementById('rayonSelect').value;
-    const details = document.getElementById('addressDetails').value;
-    
-    // Check which tab is active (Class check is safest)
-    const isMetroActive = document.getElementById('loc-metro').classList.contains('active');
-    const isLandmarkActive = document.getElementById('loc-landmark').classList.contains('active');
-    const isRayonActive = document.getElementById('loc-rayon').classList.contains('active');
-
-    if (isMetroActive && metro) {
-      // 1. Metro (Cost = 0)
-      finalAddress = `Metro: ${metro}`;
-      calculatedCost = 0; 
-
-    } else if (isLandmarkActive && landmark) {
-      // 2. Landmark (Cost = Dynamic from List)
-      finalAddress = `Nişangah: ${landmark}`;
-      const selectedItem = landmarkData.find(i => i.name === landmark);
-      if (selectedItem) calculatedCost = selectedItem.price;
-
-    } else if (isRayonActive && rayon) {
-      // 3. Rayon (Cost = 4.00)
-      finalAddress = `Rayon: ${rayon}`;
-      calculatedCost = 4.00;
-    }
-
-    // C. Final Check (Must have address OR map link)
-    if (!finalAddress && !document.getElementById('mapCoordinatesLink').value) {
-       return Swal.fire('Diqqət', 'Zəhmət olmasa Metro, Nişangah və ya Rayon seçin.', 'warning');
-    }
-
-    // D. Prepare Payload
-    // CRITICAL: We use 'courierCost' because that is what the Google Apps Script expects for Column T
-    const payload = {
-      action: 'createCustomerOrder',
-      customerName: document.getElementById('custName').value,
-      contactInfo: document.getElementById('custPhone').value,
-      deliveryDate: document.getElementById('deliveryDate').value,
-      timeSlot: document.getElementById('timeSlot').value,
-      
-      address: finalAddress,          // Column D
-      specialInstructions: details,   // Column F
-      courieradditional: calculatedCost,    // Column T (Important!)
-      
-      mapLink: document.getElementById('mapCoordinatesLink').value, // Column V
-      paymentMethod: document.getElementById('payMethod').value,
-      salesRep: rep // Column Q
-    };
-
-    // E. Send to Server
-    document.getElementById('loader').style.display = 'flex';
-
-    try {
-      const formData = new URLSearchParams();
-      for (const key in payload) formData.append(key, payload[key]);
-
-      const res = await fetch(API_URL, { method: 'POST', body: formData });
-      const data = await res.json();
-
-      if (data.success) {
-        Swal.fire({
-          title: 'Təşəkkür edirik!',
-          text: `Sifarişiniz qəbul olundu! Kodunuz: #${data.orderId}`,
-          icon: 'success',
-          confirmButtonColor: '#FF2D55'
-        });
-        
-        // Reset Form and State
-        document.getElementById('customerOrderForm').reset();
-        document.getElementById('locationStatus').style.display = 'none';
-        document.querySelectorAll('.rep-option').forEach(opt => opt.classList.remove('selected'));
-        
-      } else {
-        Swal.fire('Xəta', data.message, 'error');
-      }
-    } catch (err) {
-      console.error(err);
-      Swal.fire('Xəta', 'İnternet əlaqəsini yoxlayın.', 'error');
-    } finally {
-      document.getElementById('loader').style.display = 'none';
-    }
+  // Close search results when clicking elsewhere
+  document.addEventListener('click', ev => {
+    const inp = document.getElementById('productSearch');
+    const lst = document.getElementById('productResults');
+    if (!inp.contains(ev.target) && !lst.contains(ev.target)) lst.style.display = 'none';
   });
-
-  // ==========================================
-  // 6. TRACK ORDER LOGIC
-  // ==========================================
-  async function trackOrder() {
-    const id = document.getElementById('trackId').value;
-    const phone = document.getElementById('trackPhone').value;
-
-    if (!id || !phone) {
-      return Swal.fire('Diqqət', 'Kod və Nömrəni daxil edin.', 'warning');
-    }
-
-    document.getElementById('loader').style.display = 'flex';
-    document.getElementById('trackResult').style.display = 'none';
-
-    try {
-      const res = await fetch(`${API_URL}?action=trackOrder&orderId=${id}&phone=${phone}`);
-      const data = await res.json();
-
-      if (data.success) {
-        const o = data.order;
-        
-        // Populate UI
-        document.getElementById('resId').innerText = o.id;
-        
-        const statusEl = document.getElementById('resStatus');
-        statusEl.innerText = o.status;
-        statusEl.className = `status-badge status-${o.status}`;
-        
-        if(o.status === 'Preparing' || o.status === 'New') statusEl.innerText = "Hazırlanır";
-        if(o.status === 'Delivered') statusEl.innerText = "Təhvil Verildi";
-        if(o.status === 'OnWay') statusEl.innerText = "Yoldadır";
-
-        document.getElementById('resDate').innerText = o.date;
-        document.getElementById('resTime').innerText = o.timeSlot || 'Gün ərzində';
-        document.getElementById('resPrice').innerText = (o.price || 0) + ' ₼';
-        document.getElementById('resPayment').innerText = o.payment === 'cash' ? 'Nağd' : 'Kart';
-
-        // Courier Info
-        const courierName = document.getElementById('resCourierName');
-        const courierBtn = document.getElementById('resCourierBtn');
-        
-        if (o.courier && o.courier !== '') {
-          courierName.innerText = o.courier.toUpperCase(); 
-          if (o.courierPhone) {
-            courierBtn.style.display = 'inline-block';
-            courierBtn.href = `tel:${o.courierPhone}`;
-          } else {
-            courierBtn.style.display = 'none';
-          }
-        } else {
-          courierName.innerText = "Təyin olunmayıb";
-          courierBtn.style.display = 'none';
-        }
-        
-        document.getElementById('trackResult').style.display = 'block';
-      } else {
-        Swal.fire('Tapılmadı', 'Sifariş kodu və ya nömrə yanlışdır.', 'error');
-      }
-    } catch (err) {
-      Swal.fire('Xəta', 'Server ilə əlaqə kəsildi.', 'error');
-    } finally {
-      document.getElementById('loader').style.display = 'none';
-    }
-  }
-</script>
+  </script>
 </body>
 </html>
