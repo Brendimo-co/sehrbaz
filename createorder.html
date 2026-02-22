@@ -474,10 +474,10 @@
       </div>
 
       <!-- 4. PRODUCT SELECTION -->
-      <div class="card">
+<div class="card">
         <h3><i class="fa-solid fa-box-open"></i> Məhsul Seçimi</h3>
         <p style="font-size:12px;color:#888;margin-top:-10px;margin-bottom:15px;">
-          Məhsul kodu və ya adı ilə axtarın:
+          Məhsul kodu və ya adı ilə axtarıb səbətə əlavə edin:
         </p>
 
         <div class="product-search-wrapper">
@@ -495,23 +495,31 @@
 
         <div class="product-results-list" id="productResults"></div>
 
-        <!-- Selected product preview -->
-        <div class="selected-product-card" id="selectedProductCard">
-          <div class="selected-product-inner" id="selectedProductInner"></div>
-          <button type="button" class="clear-product-btn" onclick="clearProduct()">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+        <div id="cartContainer" style="display:none; margin-top: 15px;">
+          <h4 style="margin:0 0 10px; font-size:14px; color:var(--accent);">🛒 Səbətdəki Məhsullar:</h4>
+          <div id="cartItemsList"></div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:12px; border-top:2px dashed var(--border);">
+            <span style="font-weight:700; font-size:15px;">Ümumi Məbləğ:</span>
+            <span id="cartTotalPrice" style="font-weight:800; font-size:18px; color:var(--primary);">0.00 ₼</span>
+          </div>
         </div>
 
-        <!-- Custom product entry -->
         <div class="custom-product-section" id="customProductSection">
-          <h4><i class="fa-solid fa-pencil"></i> Məhsul siyahıda yoxdur — əl ilə daxil edin</h4>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h4 style="margin:0;"><i class="fa-solid fa-pencil"></i> Əl ilə daxil edin</h4>
+            <button type="button" onclick="cancelCustomProduct()" style="background:none;border:none;color:var(--text-sec);cursor:pointer;font-size:16px;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
 
           <label>Məhsulun adı</label>
           <input type="text" id="customProductName" placeholder="Məhsulun adını yazın...">
 
+          <label>Qiyməti (₼) <span style="font-weight:400;text-transform:none;color:#aaa;"> — bilmirsinizsə 0 saxlayın</span></label>
+          <input type="number" id="customProductPrice" placeholder="Məs: 25.50" step="0.01" min="0">
+
           <label>Məhsulun şəkli
-            <span style="font-weight:400;text-transform:none;color:#aaa;"> — daha dəqiq sifarişə kömək edir</span>
+            <span style="font-weight:400;text-transform:none;color:#aaa;"> — istəyə bağlı</span>
           </label>
           <div class="image-upload-area" id="customProductUploadArea">
             <input type="file" id="customProductImageInput" accept="image/*"
@@ -521,6 +529,9 @@
               <div class="image-upload-text">Şəkil əlavə et</div>
             </div>
           </div>
+          <button type="button" class="btn btn-map" style="margin-top:12px;" onclick="addCustomProductToCart()">
+            <i class="fa-solid fa-plus"></i> Səbətə Əlavə Et
+          </button>
         </div>
       </div>
 
@@ -851,9 +862,7 @@
   let mapOpen      = false;
 
   let productsCache   = [];    // Populated by loadProducts() from CATALOG_API
-  let selectedProduct = null;  // Product object chosen from the catalog search
-  let isCustomProduct = false; // True if user chose to type a custom product
-
+  let cart = [];
   let depositChecked        = false; // Whether the 10 AZN deposit offer was accepted
   let receiptImageB64       = '';    // Base64 of payment receipt (card or deposit)
   let customProductImageB64 = '';    // Base64 of custom product clarification photo
@@ -973,47 +982,101 @@
     list.style.display = 'block';
   }
 
-  function selectProduct(product) {
-    selectedProduct = product;
-    isCustomProduct = false;
+function selectProduct(product) {
+    cart.push({
+      name: product.name || '',
+      code: product.code || '—',
+      price: parseFloat(product.price || 0),
+      image: product.image || '',
+      isCustom: false
+    });
 
-    document.getElementById('productResults').style.display      = 'none';
-    document.getElementById('productSearch').value                = product.name || '';
+    document.getElementById('productResults').style.display = 'none';
+    document.getElementById('productSearch').value = '';
     document.getElementById('customProductSection').style.display = 'none';
-
-    const imgHtml = product.image
-      ? `<img src="${escapeHtml(product.image)}" class="selected-product-img"
-              onerror="this.style.display='none'">`
-      : `<div class="selected-product-img-placeholder"><i class="fa-solid fa-box"></i></div>`;
-
-    document.getElementById('selectedProductInner').innerHTML = `
-      ${imgHtml}
-      <div class="selected-product-info">
-        <div class="selected-product-name">${escapeHtml(product.name || '')}</div>
-        <div class="selected-product-code">Kod: ${escapeHtml(String(product.code || '—'))}</div>
-        <div class="selected-product-price">${parseFloat(product.price || 0).toFixed(2)} ₼</div>
-      </div>`;
-    document.getElementById('selectedProductCard').style.display = 'block';
+    
+    renderCart();
+    Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, icon: 'success', title: 'Səbətə əlavə edildi' });
   }
 
   function showCustomProduct() {
-    isCustomProduct = true;
-    selectedProduct = null;
-    document.getElementById('productResults').style.display       = 'none';
-    document.getElementById('selectedProductCard').style.display  = 'none';
+    document.getElementById('productResults').style.display = 'none';
     document.getElementById('customProductSection').style.display = 'block';
   }
 
-  function clearProduct() {
-    selectedProduct = null;
-    isCustomProduct = false;
+  function cancelCustomProduct() {
+    document.getElementById('customProductSection').style.display = 'none';
+    document.getElementById('customProductName').value = '';
+    document.getElementById('customProductPrice').value = '';
     customProductImageB64 = '';
-    document.getElementById('selectedProductCard').style.display  = 'none';
-    document.getElementById('customProductSection').style.display  = 'none';
-    document.getElementById('productSearch').value                 = '';
-    document.getElementById('customProductName').value             = '';
-    document.getElementById('customProductImageInput').value       = '';
     resetUploadArea('customProductUploadArea', 'customProductUploadContent', '📷', 'Şəkil əlavə et');
+  }
+
+  function addCustomProductToCart() {
+    const nameInput = document.getElementById('customProductName');
+    const priceInput = document.getElementById('customProductPrice');
+    const name = nameInput.value.trim();
+    let price = parseFloat(priceInput.value);
+
+    if (!name) return Swal.fire('Diqqət', 'Məhsulun adını yazın.', 'warning');
+    if (isNaN(price) || price < 0) price = 0;
+
+    cart.push({
+      name: name,
+      code: 'CUSTOM',
+      price: price,
+      image: customProductImageB64 || '',
+      isCustom: true
+    });
+
+    cancelCustomProduct();
+    renderCart();
+    Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, icon: 'success', title: 'Səbətə əlavə edildi' });
+  }
+
+  function renderCart() {
+    const container = document.getElementById('cartContainer');
+    const list = document.getElementById('cartItemsList');
+    const totalEl = document.getElementById('cartTotalPrice');
+
+    if (cart.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+
+    container.style.display = 'block';
+    let html = '';
+    let total = 0;
+
+    cart.forEach((item, index) => {
+      total += item.price;
+      const imgHtml = item.image
+        ? `<img src="${escapeHtml(item.image)}" class="selected-product-img" onerror="this.style.display='none'">`
+        : `<div class="selected-product-img-placeholder"><i class="fa-solid fa-box"></i></div>`;
+
+      html += `
+        <div class="selected-product-card" style="display:flex; margin-top:8px;">
+          <div class="selected-product-inner" style="flex:1;">
+            ${imgHtml}
+            <div class="selected-product-info">
+              <div class="selected-product-name">${escapeHtml(item.name)}</div>
+              <div class="selected-product-code">Kod: ${escapeHtml(item.code)}</div>
+              <div class="selected-product-price">${item.price.toFixed(2)} ₼</div>
+            </div>
+          </div>
+          <button type="button" class="clear-product-btn" style="position:relative; top:auto; right:auto; align-self:center; margin-left:10px;" onclick="removeFromCart(${index})">
+            <i class="fa-solid fa-trash" style="color:var(--primary);"></i>
+          </button>
+        </div>`;
+    });
+
+    list.innerHTML = html;
+    totalEl.innerText = total.toFixed(2) + ' ₼';
+  }
+
+  function removeFromCart(index) {
+    cart.splice(index, 1);
+    renderCart();
   }
 
   function handleCustomProductImageChange(event) {
@@ -1221,12 +1284,10 @@
       return Swal.fire('Diqqət', 'Çatdırılma saat aralığını seçin.', 'warning');
     }
     // — Product —
-    if (!selectedProduct && !isCustomProduct) {
-      return Swal.fire('Diqqət', 'Məhsul seçin və ya əl ilə daxil edin.', 'warning');
+    if (cart.length === 0) {
+      return Swal.fire('Diqqət', 'Səbətə ən azı bir məhsul əlavə edin.', 'warning');
     }
-    if (isCustomProduct && !document.getElementById('customProductName').value.trim()) {
-      return Swal.fire('Diqqət', 'Məhsulun adını yazın.', 'warning');
-    }
+   
 
     // — Address (one of the 3 tabs must have a value selected) —
     const isMetro    = document.getElementById('loc-metro').classList.contains('active');
@@ -1264,22 +1325,16 @@
     }
 
     // — Build product fields —
-    let productName  = '';
-    let productCode  = '';
-    let productPrice = 0;
-    if (selectedProduct) {
-      productName  = selectedProduct.name  || '';
-      productCode  = selectedProduct.code  || '';
-      productPrice = parseFloat(selectedProduct.price) || 0;
-    } else {
-      productName = document.getElementById('customProductName').value.trim();
-      productCode = 'CUSTOM';
-    }
+// 2. BUILD PRODUCT FIELDS HİSSƏSİNİ BUNUNLA ƏVƏZ EDİN:
+    let productName  = cart.map(p => p.name).join(' + ');
+    let productCode  = cart.map(p => p.code).join(', ');
+    let productPrice = cart.reduce((sum, p) => sum + p.price, 0);
+    let finalCustomImage = cart.find(p => p.isCustom && p.image)?.image || '';
 
     const discountApplied = (payMethod === 'cash' && depositChecked) ? 4 : 0;
     const depositPaid     = (payMethod === 'cash' && depositChecked) ? 10 : 0;
 
-    // — Payload —
+    // 3. PAYLOAD OBYEKTİNİ BUNUNLA ƏVƏZ EDİN (customProductImage dəyişib):
     const payload = {
       action:              'createCustomerOrder',
       customerName:        document.getElementById('custName').value.trim(),
@@ -1299,7 +1354,7 @@
       discountApplied,
       depositPaid,
       receiptImage:        receiptImageB64,
-      customProductImage:  customProductImageB64
+      customProductImage:  finalCustomImage
     };
 
     setLoader(true, 'Sifariş göndərilir...');
@@ -1401,8 +1456,9 @@ try {
     document.getElementById('customerOrderForm').reset();
     document.querySelectorAll('.rep-option').forEach(o => o.classList.remove('selected'));
     document.getElementById('salesRep').value = '';
-    clearProduct();
-
+cart = [];
+    renderCart();
+    cancelCustomProduct();
     switchLoc('metro', document.querySelector('.loc-tab'));
     document.getElementById('locationStatus').style.display   = 'none';
     document.getElementById('mapCoordinatesLink').value        = '';
