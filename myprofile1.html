@@ -598,22 +598,39 @@
         ui.el('detail-desc').innerText = task.desc;
         
      // --- MEDIA RENDERER ---
+     // --- MEDIA RENDERER ---
         const media = state.media.filter(m => m.taskId === id);
         
         ui.el('detail-media').innerHTML = media.map(m => {
            let content = '';
-           // Helper: Create a force-download link if it's Google Drive
            let downloadUrl = m.url;
-           if (m.url.includes('drive.google.com') && m.url.includes('/file/d/')) {
+           let previewUrl = m.url; 
+           let isGoogleDrive = m.url.includes('drive.google.com') && m.url.includes('/file/d/');
+           
+           // Helper: Create a force-download link & preview link if it's Google Drive
+           if (isGoogleDrive) {
              const fileId = m.url.split('/file/d/')[1].split('/')[0];
              downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+             previewUrl = `https://drive.google.com/file/d/${fileId}/preview`; // The watchable player
            }
            
            // 1. Determine Content Type
            if(m.type === 'VIDEO') {
-             // Note: Google Drive videos might require 'preview' link to play, 
-             // but here we assume direct link or compatible player logic
-             content = `<div class="media-wrapper aspect-video flex items-center justify-center bg-black"><video controls class="w-full h-full" src="${m.url}"></video></div>`;
+             if (isGoogleDrive) {
+               // Render Google Drive iFrame for direct streaming
+               content = `
+                 <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; background-color: #000; margin-bottom: 10px;">
+                     <iframe 
+                         src="${previewUrl}" 
+                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" 
+                         allow="autoplay; fullscreen" 
+                         allowfullscreen>
+                     </iframe>
+                 </div>`;
+             } else {
+               // Fallback standard video player for normal direct links (e.g., MP4s)
+               content = `<div class="media-wrapper aspect-video flex items-center justify-center bg-black"><video controls class="w-full h-full" src="${m.url}"></video></div>`;
+             }
            } else if(m.type === 'IMAGE') {
              // For Images, we try to use the direct link for preview if possible, 
              // otherwise just show the wrapper
@@ -788,3 +805,5 @@
   </script>
 </body>
 </html>
+
+
