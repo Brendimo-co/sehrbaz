@@ -446,8 +446,8 @@
   </div>
 
   <!-- ═══════════════ TAB: MAĞAZA ═══════════════ -->
-  <div id="tab-store" class="view-container">
-    <iframe src="partner.html" class="full-frame"></iframe>
+<div id="tab-store" class="view-container">
+    <iframe src="catalogue.html" class="full-frame"></iframe>
   </div>
 
   <!-- ═══════════════ TAB: YENİ SİFARİŞ ═══════════════ -->
@@ -1039,35 +1039,39 @@
   /* ═══════════════════════════════════════════════════
      DATA FETCH
   ═══════════════════════════════════════════════════ */
-  async function fetchAllData() {
-    toggleLoader(true);
-    try {
-      const res  = await fetch(`${ORDERS_API}?action=getGlobalStats`);
-      const json = await res.json();
+async function fetchAllData() {
+    toggleLoader(true);
+    try {
+      const res  = await fetch(`${ORDERS_API}?action=getGlobalStats`);
+      const json = await res.json();
 
-      if (json.success) {
-        globalOrdersData = json.data || [];
+      if (json.success) {
+        globalOrdersData = json.data || [];
 
-        // Filter by sales rep phone or username
-        if (currentUserPhone) {
-          globalOrdersData = globalOrdersData.filter(o =>
-            o.staff === currentUserPhone ||
-            o.staff === currentUser ||
-            o.salesRepPhone === currentUserPhone
-          );
-        } else if (currentUser && currentUser !== 'Satış Nümayəndəsi') {
-          globalOrdersData = globalOrdersData.filter(o => o.staff === currentUser);
-        }
+        // Filter by sales rep phone or username safely by converting everything to strings and trimming spaces
+        if (currentUserPhone) {
+          const safePhone = String(currentUserPhone).trim();
+          const safeUser  = String(currentUser).trim();
 
-        renderOrderList();
-        renderStats();
-      }
-    } catch (err) {
-      console.error('fetchAllData:', err);
-    } finally {
-      toggleLoader(false);
-    }
-  }
+          globalOrdersData = globalOrdersData.filter(o =>
+            String(o.staff || '').trim() === safePhone ||
+            String(o.salesRepPhone || '').trim() === safePhone ||
+            String(o.staff || '').trim() === safeUser
+          );
+        } else if (currentUser && currentUser !== 'Satış Nümayəndəsi') {
+          const safeUser = String(currentUser).trim();
+          globalOrdersData = globalOrdersData.filter(o => String(o.staff || '').trim() === safeUser);
+        }
+
+        renderOrderList();
+        renderStats();
+      }
+    } catch (err) {
+      console.error('fetchAllData:', err);
+    } finally {
+      toggleLoader(false);
+    }
+  }
 
   /* ═══════════════════════════════════════════════════
      DATE FILTER (List)
