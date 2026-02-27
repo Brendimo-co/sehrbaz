@@ -317,8 +317,11 @@
             state.withdrawals = data.withdrawals || [];
             
             // YENİ: Save the phone number to the browser's localStorage
-            localStorage.setItem('partner_user', phone);
-            
+// YENİ: Save the phone number and name to the browser's localStorage
+localStorage.setItem('partner_user', JSON.stringify({
+  phone: phone,
+  name: data.user.name // Assumes your API returns the name here
+}));            
             // Switch Screens
             ui.el('view-login').classList.add('hidden');
             ui.el('view-main').classList.remove('hidden');
