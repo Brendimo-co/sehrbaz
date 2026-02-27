@@ -3,819 +3,3233 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Brendimo - Panel</title>
-  
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>Brendimo — Partnyor Portalı</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <style>
-    /* General Settings */
-    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-    
-    /* Scrollbar Hiding */
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    
-    /* Animations */
-    .fade-in { animation: fadeIn 0.3s ease-out; }
-    .slide-up { animation: slideUp 0.3s ease-out; }
-    
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    /* ══════════════════════════════════════════════
+       CSS VARIABLES & RESET
+    ══════════════════════════════════════════════ */
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --primary-light: #eff6ff;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --cp-primary: #FF2D55;
+      --cp-primary-dark: #D61F44;
+      --cp-accent: #5856D6;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-sec: #64748b;
+      --border: #e2e8f0;
+      --input-bg: #f1f5f9;
+      --radius: 16px;
+      --nav-height: 80px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+    }
 
-    /* Visual Effects */
-    .glass { 
-      background: rgba(255, 255, 255, 0.95); 
-      backdrop-filter: blur(10px); 
-      -webkit-backdrop-filter: blur(10px); 
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+      margin: 0;
+      padding: 0;
     }
-    .gradient-card { 
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
     }
-    
-    /* Loading Spinner */
-    .loader {
-      border: 3px solid #f3f3f3; 
-      border-top: 3px solid #3b82f6; 
+
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ══════════════════════════════════════════════
+       LOGIN SCREEN
+    ══════════════════════════════════════════════ */
+    #view-login {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    #view-login.hidden {
+      opacity: 0;
+      transform: translateY(-30px);
+      pointer-events: none;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 380px;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 28px;
+      padding: 40px 32px;
+    }
+
+    .login-logo {
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      box-shadow: 0 8px 32px rgba(59,130,246,0.4);
+    }
+
+    .login-logo i { font-size: 32px; color: white; }
+
+    .login-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: white;
+      text-align: center;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .login-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,0.55);
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .login-input-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .login-input-wrap i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.4);
+      font-size: 14px;
+    }
+
+    .login-input {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 14px 16px 14px 44px;
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    .login-input::placeholder { color: rgba(255,255,255,0.3); font-weight: 400; }
+
+    .login-input:focus {
+      border-color: rgba(59,130,246,0.7);
+      background: rgba(255,255,255,0.12);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    }
+
+    .login-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      border: none;
+      border-radius: 14px;
+      padding: 15px;
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
+      box-shadow: 0 6px 24px rgba(59,130,246,0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .login-btn:active { transform: scale(0.97); box-shadow: 0 2px 12px rgba(59,130,246,0.3); }
+
+    /* ══════════════════════════════════════════════
+       MAIN APP WRAPPER
+    ══════════════════════════════════════════════ */
+    #view-main {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      background: var(--bg);
+      box-shadow: 0 0 60px rgba(0,0,0,0.15);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #view-main.active { display: flex; }
+
+    /* ══════════════════════════════════════════════
+       HEADER
+    ══════════════════════════════════════════════ */
+    .app-header {
+      background: white;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      z-index: 20;
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .header-name { font-weight: 700; font-size: 15px; color: var(--text-main); }
+    .header-sub  { font-size: 11px; color: var(--text-sec); font-weight: 500; }
+
+    .header-points {
+      background: var(--text-main);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .header-points i { color: #fbbf24; font-size: 10px; }
+
+    /* ══════════════════════════════════════════════
+       TAB CONTENT AREA
+    ══════════════════════════════════════════════ */
+    .tab-content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-content::-webkit-scrollbar { display: none; }
+    .tab-content { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .tab-page {
+      display: none;
+      padding: 16px 16px calc(var(--nav-height) + 16px) 16px;
+      animation: fadeSlideUp 0.25s ease-out;
+    }
+
+    .tab-page.active { display: block; }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══════════════════════════════════════════════
+       BOTTOM NAVIGATION
+    ══════════════════════════════════════════════ */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: var(--nav-height);
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: stretch;
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom, 8px);
+    }
+
+    .nav-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: #94a3b8;
+      font-size: 10px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .nav-btn i { font-size: 20px; transition: transform 0.2s; }
+    .nav-btn.active { color: var(--primary); }
+    .nav-btn.active i { transform: scale(1.1); }
+
+    .nav-btn.locked { color: #cbd5e1; cursor: not-allowed; }
+
+    .nav-lock-badge {
+      position: absolute;
+      top: 6px;
+      right: calc(50% - 18px);
+      width: 14px;
+      height: 14px;
+      background: #94a3b8;
       border-radius: 50%;
-      width: 24px; height: 24px; 
-      animation: spin 1s linear infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 7px;
+      color: white;
     }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* Media Wrapper */
+    .nav-btn.locked .nav-lock-badge { display: flex; }
+    .nav-btn:not(.locked) .nav-lock-badge { display: none; }
+
+    /* ══════════════════════════════════════════════
+       CARDS & COMMON COMPONENTS
+    ══════════════════════════════════════════════ */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title i { color: var(--primary); font-size: 14px; }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-sec);
+      margin-bottom: 6px;
+      margin-left: 2px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--input-bg);
+      border: 1.5px solid transparent;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-main);
+      font-family: inherit;
+      margin-bottom: 12px;
+      transition: all 0.18s;
+      -webkit-appearance: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      background: white;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+    }
+
+    input::placeholder { color: #94a3b8; font-weight: 400; }
+    textarea { resize: none; }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      border-radius: 14px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform 0.12s, opacity 0.12s;
+      text-decoration: none;
+    }
+
+    .btn:active { transform: scale(0.97); opacity: 0.9; }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 16px rgba(59,130,246,0.3); }
+    .btn-dark    { background: var(--text-main); color: white; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+    .btn-success { background: var(--success); color: white; box-shadow: 0 4px 16px rgba(34,197,94,0.3); }
+    .btn-danger  { background: rgba(239,68,68,0.1); color: var(--danger); width: auto; padding: 7px 12px; border-radius: 10px; font-size: 12px; }
+    .btn-sm      { padding: 8px 14px; font-size: 12px; width: auto; border-radius: 10px; }
+    .btn-map     { background: #dbeafe; color: var(--primary); border: 1px solid #bfdbfe; }
+    .btn-whatsapp { background: #25D366; color: white; box-shadow: 0 4px 16px rgba(37,211,102,0.3); }
+    .btn-co-primary {
+      background: linear-gradient(135deg, var(--cp-primary), var(--cp-primary-dark));
+      color: white;
+      box-shadow: 0 4px 16px rgba(255,45,85,0.3);
+    }
+
+    /* ══════════════════════════════════════════════
+       LOADER
+    ══════════════════════════════════════════════ */
+    #app-loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.88);
+      z-index: 8000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(6px);
+    }
+
+    .loader-spinner {
+      width: 36px;
+      height: 36px;
+      border: 3.5px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .loader-text {
+      margin-top: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-sec);
+      text-align: center;
+      padding: 0 30px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .inline-loader {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    /* ══════════════════════════════════════════════
+       TAB 1 — TAPŞIRIQLAR (TASKS)
+    ══════════════════════════════════════════════ */
+    .level-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 14px;
+    }
+
+    .level-tabs::-webkit-scrollbar { display: none; }
+
+    .level-tab-btn {
+      flex-shrink: 0;
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1.5px solid var(--border);
+      background: white;
+      color: var(--text-sec);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.18s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .level-tab-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      box-shadow: 0 3px 10px rgba(59,130,246,0.3);
+    }
+
+    .level-tab-btn.locked { opacity: 0.55; }
+
+    .task-card {
+      background: white;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: transform 0.12s, border-color 0.18s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .task-card:active { transform: scale(0.98); }
+    .task-card.approved { border-color: #bbf7d0; background: #f0fdf4; }
+    .task-card.pending  { border-color: #fed7aa; background: #fff7ed; }
+    .task-card.locked   { opacity: 0.55; cursor: not-allowed; filter: grayscale(1); }
+
+    .task-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--input-bg);
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .task-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .task-thumb i { color: #94a3b8; font-size: 18px; }
+
+    .task-info { flex: 1; min-width: 0; }
+    .task-name { font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .task-desc { font-size: 11px; color: var(--text-sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .task-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+    .task-points { font-size: 10px; font-weight: 800; color: var(--primary); background: var(--primary-light); padding: 3px 8px; border-radius: 8px; border: 1px solid #bfdbfe; }
+
+    /* ══════════════════════════════════════════════
+       DETAIL MODAL
+    ══════════════════════════════════════════════ */
+    #modal-detail {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: white;
+      display: none;
+      flex-direction: column;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    #modal-detail.active { display: flex; }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+
+    .modal-header {
+      background: white;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .modal-back {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--input-bg);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-sec);
+    }
+
+    .modal-title { font-size: 15px; font-weight: 700; color: var(--text-main); text-align: center; flex: 1; padding: 0 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .modal-body { flex: 1; overflow-y: auto; padding: 16px 16px 100px; }
+
+    /* Media */
     .media-wrapper {
       border-radius: 12px;
       overflow: hidden;
       background: #000;
+      margin-bottom: 8px;
+    }
+
+    /* Upload Area */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: var(--input-bg);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .upload-area:hover { border-color: var(--primary); background: var(--primary-light); }
+    .upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .upload-area i { font-size: 28px; color: #94a3b8; margin-bottom: 6px; }
+    .upload-area span { font-size: 12px; font-weight: 600; color: var(--text-sec); }
+    .upload-preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+
+    /* ══════════════════════════════════════════════
+       WITHDRAW MODAL
+    ══════════════════════════════════════════════ */
+    #modal-withdraw {
+      position: fixed;
+      inset: 0;
+      z-index: 600;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    #modal-withdraw.active { display: flex; }
+
+    .withdraw-sheet {
+      background: white;
+      border-radius: 24px 24px 0 0;
+      padding: 24px 20px 32px;
+      width: 100%;
+      max-width: 480px;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    .withdraw-handle {
+      width: 40px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+
+    /* ══════════════════════════════════════════════
+       TAB 2 — MAĞAZA (embedded iframe)
+    ══════════════════════════════════════════════ */
+    #page-magaza {
+      padding: 0;
+      height: calc(100vh - var(--nav-height) - 64px);
+    }
+
+    #page-magaza iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* ══════════════════════════════════════════════
+       TAB 3 — YENİ SİFARİŞ
+    ══════════════════════════════════════════════ */
+    .user-header-card {
+      background: linear-gradient(135deg, #3b82f6 0%, #5856D6 100%);
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: white;
+      box-shadow: 0 6px 24px rgba(59,130,246,0.25);
+    }
+
+    .uhi-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .uhi-name { font-size: 16px; font-weight: 800; }
+    .uhi-phone { font-size: 12px; opacity: 0.75; margin-top: 1px; }
+
+    /* Location Tabs */
+    .loc-tabs {
+      display: flex;
+      background: var(--input-bg);
+      border-radius: 10px;
+      padding: 3px;
+      margin-bottom: 12px;
+    }
+
+    .loc-tab {
+      flex: 1;
+      text-align: center;
+      padding: 8px 4px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sec);
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      border: none;
+      background: none;
+      transition: all 0.18s;
+    }
+
+    .loc-tab.active { background: white; color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+    .loc-content { display: none; }
+    .loc-content.active { display: block; }
+
+    /* Map */
+    .map-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: #eff6ff;
+      border-radius: 12px;
+      cursor: pointer;
+      border: 1.5px solid #dbeafe;
+      margin-top: 10px;
+    }
+
+    .map-toggle-icon { font-size: 16px; color: var(--primary); }
+    .map-toggle-label { flex: 1; font-size: 13px; font-weight: 600; color: var(--primary); }
+
+    .map-toggle-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid #bfdbfe;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: transparent;
+      flex-shrink: 0;
+    }
+
+    .map-toggle-check.checked { background: var(--primary); border-color: var(--primary); color: white; }
+    .map-optional-section { display: none; margin-top: 12px; }
+
+    /* Product Search */
+    .product-search-wrap { position: relative; }
+    .product-search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-52%); color: var(--text-sec); font-size: 13px; pointer-events: none; }
+    #co-productSearch { padding-left: 40px; margin-bottom: 0; }
+
+    .product-results-list {
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      max-height: 260px;
+      overflow-y: auto;
+      margin-top: 8px;
+      display: none;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .product-result-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.14s;
+    }
+
+    .product-result-item:last-child { border-bottom: none; }
+    .product-result-item:active { background: #fff0f3; }
+
+    .pri-img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; background: var(--input-bg); flex-shrink: 0; }
+    .pri-placeholder { width: 44px; height: 44px; border-radius: 8px; background: var(--input-bg); display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 16px; flex-shrink: 0; }
+
+    .pri-name  { font-size: 13px; font-weight: 700; color: var(--text-main); }
+    .pri-meta  { font-size: 11px; color: var(--text-sec); margin-top: 1px; }
+    .pri-price { font-size: 12px; font-weight: 800; color: var(--cp-primary); margin-top: 2px; }
+
+    .no-result-row { padding: 14px; text-align: center; }
+    .no-result-row p { font-size: 13px; color: var(--text-sec); margin-bottom: 10px; }
+
+    .btn-custom-product {
+      background: #f5f3ff;
+      border: 1.5px dashed #c4b5fd;
+      border-radius: 10px;
+      padding: 9px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--cp-accent);
+      cursor: pointer;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    /* Cart */
+    .cart-item-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, #fff5f7, #f5f5ff);
+      border: 1.5px solid #ffd6e0;
+      border-radius: 12px;
+      padding: 10px;
+      margin-top: 8px;
+    }
+
+    .cart-item-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+    .cart-item-placeholder { width: 50px; height: 50px; border-radius: 8px; background: var(--input-bg); display: flex; align-items: center; justify-content: center; color: #bbb; font-size: 18px; flex-shrink: 0; }
+
+    .cart-item-info { flex: 1; min-width: 0; }
+    .cart-item-name  { font-size: 13px; font-weight: 700; }
+    .cart-item-code  { font-size: 11px; color: var(--text-sec); margin-top: 1px; }
+    .cart-item-price { font-size: 15px; font-weight: 800; color: var(--cp-primary); margin-top: 3px; }
+
+    .cart-item-remove {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: white;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 11px;
+      color: var(--cp-primary);
+      flex-shrink: 0;
+    }
+
+    /* Total Summary */
+    .total-summary-box {
+      background: var(--input-bg);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-top: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .total-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+    .total-row.grand { font-size: 16px; font-weight: 800; margin-top: 8px; padding-top: 8px; border-top: 1.5px dashed var(--border); margin-bottom: 0; color: var(--cp-primary); }
+
+    /* Custom product section */
+    .custom-product-section {
+      display: none;
+      margin-top: 12px;
+      padding: 14px;
+      background: #f5f3ff;
+      border: 1.5px dashed #c4b5fd;
+      border-radius: 14px;
+    }
+
+    .cps-title { font-size: 13px; font-weight: 700; color: var(--cp-accent); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+
+    /* Image Upload Area */
+    .image-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--input-bg);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .image-upload-area:hover { border-color: var(--cp-primary); background: #fff5f7; }
+    .image-upload-area.has-image { border-style: solid; border-color: var(--success); background: #f0fdf4; }
+    .image-upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0; padding: 0; border: none; }
+
+    .iua-icon { font-size: 24px; margin-bottom: 5px; }
+    .iua-text { font-size: 12px; color: var(--text-sec); font-weight: 500; }
+    .iua-preview { width: 64px; height: 64px; border-radius: 8px; object-fit: cover; margin: 0 auto 6px; display: block; }
+
+    /* Payment UI */
+    .deposit-offer-box {
+      display: none;
+      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+      border: 1.5px solid #fcd34d;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    .dob-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .dob-icon { font-size: 20px; }
+    .dob-title { font-size: 13px; font-weight: 800; color: #92400e; }
+    .dob-sub   { font-size: 11px; color: #78350f; margin-top: 1px; }
+
+    .deposit-checkbox-row { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 7px 0; }
+
+    .deposit-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid #d1d5db;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 10px;
+      color: transparent;
+      transition: all 0.18s;
+    }
+
+    .deposit-checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
+
+    .discount-badge {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #166534;
+    }
+
+    .card-receipt-box {
+      display: none;
+      background: #eff6ff;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    .crb-label { font-size: 13px; font-weight: 700; color: var(--cp-accent); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+
+    .receipt-upload-section { display: none; margin-top: 10px; }
+
+    /* ══════════════════════════════════════════════
+       TAB 4 — SİFARİŞLƏR (List + Track merged)
+    ══════════════════════════════════════════════ */
+    .section-toggle {
+      display: flex;
+      background: var(--input-bg);
+      border-radius: 12px;
+      padding: 3px;
+      margin-bottom: 14px;
+    }
+
+    .section-toggle-btn {
+      flex: 1;
+      padding: 9px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sec);
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+      border: none;
+      background: none;
+      transition: all 0.18s;
+    }
+
+    .section-toggle-btn.active { background: white; color: var(--text-main); box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+    .section-content { display: none; }
+    .section-content.active { display: block; animation: fadeSlideUp 0.2s ease-out; }
+
+    /* Date chips */
+    .date-chip-row {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+    }
+
+    .date-chip-row::-webkit-scrollbar { display: none; }
+
+    .date-chip {
+      flex-shrink: 0;
+      padding: 6px 13px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: white;
+      color: var(--text-sec);
+      font-family: inherit;
+      transition: all 0.16s;
+    }
+
+    .date-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* Stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 14px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border);
+    }
+
+    .stat-val   { font-size: 20px; font-weight: 800; margin: 4px 0; letter-spacing: -0.5px; }
+    .stat-label { font-size: 10px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 700; }
+
+    /* Order card */
+    .order-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+    .order-id { font-weight: 800; font-size: 16px; }
+
+    .badge { padding: 3px 9px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; }
+    .badge-delivered { background: #dcfce7; color: #166534; }
+    .badge-preparing, .badge-pending, .badge-new { background: #fff7ed; color: #9a3412; }
+    .badge-onway     { background: #dbeafe; color: #1e40af; }
+    .badge-deleted   { background: #fee2e2; color: #991b1b; }
+
+    .row-detail { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; border-bottom: 1px dashed var(--border); padding-bottom: 5px; }
+    .label-detail { color: var(--text-sec); font-weight: 500; }
+    .val-detail   { font-weight: 600; text-align: right; max-width: 60%; word-break: break-word; }
+
+    .products-box { background: var(--input-bg); border-radius: 10px; padding: 9px 11px; font-size: 12px; line-height: 1.5; margin-top: 8px; }
+
+    .note-area { margin-top: 10px; background: var(--input-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border); }
+    .note-textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; font-size: 13px; font-family: inherit; resize: none; background: white; margin-bottom: 0; }
+
+    /* Track */
+    .track-result { display: none; animation: fadeSlideUp 0.3s ease-out; }
+
+    .status-badge-track {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: #eee;
+      color: #555;
       margin-bottom: 10px;
     }
+
+    .status-Delivered { background: #dcfce7; color: var(--success); }
+    .status-Preparing { background: #fff7ed; color: var(--warning); }
+    .status-New       { background: #ede9fe; color: var(--cp-accent); }
+    .status-OnWay     { background: #dbeafe; color: var(--primary); }
+
+    /* ══════════════════════════════════════════════
+       TAB 5 — HESABİM (Wallet + Stats + Profile merged)
+    ══════════════════════════════════════════════ */
+    .wallet-gradient-card {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      border-radius: 20px;
+      padding: 22px;
+      color: white;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 32px rgba(59,130,246,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .wgc-bg-icon {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 16px;
+      opacity: 0.12;
+    }
+
+    .wgc-bg-icon i { font-size: 64px; }
+    .wgc-label { font-size: 11px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .wgc-balance { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 18px; }
+    .wgc-balance span { font-size: 18px; font-weight: 600; }
+
+    .wgc-footer { display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 14px; }
+    .wgc-foot-label { font-size: 10px; color: rgba(255,255,255,0.6); text-transform: uppercase; margin-bottom: 2px; }
+    .wgc-foot-val   { font-size: 13px; font-weight: 700; }
+
+    /* Performance card */
+    .progress-bar-wrap { background: rgba(255,255,255,0.15); border-radius: 8px; height: 8px; overflow: hidden; margin: 8px 0 4px; }
+    .progress-bar-fill { height: 100%; border-radius: 8px; background: white; transition: width 0.6s; }
+
+    /* History items */
+    .history-item {
+      background: white;
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .hi-label { font-size: 13px; font-weight: 700; }
+    .hi-date  { font-size: 10px; color: var(--text-sec); margin-top: 1px; }
+    .hi-amount { font-size: 14px; font-weight: 800; }
+    .hi-status { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 6px; margin-top: 3px; text-align: right; }
+
+    .hs-pending  { color: #d97706; background: #fff7ed; }
+    .hs-paid     { color: #166534; background: #dcfce7; }
+    .hs-rejected { color: #991b1b; background: #fee2e2; }
+
+    /* Affiliate stats */
+    .aff-stat-item {
+      background: white;
+      border-radius: 14px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .aff-stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .aff-stat-label { font-size: 11px; color: var(--text-sec); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+    .aff-stat-val   { font-size: 20px; font-weight: 800; color: var(--text-main); margin-top: 2px; }
+
+    /* Sub section toggle */
+    .sub-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 14px;
+    }
+
+    .sub-tabs::-webkit-scrollbar { display: none; }
+
+    .sub-tab-btn {
+      flex-shrink: 0;
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1.5px solid var(--border);
+      background: white;
+      color: var(--text-sec);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.18s;
+    }
+
+    .sub-tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    .sub-section { display: none; animation: fadeSlideUp 0.2s ease-out; }
+    .sub-section.active { display: block; }
+
+    /* Support button */
+    .support-btn-floating {
+      width: 100%;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 14px;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      box-shadow: 0 6px 24px rgba(37,211,102,0.3);
+      text-decoration: none;
+      transition: transform 0.12s;
+    }
+
+    .support-btn-floating:active { transform: scale(0.97); }
+    .support-btn-floating i { font-size: 20px; }
+
+    /* Stats period */
+    .stats-period-select {
+      margin-bottom: 14px;
+      padding: 10px 14px;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Progress */
+    .progress-wrap { background: var(--input-bg); border-radius: 8px; height: 8px; overflow: hidden; margin: 8px 0 4px; }
+    .progress-fill { height: 100%; border-radius: 8px; background: var(--primary); transition: width 0.6s; }
+    .progress-label { font-size: 11px; color: var(--text-sec); font-weight: 600; }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 40px 20px; }
+    .empty-state i { font-size: 38px; color: #cbd5e1; margin-bottom: 12px; display: block; }
+    .empty-state p { color: var(--text-sec); font-size: 13px; font-weight: 500; }
+
+    /* Profile section */
+    .profile-field { margin-bottom: 16px; }
+    .profile-field label { margin-bottom: 6px; }
+
+    .profile-locked-banner {
+      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+      border: 1.5px solid #fcd34d;
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .plb-icon { font-size: 32px; margin-bottom: 8px; }
+    .plb-title { font-size: 15px; font-weight: 800; color: #78350f; margin-bottom: 4px; }
+    .plb-desc  { font-size: 12px; color: #92400e; }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
+<body>
 
-  <script>
-    // ⚠️ REPLACE THIS URL WITH YOUR GOOGLE SCRIPT WEB APP URL ⚠️
-    const API_URL = "https://script.google.com/macros/s/AKfycbwJoMAwjUlYRA4GBthfCbsvClKxYufbeMFO36d4aNGo4tHhJsX_4O1-2fg-awfUfWpt/exec"; 
-  </script>
+  <!-- ═══════════════ APP LOADER ═══════════════ -->
+  <div id="app-loader">
+    <div class="loader-spinner"></div>
+    <p class="loader-text" id="loader-text">Məlumatlar yüklənir...</p>
+  </div>
 
-  <div id="view-login" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 transition-transform duration-500">
-    <div class="w-full max-w-sm">
-      <div class="flex justify-center mb-8">
-        <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-200">
-          <i class="fa-solid fa-gem text-4xl text-white"></i>
-        </div>
+  <!-- ═══════════════ LOGIN SCREEN ═══════════════ -->
+  <div id="view-login">
+    <div class="login-card">
+      <div class="login-logo"><i class="fa-solid fa-gem"></i></div>
+      <h1 class="login-title">Brendimo</h1>
+      <p class="login-sub">Partnyor Portalı</p>
+
+      <div class="login-input-wrap">
+        <i class="fa-solid fa-phone"></i>
+        <input type="tel" id="inp-phone" class="login-input" placeholder="Nömrə (məs: 501234567)">
       </div>
-      
-      <h1 class="text-3xl font-bold text-center text-slate-900 mb-2">Brendimo</h1>
-      <p class="text-center text-gray-500 mb-8">Partnyor Portalı</p>
-      
-      <div class="space-y-4">
-        <div class="relative">
-          <span class="absolute left-4 top-3.5 text-gray-400"><i class="fa-solid fa-phone"></i></span>
-          <input type="tel" id="inp-phone" placeholder="Nömrə (məs: 501234567)" 
-            class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 outline-none focus:ring-2 focus:ring-blue-500 font-bold transition-all">
-        </div>
-        
-        <button id="btn-login" onclick="app.login()" 
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg active:scale-[0.98] transition-all flex justify-center items-center gap-2">
-          <span id="btn-login-text">Daxil Ol</span>
-          <div id="btn-login-loader" class="loader border-t-white hidden"></div>
-        </button>
-      </div>
+
+      <button id="btn-login" onclick="app.login()" class="login-btn">
+        <span id="btn-login-text">Daxil Ol</span>
+        <div id="btn-login-loader" class="inline-loader" style="display:none;"></div>
+      </button>
     </div>
   </div>
 
-  <div id="view-main" class="flex-1 flex flex-col relative hidden max-w-md mx-auto w-full bg-gray-50 shadow-2xl h-full">
-    
-    <header class="glass sticky top-0 z-20 px-5 pt-safe-top pb-2 border-b border-gray-200">
-      <div class="flex justify-between items-center py-4">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow-sm">
-            <span id="user-avatar">?</span>
-          </div>
-          <div class="leading-tight">
-            <h2 class="font-bold text-lg text-slate-800 truncate w-32" id="user-name">User</h2>
-            <p class="text-xs text-gray-500 font-medium">Xoş gəlmisiniz</p>
-          </div>
+  <!-- ═══════════════ MAIN APP ═══════════════ -->
+  <div id="view-main">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-user">
+        <div class="header-avatar" id="hdr-avatar">?</div>
+        <div>
+          <div class="header-name" id="hdr-name">Yüklənir...</div>
+          <div class="header-sub">Xoş gəlmisiniz</div>
         </div>
-        
-        <div class="bg-slate-900 text-white px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2">
-          <i class="fa-solid fa-star text-yellow-400 text-xs"></i>
-          <span class="font-bold text-sm"><span id="user-points">0</span> xal</span>
-        </div>
+      </div>
+      <div class="header-points">
+        <i class="fa-solid fa-star"></i>
+        <span id="hdr-points">0</span> xal
       </div>
     </header>
 
-   <main class="flex-1 overflow-y-auto pb-24 relative">
-      
-      <div id="page-home" class="p-5 space-y-4 fade-in">
-        
-        <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2 mb-2 sticky top-0 bg-gray-50 z-10 py-2">
-          <button onclick="app.filterLevel(1)" class="tab-btn active px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-blue-600 text-white shadow-md" data-level="1">Səviyyə 1</button>
-          <button onclick="app.filterLevel(2)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border" data-level="2">Səviyyə 2</button>
-          <button onclick="app.filterLevel(3)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border" data-level="3">Səviyyə 3</button>
-          <button onclick="app.filterLevel(4)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border" data-level="4">Səviyyə 4</button>
-          <button onclick="app.filterLevel(5)" class="tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-white text-gray-500 border" data-level="5">Səviyyə 5</button>
+    <!-- Tab Content -->
+    <div class="tab-content" id="tab-content">
+
+      <!-- ══ PAGE 1: TAPŞIRIQLAR ══ -->
+      <div id="page-tapsiriqlar" class="tab-page active">
+        <!-- Level filter tabs -->
+        <div class="level-tabs" id="level-tabs">
+          <button class="level-tab-btn active" onclick="app.filterLevel(1)" data-level="1">Səviyyə 1</button>
+          <button class="level-tab-btn" onclick="app.filterLevel(2)" data-level="2">Səviyyə 2</button>
+          <button class="level-tab-btn" onclick="app.filterLevel(3)" data-level="3">Səviyyə 3</button>
+          <button class="level-tab-btn" onclick="app.filterLevel(4)" data-level="4">Səviyyə 4</button>
+          <button class="level-tab-btn" onclick="app.filterLevel(5)" data-level="5">Səviyyə 5</button>
         </div>
-        
-        <div id="task-container" class="space-y-4">
-          </div>
+
+        <div id="task-container"></div>
       </div>
 
-      <div id="page-wallet" class="p-5 space-y-6 hidden fade-in">
-        
-        <div class="gradient-card rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
-          <div class="absolute top-0 right-0 p-4 opacity-20"><i class="fa-solid fa-wallet text-6xl"></i></div>
-          <p class="text-blue-100 text-xs font-medium mb-1">Cari Balans</p>
-          <h2 class="text-3xl font-bold mb-6"><span id="wallet-balance">0.00</span> <span class="text-lg">AZN</span></h2>
-          
-          <div class="flex justify-between items-end border-t border-blue-400/30 pt-4">
-            <div>
-              <p class="text-blue-200 text-[10px] uppercase">Gözləyən</p>
-              <p class="font-bold text-sm"><span id="wallet-pending">0.00</span> AZN</p>
-            </div>
-            <div class="text-right">
-              <p class="text-blue-200 text-[10px] uppercase">Cəmi Çıxarılan</p>
-              <p class="font-bold text-sm"><span id="wallet-withdrawn">0.00</span> AZN</p>
-            </div>
+      <!-- ══ PAGE 2: MAĞAZA ══ -->
+      <div id="page-magaza" class="tab-page">
+        <iframe src="catalogue.html" id="magaza-frame" loading="lazy"></iframe>
+      </div>
+
+      <!-- ══ PAGE 3: YENİ SİFARİŞ ══ -->
+      <div id="page-yeni" class="tab-page">
+
+        <div class="user-header-card">
+          <div class="uhi-avatar" id="co-avatar">?</div>
+          <div>
+            <div class="uhi-name" id="co-username">Yüklənir...</div>
+            <div class="uhi-phone" id="co-userphone">—</div>
           </div>
         </div>
 
-        <button onclick="ui.openWithdrawModal()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold shadow-lg flex justify-center items-center gap-2 active:scale-95 transition-transform hover:bg-slate-800">
-          <i class="fa-solid fa-money-bill-transfer"></i>
-          Vəsait Çıxar (Min 5 AZN)
-        </button>
+        <form id="customerOrderForm" novalidate>
+          <input type="hidden" id="salesRep">
 
-        <div>
-          <h3 class="font-bold text-slate-800 mb-3 text-sm">Son Əməliyyatlar</h3>
-          <div id="wallet-history" class="space-y-3">
-             </div>
-        </div>
-      </div>
+          <!-- Müştəri -->
+          <div class="card">
+            <div class="card-title"><i class="fa-regular fa-id-card"></i> Müştəri Məlumatları</div>
 
-      <div id="page-profile" class="p-5 space-y-4 hidden fade-in">
-        
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
-           <div class="w-20 h-20 bg-blue-100 rounded-full mx-auto flex items-center justify-center mb-4">
-             <i class="fa-solid fa-store text-3xl text-blue-600"></i>
-           </div>
-           <h2 class="text-xl font-bold text-slate-800">Satıcı Profili</h2>
-           <p class="text-sm text-gray-500 mt-2">Bu səhifə yalnız 2-ci səviyyəyə çatdıqda aktivləşir.</p>
-        </div>
+            <label>Ad və Soyad</label>
+            <input type="text" id="custName" placeholder="Əli Vəliyev" required>
 
-        <div class="space-y-3">
-           <label class="block text-xs font-bold text-gray-400 uppercase">Mağaza Adı</label>
-           <input type="text" class="w-full p-3 bg-white border border-gray-200 rounded-xl font-bold text-slate-700" placeholder="Mağaza adı...">
-           
-           <label class="block text-xs font-bold text-gray-400 uppercase mt-4">Əlaqə Nömrəsi</label>
-           <input type="text" class="w-full p-3 bg-white border border-gray-200 rounded-xl font-bold text-slate-700" placeholder="+994...">
-           
-           <button class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold mt-6 shadow-lg">Yadda Saxla</button>
-        </div>
-      </div>
+            <label>Əlaqə Nömrəsi</label>
+            <input type="tel" id="custPhone" placeholder="050 000 00 00" required>
 
-    </main>
+            <label>Instagram Profil Adı <span style="font-weight:400;text-transform:none;color:#bbb;"> — istəyə bağlı</span></label>
+            <div style="position:relative;">
+              <span style="position:absolute;left:14px;top:50%;transform:translateY(-52%);color:#94a3b8;font-size:13px;pointer-events:none;">@</span>
+              <input type="text" id="instagramHandle" placeholder="username" style="padding-left:32px;">
+            </div>
+          </div>
 
-    <div class="absolute bottom-0 w-full glass border-t border-gray-200 pb-safe-bottom z-30 flex justify-around p-2">
-      <button onclick="app.nav('home')" id="nav-home" class="flex-1 p-3 rounded-xl flex flex-col items-center gap-1 text-blue-600 transition-colors">
-        <i class="fa-solid fa-list-check text-xl"></i>
-        <span class="text-[10px] font-bold">Tapşırıqlar</span>
-      </button>
-      
-      <button onclick="app.nav('wallet')" id="nav-wallet" class="flex-1 p-3 rounded-xl flex flex-col items-center gap-1 text-gray-400 transition-colors">
-        <i class="fa-solid fa-wallet text-xl"></i>
-        <span class="text-[10px] font-bold">Balans</span>
-      </button>
+          <!-- Çatdırılma Zamanı -->
+          <div class="card">
+            <div class="card-title"><i class="fa-regular fa-clock"></i> Çatdırılma Zamanı</div>
+            <div style="display:flex;gap:10px;">
+              <div style="flex:1;">
+                <label>Tarix</label>
+                <input type="date" id="deliveryDate" required>
+              </div>
+              <div style="flex:1;">
+                <label>Saat Aralığı</label>
+                <select id="timeSlot" required>
+                  <option value="">Seçin...</option>
+                  <option value="12:00 - 14:00">12:00 - 14:00</option>
+                  <option value="14:00 - 16:00">14:00 - 16:00</option>
+                  <option value="16:00 - 18:00">16:00 - 18:00</option>
+                  <option value="18:00 - 20:00">18:00 - 20:00</option>
+                  <option value="20:00 - 21:00">20:00 - 21:00</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
-      <button onclick="app.nav('profile')" id="nav-profile" class="flex-1 p-3 rounded-xl flex flex-col items-center gap-1 text-gray-400 transition-colors relative">
-        <i id="icon-profile" class="fa-solid fa-lock text-xl"></i>
-        <span class="text-[10px] font-bold">Satıcı</span>
-      </button>
-    </div>
+          <!-- Məhsul Seçimi -->
+          <div class="card">
+            <div class="card-title"><i class="fa-solid fa-box-open"></i> Məhsul Seçimi</div>
+            <p style="font-size:12px;color:#94a3b8;margin:-10px 0 12px;">Məhsul kodu və ya adı ilə axtarın:</p>
 
-  </div>
+            <div class="product-search-wrap">
+              <i class="fa-solid fa-magnifying-glass product-search-icon"></i>
+              <input type="text" id="co-productSearch" placeholder="Məs: Armani kəmər, Kod: 1009..."
+                autocomplete="off" oninput="coSearchProducts()" onfocus="coSearchProducts()">
+            </div>
 
-  <div id="modal-detail" class="fixed inset-0 z-40 bg-white hidden flex flex-col h-full slide-up">
-    <div class="glass px-5 py-4 border-b flex justify-between items-center sticky top-0 z-50">
-      <button onclick="ui.closeModals()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
-        <i class="fa-solid fa-arrow-left"></i>
-      </button>
-      <h3 class="font-bold truncate px-4 text-lg text-slate-800" id="detail-title">Tapşırıq Adı</h3>
-      <div class="w-10"></div> </div>
-    
-    <div class="flex-1 overflow-y-auto p-5 pb-32">
-      <div id="detail-media" class="space-y-4 mb-6"></div>
-      
-      <div class="bg-blue-50 p-4 rounded-xl text-sm text-gray-700 leading-relaxed border border-blue-100" id="detail-desc"></div>
-      
-      <div id="detail-action" class="mt-6 border-t pt-6"></div>
-    </div>
-  </div>
+            <div id="productsLoadingNote" style="font-size:12px;color:var(--text-sec);text-align:center;padding:6px 0;display:none;">
+              <i class="fa-solid fa-circle-notch fa-spin"></i> Məhsullar yüklənir...
+            </div>
 
-  <div id="modal-withdraw" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-4">
-    <div class="bg-white w-full max-w-sm rounded-3xl p-6 fade-in relative shadow-2xl">
-      <div class="flex justify-between mb-4">
-        <h3 class="font-bold text-lg text-slate-800">Balansı Çıxar</h3>
-        <button onclick="ui.closeModals()"><i class="fa-solid fa-xmark text-gray-400 text-xl"></i></button>
-      </div>
+            <div class="product-results-list" id="coProductResults"></div>
 
-      <div class="space-y-4">
-        <div>
-          <label class="text-xs text-gray-400 font-bold uppercase">Ad Soyad</label>
-          <input type="text" id="wd-name" class="w-full p-3 border border-gray-200 rounded-xl font-bold outline-none focus:border-blue-500 bg-gray-50 focus:bg-white transition-colors">
-        </div>
-        <div>
-          <label class="text-xs text-gray-400 font-bold uppercase">Kart Nömrəsi (16 rəqəm)</label>
-          <input type="tel" id="wd-card" placeholder="0000 0000 0000 0000" class="w-full p-3 border border-gray-200 rounded-xl font-bold outline-none focus:border-blue-500 bg-gray-50 focus:bg-white transition-colors">
-        </div>
-        <div>
-          <label class="text-xs text-gray-400 font-bold uppercase">Məbləğ (AZN)</label>
-          <input type="number" id="wd-amount" placeholder="Min 5" class="w-full p-3 border border-gray-200 rounded-xl font-bold outline-none focus:border-blue-500 bg-gray-50 focus:bg-white transition-colors">
-        </div>
-        
-        <p class="text-xs text-gray-400 text-center">Çıxarış 24 saat ərzində təsdiqlənir.</p>
-        
-        <button id="btn-withdraw" onclick="app.requestWithdraw()" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold flex justify-center items-center gap-2 shadow-lg active:scale-95 transition-all">
-          <span>Təsdiqlə</span>
-          <div id="loader-wd" class="loader border-t-white w-5 h-5 hidden"></div>
-        </button>
-      </div>
-    </div>
-  </div>
+            <!-- Cart -->
+            <div id="coCartContainer" style="display:none;margin-top:12px;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <i class="fa-solid fa-cart-shopping" style="color:var(--cp-accent);font-size:13px;"></i>
+                <span style="font-weight:700;font-size:13px;color:var(--cp-accent);">Səbət</span>
+              </div>
+              <div id="coCartItemsList"></div>
+              <div class="total-summary-box">
+                <div class="total-row"><span style="color:var(--text-sec);">Məhsullar:</span><span id="coCartSubtotal">0.00 ₼</span></div>
+                <div class="total-row"><span style="color:var(--text-sec);">Kuriyer:</span><span id="coCartCourierDisplay">0.00 ₼</span></div>
+                <div class="total-row grand"><span>Cəmi:</span><span id="coCartTotalPrice">0.00 ₼</span></div>
+              </div>
+            </div>
 
-  <script>
-    // GLOBAL STATE
-    const state = {
-      user: null, 
-      tasks: [], 
-      media: [], 
-      submissions: {}, 
-      withdrawals: [],
-      currentLevel: 1, 
-      selectedTask: null
-    };
+            <input type="hidden" id="courierCostCo" value="0">
 
-    // UI CONTROLLER
-    const ui = {
-      el: (id) => document.getElementById(id),
-      
-      toggleLoader: (btnId, loaderId, show) => {
-        const btn = ui.el(btnId);
-        const loader = ui.el(loaderId);
-        const span = btn.querySelector('span');
-        if (show) {
-          span?.classList.add('hidden');
-          loader.classList.remove('hidden');
-          btn.disabled = true;
-        } else {
-          span?.classList.remove('hidden');
-          loader.classList.add('hidden');
-          btn.disabled = false;
-        }
-      },
-
-      closeModals: () => {
-        ui.el('modal-detail').classList.add('hidden');
-        ui.el('modal-withdraw').classList.add('hidden');
-        // Stop any playing videos
-        document.querySelectorAll('video').forEach(v => v.pause());
-      },
-
-      openWithdrawModal: () => {
-        // Auto-fill name if we have it
-        ui.el('wd-name').value = state.user.name || '';
-        ui.el('modal-withdraw').classList.remove('hidden');
-      },
-
-      toast: (msg) => {
-        // Simple alert for reliability across mobile devices
-        alert(msg); 
-      }
-    };
-
-    // APP LOGIC
-    const app = {
-      // 1. LOGIN
- 
-      login: async () => {
-        const phone = ui.el('inp-phone').value.trim();
-        if (!phone) return ui.toast('Zəhmət olmasa nömrə daxil edin');
-        
-        ui.toggleLoader('btn-login', 'btn-login-loader', true);
-        try {
-          const res = await fetch(`${API_URL}?action=login&phone=${phone}`);
-          const data = await res.json();
-          
-          if (data.status === 'success') {
-            // Save Data to State
-            state.user = data.user;
-            state.tasks = data.tasks;
-            state.media = data.media;
-            state.submissions = data.submissions;
-            state.withdrawals = data.withdrawals || [];
-            
-            // YENİ: Save the phone number to the browser's 
-// YENİ: Save the phone number and name to the browser's 
-// Save data explicitly so sellerprofile.html can easily catch it
-localStorage.setItem('partner_phone', state.user.phone || phone);
-localStorage.setItem('partner_name', state.user.name || 'Satıcı');
-
-            
-            // Switch Screens
-            ui.el('view-login').classList.add('hidden');
-            ui.el('view-main').classList.remove('hidden');
-            
-            // Render Everything
-            app.renderUI();
-          } else {
-            ui.toast(data.message);
-          }
-        } catch (e) { 
-          console.error(e); 
-          ui.toast("Serverlə əlaqə yaradıla bilmədi. İnterneti yoxlayın."); 
-        }
-        ui.toggleLoader('btn-login', 'btn-login-loader', false);
-      },
-
-      // 2. RENDER UI
-    // 2. RENDER UI (UPDATED)
-      renderUI: () => {
-        // Header Info
-        ui.el('user-name').innerText = state.user.name;
-        ui.el('user-avatar').innerText = state.user.name.charAt(0).toUpperCase();
-        ui.el('user-points').innerText = state.user.points;
-        
-        // Initial Task Filter
-        app.filterLevel(1);
-        
-        // Wallet Info
-        app.renderWallet();
-
-        // --- NEW: CHECK LEVEL FOR PROFILE ICON ---
-        const maxLevel = app.getMaxUnlockedLevel(); // Uses the function we added earlier
-        const profileIcon = ui.el('icon-profile');
-        
-        if (maxLevel >= 2) {
-           // Unlock the icon
-           profileIcon.className = "fa-solid fa-store text-xl";
-        } else {
-           // Keep it locked
-           profileIcon.className = "fa-solid fa-lock text-xl";
-        }
-      },
-
-      // 3. RENDER WALLET
-// 3. RENDER WALLET (UPDATED FOR AFFILIATE & SALES)
-      renderWallet: () => {
-        // Main Balance
-        ui.el('wallet-balance').innerText = state.user.balance;
-        
-        // Populate Pending/Withdrawn header stats
-        ui.el('wallet-withdrawn').innerText = state.user.totalWithdrawn;
-        ui.el('wallet-pending').innerText = state.user.pendingWithdrawal;
-
-        // --- NEW: AFFILIATE STATISTICS SECTION ---
-        // Ensure state.user.affiliate exists (fallback for safety)
-        const aff = state.user.affiliate || { totalSales: "0.00", pendingCommission: "0.00", matureCommission: "0.00" };
-
-        const statsHtml = `
-          <div class="grid grid-cols-2 gap-3 mb-4">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 col-span-2">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                  <i class="fa-solid fa-bag-shopping"></i>
+            <!-- Custom Product -->
+            <div class="custom-product-section" id="coCustomProductSection">
+              <div class="cps-title">
+                <span><i class="fa-solid fa-pencil"></i> Əl ilə daxil edin</span>
+                <button type="button" onclick="coCancelCustomProduct()" style="background:none;border:none;color:var(--text-sec);cursor:pointer;font-size:18px;padding:0;"><i class="fa-solid fa-xmark"></i></button>
+              </div>
+              <label>Məhsulun adı</label>
+              <input type="text" id="coCustomProductName" placeholder="Məhsulun adını yazın...">
+              <label>Qiyməti (₼) <span style="font-weight:400;text-transform:none;color:#aaa;"> — bilmirsinizsə 0</span></label>
+              <input type="number" id="coCustomProductPrice" placeholder="Məs: 25.50" step="0.01" min="0">
+              <label>Məhsulun şəkli <span style="font-weight:400;text-transform:none;color:#aaa;"> — istəyə bağlı</span></label>
+              <div class="image-upload-area" id="coCustomProductUploadArea">
+                <input type="file" id="coCustomProductImageInput" accept="image/*" onchange="coHandleCustomProductImageChange(event)">
+                <div id="coCustomProductUploadContent">
+                  <div class="iua-icon">📷</div>
+                  <div class="iua-text">Şəkil əlavə et</div>
                 </div>
+              </div>
+              <button type="button" class="btn btn-map" style="margin-top:12px;" onclick="coAddCustomProductToCart()">
+                <i class="fa-solid fa-plus"></i> Səbətə Əlavə Et
+              </button>
+            </div>
+          </div>
+
+          <!-- Ünvan -->
+          <div class="card">
+            <div class="card-title"><i class="fa-solid fa-map-location-dot" style="color:var(--danger);"></i> Çatdırılma Ünvanı</div>
+            <p style="font-size:12px;color:var(--cp-primary);font-weight:600;margin:-6px 0 12px;">
+              <i class="fa-solid fa-circle-info"></i> Aşağıdakı seçimlərdən MÜTLƏQBİRİNİ seçin:
+            </p>
+
+            <div class="loc-tabs">
+              <button type="button" class="loc-tab active" onclick="coSwitchLoc('metro', this)">Metro</button>
+              <button type="button" class="loc-tab" onclick="coSwitchLoc('landmark', this)">Nişangah</button>
+              <button type="button" class="loc-tab" onclick="coSwitchLoc('rayon', this)">Rayonlar</button>
+            </div>
+
+            <div id="co-loc-metro" class="loc-content active">
+              <label>Metro Stansiyası</label>
+              <select id="coMetroSelect" onchange="coUpdateDeliveryCost()">
+                <option value="">Stansiyanı seçin...</option>
+                <option>28 May</option><option>Gənclik</option><option>Nəriman Nərimanov</option>
+                <option>Elmlər Akademiyası</option><option>Nizami</option><option>İçərişəhər</option>
+                <option>Sahil</option><option>Koroğlu</option><option>Neftçilər</option>
+                <option>Xalqlar Dostluğu</option><option>Əhmədli</option><option>Həzi Aslanov</option>
+                <option>Memar Əcəmi</option><option>20 Yanvar</option><option>İnşaatçılar</option>
+              </select>
+            </div>
+
+            <div id="co-loc-landmark" class="loc-content">
+              <label>Məşhur Yer / Nişangah</label>
+              <select id="coLandmarkSelect" onchange="coUpdateDeliveryCost()"><option value="">Nişangahı seçin...</option></select>
+            </div>
+
+            <div id="co-loc-rayon" class="loc-content">
+              <label>Rayon / Şəhər Seçin <span style="color:var(--cp-primary);">(+4.00 ₼)</span></label>
+              <select id="coRayonSelect" onchange="coUpdateDeliveryCost()"><option value="">Siyahıdan seçin...</option></select>
+            </div>
+
+            <div class="map-toggle-row" onclick="coToggleMapSection()">
+              <span class="map-toggle-icon"><i class="fa-solid fa-location-crosshairs"></i></span>
+              <span class="map-toggle-label">Dəqiq ünvanı xəritədə göstər <span style="font-weight:400;color:#88a;"> — istəyə bağlı</span></span>
+              <div class="map-toggle-check" id="coMapToggleCheck"></div>
+            </div>
+
+            <div class="map-optional-section" id="coMapOptionalSection">
+              <p style="font-size:12px;color:#94a3b8;margin:0 0 8px;">Pin-i (📍) sürüşdürərək dəqiq qapınızı seçin.</p>
+              <div id="coMap" style="height:240px;width:100%;border-radius:12px;border:1px solid var(--border);"></div>
+              <div style="height:8px;"></div>
+              <button type="button" class="btn btn-map" onclick="coGetCurrentLocation()">
+                <i class="fa-solid fa-location-crosshairs"></i> Cari Mövqeyimi Tap
+              </button>
+              <div id="coLocationStatus" style="margin-top:10px;font-size:13px;font-weight:600;color:var(--success);display:none;text-align:center;">
+                <i class="fa-solid fa-check"></i> Ünvan seçildi!
+              </div>
+              <input type="hidden" id="coMapCoordinatesLink">
+            </div>
+
+            <div style="height:12px;"></div>
+            <label>Əlavə Ünvan Qeydi</label>
+            <input type="text" id="coAddressDetails" placeholder="Məs: Küçə 45, Mənzil 12, 3-cü mərtəbə" style="margin-bottom:0;">
+          </div>
+
+          <!-- Ödəniş -->
+          <div class="card">
+            <div class="card-title"><i class="fa-regular fa-credit-card" style="color:var(--success);"></i> Ödəniş Üsulu</div>
+            <label>Ödəniş növü seçin</label>
+            <select id="coPayMethod" onchange="coHandlePaymentChange()">
+              <option value="cash">Nağd (Qapıda)</option>
+              <option value="card">Kart (Köçürmə)</option>
+            </select>
+
+            <!-- Cash: Deposit offer -->
+            <div class="deposit-offer-box" id="coDepositOfferBox">
+              <div class="dob-header">
+                <span class="dob-icon">🎁</span>
                 <div>
-                  <p class="text-[10px] text-gray-400 font-bold uppercase">Ümumi Satış</p>
-                  <p class="text-xl font-bold text-slate-800">${aff.totalSales} AZN</p>
+                  <div class="dob-title">4 ₼ Endirim Qazanın!</div>
+                  <div class="dob-sub">10 ₼ beh ödəyin → 4 ₼ endirim əldə edin</div>
+                </div>
+              </div>
+              <div class="deposit-checkbox-row" onclick="coToggleDeposit()">
+                <div class="deposit-checkbox" id="coDepositCheckbox"></div>
+                <span style="font-size:13px;font-weight:600;">Bəli, 10 ₼ beh ödəmək istəyirəm</span>
+              </div>
+              <div class="discount-badge" id="coDiscountBadge">
+                <span>✅</span><span>4 ₼ endirim tətbiq ediləcək!</span>
+              </div>
+              <div class="receipt-upload-section" id="coDepositReceiptSection">
+                <label style="margin-top:4px;">Beh Ödəniş Qəbzi</label>
+                <div class="image-upload-area" id="coDepositReceiptUploadArea">
+                  <input type="file" id="coDepositReceiptInput" accept="image/*,application/pdf" onchange="coHandleReceiptImageChange(event,'deposit')">
+                  <div id="coDepositReceiptContent"><div class="iua-icon">🧾</div><div class="iua-text">Ödəniş qəbzini əlavə et</div></div>
                 </div>
               </div>
             </div>
 
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
-               <div class="absolute top-0 right-0 w-2 h-2 bg-orange-400 rounded-bl-lg"></div>
-               <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Gözləyən (14 gün)</p>
-               <h4 class="text-lg font-bold text-orange-500">${aff.pendingCommission} AZN</h4>
-               <p class="text-[9px] text-gray-300 mt-1">10% komissiya</p>
-            </div>
-
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 relative overflow-hidden">
-               <div class="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-bl-lg"></div>
-               <p class="text-[10px] text-gray-400 font-bold uppercase mb-1">Balansa Əlavə</p>
-               <h4 class="text-lg font-bold text-green-600">${aff.matureCommission} AZN</h4>
-               <p class="text-[9px] text-gray-300 mt-1">Təsdiqlənən</p>
+            <!-- Card: Required receipt -->
+            <div class="card-receipt-box" id="coCardReceiptBox">
+              <div class="crb-label"><i class="fa-solid fa-circle-exclamation"></i> Kart ilə ödəniş üçün qəbz mütləqdir</div>
+              <div class="image-upload-area" id="coCardReceiptUploadArea">
+                <input type="file" id="coCardReceiptInput" accept="image/*,application/pdf" onchange="coHandleReceiptImageChange(event,'card')">
+                <div id="coCardReceiptContent"><div class="iua-icon">🧾</div><div class="iua-text">Bank köçürmə qəbzini əlavə et</div></div>
+              </div>
             </div>
           </div>
-        `;
-        
-        // Insert this HTML before the "Funds Withdraw" button
-        // We look for the gradient-card, and insert this after it.
-        const walletPage = ui.el('page-wallet');
-        
-        // Clean previous stats if any to prevent duplication on re-render
-        const existingStats = document.getElementById('affiliate-stats-grid');
-        if(existingStats) existingStats.remove();
 
-        // Create container
-        const statsContainer = document.createElement('div');
-        statsContainer.id = 'affiliate-stats-grid';
-        statsContainer.innerHTML = statsHtml;
-        
-        // Insert after the gradient card (first child of page-wallet)
-        const gradientCard = walletPage.querySelector('.gradient-card');
-        gradientCard.parentNode.insertBefore(statsContainer, gradientCard.nextSibling);
+          <!-- Xüsusi Qeydlər -->
+          <div class="card">
+            <label>Xüsusi Qeydlər</label>
+            <textarea id="coSpecialInstructions" rows="3" placeholder="Məhsul, paketləmə və ya çatdırılma barədə əlavə qeydlər..."></textarea>
+          </div>
 
+          <button type="submit" class="btn btn-co-primary" style="margin-bottom:24px;">
+            Sifarişi Təsdiqlə &nbsp;<i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+      </div>
 
-        // --- Render History ---
-        const historyCont = ui.el('wallet-history');
-        if (state.withdrawals.length === 0) {
-          historyCont.innerHTML = `<p class="text-center text-gray-400 text-sm py-4">Hələ əməliyyat yoxdur</p>`;
-        } else {
-          historyCont.innerHTML = state.withdrawals.map(w => {
-            let color = "text-orange-500 bg-orange-50";
-            let label = "Gözləyir";
-            
-            if (w.status === 'Paid') { 
-              color = "text-green-600 bg-green-50"; 
-              label = "Ödənildi"; 
-            } else if (w.status === 'Rejected') { 
-              color = "text-red-600 bg-red-50"; 
-              label = "Ləğv"; 
-            }
-            
-            const date = new Date(w.date).toLocaleDateString('az-AZ');
-            
-            return `
-              <div class="bg-white p-3 rounded-xl border border-gray-100 flex justify-between items-center">
-                <div>
-                  <p class="font-bold text-sm text-slate-800">Çıxarış</p>
-                  <p class="text-[10px] text-gray-400">${date}</p>
-                </div>
-                <div class="text-right">
-                  <p class="font-bold text-slate-800">${w.amount} AZN</p>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded ${color}">${label}</span>
-                </div>
-              </div>`;
-          }).join('');
-        }
-      },
+      <!-- ══ PAGE 4: SİFARİŞLƏR (List + Track) ══ -->
+      <div id="page-sifarisler" class="tab-page">
 
-      // 4. NAVIGATION TAB SWITCH
-   // 4. NAVIGATION TAB SWITCH
-      nav: (page) => {
-        // Bütün tabları boz rəngə qaytar
-        ['home', 'wallet', 'profile'].forEach(p => {
-           const btn = ui.el('nav-' + p);
-           if(btn) {
-             btn.classList.remove('text-blue-600');
-             btn.classList.add('text-gray-400');
-           }
-           const view = ui.el('page-' + p);
-           if(view) view.classList.add('hidden');
-        });
+        <!-- Sub toggle -->
+        <div class="section-toggle">
+          <button class="section-toggle-btn active" onclick="switchSifarisSection('list', this)">
+            <i class="fa-solid fa-list"></i> Siyahı
+          </button>
+          <button class="section-toggle-btn" onclick="switchSifarisSection('track', this)">
+            <i class="fa-solid fa-magnifying-glass"></i> İzləmə
+          </button>
+        </div>
 
-        // LOCK CHECK for Profile
-        if (page === 'profile') {
-           if (app.getMaxUnlockedLevel() < 2) {
-             ui.toast("Bu bölmə 2-ci səviyyədə açılır!");
-             // Kilidlidirsə, ana səhifəyə qayıt
-             app.nav('home'); 
-             return;
-           } else {
-             // YENİLİK: Səviyyə 2 və yuxarıdırsa, yeni səhifəyə yönləndir!
-             window.location.href = 'sellerprofile.html';
-             return; // Funksiyanı burada saxla ki, aşağıdakı kodlar işləməsin
-           }
-        }
-
-        // Seçilmiş tabı aktivləşdir
-        ui.el('nav-' + page).classList.add('text-blue-600');
-        ui.el('nav-' + page).classList.remove('text-gray-400');
-        ui.el('page-' + page).classList.remove('hidden');
-      },
-
-      // NEW HELPER: Calculate max unlocked level
-      getMaxUnlockedLevel: () => {
-        let max = 1;
-        // Check levels 1 to 4 to see if we can unlock the next one
-        for (let l = 1; l < 5; l++) {
-          // Get all tasks for level 'l'
-          const tasksInLevel = state.tasks.filter(t => +t.level === l);
-          
-          // If level has no tasks, stop progression (or assume unlocked, but safer to stop)
-          if (tasksInLevel.length === 0) break;
-
-          // Check if ALL tasks in this level are APPROVED
-          const allApproved = tasksInLevel.every(t => state.submissions[t.id] === 'Approved');
-          
-          if (allApproved) {
-            max++;
-          } else {
-            break; // Stop checking if this level isn't finished
-          }
-        }
-        return max;
-      },
-   // 5. FILTER TASKS BY LEVEL (MODIFIED FOR LOCKING SYSTEM)
-      filterLevel: (lvl) => {
-        state.currentLevel = lvl;
-        
-        // 1. Determine Locking Status
-        const maxUnlocked = app.getMaxUnlockedLevel();
-        const isLevelLocked = lvl > maxUnlocked;
-
-        // 2. Update Tab Styles (Show Locks)
-        document.querySelectorAll('.tab-btn').forEach(b => {
-          const btnLevel = +b.dataset.level;
-          const isBtnLocked = btnLevel > maxUnlocked;
-          
-          let classes = "tab-btn px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap border transition-all flex items-center gap-2 ";
-          
-          if (btnLevel === lvl) {
-             classes += "bg-blue-600 text-white shadow-md border-blue-600";
-          } else {
-             classes += "bg-white text-gray-500 border-gray-200";
-          }
-
-          // Add visual lock indication to tab
-          if (isBtnLocked) {
-            b.innerHTML = `Səviyyə ${btnLevel} <i class="fa-solid fa-lock text-[10px]"></i>`;
-            b.classList.add('opacity-70');
-          } else {
-             b.innerHTML = `Səviyyə ${btnLevel}`;
-             b.classList.remove('opacity-70');
-          }
-          
-          b.className = classes;
-        });
-        
-        // 3. Filter Tasks
-        const tasks = state.tasks.filter(t => +t.level === lvl);
-        
-        // 4. Render Tasks
-        ui.el('task-container').innerHTML = tasks.length ? tasks.map(t => {
-          const status = state.submissions[t.id];
-          
-          // Default Styles
-          let icon = '<i class="fa-solid fa-chevron-right text-gray-300"></i>';
-          let bg = 'bg-white border-gray-100';
-          let opacity = 'opacity-100';
-          let clickAction = `app.openDetail('${t.id}')`;
-          
-          // Status Logic
-          if (status === 'Approved') {
-            icon = '<i class="fa-solid fa-check-circle text-green-500 text-lg"></i>';
-            bg = 'bg-green-50 border-green-200';
-          } else if (status === 'Pending') {
-            icon = '<i class="fa-solid fa-clock text-orange-400 text-lg"></i>';
-            bg = 'bg-orange-50 border-orange-200';
-          }
-
-          // LOCK LOGIC OVERRIDE
-          if (isLevelLocked) {
-             icon = '<i class="fa-solid fa-lock text-gray-400"></i>';
-             bg = 'bg-gray-100 border-gray-200 grayscale';
-             opacity = 'opacity-60 cursor-not-allowed';
-             clickAction = `ui.toast('Bu səviyyəni açmaq üçün əvvəlki səviyyəni tamamlayın!')`; // Block interaction
-          }
-          
-          return `
-            <div onclick="${clickAction}" class="${bg} ${opacity} p-4 rounded-xl shadow-sm border flex items-center gap-4 transition-transform ${isLevelLocked ? '' : 'active:scale-[0.98] cursor-pointer'}">
-               <div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-200">
-                 ${t.thumbnailURL ? `<img src="${t.thumbnailURL}" class="w-full h-full object-cover">` : '<i class="fa-solid fa-list-check text-gray-400"></i>'}
-               </div>
-               
-               <div class="flex-1 min-w-0">
-                 <h3 class="font-bold text-sm text-slate-800 truncate">${t.title}</h3>
-                 <p class="text-xs text-gray-500 truncate mt-0.5">${t.desc}</p>
-               </div>
-               
-               <div class="flex flex-col items-end gap-1">
-                 <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">+${t.points}</span>
-                 ${icon}
-               </div>
-            </div>`;
-        }).join('') : '<div class="text-center py-10"><i class="fa-regular fa-folder-open text-4xl text-gray-200 mb-2"></i><p class="text-gray-400 text-sm">Bu səviyyədə tapşırıq yoxdur</p></div>';
-      },
-
-      // 6. OPEN TASK DETAIL
-    // 6. OPEN TASK DETAIL (MODIFIED)
-      openDetail: (id) => {
-        const task = state.tasks.find(t => t.id === id);
-        state.selectedTask = task;
-        
-        ui.el('detail-title').innerText = task.title;
-        ui.el('detail-desc').innerText = task.desc;
-        
-     // --- MEDIA RENDERER ---
-     // --- MEDIA RENDERER ---
-        const media = state.media.filter(m => m.taskId === id);
-        
-        ui.el('detail-media').innerHTML = media.map(m => {
-           let content = '';
-           let downloadUrl = m.url;
-           let previewUrl = m.url; 
-           let isGoogleDrive = m.url.includes('drive.google.com') && m.url.includes('/file/d/');
-           
-           // Helper: Create a force-download link & preview link if it's Google Drive
-           if (isGoogleDrive) {
-             const fileId = m.url.split('/file/d/')[1].split('/')[0];
-             downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-             previewUrl = `https://drive.google.com/file/d/${fileId}/preview`; // The watchable player
-           }
-           
-           // 1. Determine Content Type
-           if(m.type === 'VIDEO') {
-             if (isGoogleDrive) {
-               // Render Google Drive iFrame for direct streaming
-               content = `
-                 <div style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; background-color: #000; margin-bottom: 10px;">
-                     <iframe 
-                         src="${previewUrl}" 
-                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" 
-                         allow="autoplay; fullscreen" 
-                         allowfullscreen>
-                     </iframe>
-                 </div>`;
-             } else {
-               // Fallback standard video player for normal direct links (e.g., MP4s)
-               content = `<div class="media-wrapper aspect-video flex items-center justify-center bg-black"><video controls class="w-full h-full" src="${m.url}"></video></div>`;
-             }
-           } else if(m.type === 'IMAGE') {
-             // For Images, we try to use the direct link for preview if possible, 
-             // otherwise just show the wrapper
-             content = `<div class="media-wrapper"><img src="${m.url}" class="w-full object-cover" onerror="this.src='https://placehold.co/600x400?text=Image+Preview'"></div>`;
-           } else if(m.type === 'PDF') {
-             content = `
-               <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl">
-                 <i class="fa-solid fa-file-pdf text-red-500 text-3xl"></i>
-                 <div>
-                   <h5 class="font-bold text-sm text-slate-800">PDF Sənəd</h5>
-                   <p class="text-xs text-red-400">Faylı aşağıdan yükləyin</p>
-                 </div>
-               </div>`;
-           }
-
-           // 2. Render Card with FIXED Download Button
-           return `
-             <div class="mb-6">
-               ${content}
-               <div class="flex justify-between items-start mt-2">
-                 <p class="text-xs text-gray-500 italic w-2/3 pt-1">${m.caption || ''}</p>
-                 
-                 <a href="${downloadUrl}" target="_blank" download class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors shadow-md active:scale-95">
-                   <i class="fa-solid fa-cloud-arrow-down"></i> Yüklə
-                 </a>
-               </div>
-             </div>`;
-        }).join('');
-
-        // Action Area Logic
-        const status = state.submissions[id];
-        const action = ui.el('detail-action');
-        
-        if (status === 'Approved') {
-          action.innerHTML = `
-            <div class="bg-green-50 text-green-700 p-5 rounded-xl text-center border border-green-200">
-              <i class="fa-solid fa-check-circle text-3xl mb-2"></i>
-              <p class="font-bold">Qəbul Edildi</p>
-            </div>`;
-        } else if (status === 'Pending') {
-          action.innerHTML = `
-            <div class="bg-orange-50 text-orange-600 p-5 rounded-xl text-center border border-orange-200">
-              <i class="fa-solid fa-clock text-3xl mb-2"></i>
-              <p class="font-bold">Yoxlanılır...</p>
-            </div>`;
-        } else {
-          // --- NEW: DISPLAY PROOF TYPE INSTRUCTION ---
-          const instruction = task.proofType ? task.proofType : "Şəkil";
-          
-          action.innerHTML = `
-            <div class="bg-blue-50 border border-blue-100 p-3 rounded-lg mb-4 flex items-start gap-3">
-              <i class="fa-solid fa-circle-info text-blue-500 mt-1"></i>
-              <div>
-                <p class="text-xs text-blue-400 font-bold uppercase">Tələb Olunan Sübut:</p>
-                <p class="text-sm text-blue-900 font-medium">${instruction}</p>
-              </div>
+        <!-- LIST SECTION -->
+        <div id="sifaris-list" class="section-content active">
+          <!-- Date Chips -->
+          <div class="card" style="padding:12px 14px;">
+            <div class="date-chip-row" id="dateChipRow">
+              <button class="date-chip" onclick="applyDateFilter('next5', this)">Növbəti 5 Gün</button>
+              <button class="date-chip active" onclick="applyDateFilter('today', this)">Bu Gün</button>
+              <button class="date-chip" onclick="applyDateFilter('thisMonth', this)">Bu Ay</button>
+              <button class="date-chip" onclick="applyDateFilter('nextMonth', this)">Növbəti Ay</button>
+              <button class="date-chip" onclick="applyDateFilter('custom', this)">Xüsusi</button>
             </div>
-
-            <h4 class="font-bold text-slate-800 mb-3">Sübut Yüklə</h4>
-            <label class="block w-full h-32 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-all relative overflow-hidden group bg-gray-50">
-              <input type="file" id="inp-file" accept="image/*" class="hidden" onchange="app.previewImage()">
-              <div id="upload-placeholder" class="text-center p-4">
-                <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-300 mb-2"></i>
-                <p class="text-xs font-bold text-gray-500">Şəkil seçin</p>
+            <div id="customDateRow" style="display:none;">
+              <div style="display:flex;gap:10px;">
+                <div style="flex:1;"><label>Başlanğıc</label><input type="date" id="filterStart" style="margin-bottom:0;"></div>
+                <div style="flex:1;"><label>Son</label><input type="date" id="filterEnd" style="margin-bottom:0;"></div>
               </div>
-              <img id="upload-preview" class="absolute inset-0 w-full h-full object-cover hidden rounded-xl">
-            </label>
-            <button onclick="app.submitProof()" id="btn-submit" class="w-full mt-4 bg-slate-900 text-white py-3.5 rounded-xl font-bold flex justify-center items-center shadow-lg active:scale-95 transition-all">
-              <span id="btn-submit-text">Təsdiqlə və Göndər</span>
-              <div id="btn-submit-loader" class="loader hidden w-5 h-5 border-t-white"></div>
+              <button onclick="renderOrderList()" class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;"><i class="fa-solid fa-rotate"></i> Axtar</button>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card" style="background:var(--primary);color:white;">
+              <div class="stat-label" style="color:rgba(255,255,255,0.75);">Sifariş Sayı</div>
+              <div class="stat-val" id="listTotalCount">0</div>
+            </div>
+            <div class="stat-card" style="background:var(--success);color:white;">
+              <div class="stat-label" style="color:rgba(255,255,255,0.75);">Toplam Məbləğ</div>
+              <div class="stat-val" id="listTotalRevenue">0.00 ₼</div>
+            </div>
+          </div>
+
+          <div id="ordersContainer"></div>
+        </div>
+
+        <!-- TRACK SECTION -->
+        <div id="sifaris-track" class="section-content">
+          <div class="card" style="text-align:center;">
+            <div class="card-title" style="justify-content:center;"><i class="fa-solid fa-magnifying-glass"></i> Sifarişi İzlə</div>
+            <p style="color:#94a3b8;font-size:13px;margin:-4px 0 16px;">Sifariş kodu və nömrənizi daxil edin.</p>
+            <input type="number" id="trackId" placeholder="Sifariş Kodu (Məs: 1045)">
+            <input type="tel" id="trackPhone" placeholder="Mobil Nömrəniz">
+            <button class="btn btn-co-primary" onclick="runTrackOrder()">
+              <i class="fa-solid fa-magnifying-glass"></i> Axtar
             </button>
-          `;
-        }
-        
-        ui.el('modal-detail').classList.remove('hidden');
-      },
+          </div>
 
-      // 7. PREVIEW UPLOAD IMAGE
-      previewImage: () => {
-        const file = ui.el('inp-file').files[0];
-        if (file) {
-          if(file.size > 5 * 1024 * 1024) return ui.toast("Fayl çox böyükdür (Max 5MB)");
-          
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            ui.el('upload-preview').src = e.target.result;
-            ui.el('upload-preview').classList.remove('hidden');
-            ui.el('upload-placeholder').classList.add('hidden');
-          };
-          reader.readAsDataURL(file);
-        }
-      },
+          <div id="trackResult" class="card track-result">
+            <div style="text-align:center;border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:14px;">
+              <div style="font-size:22px;font-weight:800;">#<span id="resId"></span></div>
+              <div id="resStatus" class="status-badge-track"></div>
+            </div>
+            <div class="row-detail"><span class="label-detail">Tarix:</span><span class="val-detail" id="resDate"></span></div>
+            <div class="row-detail"><span class="label-detail">Zaman:</span><span class="val-detail" id="resTime"></span></div>
+            <div class="row-detail"><span class="label-detail">Məbləğ:</span><span class="val-detail" id="resPrice" style="color:var(--cp-primary);"></span></div>
+            <div class="row-detail"><span class="label-detail">Ödəniş:</span><span class="val-detail" id="resPayment"></span></div>
+            <div style="background:var(--input-bg);padding:14px;border-radius:12px;margin-top:12px;">
+              <h4 style="margin:0 0 10px;font-size:13px;font-weight:700;"><i class="fa-solid fa-motorcycle"></i> Çatdırılma Məlumatı</h4>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <div id="resCourierName" style="font-weight:700;font-size:14px;">Təyin olunmayıb</div>
+                  <div style="font-size:11px;color:#94a3b8;">Kuriyer</div>
+                </div>
+                <a id="resCourierBtn" href="#" style="display:none;background:var(--success);color:white;padding:7px 14px;border-radius:16px;font-size:12px;font-weight:700;text-decoration:none;">
+                  <i class="fa-solid fa-phone"></i> Zəng Et
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      // 8. REQUEST WITHDRAWAL
-      requestWithdraw: async () => {
-        const name = ui.el('wd-name').value;
-        const card = ui.el('wd-card').value;
-        const amount = ui.el('wd-amount').value;
-        
-        if (!name || !card || !amount) return ui.toast("Bütün xanaları doldurun");
-        if (Number(amount) < 5) return ui.toast("Minimum məbləğ 5 AZN-dir");
-        if (Number(amount) > Number(state.user.balance)) return ui.toast("Balansda kifayət qədər vəsait yoxdur");
+      <!-- ══ PAGE 5: HESABİM (Wallet + Stats + Profile) ══ -->
+      <div id="page-hesabim" class="tab-page">
 
-        ui.toggleLoader('btn-withdraw', 'loader-wd', true);
-        try {
-          const res = await fetch(API_URL, {
-            method: 'POST', 
-            body: JSON.stringify({ 
-              action: 'requestWithdrawal', 
-              phone: state.user.phone, 
-              fullName: name, 
-              cardNumber: card, 
-              amount: amount 
-            })
-          });
-          const data = await res.json();
-          
-          if (data.status === 'success') {
-            ui.toast("Sorğu uğurla göndərildi!");
-            
-            // Update Local State instantly (Optimistic UI)
-            state.user.balance = (state.user.balance - amount).toFixed(2);
-            state.user.pendingWithdrawal = (Number(state.user.pendingWithdrawal) + Number(amount)).toFixed(2);
-            state.withdrawals.unshift({ date: new Date().toISOString(), amount: amount, status: 'Pending' });
-            
-            app.renderWallet();
-            ui.closeModals();
-          } else {
-            ui.toast(data.message);
-          }
-        } catch(e) { ui.toast("Xəta baş verdi"); }
-        ui.toggleLoader('btn-withdraw', 'loader-wd', false);
-      },
+        <!-- WhatsApp Support Button -->
+        <a href="https://wa.me/994707260429" target="_blank" class="support-btn-floating">
+          <i class="fa-brands fa-whatsapp"></i>
+          Canlı Dəstək
+        </a>
 
-      // 9. SUBMIT TASK PROOF
-      submitProof: async () => {
-        const file = ui.el('inp-file').files[0];
-        if (!file) return ui.toast("Fayl seçin");
-        
-        ui.toggleLoader('btn-submit', 'btn-submit-loader', true);
-        
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = async (e) => {
-           const payload = {
-             action: 'submitTask', 
-             phone: state.user.phone, 
-             taskId: state.selectedTask.id,
-             points: state.selectedTask.points, 
-             base64: e.target.result
-           };
-           
-           try {
-             const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-             const d = await res.json();
-             
-             if (d.status === 'success') {
-               ui.toast("Uğurla Yükləndi!");
-               state.submissions[state.selectedTask.id] = 'Pending';
-               app.openDetail(state.selectedTask.id); // Refresh modal
-               app.filterLevel(state.currentLevel);   // Refresh list
-             } else {
-               ui.toast(d.message);
-             }
-           } catch(err) { ui.toast("Xəta baş verdi"); }
-           
-           ui.toggleLoader('btn-submit', 'btn-submit-loader', false);
-        };
+        <!-- Sub tabs -->
+        <div class="sub-tabs">
+          <button class="sub-tab-btn active" onclick="switchHesabimSub('balans', this)">Balans</button>
+          <button class="sub-tab-btn" onclick="switchHesabimSub('analiz', this)">Analiz</button>
+          <button class="sub-tab-btn" onclick="switchHesabimSub('profil', this)">Profil</button>
+        </div>
+
+        <!-- BALANS SUB-SECTION -->
+        <div id="sub-balans" class="sub-section active">
+          <!-- Wallet Card -->
+          <div class="wallet-gradient-card">
+            <div class="wgc-bg-icon"><i class="fa-solid fa-wallet"></i></div>
+            <div class="wgc-label">Cari Balans</div>
+            <div class="wgc-balance"><span id="wallet-balance">0.00</span> <span>AZN</span></div>
+            <div class="wgc-footer">
+              <div>
+                <div class="wgc-foot-label">Gözləyən</div>
+                <div class="wgc-foot-val"><span id="wallet-pending">0.00</span> AZN</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="wgc-foot-label">Cəmi Çıxarılan</div>
+                <div class="wgc-foot-val"><span id="wallet-withdrawn">0.00</span> AZN</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Affiliate Stats -->
+          <div id="affiliate-stats-container" style="margin-bottom:12px;"></div>
+
+          <!-- Withdraw Button -->
+          <button onclick="ui.openWithdrawModal()" class="btn btn-dark" style="margin-bottom:12px;">
+            <i class="fa-solid fa-money-bill-transfer"></i> Vəsait Çıxar (Min 5 AZN)
+          </button>
+
+          <!-- History -->
+          <div style="margin-bottom:8px;">
+            <div class="card-title" style="margin-bottom:10px;"><i class="fa-solid fa-clock-rotate-left"></i> Son Əməliyyatlar</div>
+            <div id="wallet-history"></div>
+          </div>
+        </div>
+
+        <!-- ANALİZ SUB-SECTION -->
+        <div id="sub-analiz" class="sub-section">
+          <div class="card" style="margin-bottom:12px;">
+            <label>Dövr</label>
+            <select id="statsPeriod" onchange="renderStats()" class="stats-period-select" style="margin-bottom:0;">
+              <option value="today">Bu Gün</option>
+              <option value="yesterday">Dünən</option>
+              <option value="thisMonth" selected>Bu Ay</option>
+              <option value="lastMonth">Keçən Ay</option>
+              <option value="all">Bütün Zamanlar</option>
+            </select>
+          </div>
+
+          <div class="stats-grid" style="margin-bottom:12px;">
+            <div class="stat-card">
+              <div class="stat-label">Toplam Satış</div>
+              <div class="stat-val" id="statRevenue" style="color:var(--primary);">0 ₼</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Sifariş Sayı</div>
+              <div class="stat-val" id="statCount">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Uğurlu Çatdırılma</div>
+              <div class="stat-val" id="statRate">0%</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Ort. Sifariş (AOV)</div>
+              <div class="stat-val" id="statAOV">0 ₼</div>
+            </div>
+            <div class="stat-card" style="grid-column:span 2;">
+              <div class="stat-label">Bu Ayki Hədəf Proqresi</div>
+              <div class="progress-wrap">
+                <div class="progress-fill" id="statProgressFill" style="width:0%;"></div>
+              </div>
+              <div class="progress-label" id="statProgressLabel">0 / 0 ₼</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROFİL SUB-SECTION -->
+        <div id="sub-profil" class="sub-section">
+          <div id="profile-locked-banner" class="profile-locked-banner" style="display:none;">
+            <div class="plb-icon">🔒</div>
+            <div class="plb-title">Profil Səhifəsi</div>
+            <div class="plb-desc">Bu bölmə 2-ci səviyyəyə çatdıqda aktivləşir.</div>
+          </div>
+
+          <div id="profile-form-section">
+            <div class="card">
+              <div class="card-title"><i class="fa-solid fa-store"></i> Satıcı Profili</div>
+
+              <div class="profile-field">
+                <label>Mağaza Adı</label>
+                <input type="text" id="prof-store-name" placeholder="Mağaza adı...">
+              </div>
+
+              <div class="profile-field">
+                <label>Əlaqə Nömrəsi</label>
+                <input type="tel" id="prof-store-phone" placeholder="+994...">
+              </div>
+
+              <div class="profile-field">
+                <label>Instagram</label>
+                <input type="text" id="prof-instagram" placeholder="@username">
+              </div>
+
+              <button class="btn btn-primary" onclick="saveProfile()">
+                <i class="fa-solid fa-floppy-disk"></i> Yadda Saxla
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- end tab-content -->
+
+    <!-- ══ BOTTOM NAV ══ -->
+    <nav class="bottom-nav">
+      <button class="nav-btn active" id="nav-tapsiriqlar" onclick="app.nav('tapsiriqlar', this)">
+        <i class="fa-solid fa-list-check"></i>
+        <span>Tapşırıqlar</span>
+      </button>
+      <button class="nav-btn locked" id="nav-magaza" onclick="app.nav('magaza', this)">
+        <i class="fa-solid fa-store"></i>
+        <span>Mağaza</span>
+        <div class="nav-lock-badge"><i class="fa-solid fa-lock" style="font-size:7px;"></i></div>
+      </button>
+      <button class="nav-btn locked" id="nav-yeni" onclick="app.nav('yeni', this)">
+        <i class="fa-solid fa-plus"></i>
+        <span>Yeni</span>
+        <div class="nav-lock-badge"><i class="fa-solid fa-lock" style="font-size:7px;"></i></div>
+      </button>
+      <button class="nav-btn" id="nav-sifarisler" onclick="app.nav('sifarisler', this)">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <span>Sifarişlər</span>
+      </button>
+      <button class="nav-btn" id="nav-hesabim" onclick="app.nav('hesabim', this)">
+        <i class="fa-solid fa-circle-user"></i>
+        <span>Hesabım</span>
+      </button>
+    </nav>
+
+  </div><!-- end view-main -->
+
+  <!-- ═══════════════ TASK DETAIL MODAL ═══════════════ -->
+  <div id="modal-detail">
+    <div class="modal-header">
+      <button class="modal-back" onclick="ui.closeModals()"><i class="fa-solid fa-arrow-left"></i></button>
+      <div class="modal-title" id="detail-title">Tapşırıq</div>
+      <div style="width:38px;"></div>
+    </div>
+    <div class="modal-body">
+      <div id="detail-media"></div>
+      <div class="card" id="detail-desc-card" style="font-size:14px;line-height:1.6;color:var(--text-sec);margin-bottom:16px;"></div>
+      <div id="detail-action"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ WITHDRAW MODAL ═══════════════ -->
+  <div id="modal-withdraw">
+    <div class="withdraw-sheet">
+      <div class="withdraw-handle"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+        <h3 style="font-size:17px;font-weight:800;">Balansı Çıxar</h3>
+        <button onclick="ui.closeModals()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-sec);"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <label>Ad Soyad</label>
+      <input type="text" id="wd-name">
+
+      <label>Kart Nömrəsi (16 rəqəm)</label>
+      <input type="tel" id="wd-card" placeholder="0000 0000 0000 0000">
+
+      <label>Məbləğ (AZN)</label>
+      <input type="number" id="wd-amount" placeholder="Min 5">
+
+      <p style="font-size:12px;color:#94a3b8;text-align:center;margin-bottom:14px;">Çıxarış 24 saat ərzində təsdiqlənir.</p>
+
+      <button id="btn-withdraw" onclick="app.requestWithdraw()" class="btn btn-primary">
+        <span id="wd-btn-text">Təsdiqlə</span>
+        <div id="loader-wd" class="inline-loader" style="display:none;"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       SCRIPTS
+  ════════════════════════════════════════════ -->
+  <script>
+  /* ══════════════════════════════════════════════
+     API URLS
+  ══════════════════════════════════════════════ */
+  // Partner / Tasks API (myprofile1 backend)
+  const PARTNER_API = "https://script.google.com/macros/s/AKfycbwJoMAwjUlYRA4GBthfCbsvClKxYufbeMFO36d4aNGo4tHhJsX_4O1-2fg-awfUfWpt/exec";
+
+  // Orders API (sellerprofile backend)
+  const ORDERS_API  = "https://script.google.com/macros/s/AKfycbxzYNQMOtV5Bk96fhRNTAeb7ZAx92dW-3F4h8jGuFXlemwM_3RfzPSbl1qY6Y3xbqsSjg/exec";
+
+  // Catalog API (products backend)
+  const CATALOG_API = "https://script.google.com/macros/s/AKfycbzgGiOg7Rp3Y7bDmNNhlbK2PZDl-qwlU8oecz0lGrVouKigoLzlfWleg02H83chkXt53g/exec";
+
+  /* ══════════════════════════════════════════════
+     STATIC DATA
+  ══════════════════════════════════════════════ */
+  const LANDMARK_DATA = [
+    { name:"Park Bulvar",price:1},{ name:"Dəniz Mall",price:2},{ name:"Port Baku",price:1},
+    { name:"Badamdar",price:2},{ name:"Bakıxanov (Razin)",price:2},{ name:"Balaxanı",price:3},
+    { name:"Zığ",price:8},{ name:"Heydər Əliyev Liseyi",price:5},{ name:"Sulutəpə",price:2},
+    { name:"Hökməli",price:5},{ name:"Qobu",price:8},{ name:"Babək prospekti",price:1},
+    { name:"8 noyabr prospekti",price:3},{ name:"Günəşli",price:2},{ name:"Xırdalan",price:2},
+    { name:"Zirə",price:8},{ name:"Zabrat",price:8},{ name:"Türkan",price:8},
+    { name:"Şüvəlan",price:10},{ name:"Şağan",price:8},{ name:"Suraxanı",price:3},
+    { name:"Yeni Suraxanı",price:3},{ name:"Saray",price:6},{ name:"Sabunçu",price:2},
+    { name:"Ramana",price:2},{ name:"Qaraçuxur",price:2},{ name:"Qala",price:8},
+    { name:"Pirşağı",price:6},{ name:"Novxanı",price:10},{ name:"Nardaran",price:10},
+    { name:"Mərdəkan",price:10},{ name:"Məhəmmədi",price:1},{ name:"Mehdiabad",price:6},
+    { name:"Maştağa",price:10},{ name:"Masazır",price:2},{ name:"Lökbatan",price:10},
+    { name:"Kürdəxanı",price:10},{ name:"Hövsan",price:10},{ name:"Görədil",price:10},
+    { name:"Fatmayı",price:10},{ name:"Əmircan",price:10},{ name:"Əhmədli (Kənd)",price:10},
+    { name:"Digah",price:10},{ name:"Buzovna",price:10},{ name:"Binəqədi",price:6},
+    { name:"Binə",price:8},{ name:"Bilgəh",price:10},{ name:"Biləcəri",price:2},
+    { name:"Bibiheybət",price:10},{ name:"Bayıl",price:3},{ name:"Lökbatan Dairəsi",price:5},
+    { name:"Şıxov",price:5},{ name:"Baksol Yolu",price:2},{ name:"Müşviq",price:10},
+    { name:"Keşlə",price:2}
+  ];
+
+  const RAYON_DATA = [
+    "Abşeron","Ağcabədi","Ağdam","Ağdaş","Ağstafa","Ağsu","Astara","Babək","Balakən",
+    "Beyləqan","Bərdə","Biləsuvar","Cəbrayıl","Cəlilabad","Culfa","Daşkəsən","Füzuli",
+    "Gədəbəy","Gəncə","Goranboy","Göyçay","Göygöl","Hacıqabul","Xaçmaz","Xankəndi",
+    "Xocavənd","Xocalı","Xızı","İmişli","İsmayıllı","Kəlbəcər","Kəngərli","Kürdəmir",
+    "Qax","Qazax","Qəbələ","Qobustan","Quba","Qubadlı","Qusar","Laçın","Lerik","Lənkəran",
+    "Masallı","Mingəçevir","Naftalan","Naxçıvan","Neftçala","Oğuz","Ordubad","Saatlı",
+    "Sabirabad","Salyan","Samux","Sədərək","Siyəzən","Sumqayıt","Şabran","Şahbuz",
+    "Şamaxı","Şəki","Şəmkir","Şərur","Şirvan","Şuşa","Tərtər","Tovuz","Ucar",
+    "Yardımlı","Yevlax","Zaqatala","Zəngilan","Zərdab"
+  ];
+
+  /* ══════════════════════════════════════════════
+     GLOBAL STATE
+  ══════════════════════════════════════════════ */
+  const state = {
+    user:          null,
+    tasks:         [],
+    media:         [],
+    submissions:   {},
+    withdrawals:   [],
+    currentLevel:  1,
+    selectedTask:  null,
+    globalOrders:  [],
+    currentUser:   '',
+    currentPhone:  '',
+    activeDateFilter: 'today',
+    activeSifarisSection: 'list',
+    activeHesabimSub: 'balans'
+  };
+
+  // Cart & order form state
+  let coProductsCache = [];
+  let coCart = [];
+  let coDepositChecked = false;
+  let coReceiptImageB64 = '';
+  let coCustomProductImageB64 = '';
+  let coMapInstance = null;
+  let coMarkerInstance = null;
+  let coMapOpen = false;
+
+  /* ══════════════════════════════════════════════
+     UI CONTROLLER
+  ══════════════════════════════════════════════ */
+  const ui = {
+    el: id => document.getElementById(id),
+
+    toggleLoader: (show, msg = 'Yüklənir...') => {
+      const el = ui.el('app-loader');
+      const txt = ui.el('loader-text');
+      if (txt) txt.textContent = msg;
+      el.style.display = show ? 'flex' : 'none';
+    },
+
+    toggleBtnLoader: (btnId, loaderId, show, textId) => {
+      const btn = ui.el(btnId);
+      const loader = ui.el(loaderId);
+      const span = textId ? ui.el(textId) : btn ? btn.querySelector('span') : null;
+      if (!btn || !loader) return;
+      if (show) {
+        if (span) span.style.display = 'none';
+        loader.style.display = 'inline-block';
+        btn.disabled = true;
+      } else {
+        if (span) span.style.display = '';
+        loader.style.display = 'none';
+        btn.disabled = false;
       }
-      
+    },
+
+    closeModals: () => {
+      ui.el('modal-detail').classList.remove('active');
+      ui.el('modal-withdraw').classList.remove('active');
+      document.querySelectorAll('video').forEach(v => v.pause());
+    },
+
+    openWithdrawModal: () => {
+      ui.el('wd-name').value   = state.user ? (state.user.name || '') : '';
+      ui.el('wd-card').value   = '';
+      ui.el('wd-amount').value = '';
+      ui.el('modal-withdraw').classList.add('active');
+    },
+
+    toast: msg => alert(msg)
+  };
+
+  /* ══════════════════════════════════════════════
+     NAVIGATION
+  ══════════════════════════════════════════════ */
+  const app = {
+    /* ── 1. LOGIN ── */
+    login: async () => {
+      const phone = ui.el('inp-phone').value.trim();
+      if (!phone) return ui.toast('Zəhmət olmasa nömrə daxil edin');
+
+      ui.toggleBtnLoader('btn-login', 'btn-login-loader', true, 'btn-login-text');
+
+      try {
+        const res  = await fetch(`${PARTNER_API}?action=login&phone=${encodeURIComponent(phone)}`);
+        const data = await res.json();
+
+        if (data.status === 'success') {
+          state.user        = data.user;
+          state.tasks       = data.tasks;
+          state.media       = data.media;
+          state.submissions = data.submissions;
+          state.withdrawals = data.withdrawals || [];
+
+          // Save to localStorage for order forms
+          const uPhone = state.user.phone || phone;
+          const uName  = state.user.name  || 'Satıcı';
+          localStorage.setItem('partner_phone', uPhone);
+          localStorage.setItem('partner_name',  uName);
+          localStorage.setItem('staff_userphone', uPhone);
+          localStorage.setItem('staff_username',  uName);
+
+          state.currentPhone = uPhone;
+          state.currentUser  = uName;
+
+          // Hide login, show app
+          ui.el('view-login').classList.add('hidden');
+          ui.el('view-main').classList.add('active');
+
+          // Init UI
+          app.renderUI();
+          app.fetchOrdersData();
+          coLoadProducts();
+
+        } else {
+          ui.toast(data.message || 'Daxil olma uğursuz oldu');
+        }
+
+      } catch (e) {
+        console.error(e);
+        ui.toast('Serverlə əlaqə yaradıla bilmədi. İnterneti yoxlayın.');
+      }
+
+      ui.toggleBtnLoader('btn-login', 'btn-login-loader', false, 'btn-login-text');
+    },
+
+    /* ── 2. RENDER UI ── */
+    renderUI: () => {
+      const u = state.user;
+      const initials = u.name ? u.name.charAt(0).toUpperCase() : '?';
+
+      // Header
+      ui.el('hdr-name').textContent   = u.name;
+      ui.el('hdr-avatar').textContent = initials;
+      ui.el('hdr-points').textContent = u.points;
+
+      // Order form header
+      ui.el('co-avatar').textContent  = initials;
+      ui.el('co-username').textContent = u.name;
+      ui.el('co-userphone').textContent = state.currentPhone || '—';
+      ui.el('salesRep').value          = state.currentPhone || state.currentUser;
+
+      // Tasks
+      app.filterLevel(1);
+
+      // Wallet
+      app.renderWallet();
+
+      // Unlock nav based on level
+      app.updateNavLocks();
+
+      // Profile section
+      app.updateProfileSection();
+
+      // Default delivery date = tomorrow
+      const tom = new Date();
+      tom.setDate(tom.getDate() + 1);
+      ui.el('deliveryDate').valueAsDate = tom;
+    },
+
+    /* ── 3. NAV SWITCHING ── */
+    nav: (page, btnEl) => {
+      const maxLevel = app.getMaxUnlockedLevel();
+
+      // Lock check for Mağaza & Yeni
+      if ((page === 'magaza' || page === 'yeni') && maxLevel < 2) {
+        ui.toast('Bu bölmə 2-ci səviyyəyə çatdıqda açılır!');
+        return;
+      }
+
+      // Deactivate all nav buttons and pages
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+
+      // Activate selected
+      if (btnEl) btnEl.classList.add('active');
+      const pageEl = ui.el('page-' + page);
+      if (pageEl) pageEl.classList.add('active');
+
+      // Page-specific triggers
+      if (page === 'sifarisler') renderOrderList();
+      if (page === 'hesabim' && state.activeHesabimSub === 'analiz') renderStats();
+    },
+
+    /* ── 4. UNLOCK NAV ── */
+    updateNavLocks: () => {
+      const maxLevel = app.getMaxUnlockedLevel();
+      const navMagaza = ui.el('nav-magaza');
+      const navYeni   = ui.el('nav-yeni');
+
+      if (maxLevel >= 2) {
+        navMagaza.classList.remove('locked');
+        navYeni.classList.remove('locked');
+      } else {
+        navMagaza.classList.add('locked');
+        navYeni.classList.add('locked');
+      }
+    },
+
+    /* ── 5. PROFILE SECTION ── */
+    updateProfileSection: () => {
+      const maxLevel = app.getMaxUnlockedLevel();
+      const lockedBanner = ui.el('profile-locked-banner');
+      const formSection  = ui.el('profile-form-section');
+      if (maxLevel >= 2) {
+        lockedBanner.style.display = 'none';
+        formSection.style.display  = 'block';
+        if (state.currentPhone) ui.el('prof-store-phone').value = state.currentPhone;
+        if (state.currentUser)  ui.el('prof-store-name').value  = state.currentUser;
+      } else {
+        lockedBanner.style.display = 'block';
+        formSection.style.display  = 'none';
+      }
+    },
+
+    /* ── 6. MAX UNLOCKED LEVEL ── */
+    getMaxUnlockedLevel: () => {
+      let max = 1;
+      for (let l = 1; l < 5; l++) {
+        const tasksInLevel = state.tasks.filter(t => +t.level === l);
+        if (tasksInLevel.length === 0) break;
+        const allApproved = tasksInLevel.every(t => state.submissions[t.id] === 'Approved');
+        if (allApproved) { max++; } else { break; }
+      }
+      return max;
+    },
+
+    /* ── 7. FILTER TASKS BY LEVEL ── */
+    filterLevel: lvl => {
+      state.currentLevel = lvl;
+      const maxUnlocked = app.getMaxUnlockedLevel();
+      const isLocked = lvl > maxUnlocked;
+
+      // Update tab button styles
+      document.querySelectorAll('.level-tab-btn').forEach(b => {
+        const bLvl = +b.dataset.level;
+        const bLocked = bLvl > maxUnlocked;
+        b.className = 'level-tab-btn' + (bLvl === lvl ? ' active' : '') + (bLocked ? ' locked' : '');
+        if (bLocked) {
+          b.innerHTML = `Səviyyə ${bLvl} <i class="fa-solid fa-lock" style="font-size:9px;"></i>`;
+        } else {
+          b.textContent = `Səviyyə ${bLvl}`;
+        }
+      });
+
+      // Render tasks
+      const tasks = state.tasks.filter(t => +t.level === lvl);
+      const container = ui.el('task-container');
+
+      if (!tasks.length) {
+        container.innerHTML = `<div class="empty-state"><i class="fa-regular fa-folder-open"></i><p>Bu səviyyədə tapşırıq yoxdur</p></div>`;
+        return;
+      }
+
+      container.innerHTML = tasks.map(t => {
+        const status = state.submissions[t.id];
+        let statusClass = '';
+        let iconHtml = '<i class="fa-solid fa-chevron-right" style="color:#cbd5e1;"></i>';
+        let clickAction = `app.openDetail('${t.id}')`;
+
+        if (status === 'Approved') {
+          statusClass = 'approved';
+          iconHtml = '<i class="fa-solid fa-check-circle" style="color:var(--success);font-size:18px;"></i>';
+        } else if (status === 'Pending') {
+          statusClass = 'pending';
+          iconHtml = '<i class="fa-solid fa-clock" style="color:var(--warning);font-size:18px;"></i>';
+        }
+
+        if (isLocked) {
+          statusClass = 'locked';
+          iconHtml = '<i class="fa-solid fa-lock" style="color:#94a3b8;"></i>';
+          clickAction = `ui.toast('Bu səviyyəni açmaq üçün əvvəlki səviyyəni tamamlayın!')`;
+        }
+
+        const thumbHtml = t.thumbnailURL
+          ? `<img src="${t.thumbnailURL}" alt="">`
+          : `<i class="fa-solid fa-list-check"></i>`;
+
+        return `
+          <div onclick="${clickAction}" class="task-card ${statusClass}">
+            <div class="task-thumb">${thumbHtml}</div>
+            <div class="task-info">
+              <div class="task-name">${esc(t.title)}</div>
+              <div class="task-desc">${esc(t.desc)}</div>
+            </div>
+            <div class="task-meta">
+              <span class="task-points">+${esc(String(t.points))}</span>
+              ${iconHtml}
+            </div>
+          </div>`;
+      }).join('');
+    },
+
+    /* ── 8. OPEN TASK DETAIL ── */
+    openDetail: id => {
+      const task = state.tasks.find(t => t.id === id);
+      if (!task) return;
+      state.selectedTask = task;
+
+      ui.el('detail-title').textContent = task.title;
+      ui.el('detail-desc-card').textContent = task.desc;
+
+      // Media
+      const media = state.media.filter(m => m.taskId === id);
+      ui.el('detail-media').innerHTML = media.map(m => {
+        let content = '';
+        let downloadUrl = m.url;
+        let isGDrive = m.url && m.url.includes('drive.google.com') && m.url.includes('/file/d/');
+
+        if (isGDrive) {
+          const fileId = m.url.split('/file/d/')[1].split('/')[0];
+          downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+          const previewUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+          if (m.type === 'VIDEO') {
+            content = `<div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:12px;overflow:hidden;background:#000;margin-bottom:8px;">
+              <iframe src="${previewUrl}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
+            </div>`;
+          } else {
+            content = `<div class="media-wrapper"><img src="https://lh3.googleusercontent.com/d/${fileId}" class="w-full" style="width:100%;object-fit:cover;" onerror="this.src='https://placehold.co/600x400?text=Image'"></div>`;
+          }
+        } else if (m.type === 'VIDEO') {
+          content = `<div class="media-wrapper" style="aspect-ratio:16/9;"><video controls style="width:100%;height:100%;" src="${esc(m.url)}"></video></div>`;
+        } else if (m.type === 'IMAGE') {
+          content = `<div class="media-wrapper"><img src="${esc(m.url)}" style="width:100%;object-fit:cover;" onerror="this.src='https://placehold.co/600x400?text=Image'"></div>`;
+        } else if (m.type === 'PDF') {
+          content = `<div style="display:flex;align-items:center;gap:12px;padding:14px;background:#fef2f2;border:1px solid #fecaca;border-radius:12px;"><i class="fa-solid fa-file-pdf" style="color:var(--danger);font-size:28px;"></i><div><div style="font-weight:700;font-size:13px;">PDF Sənəd</div><div style="font-size:11px;color:#94a3b8;">Faylı yükləyin</div></div></div>`;
+        }
+
+        return `<div style="margin-bottom:16px;">
+          ${content}
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-top:6px;">
+            <p style="font-size:11px;color:#94a3b8;font-style:italic;flex:1;padding-top:4px;">${esc(m.caption || '')}</p>
+            <a href="${esc(downloadUrl)}" target="_blank" download style="display:flex;align-items:center;gap:6px;background:var(--primary);color:white;padding:7px 12px;border-radius:10px;font-size:12px;font-weight:700;text-decoration:none;flex-shrink:0;box-shadow:0 3px 10px rgba(59,130,246,0.3);">
+              <i class="fa-solid fa-cloud-arrow-down"></i> Yüklə
+            </a>
+          </div>
+        </div>`;
+      }).join('');
+
+      // Action area
+      const status = state.submissions[id];
+      const action = ui.el('detail-action');
+
+      if (status === 'Approved') {
+        action.innerHTML = `<div style="background:#f0fdf4;color:#166534;padding:20px;border-radius:14px;text-align:center;border:1.5px solid #bbf7d0;">
+          <i class="fa-solid fa-check-circle" style="font-size:28px;margin-bottom:8px;display:block;"></i>
+          <div style="font-weight:800;font-size:15px;">Qəbul Edildi</div>
+        </div>`;
+      } else if (status === 'Pending') {
+        action.innerHTML = `<div style="background:#fff7ed;color:#9a3412;padding:20px;border-radius:14px;text-align:center;border:1.5px solid #fed7aa;">
+          <i class="fa-solid fa-clock" style="font-size:28px;margin-bottom:8px;display:block;"></i>
+          <div style="font-weight:800;font-size:15px;">Yoxlanılır...</div>
+        </div>`;
+      } else {
+        const instruction = task.proofType ? task.proofType : 'Şəkil';
+        action.innerHTML = `
+          <div style="background:#eff6ff;border:1.5px solid #bfdbfe;padding:12px;border-radius:12px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;">
+            <i class="fa-solid fa-circle-info" style="color:var(--primary);margin-top:1px;font-size:14px;"></i>
+            <div>
+              <div style="font-size:11px;color:#64748b;font-weight:700;text-transform:uppercase;margin-bottom:2px;">Tələb Olunan Sübut:</div>
+              <div style="font-size:13px;font-weight:600;color:#1e40af;">${esc(instruction)}</div>
+            </div>
+          </div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:10px;">Sübut Yüklə</div>
+          <label class="upload-area" style="margin-bottom:14px;">
+            <input type="file" id="inp-file" accept="image/*" onchange="app.previewImage()">
+            <div id="upload-placeholder">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Şəkil seçin</span>
+            </div>
+            <img id="upload-preview" class="upload-preview">
+          </label>
+          <button onclick="app.submitProof()" id="btn-submit" class="btn btn-dark">
+            <span id="btn-submit-text">Təsdiqlə və Göndər</span>
+            <div id="btn-submit-loader" class="inline-loader" style="display:none;"></div>
+          </button>`;
+      }
+
+      ui.el('modal-detail').classList.add('active');
+    },
+
+    /* ── 9. PREVIEW UPLOAD ── */
+    previewImage: () => {
+      const file = ui.el('inp-file') ? ui.el('inp-file').files[0] : null;
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) return ui.toast('Fayl çox böyükdür (Max 5MB)');
+      const reader = new FileReader();
+      reader.onload = e => {
+        const prev = ui.el('upload-preview');
+        const plac = ui.el('upload-placeholder');
+        if (prev) { prev.src = e.target.result; prev.style.display = 'block'; }
+        if (plac) plac.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    },
+
+    /* ── 10. SUBMIT PROOF ── */
+    submitProof: async () => {
+      const fileInput = ui.el('inp-file');
+      if (!fileInput || !fileInput.files[0]) return ui.toast('Fayl seçin');
+
+      ui.toggleBtnLoader('btn-submit', 'btn-submit-loader', true, 'btn-submit-text');
+
+      const reader = new FileReader();
+      reader.readAsDataURL(fileInput.files[0]);
+      reader.onload = async e => {
+        const payload = {
+          action:  'submitTask',
+          phone:   state.user.phone,
+          taskId:  state.selectedTask.id,
+          points:  state.selectedTask.points,
+          base64:  e.target.result
+        };
+        try {
+          const res = await fetch(PARTNER_API, { method: 'POST', body: JSON.stringify(payload) });
+          const d   = await res.json();
+          if (d.status === 'success') {
+            ui.toast('Uğurla Yükləndi!');
+            state.submissions[state.selectedTask.id] = 'Pending';
+            app.openDetail(state.selectedTask.id);
+            app.filterLevel(state.currentLevel);
+          } else {
+            ui.toast(d.message);
+          }
+        } catch (err) { ui.toast('Xəta baş verdi'); }
+        ui.toggleBtnLoader('btn-submit', 'btn-submit-loader', false, 'btn-submit-text');
+      };
+    },
+
+    /* ── 11. RENDER WALLET ── */
+    renderWallet: () => {
+      const u = state.user;
+      ui.el('wallet-balance').textContent   = u.balance;
+      ui.el('wallet-withdrawn').textContent = u.totalWithdrawn;
+      ui.el('wallet-pending').textContent   = u.pendingWithdrawal;
+
+      // Affiliate Stats
+      const aff = u.affiliate || { totalSales: '0.00', pendingCommission: '0.00', matureCommission: '0.00' };
+      ui.el('affiliate-stats-container').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;">
+          <div class="aff-stat-item" style="grid-column:span 2;">
+            <div class="aff-stat-icon" style="background:#eff6ff;">🛍️</div>
+            <div>
+              <div class="aff-stat-label">Ümumi Satış</div>
+              <div class="aff-stat-val">${esc(String(aff.totalSales))} AZN</div>
+            </div>
+          </div>
+          <div class="aff-stat-item">
+            <div style="position:absolute;top:0;right:0;width:6px;height:6px;background:var(--warning);border-radius:0 14px 0 6px;"></div>
+            <div class="aff-stat-icon" style="background:#fff7ed;position:relative;">⏳</div>
+            <div>
+              <div class="aff-stat-label">Gözləyən (14 gün)</div>
+              <div class="aff-stat-val" style="color:var(--warning);font-size:16px;">${esc(String(aff.pendingCommission))} AZN</div>
+            </div>
+          </div>
+          <div class="aff-stat-item">
+            <div class="aff-stat-icon" style="background:#f0fdf4;">✅</div>
+            <div>
+              <div class="aff-stat-label">Balansa Əlavə</div>
+              <div class="aff-stat-val" style="color:var(--success);font-size:16px;">${esc(String(aff.matureCommission))} AZN</div>
+            </div>
+          </div>
+        </div>`;
+
+      // History
+      const histCont = ui.el('wallet-history');
+      if (!state.withdrawals.length) {
+        histCont.innerHTML = `<div class="empty-state"><i class="fa-regular fa-file-lines"></i><p>Hələ əməliyyat yoxdur</p></div>`;
+      } else {
+        histCont.innerHTML = state.withdrawals.map(w => {
+          let cls = 'hs-pending', lbl = 'Gözləyir';
+          if (w.status === 'Paid')     { cls = 'hs-paid';     lbl = 'Ödənildi'; }
+          if (w.status === 'Rejected') { cls = 'hs-rejected'; lbl = 'Ləğv'; }
+          const date = new Date(w.date).toLocaleDateString('az-AZ');
+          return `<div class="history-item">
+            <div><div class="hi-label">Çıxarış</div><div class="hi-date">${esc(date)}</div></div>
+            <div style="text-align:right;"><div class="hi-amount">${esc(String(w.amount))} AZN</div><div class="hi-status ${cls}">${lbl}</div></div>
+          </div>`;
+        }).join('');
+      }
+    },
+
+    /* ── 12. REQUEST WITHDRAWAL ── */
+    requestWithdraw: async () => {
+      const name   = ui.el('wd-name').value;
+      const card   = ui.el('wd-card').value;
+      const amount = ui.el('wd-amount').value;
+
+      if (!name || !card || !amount)       return ui.toast('Bütün xanaları doldurun');
+      if (Number(amount) < 5)              return ui.toast('Minimum məbləğ 5 AZN-dir');
+      if (Number(amount) > Number(state.user.balance)) return ui.toast('Balansda kifayət qədər vəsait yoxdur');
+
+      ui.toggleBtnLoader('btn-withdraw', 'loader-wd', true, 'wd-btn-text');
+
+      try {
+        const res  = await fetch(PARTNER_API, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'requestWithdrawal', phone: state.user.phone, fullName: name, cardNumber: card, amount })
+        });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+          ui.toast('Sorğu uğurla göndərildi!');
+          state.user.balance         = (Number(state.user.balance) - Number(amount)).toFixed(2);
+          state.user.pendingWithdrawal = (Number(state.user.pendingWithdrawal) + Number(amount)).toFixed(2);
+          state.withdrawals.unshift({ date: new Date().toISOString(), amount, status: 'Pending' });
+          app.renderWallet();
+          ui.closeModals();
+        } else {
+          ui.toast(data.message);
+        }
+      } catch (e) { ui.toast('Xəta baş verdi'); }
+
+      ui.toggleBtnLoader('btn-withdraw', 'loader-wd', false, 'wd-btn-text');
+    },
+
+    /* ── 13. FETCH ORDERS DATA ── */
+    fetchOrdersData: async () => {
+      try {
+        const res  = await fetch(`${ORDERS_API}?action=getGlobalStats`);
+        const json = await res.json();
+
+        if (json.success) {
+          let orders = json.data || [];
+          const safePhone = String(state.currentPhone).trim();
+          const safeUser  = String(state.currentUser).trim();
+
+          if (safePhone) {
+            orders = orders.filter(o =>
+              String(o.staff || '').trim() === safePhone ||
+              String(o.salesRepPhone || '').trim() === safePhone ||
+              String(o.staff || '').trim() === safeUser
+            );
+          } else if (safeUser && safeUser !== 'Satıcı') {
+            orders = orders.filter(o => String(o.staff || '').trim() === safeUser);
+          }
+
+          state.globalOrders = orders;
+        }
+      } catch (err) { console.error('fetchOrdersData:', err); }
+    }
+  };
+
+  /* ══════════════════════════════════════════════
+     SUB-SECTION TOGGLES
+  ══════════════════════════════════════════════ */
+  function switchSifarisSection(section, btnEl) {
+    state.activeSifarisSection = section;
+    document.querySelectorAll('.section-toggle-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#page-sifarisler .section-content').forEach(s => s.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+    const el = document.getElementById('sifaris-' + section);
+    if (el) el.classList.add('active');
+    if (section === 'list') renderOrderList();
+  }
+
+  function switchHesabimSub(sub, btnEl) {
+    state.activeHesabimSub = sub;
+    document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.sub-section').forEach(s => s.classList.remove('active'));
+    if (btnEl) btnEl.classList.add('active');
+    const el = document.getElementById('sub-' + sub);
+    if (el) el.classList.add('active');
+    if (sub === 'analiz') renderStats();
+  }
+
+  /* ══════════════════════════════════════════════
+     DATE FILTER
+  ══════════════════════════════════════════════ */
+  function applyDateFilter(type, btn) {
+    state.activeDateFilter = type;
+    document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const fmt = d => d.toISOString().split('T')[0];
+    let start, end;
+
+    if (type === 'today') {
+      start = end = fmt(today);
+    } else if (type === 'next5') {
+      start = fmt(today);
+      const e = new Date(today); e.setDate(e.getDate() + 4);
+      end = fmt(e);
+    } else if (type === 'thisMonth') {
+      start = fmt(new Date(today.getFullYear(), today.getMonth(), 1));
+      end   = fmt(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+    } else if (type === 'nextMonth') {
+      start = fmt(new Date(today.getFullYear(), today.getMonth() + 1, 1));
+      end   = fmt(new Date(today.getFullYear(), today.getMonth() + 2, 0));
+    } else if (type === 'custom') {
+      ui.el('customDateRow').style.display = 'block';
+      return;
+    }
+
+    ui.el('customDateRow').style.display = 'none';
+    ui.el('filterStart').value = start;
+    ui.el('filterEnd').value   = end;
+    renderOrderList();
+  }
+
+  /* ══════════════════════════════════════════════
+     RENDER ORDER LIST
+  ══════════════════════════════════════════════ */
+  function renderOrderList() {
+    const container = ui.el('ordersContainer');
+    const start = ui.el('filterStart') ? ui.el('filterStart').value : '';
+    const end   = ui.el('filterEnd')   ? ui.el('filterEnd').value   : '';
+
+    if (!start || !end) {
+      container.innerHTML = '<div class="empty-state"><i class="fa-regular fa-calendar-xmark"></i><p>Tarix aralığı seçin</p></div>';
+      return;
+    }
+
+    const filtered = (state.globalOrders || [])
+      .filter(o => o.date >= start && o.date <= end)
+      .sort((a, b) => (b.id || 0) - (a.id || 0));
+
+    let totalRev = 0;
+
+    if (!filtered.length) {
+      container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-box-open"></i><p>Bu tarixdə sifariş tapılmadı</p></div>';
+    } else {
+      const badgeMap = {
+        Delivered: 'badge-delivered', delivered: 'badge-delivered',
+        Preparing: 'badge-preparing', pending: 'badge-pending', Pending: 'badge-pending',
+        New: 'badge-new', new: 'badge-new',
+        OnWay: 'badge-onway',
+        Deleted: 'badge-deleted', deleted: 'badge-deleted'
+      };
+
+      const labelMap = {
+        Delivered: 'Çatdırıldı', Preparing: 'Hazırlanır', Pending: 'Gözləyir',
+        pending: 'Gözləyir', New: 'Yeni', new: 'Yeni',
+        OnWay: 'Yoldadır', Deleted: 'Ləğv', deleted: 'Ləğv'
+      };
+
+      container.innerHTML = '';
+      filtered.forEach(o => {
+        totalRev += parseFloat(o.revenue || 0);
+        const bClass = badgeMap[o.status] || 'badge-pending';
+        const bLabel = labelMap[o.status] || o.status;
+        const rev = parseFloat(o.revenue || 0);
+        const date = o.date || '';
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="order-card-header">
+            <span class="order-id">#${esc(String(o.id || '—'))}</span>
+            <span class="badge ${bClass}">${esc(bLabel)}</span>
+          </div>
+          <div class="row-detail"><span class="label-detail">Müştəri</span><span class="val-detail">${esc(o.name || '—')}</span></div>
+          ${o.phone ? `<div class="row-detail"><span class="label-detail">Telefon</span><span class="val-detail"><a href="tel:${esc(o.phone)}" style="color:var(--primary);text-decoration:none;font-weight:700;">${esc(o.phone)}</a></span></div>` : ''}
+          <div class="row-detail"><span class="label-detail">Məbləğ</span><span class="val-detail" style="color:var(--primary);font-weight:800;">${rev.toFixed(2)} ₼</span></div>
+          ${o.address ? `<div class="row-detail"><span class="label-detail">Ünvan</span><span class="val-detail">${esc(o.address)}</span></div>` : ''}
+          ${o.timeSlot ? `<div class="row-detail"><span class="label-detail">Vaxt</span><span class="val-detail">${esc(o.timeSlot)}</span></div>` : ''}
+          ${o.courier ? `<div class="row-detail"><span class="label-detail">Kuriyer</span><span class="val-detail">${esc(o.courier)}</span></div>` : ''}
+          ${o.products ? `<div style="margin-top:6px;"><div class="label-detail" style="display:block;margin-bottom:4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#64748b;">Məhsullar</div><div class="products-box">${esc(o.products)}</div></div>` : ''}
+          <div class="note-area">
+            <label style="margin-bottom:5px;">Qeyd</label>
+            <textarea id="note-${esc(String(o.id))}" rows="2" class="note-textarea" placeholder="Qeyd əlavə et...">${esc(o.note || '')}</textarea>
+            <div style="text-align:right;margin-top:6px;">
+              <button class="btn btn-primary btn-sm" onclick="saveNote('${esc(String(o.id))}')">
+                <i class="fa-solid fa-floppy-disk"></i> Saxla
+              </button>
+            </div>
+          </div>
+          <div style="text-align:right;font-size:10px;color:#94a3b8;margin-top:8px;">${esc(date)}</div>`;
+        container.appendChild(card);
+      });
+    }
+
+    ui.el('listTotalCount').textContent   = filtered.length;
+    ui.el('listTotalRevenue').textContent = totalRev.toFixed(2) + ' ₼';
+  }
+
+  /* ══════════════════════════════════════════════
+     SAVE NOTE
+  ══════════════════════════════════════════════ */
+  async function saveNote(orderId) {
+    const field = document.getElementById(`note-${orderId}`);
+    if (!field) return;
+    const newNote = field.value;
+    const btn = field.parentElement.querySelector('button');
+    const orig = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+
+    const form = new URLSearchParams();
+    form.append('action', 'updateOrderNote');
+    form.append('orderId', orderId);
+    form.append('newNote', newNote);
+
+    try {
+      const res  = await fetch(ORDERS_API, { method: 'POST', body: form });
+      const data = await res.json();
+      if (data.success) {
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Saxlandı';
+        btn.style.background = 'var(--success)';
+        const order = state.globalOrders.find(o => o.id == orderId);
+        if (order) order.note = newNote;
+        setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; btn.disabled = false; }, 2200);
+      } else {
+        alert('Xəta: ' + (data.message || ''));
+        btn.innerHTML = orig; btn.disabled = false;
+      }
+    } catch (err) {
+      alert('İnternet xətası');
+      btn.innerHTML = orig; btn.disabled = false;
+    }
+  }
+
+  /* ══════════════════════════════════════════════
+     RENDER STATS
+  ══════════════════════════════════════════════ */
+  function renderStats() {
+    const period = ui.el('statsPeriod') ? ui.el('statsPeriod').value : 'thisMonth';
+    const now = new Date();
+    let start, end;
+    const fmt = d => d.toISOString().split('T')[0];
+
+    if (period === 'today') {
+      start = end = fmt(now);
+    } else if (period === 'yesterday') {
+      const y = new Date(now); y.setDate(y.getDate() - 1); start = end = fmt(y);
+    } else if (period === 'thisMonth') {
+      start = fmt(new Date(now.getFullYear(), now.getMonth(), 1));
+      end   = fmt(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+    } else if (period === 'lastMonth') {
+      start = fmt(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+      end   = fmt(new Date(now.getFullYear(), now.getMonth(), 0));
+    } else {
+      start = '2020-01-01'; end = '2030-12-31';
+    }
+
+    const orders    = (state.globalOrders || []).filter(o => o.date >= start && o.date <= end && o.status !== 'Deleted' && o.status !== 'deleted');
+    const count     = orders.length;
+    const revenue   = orders.reduce((s, o) => s + (parseFloat(o.revenue) || 0), 0);
+    const delivered = orders.filter(o => o.status === 'Delivered' || o.status === 'delivered').length;
+    const rate      = count > 0 ? ((delivered / count) * 100).toFixed(0) : 0;
+    const aov       = count > 0 ? (revenue / count).toFixed(2) : '0.00';
+
+    ui.el('statRevenue').textContent = revenue.toFixed(2) + ' ₼';
+    ui.el('statCount').textContent   = count;
+    ui.el('statRate').textContent    = `${rate}% (${delivered})`;
+    ui.el('statAOV').textContent     = aov + ' ₼';
+
+    const target = 5000;
+    const pct    = Math.min((revenue / target) * 100, 100).toFixed(1);
+    ui.el('statProgressFill').style.width = pct + '%';
+    ui.el('statProgressLabel').textContent = `${revenue.toFixed(2)} / ${target} ₼`;
+  }
+
+  /* ══════════════════════════════════════════════
+     TRACK ORDER
+  ══════════════════════════════════════════════ */
+  async function runTrackOrder() {
+    const id    = ui.el('trackId').value.trim();
+    const phone = ui.el('trackPhone').value.trim();
+    if (!id || !phone) return Swal.fire('Diqqət', 'Kod və Nömrəni daxil edin.', 'warning');
+
+    ui.toggleLoader(true, 'Axtarılır...');
+    ui.el('trackResult').style.display = 'none';
+
+    try {
+      const res  = await fetch(`${ORDERS_API}?action=trackOrder&orderId=${encodeURIComponent(id)}&phone=${encodeURIComponent(phone)}`);
+      const data = await res.json();
+
+      if (data.success) {
+        const o = data.order;
+        const statusLabels = { New: 'Yeni', Preparing: 'Hazırlanır', OnWay: 'Yoldadır', Delivered: 'Təhvil Verildi', Deleted: 'Ləğv Edildi' };
+        ui.el('resId').textContent      = o.id;
+        const statusEl = ui.el('resStatus');
+        statusEl.textContent = statusLabels[o.status] || o.status;
+        statusEl.className   = `status-badge-track status-${o.status}`;
+        ui.el('resDate').textContent    = o.date     || '—';
+        ui.el('resTime').textContent    = o.timeSlot || 'Gün ərzində';
+        ui.el('resPrice').textContent   = (o.price || 0) + ' ₼';
+        ui.el('resPayment').textContent = o.payment === 'cash' ? 'Nağd' : 'Kart';
+
+        const nameEl = ui.el('resCourierName');
+        const btnEl  = ui.el('resCourierBtn');
+        if (o.courier && String(o.courier).trim()) {
+          nameEl.textContent = String(o.courier).toUpperCase();
+          if (o.courierPhone) {
+            btnEl.style.display = 'inline-block';
+            btnEl.href = `tel:${o.courierPhone}`;
+          } else { btnEl.style.display = 'none'; }
+        } else {
+          nameEl.textContent  = 'Təyin olunmayıb';
+          btnEl.style.display = 'none';
+        }
+        ui.el('trackResult').style.display = 'block';
+      } else {
+        Swal.fire('Tapılmadı', 'Sifariş kodu və ya nömrə yanlışdır.', 'error');
+      }
+    } catch (err) {
+      Swal.fire('Xəta', 'Server ilə əlaqə kəsildi.', 'error');
+    } finally {
+      ui.toggleLoader(false);
+    }
+  }
+
+  /* ══════════════════════════════════════════════
+     SAVE PROFILE
+  ══════════════════════════════════════════════ */
+  function saveProfile() {
+    const storeName  = ui.el('prof-store-name').value.trim();
+    const storePhone = ui.el('prof-store-phone').value.trim();
+    const instagram  = ui.el('prof-instagram').value.trim();
+
+    if (storeName)  localStorage.setItem('profile_store_name',  storeName);
+    if (storePhone) localStorage.setItem('profile_store_phone', storePhone);
+    if (instagram)  localStorage.setItem('profile_instagram',   instagram);
+
+    Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Profil yadda saxlandı!' });
+  }
+
+  /* ══════════════════════════════════════════════
+     PRODUCT CATALOG FUNCTIONS
+  ══════════════════════════════════════════════ */
+  async function coLoadProducts() {
+    const note = ui.el('productsLoadingNote');
+    if (note) note.style.display = 'block';
+    try {
+      const res  = await fetch(`${CATALOG_API}?action=getProductList`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.products)) {
+        coProductsCache = data.products;
+      }
+    } catch (e) { console.warn('Catalog unavailable:', e.message); }
+    finally { if (note) note.style.display = 'none'; }
+  }
+
+  function coSearchProducts() {
+    const query = ui.el('co-productSearch').value.toLowerCase().trim();
+    const list  = ui.el('coProductResults');
+    if (!query) { list.style.display = 'none'; return; }
+
+    const matches = coProductsCache.filter(p =>
+      (p.name && p.name.toLowerCase().includes(query)) ||
+      (p.code && String(p.code).toLowerCase().includes(query))
+    ).slice(0, 10);
+
+    let html = '';
+
+    if (matches.length > 0) {
+      html = matches.map(p => {
+        const safeData = encodeURIComponent(JSON.stringify(p));
+        const imgHtml  = p.image
+          ? `<img src="${esc(p.image)}" class="pri-img" onerror="this.style.display='none'">`
+          : `<div class="pri-placeholder"><i class="fa-solid fa-box"></i></div>`;
+        return `<div class="product-result-item" onclick="coSelectProduct(JSON.parse(decodeURIComponent('${safeData}')))">
+          ${imgHtml}
+          <div style="min-width:0;flex:1;">
+            <div class="pri-name">${esc(p.name || '')}</div>
+            <div class="pri-meta">Kod: ${esc(String(p.code || '—'))}</div>
+            <div class="pri-price">${parseFloat(p.price || 0).toFixed(2)} ₼</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    html += `<div class="no-result-row">
+      <p>${matches.length > 0 ? 'Başqa məhsul axtarırsınız?' : 'Məhsul tapılmadı.'}</p>
+      <button type="button" class="btn-custom-product" onclick="coShowCustomProduct()">
+        <i class="fa-solid fa-plus"></i> Əl ilə daxil et
+      </button>
+    </div>`;
+
+    list.innerHTML     = html;
+    list.style.display = 'block';
+  }
+
+  function coSelectProduct(product) {
+    coCart.push({
+      name: product.name || '', code: product.code || '—',
+      price: parseFloat(product.price || 0), image: product.image || '', isCustom: false
+    });
+    ui.el('coProductResults').style.display = 'none';
+    ui.el('co-productSearch').value = '';
+    ui.el('coCustomProductSection').style.display = 'none';
+    coRenderCart();
+    Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1400, icon: 'success', title: 'Səbətə əlavə edildi' });
+  }
+
+  function coShowCustomProduct() {
+    ui.el('coProductResults').style.display = 'none';
+    ui.el('coCustomProductSection').style.display = 'block';
+  }
+
+  function coCancelCustomProduct() {
+    ui.el('coCustomProductSection').style.display = 'none';
+    ui.el('coCustomProductName').value  = '';
+    ui.el('coCustomProductPrice').value = '';
+    coCustomProductImageB64 = '';
+    resetUploadArea('coCustomProductUploadArea', 'coCustomProductUploadContent', '📷', 'Şəkil əlavə et');
+  }
+
+  function coAddCustomProductToCart() {
+    const name  = ui.el('coCustomProductName').value.trim();
+    let   price = parseFloat(ui.el('coCustomProductPrice').value);
+    if (!name) return Swal.fire('Diqqət', 'Məhsulun adını yazın.', 'warning');
+    if (isNaN(price) || price < 0) price = 0;
+    coCart.push({ name, code: 'CUSTOM', price, image: coCustomProductImageB64 || '', isCustom: true });
+    coCancelCustomProduct();
+    coRenderCart();
+    Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1400, icon: 'success', title: 'Səbətə əlavə edildi' });
+  }
+
+  function coRenderCart() {
+    const container = ui.el('coCartContainer');
+    const list      = ui.el('coCartItemsList');
+    if (!coCart.length) { container.style.display = 'none'; coUpdateCartTotals(); return; }
+    container.style.display = 'block';
+    list.innerHTML = coCart.map((item, i) => {
+      const imgHtml = item.image
+        ? `<img src="${esc(item.image)}" class="cart-item-img" onerror="this.style.display='none'">`
+        : `<div class="cart-item-placeholder"><i class="fa-solid fa-box"></i></div>`;
+      return `<div class="cart-item-card">
+        ${imgHtml}
+        <div class="cart-item-info">
+          <div class="cart-item-name">${esc(item.name)}</div>
+          <div class="cart-item-code">Kod: ${esc(item.code)}</div>
+          <div class="cart-item-price">${item.price.toFixed(2)} ₼</div>
+        </div>
+        <div class="cart-item-remove" onclick="coRemoveFromCart(${i})"><i class="fa-solid fa-trash"></i></div>
+      </div>`;
+    }).join('');
+    coUpdateCartTotals();
+  }
+
+  function coUpdateCartTotals() {
+    const subtotal = coCart.reduce((s, p) => s + p.price, 0);
+    const courier  = parseFloat(ui.el('courierCostCo').value) || 0;
+    const total    = subtotal + courier;
+    const sub = ui.el('coCartSubtotal');
+    const cour = ui.el('coCartCourierDisplay');
+    const tot  = ui.el('coCartTotalPrice');
+    if (sub)  sub.textContent  = subtotal.toFixed(2) + ' ₼';
+    if (cour) cour.textContent = courier.toFixed(2) + ' ₼';
+    if (tot)  tot.textContent  = total.toFixed(2) + ' ₼';
+  }
+
+  function coRemoveFromCart(index) { coCart.splice(index, 1); coRenderCart(); }
+
+  function coHandleCustomProductImageChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    compressImage(file, (b64, preview) => {
+      coCustomProductImageB64 = b64;
+      updateUploadArea('coCustomProductUploadArea', 'coCustomProductUploadContent', preview);
+    });
+  }
+
+  /* ══════════════════════════════════════════════
+     LOCATION / MAP
+  ══════════════════════════════════════════════ */
+  function coSwitchLoc(type, btn) {
+    document.querySelectorAll('.loc-content').forEach(el => el.classList.remove('active'));
+    document.getElementById('co-loc-' + type).classList.add('active');
+    document.querySelectorAll('.loc-tab').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+    coUpdateDeliveryCost();
+  }
+
+  function coUpdateDeliveryCost() {
+    const isLandmark = document.getElementById('co-loc-landmark').classList.contains('active');
+    const isRayon    = document.getElementById('co-loc-rayon').classList.contains('active');
+    let cost = 0;
+    if (isLandmark) {
+      const val = ui.el('coLandmarkSelect').value;
+      const lm = LANDMARK_DATA.find(i => i.name === val);
+      if (lm) cost = lm.price;
+    } else if (isRayon) {
+      if (ui.el('coRayonSelect').value) cost = 4;
+    }
+    const costInput = ui.el('courierCostCo');
+    if (costInput) { costInput.value = cost; coUpdateCartTotals(); }
+  }
+
+  function coToggleMapSection() {
+    coMapOpen = !coMapOpen;
+    const sec   = ui.el('coMapOptionalSection');
+    const check = ui.el('coMapToggleCheck');
+    if (coMapOpen) {
+      sec.style.display = 'block';
+      check.classList.add('checked');
+      check.innerHTML = '<i class="fa-solid fa-check" style="font-size:10px;"></i>';
+      setTimeout(() => { coInitMap(); if (coMapInstance) coMapInstance.invalidateSize(); }, 320);
+    } else {
+      sec.style.display = 'none';
+      check.classList.remove('checked');
+      check.innerHTML = '';
+      ui.el('coMapCoordinatesLink').value = '';
+      ui.el('coLocationStatus').style.display = 'none';
+    }
+  }
+
+  function coInitMap() {
+    if (coMapInstance) return;
+    coMapInstance    = L.map('coMap').setView([40.4093, 49.8671], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(coMapInstance);
+    coMarkerInstance = L.marker([40.4093, 49.8671], { draggable: true }).addTo(coMapInstance);
+    coMarkerInstance.on('dragend', () => coSaveMapLoc(coMarkerInstance.getLatLng()));
+    coMapInstance.on('click', e => { coMarkerInstance.setLatLng(e.latlng); coSaveMapLoc(e.latlng); });
+  }
+
+  function coSaveMapLoc(latlng) {
+    ui.el('coMapCoordinatesLink').value = `https://maps.google.com/?q=${latlng.lat},${latlng.lng}`;
+    ui.el('coLocationStatus').style.display = 'block';
+  }
+
+  function coGetCurrentLocation() {
+    if (!navigator.geolocation) return Swal.fire('Xəta', 'Brauzeriniz mövqe dəstəkləmir.', 'error');
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const ll = new L.LatLng(pos.coords.latitude, pos.coords.longitude);
+        if (coMarkerInstance) { coMarkerInstance.setLatLng(ll); coMapInstance.setView(ll, 16); }
+        coSaveMapLoc(ll);
+      },
+      () => Swal.fire('Xəta', 'Mövqe götürülə bilmədi.', 'error')
+    );
+  }
+
+  /* ══════════════════════════════════════════════
+     PAYMENT UI
+  ══════════════════════════════════════════════ */
+  function coHandlePaymentChange() {
+    const method = ui.el('coPayMethod').value;
+    ui.el('coDepositOfferBox').style.display = method === 'cash' ? 'block' : 'none';
+    ui.el('coCardReceiptBox').style.display  = method === 'card' ? 'block' : 'none';
+    if (method === 'card') {
+      if (coDepositChecked) coToggleDeposit();
+      coReceiptImageB64 = '';
+    }
+  }
+
+  function coToggleDeposit() {
+    coDepositChecked = !coDepositChecked;
+    const cb    = ui.el('coDepositCheckbox');
+    const badge = ui.el('coDiscountBadge');
+    const sec   = ui.el('coDepositReceiptSection');
+    if (coDepositChecked) {
+      cb.classList.add('checked');
+      cb.innerHTML        = '<i class="fa-solid fa-check" style="font-size:10px;"></i>';
+      badge.style.display = 'flex';
+      sec.style.display   = 'block';
+    } else {
+      cb.classList.remove('checked');
+      cb.innerHTML        = '';
+      badge.style.display = 'none';
+      sec.style.display   = 'none';
+      coReceiptImageB64   = '';
+      if (ui.el('coDepositReceiptInput')) ui.el('coDepositReceiptInput').value = '';
+      resetUploadArea('coDepositReceiptUploadArea', 'coDepositReceiptContent', '🧾', 'Ödəniş qəbzini əlavə et');
+    }
+  }
+
+  function coHandleReceiptImageChange(event, type) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const areaId    = type === 'deposit' ? 'coDepositReceiptUploadArea' : 'coCardReceiptUploadArea';
+    const contentId = type === 'deposit' ? 'coDepositReceiptContent'    : 'coCardReceiptContent';
+    if (file.type === 'application/pdf') {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        coReceiptImageB64 = ev.target.result;
+        document.getElementById(areaId).classList.add('has-image');
+        document.getElementById(contentId).innerHTML = `<div style="font-size:28px;">📄</div><div class="iua-text" style="color:var(--success);font-weight:700;">${esc(file.name)}</div>`;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      compressImage(file, (b64, preview) => {
+        coReceiptImageB64 = b64;
+        updateUploadArea(areaId, contentId, preview);
+      });
+    }
+  }
+
+  /* ══════════════════════════════════════════════
+     ORDER FORM SUBMIT
+  ══════════════════════════════════════════════ */
+  document.getElementById('customerOrderForm').addEventListener('submit', async e => {
+    e.preventDefault();
+
+    if (!ui.el('custName').value.trim())  return Swal.fire('Diqqət', 'Ad və Soyadı daxil edin.', 'warning');
+    if (!ui.el('custPhone').value.trim()) return Swal.fire('Diqqət', 'Əlaqə nömrəsini daxil edin.', 'warning');
+    if (!ui.el('timeSlot').value)         return Swal.fire('Diqqət', 'Çatdırılma saat aralığını seçin.', 'warning');
+    if (!coCart.length)                   return Swal.fire('Diqqət', 'Səbətə ən azı bir məhsul əlavə edin.', 'warning');
+
+    const isMetro    = document.getElementById('co-loc-metro').classList.contains('active');
+    const isLandmark = document.getElementById('co-loc-landmark').classList.contains('active');
+    const isRayon    = document.getElementById('co-loc-rayon').classList.contains('active');
+
+    const metro    = ui.el('coMetroSelect').value;
+    const landmark = ui.el('coLandmarkSelect').value;
+    const rayon    = ui.el('coRayonSelect').value;
+
+    let finalAddress = '';
+    let deliveryCost = 0;
+
+    if (isMetro) {
+      if (!metro) return Swal.fire('Diqqət', 'Metro stansiyasını seçin.', 'warning');
+      finalAddress = `Metro: ${metro}`;
+    } else if (isLandmark) {
+      if (!landmark) return Swal.fire('Diqqət', 'Nişangahı seçin.', 'warning');
+      finalAddress = `Nişangah: ${landmark}`;
+      const lm = LANDMARK_DATA.find(i => i.name === landmark);
+      if (lm) deliveryCost = lm.price;
+    } else if (isRayon) {
+      if (!rayon) return Swal.fire('Diqqət', 'Rayon/şəhər seçin.', 'warning');
+      finalAddress = `Rayon: ${rayon}`;
+      deliveryCost = 4;
+    }
+
+    const extraDetails = ui.el('coAddressDetails').value.trim();
+    if (extraDetails) finalAddress += `, ${extraDetails}`;
+
+    const manualCourier = parseFloat(ui.el('courierCostCo').value) || 0;
+    if (manualCourier > 0) deliveryCost = manualCourier;
+
+    const payMethod = ui.el('coPayMethod').value;
+    if (payMethod === 'card' && !coReceiptImageB64) return Swal.fire('Diqqət', 'Kart ilə ödəniş üçün bank köçürmə qəbzini əlavə edin.', 'warning');
+    if (payMethod === 'cash' && coDepositChecked && !coReceiptImageB64) return Swal.fire('Diqqət', 'Beh ödənişinin qəbzini əlavə edin.', 'warning');
+
+    const productName  = coCart.map(p => p.name).join(' + ');
+    const productCode  = coCart.map(p => p.code).join(', ');
+    const productPrice = coCart.reduce((s, p) => s + p.price, 0);
+    const customImage  = coCart.find(p => p.isCustom && p.image)?.image || '';
+    const discountApplied = (payMethod === 'cash' && coDepositChecked) ? 4  : 0;
+    const depositPaid     = (payMethod === 'cash' && coDepositChecked) ? 10 : 0;
+
+    ui.toggleLoader(true, 'Sifariş serverə göndərilir... Pəncərəni bağlamayın.');
+
+    try {
+      const payload = {
+        action:              'createCustomerOrder',
+        customerName:        ui.el('custName').value.trim(),
+        contactInfo:         ui.el('custPhone').value.trim(),
+        instagramHandle:     ui.el('instagramHandle').value.trim(),
+        deliveryDate:        ui.el('deliveryDate').value,
+        timeSlot:            ui.el('timeSlot').value,
+        address:             finalAddress,
+        specialInstructions: ui.el('coSpecialInstructions').value.trim(),
+        courieradditional:   deliveryCost,
+        mapLink:             ui.el('coMapCoordinatesLink').value,
+        paymentMethod:       payMethod,
+        salesRep:            state.currentPhone || state.currentUser,
+        salesRepPhone:       state.currentPhone,
+        salesSource:         'Staff',
+        productName,
+        productCode,
+        productPrice,
+        discountApplied,
+        depositPaid,
+        receiptImage:        coReceiptImageB64,
+        customProductImage:  customImage
+      };
+
+      const form = new URLSearchParams();
+      Object.entries(payload).forEach(([k, v]) => { if (v !== '' && v !== null && v !== undefined) form.append(k, v); });
+
+      const res  = await fetch(ORDERS_API, { method: 'POST', body: form });
+      const data = await res.json();
+
+      ui.toggleLoader(false);
+
+      if (data.success) {
+        await Swal.fire({
+          title: 'Təşəkkür edirik! 🎉',
+          html:  `Sifariş qəbul olundu!<br><b style="font-size:20px;">Kod: #${data.orderId}</b>`,
+          icon:  'success',
+          confirmButtonColor: '#3b82f6'
+        });
+        coResetForm();
+        await app.fetchOrdersData();
+        // Switch to Sifarişlər tab
+        const sifarisBtn = document.getElementById('nav-sifarisler');
+        app.nav('sifarisler', sifarisBtn);
+      } else {
+        Swal.fire('Xəta', data.message || 'Xəta baş verdi.', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      ui.toggleLoader(false);
+      Swal.fire('Xəta', 'İnternet əlaqəsini yoxlayın: ' + err.message, 'error');
+    }
+  });
+
+  /* ══════════════════════════════════════════════
+     RESET ORDER FORM
+  ══════════════════════════════════════════════ */
+  function coResetForm() {
+    document.getElementById('customerOrderForm').reset();
+    ui.el('salesRep').value = state.currentPhone || state.currentUser;
+    coCart                  = [];
+    coDepositChecked        = false;
+    coReceiptImageB64       = '';
+    coCustomProductImageB64 = '';
+    coRenderCart();
+    coCancelCustomProduct();
+
+    const metroTab = document.querySelector('.loc-tab');
+    coSwitchLoc('metro', metroTab);
+    metroTab.classList.add('active');
+
+    ui.el('coLocationStatus').style.display = 'none';
+    ui.el('coMapCoordinatesLink').value = '';
+    if (coMapOpen) coToggleMapSection();
+
+    const cb = ui.el('coDepositCheckbox');
+    cb.classList.remove('checked'); cb.innerHTML = '';
+    ui.el('coDiscountBadge').style.display         = 'none';
+    ui.el('coDepositReceiptSection').style.display = 'none';
+    resetUploadArea('coDepositReceiptUploadArea', 'coDepositReceiptContent', '🧾', 'Ödəniş qəbzini əlavə et');
+    resetUploadArea('coCardReceiptUploadArea', 'coCardReceiptContent', '🧾', 'Bank köçürmə qəbzini əlavə et');
+    coHandlePaymentChange();
+
+    const tom = new Date();
+    tom.setDate(tom.getDate() + 1);
+    ui.el('deliveryDate').valueAsDate = tom;
+  }
+
+  /* ══════════════════════════════════════════════
+     IMAGE HELPERS
+  ══════════════════════════════════════════════ */
+  function compressImage(file, callback) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else        { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const cvs = document.createElement('canvas');
+        cvs.width = w; cvs.height = h;
+        cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+        const b64 = cvs.toDataURL('image/jpeg', 0.76);
+        callback(b64, b64);
+      };
+      img.src = ev.target.result;
     };
+    reader.readAsDataURL(file);
+  }
+
+  function updateUploadArea(areaId, contentId, previewUrl) {
+    const area = document.getElementById(areaId);
+    const cont = document.getElementById(contentId);
+    if (area) area.classList.add('has-image');
+    if (cont) cont.innerHTML = `<img src="${previewUrl}" class="iua-preview"><div class="iua-text" style="color:var(--success);font-weight:700;"><i class="fa-solid fa-check"></i> Əlavə olundu</div>`;
+  }
+
+  function resetUploadArea(areaId, contentId, icon, text) {
+    const area = document.getElementById(areaId);
+    const cont = document.getElementById(contentId);
+    if (area) area.classList.remove('has-image');
+    if (cont) cont.innerHTML = `<div class="iua-icon">${icon}</div><div class="iua-text">${text}</div>`;
+  }
+
+  /* ══════════════════════════════════════════════
+     ESCAPE HELPER
+  ══════════════════════════════════════════════ */
+  function esc(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  /* ══════════════════════════════════════════════
+     INIT ON DOM READY
+  ══════════════════════════════════════════════ */
+  window.addEventListener('DOMContentLoaded', () => {
+    // Populate Landmark dropdown
+    const lmSel = ui.el('coLandmarkSelect');
+    LANDMARK_DATA.forEach(item => {
+      const opt = new Option(`${item.name} (+${item.price.toFixed(2)} ₼)`, item.name);
+      lmSel.appendChild(opt);
+    });
+
+    // Populate Rayon dropdown
+    const raySel = ui.el('coRayonSelect');
+    [...RAYON_DATA].sort().forEach(city => {
+      raySel.appendChild(new Option(`${city} (+4.00 ₼)`, city));
+    });
+
+    // Init payment UI
+    coHandlePaymentChange();
+
+    // Apply today filter chips
+    applyDateFilter('today', document.querySelector('.date-chip.active'));
+
+    // Check if already logged in from session storage
+    const savedPhone = localStorage.getItem('partner_phone') || localStorage.getItem('staff_userphone') || '';
+    const savedName  = localStorage.getItem('partner_name')  || localStorage.getItem('staff_username')  || '';
+    const savedUser  = localStorage.getItem('partner_user')  || '';
+
+    if (savedUser) {
+      try {
+        const parsed = JSON.parse(savedUser);
+        if (parsed && parsed.phone) {
+          // We have a cached user, but for security we still require login
+        }
+      } catch(_) {}
+    }
+
+    // Restore profile fields if saved
+    const savedStoreName  = localStorage.getItem('profile_store_name');
+    const savedStorePhone = localStorage.getItem('profile_store_phone');
+    const savedInstagram  = localStorage.getItem('profile_instagram');
+    if (savedStoreName  && ui.el('prof-store-name'))  ui.el('prof-store-name').value  = savedStoreName;
+    if (savedStorePhone && ui.el('prof-store-phone')) ui.el('prof-store-phone').value = savedStorePhone;
+    if (savedInstagram  && ui.el('prof-instagram'))   ui.el('prof-instagram').value   = savedInstagram;
+
+    // Default delivery date
+    const tom = new Date();
+    tom.setDate(tom.getDate() + 1);
+    if (ui.el('deliveryDate')) ui.el('deliveryDate').valueAsDate = tom;
+  });
+
+  /* Close product search on outside click */
+  document.addEventListener('click', ev => {
+    const inp = ui.el('co-productSearch');
+    const lst = ui.el('coProductResults');
+    if (inp && lst && !inp.contains(ev.target) && !lst.contains(ev.target)) {
+      lst.style.display = 'none';
+    }
+  });
+
+  /* Close modals on backdrop click */
+  ui.el('modal-withdraw').addEventListener('click', function(e) {
+    if (e.target === this) ui.closeModals();
+  });
   </script>
 </body>
 </html>
-
-
