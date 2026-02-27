@@ -4,911 +4,2203 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Hədiyyə Sehrbazı | Brendimo</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
   <style>
+    /* ═══════════════════════════════════════════════
+       DESIGN TOKENS & ROOT VARIABLES
+    ═══════════════════════════════════════════════ */
     :root {
-      --primary: #111111;
-      --gold: #D4AF37;
-      --gold-light: #f3e5ab;
-      --bg: #FAFAFA;
-      --card-bg: #FFFFFF;
-      --text: #333333;
-      --text-light: #888888;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-      --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
-      --radius: 16px;
+      --ink:       #0D0D0D;
+      --ink-soft:  #4A4A4A;
+      --ink-faint: #9A9A9A;
+      --gold:      #C9A84C;
+      --gold-dim:  #E8D5A3;
+      --gold-glow: rgba(201,168,76,0.18);
+      --cream:     #FAF8F4;
+      --white:     #FFFFFF;
+      --surface:   #F4F1EB;
+      --border:    rgba(0,0,0,0.07);
+      --shadow-sm: 0 2px 12px rgba(0,0,0,0.05);
+      --shadow-md: 0 8px 32px rgba(0,0,0,0.10);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.14);
+      --r-sm: 10px;
+      --r-md: 16px;
+      --r-lg: 24px;
+      --transition: all 0.28s cubic-bezier(0.4,0,0.2,1);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-    
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      padding-bottom: 40px;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
-    /* --- HERO HEADER --- */
-    header {
-      background: rgba(26, 26, 26, 0.95);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      color: white;
-      padding: 1.5rem 1rem 3rem 1rem;
+    /* ═══════════════════════════════════════════════
+       TOP NAVIGATION BAR
+    ═══════════════════════════════════════════════ */
+    .navbar {
       position: sticky;
       top: 0;
-      z-index: 100;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      transition: all 0.3s ease;
+      z-index: 200;
+      background: rgba(13,13,13,0.97);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(201,168,76,0.2);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
     }
 
-    .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      text-align: center;
+    .navbar-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex-shrink: 0;
     }
 
-    h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      margin-bottom: 5px;
+    .navbar-brand .brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--white);
+      letter-spacing: 0.5px;
+      line-height: 1;
     }
 
-    .brand-tag {
+    .navbar-brand .brand-sub {
+      font-size: 0.62rem;
       color: var(--gold);
-      font-size: 0.85rem;
-      font-weight: 500;
+      letter-spacing: 2.5px;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 20px;
-      display: block;
+      line-height: 1;
     }
 
-    /* --- SEARCH BAR --- */
-    .search-container {
+    .navbar-search {
+      flex: 1;
+      max-width: 380px;
       position: relative;
-      max-width: 500px;
-      margin: 0 auto;
-      transform: translateY(25px); /* Hangs halfway off the header */
     }
 
-    .search-input {
+    .navbar-search input {
       width: 100%;
-      padding: 16px 24px 16px 50px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 50px;
-      border: none;
-      font-size: 1rem;
-      background: white;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-      transition: all 0.3s ease;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .search-input:focus {
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      padding: 9px 18px 9px 40px;
       outline: none;
-      box-shadow: 0 8px 30px rgba(212, 175, 55, 0.25);
-      transform: scale(1.02);
+      transition: var(--transition);
+    }
+    .navbar-search input::placeholder { color: rgba(255,255,255,0.35); }
+    .navbar-search input:focus {
+      background: rgba(255,255,255,0.11);
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-glow);
     }
 
-    .search-icon {
+    .navbar-search .search-ico {
       position: absolute;
-      left: 20px;
+      left: 14px;
       top: 50%;
       transform: translateY(-50%);
-      width: 18px;
-      height: 18px;
-      fill: #999;
+      color: rgba(255,255,255,0.35);
+      pointer-events: none;
+      font-size: 14px;
     }
 
-    /* --- GRID LAYOUT --- */
-    main {
-      max-width: 1200px;
-      margin: 3rem auto 0;
-      padding: 0 1.5rem;
+    .navbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.8);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 8px 12px;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .nav-btn:hover {
+      background: rgba(201,168,76,0.15);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .nav-btn.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--ink);
+    }
+    .nav-btn .badge {
+      background: var(--gold);
+      color: var(--ink);
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 2px;
+    }
+    .nav-btn.active .badge {
+      background: var(--ink);
+      color: var(--gold);
+    }
+
+    /* ═══════════════════════════════════════════════
+       FILTER PANEL
+    ═══════════════════════════════════════════════ */
+    .filter-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      height: 56px;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+
+    .filter-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .filter-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--ink-faint);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .filter-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .chip {
+      background: var(--surface);
+      border: 1.5px solid transparent;
+      border-radius: 50px;
+      color: var(--ink-soft);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 5px 14px;
+      transition: var(--transition);
+      white-space: nowrap;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .chip:hover {
+      border-color: var(--gold);
+      color: var(--ink);
+    }
+    .chip.active {
+      background: var(--ink);
+      color: var(--white);
+      border-color: var(--ink);
+    }
+    .chip .chip-emoji { font-size: 0.9rem; }
+
+    /* Price range filter */
+    .price-filter-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .price-select {
+      appearance: none;
+      background: var(--surface);
+      border: 1.5px solid transparent;
+      border-radius: 50px;
+      color: var(--ink-soft);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 5px 28px 5px 14px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%239A9A9A' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      outline: none;
+      transition: var(--transition);
+    }
+    .price-select:focus, .price-select:hover {
+      border-color: var(--gold);
+      color: var(--ink);
+    }
+
+    /* Sort select */
+    .sort-select {
+      appearance: none;
+      background: var(--surface);
+      border: 1.5px solid transparent;
+      border-radius: 50px;
+      color: var(--ink-soft);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 5px 28px 5px 14px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%239A9A9A' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      outline: none;
+      transition: var(--transition);
+    }
+    .sort-select:focus, .sort-select:hover {
+      border-color: var(--gold);
+      color: var(--ink);
+    }
+
+    /* ═══════════════════════════════════════════════
+       RESULTS BAR
+    ═══════════════════════════════════════════════ */
+    .results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px 8px;
+      gap: 12px;
+    }
+
+    .results-count {
+      font-size: 0.82rem;
+      color: var(--ink-faint);
+      font-weight: 500;
+    }
+    .results-count strong { color: var(--ink); }
+
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+    }
+    .view-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 5px 8px;
+      color: var(--ink-faint);
+      transition: var(--transition);
+    }
+    .view-btn.active {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--white);
+    }
+
+    /* ═══════════════════════════════════════════════
+       MAIN GRID
+    ═══════════════════════════════════════════════ */
+    .main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
     }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 24px;
+      gap: 20px;
+    }
+    .grid.list-view {
+      grid-template-columns: 1fr;
     }
 
-    /* --- PRODUCT CARD --- */
-.card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      overflow: hidden;
-      border: 1px solid rgba(0,0,0,0.03);
+    /* ═══════════════════════════════════════════════
+       PRODUCT CARD
+    ═══════════════════════════════════════════════ */
+    .card {
+      background: var(--white);
+      border-radius: var(--r-md);
+      border: 1px solid var(--border);
       box-shadow: var(--shadow-sm);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
       position: relative;
-      opacity: 0;
-      animation: fadeIn 0.5s forwards;
-      cursor: pointer; /* <--- ADD THIS LINE */
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
+      animation: cardIn 0.4s both;
     }
-
-    @keyframes fadeIn { to { opacity: 1; } }
-
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
     .card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-4px);
       box-shadow: var(--shadow-md);
     }
 
-    .card-img-container {
+    /* Selection state */
+    .card.selected {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px var(--gold), var(--shadow-sm);
+    }
+    .card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 26px;
+      height: 26px;
+      background: var(--gold);
+      color: var(--ink);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+    }
+
+    /* List view card */
+    .grid.list-view .card {
+      flex-direction: row;
+      height: 120px;
+    }
+    .grid.list-view .card-img-wrap {
+      width: 120px;
+      min-width: 120px;
+      height: 100%;
+    }
+    .grid.list-view .card-body {
+      padding: 14px 16px;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .grid.list-view .card-info { flex: 1; }
+    .grid.list-view .card-desc { display: block !important; }
+    .grid.list-view .card-footer {
+      border: none;
+      padding: 0;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      min-width: 110px;
+    }
+    .grid.list-view .card-actions { flex-direction: column; }
+
+    .card-img-wrap {
       width: 100%;
-      height: 260px;
-      background: #f4f4f4;
-      position: relative;
+      aspect-ratio: 1 / 1;
+      background: var(--surface);
       overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
     }
 
     .card-img {
       width: 100%;
       height: 100%;
-      object-fit: cover; /* Ensures image covers area */
-      transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      object-fit: cover;
+      transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
     }
+    .card:hover .card-img { transform: scale(1.06); }
 
-    .card:hover .card-img {
-      transform: scale(1.08);
-    }
-
-    /* Badge for Code */
-    .code-badge {
+    /* NEW badge */
+    .badge-new {
       position: absolute;
-      top: 12px;
-      left: 12px;
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(4px);
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: 0.7rem;
+      top: 10px;
+      left: 10px;
+      background: var(--ink);
+      color: var(--white);
+      font-size: 0.62rem;
       font-weight: 700;
-      color: var(--primary);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
       z-index: 2;
     }
 
-    .card-body {
-      padding: 18px;
+    /* Code badge */
+    .badge-code {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(4px);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--ink-soft);
+      padding: 3px 8px;
+      border-radius: 5px;
+      z-index: 2;
+      letter-spacing: 0.5px;
+    }
+
+    /* Target tags on image */
+    .badge-targets {
+      position: absolute;
+      top: 10px;
+      right: 10px;
       display: flex;
       flex-direction: column;
-      flex-grow: 1;
+      gap: 3px;
+      z-index: 2;
+      align-items: flex-end;
+    }
+    .badge-target {
+      background: rgba(13,13,13,0.72);
+      backdrop-filter: blur(4px);
+      color: var(--white);
+      font-size: 0.6rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .card-body {
+      padding: 14px 16px 12px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
     }
 
     .card-title {
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       font-weight: 600;
-      color: var(--primary);
-      margin-bottom: 6px;
-      line-height: 1.4;
+      color: var(--ink);
+      line-height: 1.35;
+      margin-bottom: 4px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .card-desc {
-      font-size: 0.85rem;
-      color: var(--text-light);
-      margin-bottom: 16px;
+      font-size: 0.78rem;
+      color: var(--ink-faint);
       line-height: 1.5;
+      display: none;
+      overflow: hidden;
       display: -webkit-box;
-      -webkit-line-clamp: 2; /* Limit to 2 lines */
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      flex-grow: 1;
     }
 
     .card-footer {
       margin-top: auto;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      border-top: 1px solid #f0f0f0;
-      padding-top: 12px;
+      justify-content: space-between;
+      gap: 8px;
     }
 
     .price {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--primary);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
     }
-
-    .currency {
-      font-size: 0.8rem;
-      font-weight: 500;
+    .price-currency {
+      font-size: 0.7rem;
+      font-weight: 600;
       color: var(--gold);
+      font-family: 'DM Sans', sans-serif;
       margin-left: 2px;
     }
 
-    /* --- LOADING STATE --- */
-    .loader {
-      text-align: center;
-      padding: 60px 20px;
+    .card-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .icon-btn {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--ink-faint);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+    .icon-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: var(--gold-glow);
+    }
+    .icon-btn.select-btn.selected-state {
+      background: var(--gold-glow);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .icon-btn svg { width: 15px; height: 15px; fill: currentColor; }
+
+    /* ═══════════════════════════════════════════════
+       LOADER & STATES
+    ═══════════════════════════════════════════════ */
+    .loader-wrap {
       grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 20px;
+      gap: 16px;
     }
 
     .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(0,0,0,0.1);
-      border-left-color: var(--gold);
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--gold);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 15px;
+      animation: spin 0.7s linear infinite;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-
-    .error-msg {
-      color: #e74c3c;
-      background: #fdecea;
-      padding: 1rem;
-      border-radius: 8px;
-      text-align: center;
+    .empty-state {
       grid-column: 1 / -1;
-    }
-
-    .no-results {
       text-align: center;
-      padding: 40px;
-      color: var(--text-light);
-      grid-column: 1 / -1;
-      font-style: italic;
+      padding: 60px 20px;
     }
+    .empty-state-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
+    .empty-state h3 { font-size: 1.1rem; margin-bottom: 6px; color: var(--ink-soft); }
+    .empty-state p { font-size: 0.85rem; color: var(--ink-faint); }
 
-    /* Mobile Tweaks */
-    @media (max-width: 600px) {
-      .grid { grid-template-columns: 1fr; gap: 20px; }
-      h1 { font-size: 1.5rem; }
-      .search-container { width: 90%; transform: translateY(28px); }
-      main { margin-top: 3.5rem; }
-    }
-
-    /* --- MODAL (POPUP) STYLES --- */
+    /* ═══════════════════════════════════════════════
+       PRODUCT MODAL
+    ═══════════════════════════════════════════════ */
     .modal-overlay {
       position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      z-index: 2000;
-      display: none; /* Hidden by default */
-      justify-content: center;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
       align-items: center;
+      justify-content: center;
       padding: 20px;
       opacity: 0;
       transition: opacity 0.3s ease;
     }
-
-    .modal-active {
+    .modal-overlay.open {
       display: flex;
       opacity: 1;
     }
 
-    .modal-content {
-      background: white;
-      width: 100%;
-      max-width: 800px;
-      border-radius: 24px;
+    .modal {
+      background: var(--white);
+      border-radius: var(--r-lg);
+      display: flex;
+      max-height: 90vh;
+      max-width: 860px;
       overflow: hidden;
       position: relative;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      display: flex;
-      flex-direction: column;
-      animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    
-    @media (min-width: 768px) {
-      .modal-content { flex-direction: row; height: 500px; }
-      .modal-image-col { width: 50%; height: 100%; }
-      .modal-info-col { width: 50%; overflow-y: auto; }
-    }
-
-    @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-    .modal-image-col {
-      background: #f4f4f4;
-      position: relative;
-      height: 300px; /* Mobile height */
-    }
-
-    .modal-img {
       width: 100%;
-      height: 100%;
-      object-fit: contain; /* Shows full image without cropping */
-      padding: 20px;
+      box-shadow: var(--shadow-lg);
+      animation: modalIn 0.38s cubic-bezier(0.16,1,0.3,1);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.94) translateY(20px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
     }
 
-    .close-btn {
+    .modal-close {
       position: absolute;
-      top: 15px; right: 15px;
-      background: rgba(255,255,255,0.8);
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.9);
       border: none;
-      width: 40px; height: 40px;
       border-radius: 50%;
       cursor: pointer;
-      font-size: 1.5rem;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
       z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      font-size: 1.2rem;
+      color: var(--ink);
     }
+    .modal-close:hover { background: var(--ink); color: var(--white); }
 
-    .modal-info-col {
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .modal-code {
-      background: #eee;
-      color: #555;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      align-self: flex-start;
-      margin-bottom: 15px;
-      font-weight: 600;
-    }
-
-    .modal-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 10px; line-height: 1.2; }
-    .modal-price { font-size: 2rem; color: var(--gold); font-weight: 800; margin-bottom: 20px; }
-    .modal-desc { color: #666; line-height: 1.6; margin-bottom: 30px; flex-grow: 1; }
-
-    /* Share Buttons */
-    .share-label { font-size: 0.9rem; font-weight: 600; color: #888; margin-bottom: 10px; display: block; }
-    
-    .share-buttons { display: flex; gap: 10px; }
-    
-    .btn-share {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: transform 0.2s;
-      color: white;
-      font-size: 0.9rem;
-    }
-
-    .btn-share:hover { transform: translateY(-2px); }
-    .btn-copy { background: #333; }
-
-    /* ... previous styles ... */
-    
-    .btn-native-share { 
-        background: var(--primary); /* Uses your black brand color */
-        color: white;
-    }
-    .btn-native-share:hover {
-        background: #333;
-    }
-    
-    .btn-copy { 
-        background: #f0f0f0; 
-        color: #333; 
-    }
-    .btn-copy:hover {
-        background: #e0e0e0;
-    }
-/* --- ADD THIS NEW STYLE FOR CARD SHARE BUTTON --- */
-    .card-share-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 50%;
-      transition: background 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-light);
-    }
-    .card-share-btn:hover {
-      background-color: #f0f0f0;
-      color: var(--gold);
-    }
-
-    /* --- UPDATED MODAL STYLES (MOBILE FIX) --- */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7); /* Darker background */
-      backdrop-filter: blur(5px);
-      z-index: 2000;
-      display: none;
-      justify-content: center;
-      align-items: center; /* Centers modal vertically */
-      padding: 20px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .modal-active { display: flex; opacity: 1; }
-
-    .modal-content {
-      background: white;
-      width: 100%;
-      max-width: 800px;
-      border-radius: 20px;
-      overflow: hidden;
+    .modal-img-col {
+      width: 50%;
+      min-height: 440px;
+      background: var(--surface);
       position: relative;
-      display: flex;
-      flex-direction: column;
-      /* CRITICAL MOBILE FIXES: */
-      max-height: 90vh; /* Prevents modal from being taller than screen */
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      flex-shrink: 0;
     }
 
-    /* Desktop View */
-    @media (min-width: 768px) {
-      .modal-content { 
-        flex-direction: row; 
-        height: 500px; /* Fixed height on desktop */
-      }
-      .modal-image-col { width: 50%; height: 100%; }
-      .modal-info-col { width: 50%; overflow-y: auto; }
-    }
-
-    /* Mobile View Specifics */
-    @media (max-width: 767px) {
-      .modal-image-col {
-        height: 250px; /* Smaller image on mobile */
-        flex-shrink: 0; /* Prevents image from squishing */
-        background: #f8f8f8;
-      }
-      .modal-info-col {
-        overflow-y: auto; /* Allows text to scroll independently */
-        padding: 20px;
-        /* Ensure there is space for the share buttons at bottom */
-      }
-    }
-
-    /* ... (Keep existing close-btn, share-buttons, etc.) ... */
-    
     .modal-img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      padding: 10px;
+      padding: 24px;
     }
-    
+
+    .modal-info-col {
+      flex: 1;
+      padding: 32px 28px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .modal-tag {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 3px 9px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      color: var(--ink-soft);
+    }
+    .modal-tag.target { background: #FFF8E1; border-color: #FFE082; color: #8B6914; }
+    .modal-tag.code { background: var(--surface); color: var(--ink-soft); }
+    .modal-tag.new-tag { background: var(--ink); color: var(--white); border-color: var(--ink); }
+
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      color: var(--ink);
+    }
+
+    .modal-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 16px;
+      line-height: 1;
+    }
+    .modal-price span {
+      font-size: 1rem;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ink-faint);
+      font-weight: 400;
+      margin-left: 4px;
+    }
+
+    .modal-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+
+    .modal-desc {
+      font-size: 0.88rem;
+      color: var(--ink-soft);
+      line-height: 1.65;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+
+    /* Share section */
+    .share-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--ink-faint);
+      margin-bottom: 12px;
+    }
+
+    .share-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .share-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 10px 12px;
+      transition: var(--transition);
+      color: white;
+    }
+    .share-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .share-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .share-btn:active { transform: translateY(0); }
+
+    .share-btn-whatsapp { background: #25D366; }
+    .share-btn-telegram { background: #0088CC; }
+    .share-btn-instagram { background: linear-gradient(135deg, #E1306C, #833AB4); }
+    .share-btn-copy {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1.5px solid var(--border);
+    }
+    .share-btn-copy:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); filter: none; }
+    .share-btn-native {
+      background: var(--ink);
+      grid-column: 1 / -1;
+    }
+
+    .modal-select-btn {
+      margin-top: 10px;
+      width: 100%;
+      background: none;
+      border: 2px solid var(--border);
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 10px;
+      color: var(--ink-soft);
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .modal-select-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .modal-select-btn.selected { border-color: var(--gold); background: var(--gold-glow); color: var(--ink); }
+
+    /* ═══════════════════════════════════════════════
+       COLLECTION PANEL (Slide-out)
+    ═══════════════════════════════════════════════ */
+    .collection-panel {
+      position: fixed;
+      top: 0;
+      right: -420px;
+      width: 400px;
+      height: 100vh;
+      background: var(--white);
+      box-shadow: -8px 0 40px rgba(0,0,0,0.15);
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      transition: right 0.38s cubic-bezier(0.16,1,0.3,1);
+      overflow: hidden;
+    }
+    .collection-panel.open { right: 0; }
+
+    .panel-header {
+      background: var(--ink);
+      color: var(--white);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .panel-header h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+    }
+    .panel-header p {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.6);
+      margin-top: 2px;
+    }
+    .panel-close {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+      transition: var(--transition);
+    }
+    .panel-close:hover { background: rgba(255,255,255,0.2); }
+
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .panel-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--border);
+      background: var(--cream);
+      margin-bottom: 8px;
+      transition: var(--transition);
+    }
+    .panel-item:hover { border-color: var(--gold); }
+    .panel-item img {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: var(--surface);
+    }
+    .panel-item-info { flex: 1; min-width: 0; }
+    .panel-item-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--ink);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .panel-item-price {
+      font-size: 0.78rem;
+      color: var(--gold);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .panel-item-remove {
+      background: none;
+      border: none;
+      color: var(--ink-faint);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
+      transition: var(--transition);
+    }
+    .panel-item-remove:hover { color: #e74c3c; }
+
+    .panel-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .panel-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .panel-total .label { font-size: 0.82rem; color: var(--ink-faint); font-weight: 500; }
+    .panel-total .value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .panel-actions { display: grid; gap: 8px; }
+
+    .panel-btn {
+      border: none;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 12px;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .panel-btn-primary { background: var(--ink); color: white; }
+    .panel-btn-primary:hover { background: #222; }
+    .panel-btn-secondary {
+      background: var(--surface);
+      color: var(--ink-soft);
+      border: 1.5px solid var(--border);
+    }
+    .panel-btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+    .panel-empty {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--ink-faint);
+    }
+    .panel-empty-icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.5; }
+
+    /* ═══════════════════════════════════════════════
+       TOAST NOTIFICATION
+    ═══════════════════════════════════════════════ */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--ink);
+      color: white;
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-md);
+      animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1);
+      white-space: nowrap;
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(12px); } }
+    .toast.success { background: #16a34a; }
+    .toast.error   { background: #dc2626; }
+
+    /* ═══════════════════════════════════════════════
+       COLLECTION LINK MODAL
+    ═══════════════════════════════════════════════ */
+    .link-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      z-index: 1500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .link-modal.open { display: flex; }
+
+    .link-modal-box {
+      background: var(--white);
+      border-radius: var(--r-lg);
+      padding: 32px;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1);
+    }
+    .link-modal-box h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+    }
+    .link-modal-box p {
+      font-size: 0.85rem;
+      color: var(--ink-faint);
+      margin-bottom: 20px;
+    }
+
+    .link-preview {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 12px 16px;
+      font-size: 0.78rem;
+      color: var(--ink-soft);
+      word-break: break-all;
+      margin-bottom: 16px;
+      font-family: monospace;
+      max-height: 80px;
+      overflow-y: auto;
+    }
+
+    .link-modal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .lm-btn {
+      flex: 1;
+      min-width: 120px;
+      border: none;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 11px 16px;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+    .lm-btn-primary { background: var(--ink); color: white; }
+    .lm-btn-primary:hover { background: #222; }
+    .lm-btn-wa { background: #25D366; color: white; }
+    .lm-btn-tg { background: #0088CC; color: white; }
+    .lm-btn-cancel { background: var(--surface); color: var(--ink-soft); border: 1.5px solid var(--border); }
+
+    .link-modal-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .link-preview-thumb {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      object-fit: cover;
+      background: var(--surface);
+    }
+
+    /* ═══════════════════════════════════════════════
+       COLLECTION SHARE PAGE (inline view)
+    ═══════════════════════════════════════════════ */
+    .collection-view {
+      display: none;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .collection-view.visible { display: block; }
+
+    .collection-hero {
+      background: var(--ink);
+      color: white;
+      border-radius: var(--r-lg);
+      padding: 32px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .collection-hero h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      margin-bottom: 4px;
+    }
+    .collection-hero p { color: rgba(255,255,255,0.6); font-size: 0.88rem; }
+    .back-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: var(--r-sm);
+      color: white;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 10px 18px;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.2); }
+
+    /* ═══════════════════════════════════════════════
+       MOBILE RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 767px) {
+      .navbar { padding: 0 16px; gap: 10px; }
+      .navbar-brand .brand-sub { display: none; }
+      .nav-btn span { display: none; }
+      .nav-btn { padding: 8px; }
+
+      .filter-bar { padding: 0 16px; gap: 10px; }
+
+      .main { padding: 0 12px 80px; }
+      .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+      .modal { flex-direction: column; max-height: 92vh; border-radius: var(--r-md); }
+      .modal-img-col { width: 100%; min-height: 220px; max-height: 240px; }
+      .modal-info-col { padding: 20px 18px; }
+      .modal-title { font-size: 1.3rem; }
+      .modal-price { font-size: 1.7rem; }
+
+      .collection-panel { width: 100%; right: -110%; }
+
+      .results-bar { padding: 10px 12px 4px; }
+
+      .share-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .grid { grid-template-columns: 1fr; gap: 10px; }
+    }
+
+    /* ═══════════════════════════════════════════════
+       SCROLLBAR
+    ═══════════════════════════════════════════════ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+    /* NEW label badge */
+    .is-new-label {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: var(--gold);
+      color: var(--ink);
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      z-index: 3;
+    }
+
+    /* Overlay when panel is open */
+    .panel-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 499;
+      display: none;
+    }
+    .panel-overlay.open { display: block; }
+
+    /* Active filter indicator */
+    .filter-clear {
+      background: none;
+      border: 1.5px dashed var(--border);
+      border-radius: 50px;
+      color: var(--ink-faint);
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 4px 12px;
+      transition: var(--transition);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .filter-clear:hover { border-color: #e74c3c; color: #e74c3c; }
+
+    /* Occasion & mood chips hidden initially */
+    .second-filter-row {
+      display: none;
+    }
+    .second-filter-row.visible {
+      display: flex;
+    }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="header-content">
-      <span class="brand-tag">Brendimo Collection</span>
-      <h1>Hədiyyə Sehrbazı</h1>
-    </div>
-    <div class="search-container">
-      <svg class="search-icon" viewBox="0 0 24 24">
-        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-      </svg>
-      <input type="text" id="searchInput" class="search-input" placeholder="Məhsul adı və ya kodu..." autocomplete="off">
-    </div>
-  </header>
+<!-- ═══ TOP NAVIGATION ═══ -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <span class="brand-name">Brendimo</span>
+    <span class="brand-sub">Hədiyyə Sehrbazı</span>
+  </div>
 
-  <main>
-    <div id="productGrid" class="grid">
-      <div class="loader" id="loader">
-        <div class="spinner"></div>
-        <p style="color: #888; font-size: 0.9rem;">Kataloq yüklənir...</p>
-      </div>
+  <div class="navbar-search">
+    <svg class="search-ico" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+      <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+    </svg>
+    <input type="text" id="searchInput" placeholder="Məhsul adı, kodu..." autocomplete="off">
+  </div>
+
+  <div class="navbar-actions">
+    <button class="nav-btn" id="selectionBtn" onclick="toggleCollectionPanel()">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+      </svg>
+      <span>Kolleksiya</span>
+      <span class="badge" id="collectionBadge" style="display:none">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══ FILTER BAR ═══ -->
+<div class="filter-bar" id="filterBar">
+  <!-- Target Audience -->
+  <div class="filter-section">
+    <span class="filter-label">Kimə</span>
+    <div class="chip active" data-filter="target" data-value="all" onclick="setFilter('target','all',this)">
+      <span class="chip-emoji">🎁</span> Hamısı
     </div>
-  </main>
-<div id="productModal" class="modal-overlay" onclick="closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()"> <button class="close-btn" onclick="closeModal()">&times;</button>
-      
-      <div class="modal-image-col">
-        <img id="modalImg" class="modal-img" src="" alt="">
+    <div class="chip" data-filter="target" data-value="Xanım" onclick="setFilter('target','Xanım',this)">
+      <span class="chip-emoji">👩</span> Xanım
+    </div>
+    <div class="chip" data-filter="target" data-value="Bəy" onclick="setFilter('target','Bəy',this)">
+      <span class="chip-emoji">👨</span> Bəy
+    </div>
+    <div class="chip" data-filter="target" data-value="Uşaq" onclick="setFilter('target','Uşaq',this)">
+      <span class="chip-emoji">🧒</span> Uşaq
+    </div>
+    <div class="chip" data-filter="target" data-value="Həmkar" onclick="setFilter('target','Həmkar',this)">
+      <span class="chip-emoji">🤝</span> Həmkar
+    </div>
+  </div>
+
+  <div class="filter-divider"></div>
+
+  <!-- Price Range -->
+  <div class="filter-section price-filter-wrap">
+    <span class="filter-label">Qiymət</span>
+    <select class="price-select" id="priceFilter" onchange="applyFilters()">
+      <option value="all">Hər qiymət</option>
+      <option value="0-20">0 – 20 AZN</option>
+      <option value="20-50">20 – 50 AZN</option>
+      <option value="50-100">50 – 100 AZN</option>
+      <option value="100-999999">100+ AZN</option>
+    </select>
+  </div>
+
+  <div class="filter-divider"></div>
+
+  <!-- Sort -->
+  <div class="filter-section">
+    <span class="filter-label">Sırala</span>
+    <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+      <option value="newest">Ən yeni</option>
+      <option value="oldest">Ən köhnə</option>
+      <option value="price-asc">Qiymət ↑</option>
+      <option value="price-desc">Qiymət ↓</option>
+      <option value="name-asc">A → Z</option>
+    </select>
+  </div>
+
+  <div class="filter-divider"></div>
+
+  <!-- Occasion chips -->
+  <div class="filter-section">
+    <span class="filter-label">Məqam</span>
+    <div class="chip active" data-filter="occasion" data-value="all" onclick="setFilter('occasion','all',this)">Hamısı</div>
+    <div class="chip" data-filter="occasion" data-value="Adgünü" onclick="setFilter('occasion','Adgünü',this)">🎂 Adgünü</div>
+    <div class="chip" data-filter="occasion" data-value="Təbrik" onclick="setFilter('occasion','Təbrik',this)">🎉 Təbrik</div>
+    <div class="chip" data-filter="occasion" data-value="Yeniil" onclick="setFilter('occasion','Yeniil',this)">🎆 Yeni il</div>
+    <div class="chip" data-filter="occasion" data-value="Səbəbsiz" onclick="setFilter('occasion','Səbəbsiz',this)">💝 Səbəbsiz</div>
+  </div>
+
+  <div class="filter-divider"></div>
+
+  <!-- Mood / Type chips -->
+  <div class="filter-section">
+    <span class="filter-label">Növ</span>
+    <div class="chip active" data-filter="mood" data-value="all" onclick="setFilter('mood','all',this)">Hamısı</div>
+    <div class="chip" data-filter="mood" data-value="Aksesuar" onclick="setFilter('mood','Aksesuar',this)">💍 Aksesuar</div>
+    <div class="chip" data-filter="mood" data-value="Giftset" onclick="setFilter('mood','Giftset',this)">🎀 Gift Set</div>
+    <div class="chip" data-filter="mood" data-value="Gözəllik" onclick="setFilter('mood','Gözəllik',this)">✨ Gözəllik</div>
+    <div class="chip" data-filter="mood" data-value="Qarışıq" onclick="setFilter('mood','Qarışıq',this)">🎭 Qarışıq</div>
+  </div>
+
+  <!-- Clear filters -->
+  <button class="filter-clear" id="clearFiltersBtn" onclick="clearAllFilters()" style="display:none">✕ Filtrləri sıfırla</button>
+</div>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<div class="results-bar">
+  <p class="results-count" id="resultsCount"><strong>0</strong> məhsul</p>
+  <div class="view-toggle">
+    <button class="view-btn active" id="gridViewBtn" onclick="setViewMode('grid')" title="Grid">
+      <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"/>
+      </svg>
+    </button>
+    <button class="view-btn" id="listViewBtn" onclick="setViewMode('list')" title="List">
+      <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<main class="main" id="mainContent">
+
+  <!-- Collection view (shown when ?collection= param is in URL) -->
+  <div class="collection-view" id="collectionView">
+    <div class="collection-hero">
+      <div>
+        <h2>Seçilmiş Kolleksiya</h2>
+        <p id="collectionViewDesc">Brendimo tərəfindən tövsiyə olunan məhsullar</p>
       </div>
-      
-      <div class="modal-info-col">
-        <span id="modalCode" class="modal-code"></span>
-        <h2 id="modalTitle" class="modal-title"></h2>
-        <div id="modalPrice" class="modal-price"></div>
-        <p id="modalDesc" class="modal-desc"></p>
-        
-      <div class="share-section">
-          <span class="share-label">Dostlarınla Paylaş:</span>
-          <div class="share-buttons">
-            <button class="btn-share btn-native-share" onclick="shareProduct(event)">
-              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4m0 0l-4 4m4-4v12"></path>
-              </svg>
-              Paylaş
+      <button class="back-btn" onclick="exitCollectionView()">← Geri</button>
+    </div>
+  </div>
+
+  <!-- Product grid -->
+  <div class="grid" id="productGrid">
+    <div class="loader-wrap">
+      <div class="spinner"></div>
+      <p style="color:var(--ink-faint);font-size:0.85rem">Kataloq yüklənir...</p>
+    </div>
+  </div>
+</main>
+
+<!-- ═══ PRODUCT MODAL ═══ -->
+<div class="modal-overlay" id="productModal" onclick="handleModalOverlayClick(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+
+    <div class="modal-img-col">
+      <img class="modal-img" id="modalImg" src="" alt="">
+    </div>
+
+    <div class="modal-info-col">
+      <div class="modal-tags" id="modalTags"></div>
+
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <div class="modal-price" id="modalPrice"></div>
+
+      <div class="modal-divider"></div>
+
+      <p class="modal-desc" id="modalDesc"></p>
+
+      <p class="share-title">Paylaş</p>
+      <div class="share-grid">
+        <button class="share-btn share-btn-whatsapp" onclick="shareVia('whatsapp')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+          WhatsApp
+        </button>
+        <button class="share-btn share-btn-telegram" onclick="shareVia('telegram')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          Telegram
+        </button>
+        <button class="share-btn share-btn-instagram" onclick="shareVia('instagram')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          Instagram
+        </button>
+        <button class="share-btn share-btn-copy" onclick="copyProductInfo()">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Kopyala
+        </button>
+        <button class="share-btn share-btn-native" onclick="shareVia('native')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+          Paylaş
+        </button>
+      </div>
+
+      <button class="modal-select-btn" id="modalSelectBtn" onclick="toggleSelectFromModal()">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Kolleksiyaya əlavə et
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ COLLECTION PANEL ═══ -->
+<div class="panel-overlay" id="panelOverlay" onclick="toggleCollectionPanel()"></div>
+
+<div class="collection-panel" id="collectionPanel">
+  <div class="panel-header">
+    <div>
+      <h3>Mənim Kolleksiyam</h3>
+      <p id="panelSubtitle">0 məhsul seçilib</p>
+    </div>
+    <button class="panel-close" onclick="toggleCollectionPanel()">×</button>
+  </div>
+
+  <div class="panel-body" id="panelBody">
+    <div class="panel-empty">
+      <div class="panel-empty-icon">⭐</div>
+      <p>Hələ heç bir məhsul seçilməyib.</p>
+      <p style="font-size:0.78rem;margin-top:6px;color:var(--ink-faint)">Kartın üzərindəki ulduz düyməsinə basın</p>
+    </div>
+  </div>
+
+  <div class="panel-footer" id="panelFooter" style="display:none">
+    <div class="panel-total">
+      <span class="label">Ümumi qiymət</span>
+      <span class="value" id="panelTotal">0 AZN</span>
+    </div>
+    <div class="panel-actions">
+      <button class="panel-btn panel-btn-primary" onclick="generateCollectionLink()">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+        Link Yarat
+      </button>
+      <button class="panel-btn panel-btn-secondary" onclick="clearCollection()">
+        Kolleksiyanı Sil
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ COLLECTION LINK MODAL ═══ -->
+<div class="link-modal" id="linkModal" onclick="if(event.target===this)closeLinkModal()">
+  <div class="link-modal-box">
+    <h3>🔗 Kolleksiya Linki</h3>
+    <p>Bu linki paylaşaraq seçdiyiniz məhsulları göstərə bilərsiniz</p>
+
+    <div class="link-modal-preview-grid" id="linkPreviewGrid"></div>
+
+    <div class="link-preview" id="linkPreviewUrl"></div>
+
+    <div class="link-modal-actions">
+      <button class="lm-btn lm-btn-primary" onclick="copyCollectionLink()">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+        Kopyala
+      </button>
+      <button class="lm-btn lm-btn-wa" onclick="shareCollectionVia('whatsapp')">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+        WhatsApp
+      </button>
+      <button class="lm-btn lm-btn-tg" onclick="shareCollectionVia('telegram')">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        Telegram
+      </button>
+      <button class="lm-btn lm-btn-cancel" onclick="closeLinkModal()">Bağla</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST CONTAINER ═══ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════ -->
+<script>
+/* ─────────────────────────────────────────────
+   CONFIGURATION
+───────────────────────────────────────────── */
+const API_URL = "https://script.google.com/macros/s/AKfycbzgGiOg7Rp3Y7bDmNNhlbK2PZDl-qwlU8oecz0lGrVouKigoLzlfWleg02H83chkXt53g/exec";
+const PLACEHOLDER = "https://placehold.co/600x600/F4F1EB/9A9A9A?text=Brendimo";
+// How many of the last-N rows are considered "new"
+const NEW_THRESHOLD = 10;
+
+/* ─────────────────────────────────────────────
+   STATE
+───────────────────────────────────────────── */
+let allProducts = [];            // full catalog from API
+let filteredProducts = [];       // currently displayed
+let currentProduct = null;       // product open in modal
+let collection = new Set();      // set of product codes in collection
+let viewMode = 'grid';           // 'grid' | 'list'
+
+// Filter state
+const filters = {
+  target:   'all',
+  occasion: 'all',
+  mood:     'all',
+  price:    'all',
+  sort:     'newest',
+  query:    ''
+};
+
+/* ─────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  fetchProducts();
+
+  // Search with debounce
+  const input = document.getElementById('searchInput');
+  let debounceTimer;
+  input.addEventListener('input', e => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      filters.query = e.target.value.toLowerCase().trim();
+      applyFilters();
+    }, 280);
+  });
+
+  // Check URL for collection share
+  const urlParams = new URLSearchParams(window.location.search);
+  const sharedCodes = urlParams.get('collection');
+  if (sharedCodes) {
+    // We'll handle after products load
+    window._sharedCodes = sharedCodes.split(',').map(c => c.trim()).filter(Boolean);
+  }
+});
+
+/* ─────────────────────────────────────────────
+   FETCH PRODUCTS
+───────────────────────────────────────────── */
+async function fetchProducts() {
+  try {
+    const res = await fetch(`${API_URL}?action=getProducts`);
+    if (!res.ok) throw new Error('Network error');
+
+    const data = await res.json();
+    const raw = data.products || data;
+
+    if (!Array.isArray(raw) || raw.length === 0) {
+      showEmpty('Hazırda aktiv məhsul yoxdur.');
+      return;
+    }
+
+    // Enrich products with index (for "new" detection — last rows are newest)
+    allProducts = raw.map((p, i) => ({ ...p, _index: i }));
+
+    applyFilters();
+
+    // Handle shared collection view
+    if (window._sharedCodes && window._sharedCodes.length > 0) {
+      showCollectionView(window._sharedCodes);
+    }
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById('productGrid').innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#dc2626">
+        <p style="font-size:1.5rem;margin-bottom:8px">⚠️</p>
+        <p style="font-weight:600">Kataloq yüklənmədi</p>
+        <p style="font-size:0.82rem;color:var(--ink-faint);margin-top:4px">Səhifəni yeniləyin və ya internet bağlantınızı yoxlayın</p>
+      </div>`;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   FILTERS
+───────────────────────────────────────────── */
+function setFilter(filterKey, value, chipEl) {
+  filters[filterKey] = value;
+
+  // Toggle chip active state
+  document.querySelectorAll(`[data-filter="${filterKey}"]`).forEach(c => c.classList.remove('active'));
+  if (chipEl) chipEl.classList.add('active');
+
+  updateClearButton();
+  applyFilters();
+}
+
+function applyFilters() {
+  filters.price = document.getElementById('priceFilter').value;
+  filters.sort  = document.getElementById('sortSelect').value;
+
+  updateClearButton();
+
+  let result = allProducts.filter(p => {
+    // ── Search ──
+    if (filters.query) {
+      const name = (p.name || '').toLowerCase();
+      const code = (p.productcode || p.code || '').toString().toLowerCase();
+      const desc = (p.description || '').toLowerCase();
+      const terms = filters.query.split(/\s+/);
+      const matches = terms.every(t => name.includes(t) || code.includes(t) || desc.includes(t));
+      if (!matches) return false;
+    }
+
+    // ── Target ── Column L, comma-separated like "Xanım,Bəy"
+    if (filters.target !== 'all') {
+      const targetRaw = p.target || p.l || '';
+      const targets = String(targetRaw).split(',').map(t => t.trim());
+      if (!targets.includes(filters.target)) return false;
+    }
+
+    // ── Occasion ── Column M
+    if (filters.occasion !== 'all') {
+      const occ = String(p.occasion || '');
+      if (!occ.includes(filters.occasion)) return false;
+    }
+
+    // ── Mood / Type ── Column N
+    if (filters.mood !== 'all') {
+      const mood = String(p.mood || '');
+      if (!mood.includes(filters.mood)) return false;
+    }
+
+    // ── Price ──
+    if (filters.price !== 'all') {
+      const [min, max] = filters.price.split('-').map(Number);
+      const price = parseFloat(p.price) || 0;
+      if (price < min || price > max) return false;
+    }
+
+    return true;
+  });
+
+  // ── Sort ──
+  const total = allProducts.length;
+  result.sort((a, b) => {
+    switch (filters.sort) {
+      case 'newest':    return b._index - a._index;  // last row = newest = higher index
+      case 'oldest':    return a._index - b._index;
+      case 'price-asc': return (parseFloat(a.price)||0) - (parseFloat(b.price)||0);
+      case 'price-desc':return (parseFloat(b.price)||0) - (parseFloat(a.price)||0);
+      case 'name-asc':  return (a.name||'').localeCompare(b.name||'');
+      default:          return 0;
+    }
+  });
+
+  filteredProducts = result;
+  renderProducts(result, total);
+
+  // Update count
+  document.getElementById('resultsCount').innerHTML =
+    `<strong>${result.length}</strong> məhsul`;
+}
+
+function clearAllFilters() {
+  filters.target   = 'all';
+  filters.occasion = 'all';
+  filters.mood     = 'all';
+  filters.query    = '';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('priceFilter').value = 'all';
+  document.getElementById('sortSelect').value  = 'newest';
+
+  document.querySelectorAll('.chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.value === 'all');
+  });
+
+  updateClearButton();
+  applyFilters();
+}
+
+function updateClearButton() {
+  const active = filters.target !== 'all' || filters.occasion !== 'all' ||
+                 filters.mood !== 'all' || filters.price !== 'all' ||
+                 filters.query !== '';
+  document.getElementById('clearFiltersBtn').style.display = active ? 'block' : 'none';
+}
+
+/* ─────────────────────────────────────────────
+   RENDER
+───────────────────────────────────────────── */
+function renderProducts(products, totalCount) {
+  const grid = document.getElementById('productGrid');
+  grid.innerHTML = '';
+
+  if (!products || products.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <h3>Məhsul tapılmadı</h3>
+        <p>Fərqli axtarış sözü və ya filtr seçin</p>
+      </div>`;
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+
+  products.forEach((p, i) => {
+    const name  = p.name || p.Name || 'Adsız';
+    const code  = p.productcode || p.code || p.id || '';
+    const price = parseFloat(p.price || 0);
+    const desc  = p.description || '';
+
+    // Image
+    let imgSrc = (p.image || p.img || '').toString().trim();
+    if (!imgSrc) imgSrc = PLACEHOLDER;
+
+    // Target tags (comma-separated from column L)
+    const targetRaw = p.target || '';
+    const targets = String(targetRaw).split(',').map(t => t.trim()).filter(Boolean);
+
+    // Is NEW? (last NEW_THRESHOLD products by index are "new")
+    const isNew = p._index >= (totalCount - NEW_THRESHOLD);
+
+    // Is selected in collection?
+    const isSelected = collection.has(code);
+
+    const card = document.createElement('div');
+    card.className = 'card' + (isSelected ? ' selected' : '');
+    card.dataset.code = code;
+    card.style.animationDelay = `${Math.min(i, 12) * 40}ms`;
+
+    card.innerHTML = `
+      <div class="card-img-wrap">
+        ${isNew ? `<span class="is-new-label">YENİ</span>` : ''}
+        ${targets.length ? `<div class="badge-targets">${targets.slice(0,2).map(t => `<span class="badge-target">${targetEmoji(t)} ${t}</span>`).join('')}</div>` : ''}
+        <img class="card-img" src="${imgSrc}" alt="${name}" loading="lazy" onerror="imgError(this)">
+        ${code ? `<span class="badge-code">${code}</span>` : ''}
+      </div>
+      <div class="card-body">
+        <div class="card-info">
+          <h3 class="card-title">${name}</h3>
+          ${desc ? `<p class="card-desc">${desc}</p>` : ''}
+        </div>
+        <div class="card-footer">
+          <div class="price">${price.toFixed(2)}<span class="price-currency">AZN</span></div>
+          <div class="card-actions">
+            <button class="icon-btn select-btn ${isSelected ? 'selected-state' : ''}"
+              onclick="toggleSelect(event,'${escapeAttr(code)}')"
+              title="${isSelected ? 'Kolleksiyadan çıxar' : 'Kolleksiyaya əlavə et'}">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             </button>
-            
-            <button class="btn-share btn-copy" onclick="copyProductInfo()">
-              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-              </svg>
-              Kopyala
+            <button class="icon-btn" onclick="quickShare(event,'${escapeAttr(code)}')" title="Paylaş">
+              <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
             </button>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
- <script>
-    /**
-     * ==========================================
-     * CONFIGURATION & GLOBAL STATE
-     * ==========================================
-     */
-    // The specific Web App URL for your backend
-    const API_URL = "https://script.google.com/macros/s/AKfycbzU6F2FkbOkyqUOi7y7HJMNfqZBnBxdDdTNXppw73M_f8zSFGCQSE0zOWQf3E08eROwdQ/exec";
-    
-    // Store all downloaded products here to avoid re-fetching during search
-    let allProducts = [];
-    
-    // Store the product currently displayed in the popup (Modal)
-    let currentModalProduct = null; 
+      </div>`;
 
-    /**
-     * ==========================================
-     * INITIALIZATION
-     * ==========================================
-     * Runs when the page finishes loading.
-     */
-    document.addEventListener("DOMContentLoaded", () => {
-      // 1. Fetch data immediately
-      fetchProducts();
-      
-      // 2. Setup Search Bar with "Debounce"
-      // (Waits 300ms after you stop typing to prevent freezing)
-      const searchInput = document.getElementById('searchInput');
-      let timeout = null;
-      
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          clearTimeout(timeout);
-          timeout = setTimeout(() => {
-            filterProducts(e.target.value);
-          }, 300);
-        });
-      }
+    // Open modal on card body click (not on buttons)
+    card.querySelector('.card-body').addEventListener('click', (e) => {
+      if (!e.target.closest('button')) openModal(p);
     });
+    card.querySelector('.card-img-wrap').addEventListener('click', () => openModal(p));
 
-    /**
-     * ==========================================
-     * DATA FETCHING
-     * ==========================================
-     * Connects to Google Apps Script to get the JSON data.
-     */
-    async function fetchProducts() {
-      const grid = document.getElementById('productGrid');
-      
-      try {
-        // We add '?action=getProducts' to tell the script what we want
-        const response = await fetch(`${API_URL}?action=getProducts`);
-        
-        if (!response.ok) {
-          throw new Error("Server bağlantısı uğursuz oldu (Network Error)");
-        }
-        
-        const data = await response.json();
-        
-        // Handle different data structures (array vs object wrapper)
-        allProducts = data.products || data; 
-        
-        // Check if list is empty
-        if (!Array.isArray(allProducts) || allProducts.length === 0) {
-          grid.innerHTML = '<div class="no-results">Hazırda aktiv məhsul yoxdur.</div>';
-          return;
-        }
+    fragment.appendChild(card);
+  });
 
-        // Render the full list
-        renderProducts(allProducts);
+  grid.appendChild(fragment);
+}
 
-      } catch (error) {
-        console.error("Fetch Error:", error);
-        grid.innerHTML = `
-          <div class="error-msg">
-            <strong>Xəta baş verdi.</strong><br>
-            Zəhmət olmasa səhifəni yeniləyin və ya internet bağlantınızı yoxlayın.<br>
-            <small>${error.message}</small>
-          </div>`;
-      }
-    }
+function showEmpty(msg) {
+  document.getElementById('productGrid').innerHTML =
+    `<div class="empty-state"><div class="empty-state-icon">📦</div><h3>${msg}</h3></div>`;
+}
 
-    /**
-     * ==========================================
-     * RENDERING ENGINE
-     * ==========================================
-     * Draws the product cards on the screen.
-     */
-    function renderProducts(products) {
-      const grid = document.getElementById('productGrid');
-      grid.innerHTML = ''; // Clear existing content (loader or old results)
+/* ─────────────────────────────────────────────
+   HELPER FUNCTIONS
+───────────────────────────────────────────── */
+function targetEmoji(t) {
+  return { 'Xanım': '👩', 'Bəy': '👨', 'Uşaq': '🧒', 'Həmkar': '🤝' }[t] || '';
+}
 
-      if (!products || products.length === 0) {
-        grid.innerHTML = '<div class="no-results">Axtarışa uyğun məhsul tapılmadı.</div>';
-        return;
-      }
+function escapeAttr(str) {
+  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
 
-      // Create a document fragment for faster performance
-      const fragment = document.createDocumentFragment();
+function imgError(img) {
+  if (img.dataset.tried) return;
+  img.dataset.tried = '1';
+  const src = img.src;
+  if (!src.includes('.jpg') && !src.includes('.png') && !src.includes('.webp')) {
+    img.src = src + '.jpg';
+  } else {
+    img.src = PLACEHOLDER;
+    img.onerror = null;
+  }
+}
 
-      // Loop through every product
-      products.forEach((p) => {
-        // --- 1. DATA NORMALIZATION ---
-        // Find the index in the main array to ensure sharing works even when filtered
-        const realIndex = allProducts.indexOf(p);
+/* ─────────────────────────────────────────────
+   VIEW MODE
+───────────────────────────────────────────── */
+function setViewMode(mode) {
+  viewMode = mode;
+  const grid = document.getElementById('productGrid');
+  grid.classList.toggle('list-view', mode === 'list');
+  document.getElementById('gridViewBtn').classList.toggle('active', mode === 'grid');
+  document.getElementById('listViewBtn').classList.toggle('active', mode === 'list');
+}
 
-        // Handle various capitalization (Name, name, NAME)
-        const name = p.name || p.Name || p.NAME || "Adsız Məhsul";
-        
-        // Handle Code (checks 'productcode' first, then 'code', then 'id')
-        const code = p.productcode || p.code || p.id || "";
-        
-        // Handle Price (convert to number and format to 2 decimals)
-        const rawPrice = p.price || p.Price || p.Cost || 0;
-        let formattedPrice = "0.00";
-        if (!isNaN(parseFloat(rawPrice))) {
-           formattedPrice = parseFloat(rawPrice).toFixed(2);
-        }
+/* ─────────────────────────────────────────────
+   MODAL
+───────────────────────────────────────────── */
+function openModal(product) {
+  currentProduct = product;
+  const name  = product.name || 'Adsız';
+  const code  = product.productcode || product.code || '';
+  const price = parseFloat(product.price || 0).toFixed(2);
+  const desc  = product.description || 'Məhsul haqqında ətraflı məlumat yoxdur.';
+  let imgSrc  = (product.image || '').trim() || PLACEHOLDER;
 
-        // --- 2. SMART IMAGE LOGIC ---
-        // Get URL, remove spaces
-        let originalUrl = p.image || p.Image || p.img || "";
-        originalUrl = originalUrl.toString().trim();
-        
-        // Default placeholder if empty
-        const placeholder = "https://placehold.co/600x600/f5f5f5/cccccc?text=Şəkil+Yoxdur";
-        let imgSrc = originalUrl ? originalUrl : placeholder;
+  // Tags
+  const tagsEl = document.getElementById('modalTags');
+  let tagsHTML = '';
+  if (code) tagsHTML += `<span class="modal-tag code">📦 ${code}</span>`;
 
-        // --- 3. CREATE HTML ELEMENT ---
-        const col = document.createElement('div');
-        col.className = 'card';
-        
-        // Add CLICK EVENT to open the modal
-        col.onclick = function() { openModal(p); }; 
-        
-        // Construct the inner HTML
-        col.innerHTML = `
-          <div class="card-img-container">
-            <span class="code-badge">${code}</span>
-            <img class="card-img" 
-                 src="${imgSrc}" 
-                 data-original="${imgSrc}"
-                 alt="${name}" 
-                 loading="lazy" 
-                 onerror="handleImageError(this)">
-          </div>
-          <div class="card-body">
-            <h3 class="card-title">${name}</h3>
-            <div class="card-footer">
-              <div class="price">${formattedPrice}<span class="currency">AZN</span></div>
-              
-              <button class="card-share-btn" onclick="shareProduct(event, ${realIndex})" title="Paylaş">
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-        `;
-        
-        fragment.appendChild(col);
-      });
+  const targets = String(product.target || '').split(',').map(t => t.trim()).filter(Boolean);
+  targets.forEach(t => {
+    tagsHTML += `<span class="modal-tag target">${targetEmoji(t)} ${t}</span>`;
+  });
 
-      // Append all cards to the grid at once
-      grid.appendChild(fragment);
-    }
+  if (product.occasion) {
+    String(product.occasion).split(',').forEach(o => {
+      if (o.trim()) tagsHTML += `<span class="modal-tag" style="background:#EEF7FF;border-color:#BFDBFE;color:#1E40AF">🎉 ${o.trim()}</span>`;
+    });
+  }
 
-    /**
-     * ==========================================
-     * IMAGE ERROR HANDLER (The Fixer)
-     * ==========================================
-     * Tries to fix broken images automatically (e.g., missing .jpg extension)
-     */
-    function handleImageError(img) {
-      const originalSrc = img.getAttribute('data-original');
-      const placeholder = "https://placehold.co/600x600/f5f5f5/cccccc?text=Şəkil+Yoxdur";
+  const isNew = product._index >= (allProducts.length - NEW_THRESHOLD);
+  if (isNew) tagsHTML += `<span class="modal-tag new-tag">✨ YENİ</span>`;
 
-      // If we already tried fixing it and it failed again, show placeholder
-      if (img.getAttribute('data-tried') === 'true') {
-        img.src = placeholder;
-        img.onerror = null; // Stop looping
-        return;
-      }
+  tagsEl.innerHTML = tagsHTML;
 
-      // Mark that we are trying a fix
-      img.setAttribute('data-tried', 'true');
+  document.getElementById('modalTitle').textContent  = name;
+  document.getElementById('modalPrice').innerHTML    = `${price}<span>AZN</span>`;
+  document.getElementById('modalDesc').textContent   = desc;
+  document.getElementById('modalImg').src            = imgSrc;
+  document.getElementById('modalImg').onerror = function() { this.src = PLACEHOLDER; };
 
-      // Attempt Fix: Add .jpg if missing
-      if (originalSrc && !originalSrc.includes('.jpg') && !originalSrc.includes('.png')) {
-        img.src = originalSrc + ".jpg";
-      } else {
-        // If it already had extension and failed, show placeholder
-        img.src = placeholder;
-      }
-    }
+  // Select button state
+  const selectBtn = document.getElementById('modalSelectBtn');
+  if (collection.has(code)) {
+    selectBtn.classList.add('selected');
+    selectBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Kolleksiyadan çıxar`;
+  } else {
+    selectBtn.classList.remove('selected');
+    selectBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Kolleksiyaya əlavə et`;
+  }
 
-    /**
-     * ==========================================
-     * MODAL (POPUP) LOGIC
-     * ==========================================
-     */
-    function openModal(product) {
-      currentModalProduct = product; 
-      
-      // Populate Text
-      const name = product.name || product.Name || "Adsız Məhsul";
-      const code = product.productcode || product.code || "";
-      const price = parseFloat(product.price || 0).toFixed(2);
-      const desc = product.description || "Təsvir yoxdur.";
+  const overlay = document.getElementById('productModal');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  document.body.style.overflow = 'hidden';
+}
 
-      document.getElementById('modalTitle').innerText = name;
-      document.getElementById('modalCode').innerText = "KOD: " + code;
-      document.getElementById('modalPrice').innerText = price + " AZN";
-      document.getElementById('modalDesc').innerText = desc;
-      
-      // Populate Image
-      let imgUrl = (product.image || "").toString().trim();
-      if(!imgUrl) imgUrl = "https://placehold.co/600x600/f5f5f5/cccccc?text=Şəkil+Yoxdur";
-      
-      const modalImg = document.getElementById('modalImg');
-      modalImg.src = imgUrl;
-      // Reset error handler for modal image just in case
-      modalImg.onerror = function() { 
-        this.src = "https://placehold.co/600x600/f5f5f5/cccccc?text=Şəkil+Yoxdur"; 
-      };
+function closeModal() {
+  const overlay = document.getElementById('productModal');
+  overlay.classList.remove('open');
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }, 300);
+}
 
-      // Show Modal with Animation
-      const modal = document.getElementById('productModal');
-      modal.style.display = 'flex';
-      
-      // Small delay allows CSS transition to trigger
-      setTimeout(() => {
-        modal.classList.add('modal-active');
-      }, 10);
-      
-      // Disable scrolling on the main page while modal is open
-      document.body.style.overflow = 'hidden';
-    }
+function handleModalOverlayClick(e) {
+  if (e.target === e.currentTarget) closeModal();
+}
 
-    function closeModal(event) {
-      // If event is passed, ensure we only close if clicking the Overlay (background)
-      // and NOT when clicking inside the content box
-      if (event && event.target !== event.currentTarget) return;
+/* ─────────────────────────────────────────────
+   COLLECTION (SELECTION)
+───────────────────────────────────────────── */
+function toggleSelect(e, code) {
+  e.stopPropagation();
+  if (!code) return;
 
-      const modal = document.getElementById('productModal');
-      modal.classList.remove('modal-active');
-      
-      // Wait for animation to finish before hiding
-      setTimeout(() => {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto'; // Re-enable scrolling
-      }, 300);
-    }
+  if (collection.has(code)) {
+    collection.delete(code);
+    toast('Kolleksiyadan çıxarıldı');
+  } else {
+    collection.add(code);
+    toast('Kolleksiyaya əlavə edildi ⭐', 'success');
+  }
 
-    /**
-     * ==========================================
-     * SHARING LOGIC (WhatsApp & Copy)
-     * ==========================================
-     */
-    
-    /**
-     * ==========================================
-     * NATIVE SHARING LOGIC
-     * ==========================================
-     */
- // --- NATIVE SHARE FUNCTION ---
-    async function shareProduct(event, productIndex) {
-      if (event) {
-        event.stopPropagation();
-        event.preventDefault();
-      }
+  updateCollectionUI();
+  refreshCardStates();
+}
 
-      let product;
-      if (productIndex !== undefined) {
-        product = allProducts[productIndex];
-      } else {
-        product = currentModalProduct;
-      }
-      
-      if (!product) return;
-      
-      const name = product.name || "Məhsul";
-      const code = product.productcode || product.code || "";
-      const price = parseFloat(product.price || 0).toFixed(2);
-      
-      let imageUrl = (product.image || "").toString().trim();
-      if (!imageUrl || !imageUrl.startsWith('http')) {
-         imageUrl = window.location.href; 
-      }
+function toggleSelectFromModal() {
+  if (!currentProduct) return;
+  const code = currentProduct.productcode || currentProduct.code || '';
+  if (!code) return;
 
-      const title = `Hədiyyə Sehrbazı: ${name}`;
-      const text = `${name}\nKod: ${code}\nQiymət: ${price} AZN\n\nBu məhsula baxın:`;
-      const url = imageUrl; 
+  if (collection.has(code)) {
+    collection.delete(code);
+    document.getElementById('modalSelectBtn').classList.remove('selected');
+    document.getElementById('modalSelectBtn').innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Kolleksiyaya əlavə et`;
+    toast('Kolleksiyadan çıxarıldı');
+  } else {
+    collection.add(code);
+    document.getElementById('modalSelectBtn').classList.add('selected');
+    document.getElementById('modalSelectBtn').innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Kolleksiyadan çıxar`;
+    toast('Kolleksiyaya əlavə edildi ⭐', 'success');
+  }
 
-      // Native Share API
+  updateCollectionUI();
+  refreshCardStates();
+}
+
+function refreshCardStates() {
+  document.querySelectorAll('.card').forEach(card => {
+    const code = card.dataset.code;
+    const sel  = collection.has(code);
+    card.classList.toggle('selected', sel);
+    const btn = card.querySelector('.select-btn');
+    if (btn) btn.classList.toggle('selected-state', sel);
+  });
+}
+
+function updateCollectionUI() {
+  const count = collection.size;
+  const badge = document.getElementById('collectionBadge');
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'inline-flex' : 'none';
+
+  document.getElementById('selectionBtn').classList.toggle('active', count > 0);
+  document.getElementById('panelSubtitle').textContent = `${count} məhsul seçilib`;
+
+  renderCollectionPanel();
+}
+
+function renderCollectionPanel() {
+  const body   = document.getElementById('panelBody');
+  const footer = document.getElementById('panelFooter');
+
+  if (collection.size === 0) {
+    body.innerHTML = `
+      <div class="panel-empty">
+        <div class="panel-empty-icon">⭐</div>
+        <p>Hələ heç bir məhsul seçilməyib.</p>
+        <p style="font-size:0.78rem;margin-top:6px;color:var(--ink-faint)">Kartın üzərindəki ulduz düyməsinə basın</p>
+      </div>`;
+    footer.style.display = 'none';
+    return;
+  }
+
+  footer.style.display = 'block';
+
+  let total = 0;
+  let html = '';
+
+  collection.forEach(code => {
+    const p = allProducts.find(prod => (prod.productcode || prod.code || '') == code);
+    if (!p) return;
+    const name = p.name || 'Adsız';
+    const price = parseFloat(p.price || 0);
+    const img = (p.image || '').trim() || PLACEHOLDER;
+    total += price;
+
+    html += `
+      <div class="panel-item">
+        <img src="${img}" alt="${name}" onerror="this.src='${PLACEHOLDER}'">
+        <div class="panel-item-info">
+          <div class="panel-item-name">${name}</div>
+          <div class="panel-item-price">${price.toFixed(2)} AZN</div>
+        </div>
+        <button class="panel-item-remove" onclick="removeFromCollection('${escapeAttr(code)}')" title="Çıxar">×</button>
+      </div>`;
+  });
+
+  body.innerHTML = html;
+  document.getElementById('panelTotal').textContent = `${total.toFixed(2)} AZN`;
+}
+
+function removeFromCollection(code) {
+  collection.delete(code);
+  updateCollectionUI();
+  refreshCardStates();
+}
+
+function clearCollection() {
+  collection.clear();
+  updateCollectionUI();
+  refreshCardStates();
+  toast('Kolleksiya silindi');
+}
+
+function toggleCollectionPanel() {
+  const panel   = document.getElementById('collectionPanel');
+  const overlay = document.getElementById('panelOverlay');
+  const isOpen  = panel.classList.contains('open');
+
+  panel.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('open', !isOpen);
+
+  if (!isOpen) {
+    renderCollectionPanel();
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+/* ─────────────────────────────────────────────
+   COLLECTION LINK GENERATION
+───────────────────────────────────────────── */
+function generateCollectionLink() {
+  if (collection.size === 0) return;
+
+  const codes = Array.from(collection).join(',');
+  const url   = `${window.location.origin}${window.location.pathname}?collection=${encodeURIComponent(codes)}`;
+
+  // Preview thumbnails
+  const previewEl = document.getElementById('linkPreviewGrid');
+  previewEl.innerHTML = '';
+  collection.forEach(code => {
+    const p = allProducts.find(prod => (prod.productcode || prod.code || '') == code);
+    if (!p) return;
+    const img = document.createElement('img');
+    img.className = 'link-preview-thumb';
+    img.src = (p.image || '').trim() || PLACEHOLDER;
+    img.alt = p.name || '';
+    img.onerror = () => { img.src = PLACEHOLDER; };
+    previewEl.appendChild(img);
+  });
+
+  document.getElementById('linkPreviewUrl').textContent = url;
+  document.getElementById('linkModal').classList.add('open');
+
+  // Close the panel
+  const panel = document.getElementById('collectionPanel');
+  const panelOv = document.getElementById('panelOverlay');
+  panel.classList.remove('open');
+  panelOv.classList.remove('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLinkModal() {
+  document.getElementById('linkModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function copyCollectionLink() {
+  const url = document.getElementById('linkPreviewUrl').textContent;
+  navigator.clipboard.writeText(url).then(() => toast('Link kopyalandı! 🔗', 'success'))
+    .catch(() => toast('Kopyalamaq mümkün olmadı', 'error'));
+}
+
+function shareCollectionVia(platform) {
+  const url  = document.getElementById('linkPreviewUrl').textContent;
+  const text = `Brendimo Hədiyyə Sehrbazı — Kolleksiyama baxın 🎁`;
+
+  let shareUrl;
+  if (platform === 'whatsapp') {
+    shareUrl = `https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`;
+  } else if (platform === 'telegram') {
+    shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+  }
+  if (shareUrl) window.open(shareUrl, '_blank');
+}
+
+/* ─────────────────────────────────────────────
+   COLLECTION SHARED VIEW (from URL param)
+───────────────────────────────────────────── */
+function showCollectionView(codes) {
+  const colView = document.getElementById('collectionView');
+  colView.classList.add('visible');
+
+  const sharedProducts = codes
+    .map(code => allProducts.find(p => (p.productcode || p.code || '') == code))
+    .filter(Boolean);
+
+  document.getElementById('collectionViewDesc').textContent =
+    `${sharedProducts.length} məhsul seçilib — Brendimo Hədiyyə Sehrbazı`;
+
+  // Re-render grid with only these products
+  renderProducts(sharedProducts, allProducts.length);
+  document.getElementById('resultsCount').innerHTML =
+    `<strong>${sharedProducts.length}</strong> məhsul (kolleksiya)`;
+
+  // Scroll to main
+  colView.scrollIntoView({ behavior: 'smooth' });
+}
+
+function exitCollectionView() {
+  document.getElementById('collectionView').classList.remove('visible');
+  // Remove URL param
+  const url = new URL(window.location.href);
+  url.searchParams.delete('collection');
+  window.history.replaceState({}, '', url.toString());
+
+  applyFilters();
+}
+
+/* ─────────────────────────────────────────────
+   SHARING
+───────────────────────────────────────────── */
+function buildShareText(product) {
+  const name  = product.name || '';
+  const code  = product.productcode || product.code || '';
+  const price = parseFloat(product.price || 0).toFixed(2);
+  const img   = (product.image || '').trim();
+  return { name, code, price, img };
+}
+
+function shareVia(platform) {
+  if (!currentProduct) return;
+  const { name, code, price, img } = buildShareText(currentProduct);
+  const text = `🎁 *${name}*\n📦 Kod: ${code}\n💰 Qiymət: ${price} AZN\n\n_Brendimo Hədiyyə Sehrbazı_`;
+  const url  = img || window.location.href;
+
+  switch (platform) {
+    case 'whatsapp':
+      window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
+      break;
+    case 'telegram':
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
+      break;
+    case 'instagram':
+      copyProductInfo();
+      toast('Mətn kopyalandı! Instagram-da paylaşın 📸', 'success');
+      break;
+    case 'native':
       if (navigator.share) {
-        try {
-          await navigator.share({ title: title, text: text, url: url });
-        } catch (err) { console.log('Error sharing:', err); }
+        navigator.share({ title: `Brendimo: ${name}`, text, url }).catch(() => {});
       } else {
-        // Fallback to WhatsApp
-        const waText = `Salam, bu məhsulla maraqlanıram:\n\n*${name}*\nKod: ${code}\nQiymət: ${price} AZN\n\nLink: ${url}`;
-        const waUrl = `https://wa.me/?text=${encodeURIComponent(waText)}`;
-        window.open(waUrl, '_blank');
+        copyProductInfo();
       }
+      break;
+  }
+}
+
+function quickShare(e, code) {
+  e.stopPropagation();
+  const p = allProducts.find(prod => (prod.productcode || prod.code || '') == code);
+  if (!p) return;
+
+  const name  = p.name || '';
+  const pcode = p.productcode || p.code || '';
+  const price = parseFloat(p.price || 0).toFixed(2);
+  const img   = (p.image || '').trim();
+  const text  = `🎁 *${name}*\n📦 Kod: ${pcode}\n💰 Qiymət: ${price} AZN\n\n_Brendimo Hədiyyə Sehrbazı_`;
+  const url   = img || window.location.href;
+
+  if (navigator.share) {
+    navigator.share({ title: `Brendimo: ${name}`, text, url }).catch(() => {});
+  } else {
+    window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
+  }
+}
+
+function copyProductInfo() {
+  if (!currentProduct) return;
+  const { name, code, price, img } = buildShareText(currentProduct);
+  const text = `🎁 ${name}\n📦 Kod: ${code}\n💰 Qiymət: ${price} AZN\n🔗 ${img}`;
+  navigator.clipboard.writeText(text)
+    .then(() => toast('Kopyalandı! 📋', 'success'))
+    .catch(() => toast('Kopyalamaq mümkün olmadı', 'error'));
+}
+
+/* ─────────────────────────────────────────────
+   TOAST NOTIFICATIONS
+───────────────────────────────────────────── */
+function toast(msg, type = '') {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast' + (type ? ` ${type}` : '');
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 0.3s';
+    setTimeout(() => el.remove(), 350);
+  }, 2400);
+}
+
+/* ─────────────────────────────────────────────
+   KEYBOARD
+───────────────────────────────────────────── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal();
+    closeLinkModal();
+    if (document.getElementById('collectionPanel').classList.contains('open')) {
+      toggleCollectionPanel();
     }
-
-    function copyProductInfo() {
-      if (!currentModalProduct) return;
-      
-      const p = currentModalProduct;
-      const name = p.name || "Məhsul";
-      const code = p.productcode || p.code || "";
-      const price = parseFloat(p.price || 0).toFixed(2);
-      const image = p.image || "";
-      
-      const text = `${name}\nKod: ${code}\nQiymət: ${price} AZN\nLink: ${image}`;
-      
-      navigator.clipboard.writeText(text).then(() => {
-        const btn = document.querySelector('.btn-copy');
-        const originalText = btn.innerText; 
-        btn.innerText = "Kopyalandı!";
-        btn.style.background = "#28a745"; 
-        setTimeout(() => {
-          btn.innerText = originalText;
-          btn.style.background = "#f0f0f0";
-        }, 2000);
-      }).catch(err => {
-        console.error('Copy failed', err);
-        alert("Kopyalamaq mümkün olmadı.");
-      });
-    }
-
-    /**
-     * ==========================================
-     * SMART SEARCH FILTER
-     * ==========================================
-     */
-    function filterProducts(query) {
-      // 1. Clean the input and split into individual words
-      const lowerQuery = query.toLowerCase().trim();
-      
-      // If search is empty, show everything
-      if (!lowerQuery) { 
-        renderProducts(allProducts); 
-        return; 
-      }
-      
-      // Split "Lacoste qolbaq" into ["lacoste", "qolbaq"]
-      // We filter out empty spaces to avoid bugs if user types double spaces
-      const searchTerms = lowerQuery.split(/\s+/).filter(word => word.length > 0);
-
-      const filtered = allProducts.filter(p => {
-        // Prepare product data for searching
-        const name = (p.name || "").toLowerCase();
-        const code = (p.productcode || p.code || p.id || "").toString().toLowerCase();
-        
-        // 2. LOGIC: Product must contain ALL typed words
-        // Check if EVERY word in searchTerms exists in either Name OR Code
-        const matchesAllWords = searchTerms.every(term => {
-          return name.includes(term) || code.includes(term);
-        });
-
-        return matchesAllWords;
-      });
-
-      renderProducts(filtered);
-    }
-  </script>
+  }
+});
+</script>
 </body>
 </html>
