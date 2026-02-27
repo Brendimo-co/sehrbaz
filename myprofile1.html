@@ -298,6 +298,7 @@
     // APP LOGIC
     const app = {
       // 1. LOGIN
+ 
       login: async () => {
         const phone = ui.el('inp-phone').value.trim();
         if (!phone) return ui.toast('Zəhmət olmasa nömrə daxil edin');
@@ -314,6 +315,9 @@
             state.media = data.media;
             state.submissions = data.submissions;
             state.withdrawals = data.withdrawals || [];
+            
+            // YENİ: Save the phone number to the browser's localStorage
+            localStorage.setItem('partner_user', phone);
             
             // Switch Screens
             ui.el('view-login').classList.add('hidden');
