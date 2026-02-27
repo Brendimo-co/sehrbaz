@@ -455,9 +455,9 @@
       },
 
       // 4. NAVIGATION TAB SWITCH
-   // 4. NAVIGATION TAB SWITCH (UPDATED)
+   // 4. NAVIGATION TAB SWITCH
       nav: (page) => {
-        // Reset all tabs to gray
+        // Bütün tabları boz rəngə qaytar
         ['home', 'wallet', 'profile'].forEach(p => {
            const btn = ui.el('nav-' + p);
            if(btn) {
@@ -472,13 +472,17 @@
         if (page === 'profile') {
            if (app.getMaxUnlockedLevel() < 2) {
              ui.toast("Bu bölmə 2-ci səviyyədə açılır!");
-             // Return to home if locked
+             // Kilidlidirsə, ana səhifəyə qayıt
              app.nav('home'); 
              return;
+           } else {
+             // YENİLİK: Səviyyə 2 və yuxarıdırsa, yeni səhifəyə yönləndir!
+             window.location.href = 'sellerprofile.html';
+             return; // Funksiyanı burada saxla ki, aşağıdakı kodlar işləməsin
            }
         }
 
-        // Activate selected tab
+        // Seçilmiş tabı aktivləşdir
         ui.el('nav-' + page).classList.add('text-blue-600');
         ui.el('nav-' + page).classList.remove('text-gray-400');
         ui.el('page-' + page).classList.remove('hidden');
