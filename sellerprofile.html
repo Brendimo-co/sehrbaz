@@ -6,9 +6,11 @@
   <title>Brendimo Staff Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* --- iOS Design System --- */
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
     :root {
       --primary: #007AFF;
+      --primary-dark: #0062CC;
       --success: #34C759;
       --warning: #FF9500;
       --danger: #FF3B30;
@@ -19,20 +21,19 @@
       --border: #E5E5EA;
       --input-bg: #F2F2F7;
       --radius: 16px;
-      --shadow: 0 4px 20px rgba(0,0,0,0.05);
+      --shadow: 0 2px 12px rgba(0,0,0,0.07);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
       --nav-height: 85px;
-
-      /* createorder colors */
-      --cp-primary:      #FF2D55;
+      --cp-primary: #FF2D55;
       --cp-primary-dark: #D61F44;
-      --cp-accent:       #5856D6;
+      --cp-accent: #5856D6;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
 
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--bg);
       color: var(--text-main);
       height: 100vh;
@@ -41,335 +42,317 @@
       overflow: hidden;
     }
 
-    /* --- Views (Tabs) --- */
+    /* ── Views ── */
     .view-container {
       flex: 1;
       overflow-y: auto;
-      padding: 20px 20px 100px 20px;
+      padding: 16px 16px 100px 16px;
       display: none;
-      animation: fadeIn 0.2s ease-out;
+      animation: fadeIn 0.22s ease-out;
+      -webkit-overflow-scrolling: touch;
     }
-
     .view-container.active { display: block; }
 
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-    h2 { margin: 10px 0 20px; font-size: 26px; font-weight: 800; text-align: center; letter-spacing: -0.5px; }
-    h3 { margin: 0 0 15px; font-size: 18px; font-weight: 700; color: #333; }
-    h4 { margin: 0 0 10px; font-size: 17px; font-weight: 600; }
+    /* ── Typography ── */
+    h2 { margin: 8px 0 18px; font-size: 24px; font-weight: 800; text-align: center; letter-spacing: -0.5px; }
+    h3 { margin: 0 0 14px; font-size: 17px; font-weight: 700; color: #1C1C1E; }
+    h4 { margin: 0 0 10px; font-size: 16px; font-weight: 600; }
 
-    /* --- Cards --- */
+    /* ── Cards ── */
     .card {
       background: var(--card-bg);
       border-radius: var(--radius);
-      padding: 20px;
+      padding: 18px;
       box-shadow: var(--shadow);
-      margin-bottom: 20px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(0,0,0,0.04);
     }
 
-    /* --- Inputs --- */
+    /* ── Labels & Inputs ── */
     label {
-      display: block; font-size: 12px; font-weight: 600; text-transform: uppercase;
-      color: var(--text-sec); margin-bottom: 6px; margin-left: 4px;
+      display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--text-sec); margin-bottom: 6px; margin-left: 2px;
     }
 
     input, select, textarea {
-      width: 100%; padding: 14px; background: var(--input-bg);
-      border: 1px solid transparent; border-radius: 12px;
-      font-size: 16px; color: var(--text-main); font-family: inherit;
-      margin-bottom: 15px; transition: 0.2s; -webkit-appearance: none;
+      width: 100%; padding: 13px 14px; background: var(--input-bg);
+      border: 1.5px solid transparent; border-radius: 12px;
+      font-size: 15px; color: var(--text-main); font-family: inherit;
+      margin-bottom: 13px; transition: all 0.18s; -webkit-appearance: none;
+      font-weight: 500;
     }
+    input:focus, select:focus, textarea:focus {
+      background: #fff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,122,255,0.12);
+    }
+    input::placeholder { color: #C7C7CC; font-weight: 400; }
+    textarea { resize: none; }
 
-    input:focus, select:focus, textarea:focus { background: #fff; border-color: var(--primary); }
-
-    /* --- Buttons --- */
+    /* ── Buttons ── */
     .btn {
-      width: 100%; padding: 16px; border-radius: 14px; border: none;
-      font-weight: 700; font-size: 16px; cursor: pointer;
+      width: 100%; padding: 15px; border-radius: 14px; border: none;
+      font-weight: 700; font-size: 15px; cursor: pointer;
       display: flex; justify-content: center; align-items: center;
-      transition: transform 0.1s; gap: 8px;
+      transition: transform 0.12s, opacity 0.12s; gap: 8px;
+      font-family: inherit;
     }
-    .btn:active { transform: scale(0.98); opacity: 0.9; }
+    .btn:active { transform: scale(0.975); opacity: 0.88; }
     .btn-primary { background: var(--primary); color: white; }
     .btn-success { background: var(--success); color: white; }
-    .btn-danger { background: rgba(255, 59, 48, 0.1); color: var(--danger); font-size: 14px; padding: 8px 12px; width: auto; }
-    .btn-sm { padding: 8px 16px; font-size: 13px; width: auto; }
-    .btn-map { background: #E8F0FE; color: #1a73e8; border: 1px solid #d2e3fc; }
-
-    /* --- List Items --- */
-    .item-list { list-style: none; padding: 0; margin: 0; }
-    .item-list li {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 0; border-bottom: 1px solid var(--border);
+    .btn-danger  { background: rgba(255,59,48,0.1); color: var(--danger); font-size: 13px; padding: 7px 12px; width: auto; border-radius: 10px; }
+    .btn-sm      { padding: 8px 16px; font-size: 13px; width: auto; border-radius: 10px; }
+    .btn-map     { background: #E8F0FE; color: #1a73e8; border: 1px solid #d2e3fc; }
+    .btn-co-primary {
+      background: linear-gradient(135deg, var(--cp-primary), var(--cp-primary-dark));
+      color: white; box-shadow: 0 4px 16px rgba(255,45,85,0.28);
     }
-    .item-list li:last-child { border-bottom: none; }
 
-    /* --- Badges --- */
-    .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-    .badge.Delivered { background: #E0F8E5; color: var(--success); }
-    .badge.Preparing, .badge.Pending { background: #FFF4E5; color: var(--warning); }
-    .badge.Deleted { background: #FFE5E5; color: var(--danger); }
+    /* ── Badge ── */
+    .badge { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge.Delivered, .badge.delivered { background: #E0F8E5; color: var(--success); }
+    .badge.Preparing, .badge.Pending, .badge.pending, .badge.New, .badge.new { background: #FFF4E5; color: var(--warning); }
+    .badge.Deleted, .badge.deleted { background: #FFE5E5; color: var(--danger); }
+    .badge.OnWay { background: #E3F0FF; color: var(--primary); }
 
-    /* --- Stats Grid --- */
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    /* ── Stats Grid ── */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .stat-card {
-      background: var(--card-bg); padding: 15px; border-radius: var(--radius);
-      box-shadow: var(--shadow); text-align: center;
+      background: var(--card-bg); padding: 14px; border-radius: 14px;
+      box-shadow: var(--shadow); text-align: center; border: 1px solid rgba(0,0,0,0.04);
     }
-    .stat-val { font-size: 20px; font-weight: 800; margin: 5px 0; }
-    .stat-label { font-size: 11px; color: var(--text-sec); text-transform: uppercase; }
+    .stat-val   { font-size: 20px; font-weight: 800; margin: 4px 0; letter-spacing: -0.5px; }
+    .stat-label { font-size: 10px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 700; }
 
-    /* --- Bottom Navigation --- */
+    /* ── Bottom Nav ── */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(255,255,255,0.95);
+      background: rgba(255,255,255,0.96);
       border-top: 1px solid var(--border);
       height: var(--nav-height);
       display: flex; justify-content: space-around;
-      padding-bottom: 20px; z-index: 1000;
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+      z-index: 1000;
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     }
-
     .nav-item {
       background: none; border: none; flex: 1;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      color: #C7C7CC; font-size: 10px; font-weight: 600;
-      cursor: pointer; transition: color 0.2s;
+      color: #C7C7CC; font-size: 10px; font-weight: 700;
+      cursor: pointer; transition: color 0.2s; font-family: inherit;
+      padding-top: 8px;
     }
-    .nav-item svg { width: 26px; height: 26px; margin-bottom: 4px; fill: currentColor; }
-    .nav-item i { font-size: 22px; margin-bottom: 4px; }
+    .nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; fill: currentColor; }
+    .nav-item i   { font-size: 20px; margin-bottom: 4px; }
     .nav-item.active { color: var(--primary); }
 
-    /* --- Loading Overlay --- */
+    /* ── Loader ── */
     #loader {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255,255,255,0.8); z-index: 2000;
-      display: flex; flex-direction: column;
+      background: rgba(255,255,255,0.85); z-index: 9000;
+      display: none; flex-direction: column;
       justify-content: center; align-items: center;
+      backdrop-filter: blur(6px);
     }
     .spinner {
-      width: 40px; height: 40px; border: 4px solid var(--border);
+      width: 36px; height: 36px; border: 3.5px solid var(--border);
       border-top-color: var(--primary); border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 0.75s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    #loaderText { margin-top: 14px; font-weight: 600; color: var(--text-sec); font-size: 14px; text-align: center; padding: 0 30px; }
 
-    /* --- Date Inputs Wrapper --- */
-    .date-row { display: flex; gap: 10px; }
-    .date-row div { flex: 1; }
-
-    /* --- NEW STYLES FOR LIST DETAILS --- */
+    /* ── Row Detail (List) ── */
     .row-detail {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 14px;
-      border-bottom: 1px dashed #f0f0f0;
-      padding-bottom: 4px;
+      display: flex; justify-content: space-between;
+      margin-bottom: 7px; font-size: 13.5px;
+      border-bottom: 1px dashed #F0F0F5; padding-bottom: 5px;
     }
-    .label-detail { color: #8E8E93; font-weight: 500; }
-    .val-detail { font-weight: 600; text-align: right; max-width: 65%; color: #333; }
+    .label-detail { color: var(--text-sec); font-weight: 500; }
+    .val-detail   { font-weight: 600; text-align: right; max-width: 62%; color: #1C1C1E; word-break: break-word; }
 
+    /* ── Note Area ── */
     .note-area {
-      margin-top: 10px;
-      background: #FAFAFA;
-      padding: 10px;
-      border-radius: 12px;
-      border: 1px solid #E5E5EA;
+      margin-top: 10px; background: #FAFAFA;
+      padding: 10px; border-radius: 12px; border: 1px solid var(--border);
     }
     .note-textarea {
-      width: 100%;
-      border: 1px solid #DDD;
-      border-radius: 8px;
-      padding: 8px;
-      font-size: 14px;
-      font-family: inherit;
-      resize: none;
+      width: 100%; border: 1px solid #DDD; border-radius: 8px;
+      padding: 8px; font-size: 14px; font-family: inherit; resize: none;
+      background: #fff; margin-bottom: 0;
     }
 
-    .full-frame {
-      width: 100%;
-      height: 100%;
-      min-height: 80vh;
-      border: none;
-      border-radius: var(--radius);
+    /* ── Date Quick Filters ── */
+    .date-chip-row {
+      display: flex; gap: 7px; overflow-x: auto;
+      padding-bottom: 4px; margin-bottom: 12px;
+      -webkit-overflow-scrolling: touch;
     }
+    .date-chip-row::-webkit-scrollbar { display: none; }
+    .date-chip {
+      flex-shrink: 0; padding: 6px 14px; border-radius: 20px;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      border: 1.5px solid var(--border); background: #fff; color: var(--text-sec);
+      transition: all 0.16s; font-family: inherit;
+    }
+    .date-chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
-    /* ═══════════════════════════════════════════
-       CREATEORDER STYLES (integrated into Yeni tab)
-    ═══════════════════════════════════════════ */
-
-    /* --- Product Search (createorder style) --- */
+    /* ── Product Search ── */
     .product-search-wrapper { position: relative; }
     .product-search-icon {
-      position: absolute; left: 16px; top: 50%;
-      transform: translateY(-55%);
-      color: var(--text-sec); font-size: 15px; pointer-events: none;
+      position: absolute; left: 14px; top: 50%;
+      transform: translateY(-55%); color: var(--text-sec); font-size: 14px; pointer-events: none;
     }
-    #co-productSearch { padding-left: 44px; margin-bottom: 0; }
-
-    .products-loading-note {
-      font-size: 12px; color: var(--text-sec);
-      text-align: center; padding: 8px 0 0; display: none;
-    }
+    #co-productSearch { padding-left: 40px; margin-bottom: 0; }
 
     .product-results-list {
       background: #fff; border: 1px solid var(--border);
-      border-radius: 12px; max-height: 260px; overflow-y: auto;
+      border-radius: 14px; max-height: 260px; overflow-y: auto;
       margin-top: 8px; display: none;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.10);
-      z-index: 50; position: relative;
+      box-shadow: var(--shadow-lg); z-index: 50; position: relative;
     }
     .product-result-item {
       display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px; border-bottom: 1px solid var(--border);
-      cursor: pointer; transition: background 0.15s;
+      padding: 11px 14px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.14s;
     }
     .product-result-item:last-child { border-bottom: none; }
-    .product-result-item:hover { background: #FFF5F7; }
+    .product-result-item:active { background: #FFF0F3; }
     .product-result-img {
-      width: 52px; height: 52px; border-radius: 10px;
+      width: 48px; height: 48px; border-radius: 10px;
       object-fit: cover; background: #F2F2F7; flex-shrink: 0;
     }
     .product-result-img-placeholder {
-      width: 52px; height: 52px; border-radius: 10px; background: #F2F2F7;
+      width: 48px; height: 48px; border-radius: 10px; background: #F2F2F7;
       display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; color: #ccc; font-size: 20px;
+      flex-shrink: 0; color: #ccc; font-size: 18px;
     }
-    .product-result-name  { font-size: 14px; font-weight: 700; color: var(--text-main); }
-    .product-result-meta  { font-size: 12px; color: var(--text-sec); margin-top: 2px; }
-    .product-result-price { font-size: 14px; font-weight: 800; color: var(--cp-primary); margin-top: 2px; }
+    .product-result-name  { font-size: 13.5px; font-weight: 700; color: var(--text-main); }
+    .product-result-meta  { font-size: 11px; color: var(--text-sec); margin-top: 2px; }
+    .product-result-price { font-size: 13px; font-weight: 800; color: var(--cp-primary); margin-top: 2px; }
 
     .product-not-found-row { padding: 14px; text-align: center; }
     .product-not-found-row p { margin: 0 0 10px; font-size: 13px; color: var(--text-sec); }
     .btn-custom-product {
       background: #F2F2F7; border: 1.5px dashed #ccc; border-radius: 10px;
       padding: 10px 18px; font-size: 13px; font-weight: 700;
-      color: var(--cp-accent); cursor: pointer; width: 100%;
+      color: var(--cp-accent); cursor: pointer; width: 100%; font-family: inherit;
     }
 
-    /* Cart items */
-    .selected-product-card {
-      display: none;
+    /* ── Cart ── */
+    .cart-item-card {
+      display: flex; align-items: center; gap: 12px;
       background: linear-gradient(135deg, #FFF5F7, #F5F5FF);
-      border: 1.5px solid #FFD6E0;
-      border-radius: 14px; padding: 14px; margin-top: 8px; position: relative;
+      border: 1.5px solid #FFD6E0; border-radius: 13px;
+      padding: 12px; margin-top: 8px;
     }
-    .selected-product-inner { display: flex; align-items: center; gap: 14px; }
-    .selected-product-img {
-      width: 70px; height: 70px; border-radius: 12px;
-      object-fit: cover; flex-shrink: 0;
+    .cart-item-img {
+      width: 56px; height: 56px; border-radius: 10px; object-fit: cover; flex-shrink: 0;
     }
-    .selected-product-img-placeholder {
-      width: 70px; height: 70px; border-radius: 12px; background: #F2F2F7;
+    .cart-item-img-placeholder {
+      width: 56px; height: 56px; border-radius: 10px; background: #F2F2F7;
       display: flex; align-items: center; justify-content: center;
-      color: #bbb; font-size: 28px; flex-shrink: 0;
+      color: #bbb; font-size: 22px; flex-shrink: 0;
     }
-    .selected-product-info { flex: 1; min-width: 0; }
-    .selected-product-name  { font-size: 15px; font-weight: 700; color: var(--text-main); }
-    .selected-product-code  { font-size: 11px; color: var(--text-sec); margin-top: 2px; }
-    .selected-product-price { font-size: 17px; font-weight: 800; color: var(--cp-primary); margin-top: 4px; }
-    .clear-product-btn {
+    .cart-item-info { flex: 1; min-width: 0; }
+    .cart-item-name  { font-size: 14px; font-weight: 700; }
+    .cart-item-code  { font-size: 11px; color: var(--text-sec); margin-top: 1px; }
+    .cart-item-price { font-size: 16px; font-weight: 800; color: var(--cp-primary); margin-top: 3px; }
+    .cart-item-remove {
       background: #fff; border: 1px solid var(--border);
       border-radius: 50%; width: 28px; height: 28px;
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer; font-size: 13px; color: var(--text-sec); flex-shrink: 0;
+      cursor: pointer; font-size: 12px; color: var(--cp-primary); flex-shrink: 0;
     }
 
-    /* Custom Product Section */
+    /* ── Custom Product Section ── */
     .custom-product-section {
-      display: none; margin-top: 12px; padding: 16px;
+      display: none; margin-top: 12px; padding: 15px;
       background: #F9F5FF; border: 1.5px dashed #C7C5F4; border-radius: 14px;
     }
     .custom-product-section h4 { margin: 0 0 12px; font-size: 14px; font-weight: 700; color: var(--cp-accent); }
-    .custom-product-section input { margin-bottom: 10px; }
 
-    /* --- Image Upload Areas --- */
+    /* ── Image Upload ── */
     .image-upload-area {
       border: 2px dashed var(--border); border-radius: 12px;
       padding: 20px; text-align: center; cursor: pointer;
-      transition: 0.2s; background: #F9F9F9;
-      position: relative; overflow: hidden;
+      transition: 0.2s; background: #F9F9F9; position: relative; overflow: hidden;
     }
-    .image-upload-area:hover { border-color: var(--cp-primary); background: #FFF5F7; }
+    .image-upload-area:hover   { border-color: var(--cp-primary); background: #FFF5F7; }
     .image-upload-area.has-image { border-style: solid; border-color: var(--success); background: #F0FFF4; }
     .image-upload-area input[type="file"] {
       position: absolute; inset: 0; width: 100%; height: 100%;
       opacity: 0; cursor: pointer; margin: 0; padding: 0; border: none;
     }
-    .image-upload-icon  { font-size: 28px; margin-bottom: 6px; }
-    .image-upload-text  { font-size: 13px; color: var(--text-sec); font-weight: 500; }
-    .image-preview-thumb {
-      width: 80px; height: 80px; border-radius: 10px;
-      object-fit: cover; margin: 0 auto 6px; display: block;
-    }
+    .image-upload-icon  { font-size: 26px; margin-bottom: 6px; }
+    .image-upload-text  { font-size: 12px; color: var(--text-sec); font-weight: 500; }
+    .image-preview-thumb { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; margin: 0 auto 6px; display: block; }
 
-    /* --- Location Tabs --- */
+    /* ── Location Tabs ── */
     .loc-tabs {
       display: flex; background: #EFEFF4;
-      border-radius: 10px; padding: 4px; margin-bottom: 15px;
+      border-radius: 10px; padding: 3px; margin-bottom: 14px;
     }
     .loc-tab {
-      flex: 1; text-align: center; padding: 8px;
-      font-size: 13px; font-weight: 600; color: var(--text-sec);
-      border-radius: 8px; cursor: pointer; transition: 0.2s;
+      flex: 1; text-align: center; padding: 8px 6px;
+      font-size: 12px; font-weight: 700; color: var(--text-sec);
+      border-radius: 8px; cursor: pointer; transition: 0.18s; font-family: inherit; border: none; background: none;
     }
-    .loc-tab.active { background: #fff; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .loc-tab.active { background: #fff; color: #000; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
     .loc-content { display: none; }
     .loc-content.active { display: block; }
 
-    /* Optional Map Toggle */
+    /* ── Map Toggle ── */
     .map-toggle-row {
       display: flex; align-items: center; gap: 10px;
-      margin-top: 10px; padding: 12px 14px; background: #F0F4FF;
+      margin-top: 10px; padding: 11px 14px; background: #F0F4FF;
       border-radius: 12px; cursor: pointer; border: 1.5px solid #D2E3FC;
     }
-    .map-toggle-icon  { font-size: 18px; color: #1a73e8; }
+    .map-toggle-icon  { font-size: 17px; color: #1a73e8; }
     .map-toggle-label { flex: 1; font-size: 13px; font-weight: 600; color: #1a73e8; }
     .map-toggle-check {
       width: 22px; height: 22px; border-radius: 6px;
       border: 2px solid #D2E3FC; background: #fff;
       display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; font-size: 12px; color: transparent;
+      flex-shrink: 0; font-size: 11px; color: transparent;
     }
     .map-toggle-check.checked { background: #1a73e8; border-color: #1a73e8; color: white; }
     .map-optional-section { display: none; margin-top: 12px; }
 
-    /* --- Payment Section --- */
+    /* ── Deposit / Payment ── */
     .deposit-offer-box {
       display: none;
       background: linear-gradient(135deg, #FFF8E1, #FFFBF0);
       border: 1.5px solid #FFD600; border-radius: 14px;
-      padding: 16px; margin-top: 12px;
+      padding: 14px; margin-top: 12px;
     }
     .deposit-offer-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .deposit-offer-icon  { font-size: 22px; }
-    .deposit-offer-title { font-size: 15px; font-weight: 800; color: #B8860B; }
-    .deposit-offer-sub   { font-size: 12px; color: #9A7200; margin-top: 1px; }
-
-    .deposit-checkbox-row {
-      display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 10px 0;
-    }
+    .deposit-offer-icon  { font-size: 20px; }
+    .deposit-offer-title { font-size: 14px; font-weight: 800; color: #B8860B; }
+    .deposit-offer-sub   { font-size: 11px; color: #9A7200; margin-top: 1px; }
+    .deposit-checkbox-row { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 8px 0; }
     .deposit-checkbox {
       width: 22px; height: 22px; border-radius: 6px; border: 2px solid #ccc;
       background: #fff; display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; transition: 0.2s; font-size: 12px; color: transparent;
+      flex-shrink: 0; transition: 0.18s; font-size: 11px; color: transparent;
     }
     .deposit-checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
     .deposit-checkbox-label { font-size: 14px; font-weight: 600; color: var(--text-main); flex: 1; }
-
     .discount-badge {
       display: none; align-items: center; gap: 8px;
       background: #E0F8E5; border: 1px solid var(--success);
-      border-radius: 10px; padding: 10px 14px; margin-top: 8px;
+      border-radius: 10px; padding: 9px 13px; margin-top: 8px;
     }
-    .discount-badge-icon { font-size: 18px; }
     .discount-badge-text { font-size: 13px; font-weight: 700; color: #1E7E34; }
-
     .card-receipt-box {
       display: none; background: #F0F4FF;
       border: 1.5px solid #D2E3FC; border-radius: 14px;
-      padding: 16px; margin-top: 12px;
+      padding: 14px; margin-top: 12px;
     }
     .receipt-required-label {
       font-size: 13px; font-weight: 700; color: var(--cp-accent);
@@ -377,75 +360,115 @@
     }
     .receipt-upload-section { display: none; margin-top: 10px; }
 
-    /* --- Submit button for createorder --- */
-    .btn-co-primary {
-      background: linear-gradient(135deg, var(--cp-primary), var(--cp-primary-dark));
-      color: white; box-shadow: 0 4px 15px rgba(255,45,85,0.3);
-    }
-
-    /* --- Tracking Results --- */
+    /* ── Track / Status ── */
     .track-result { display: none; animation: slideUp 0.3s ease-out; }
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     .status-badge {
-      display: inline-block; padding: 6px 12px; border-radius: 20px;
-      font-size: 12px; font-weight: 800; text-transform: uppercase;
+      display: inline-block; padding: 5px 12px; border-radius: 20px;
+      font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
       background: #eee; color: #555; margin-bottom: 10px;
     }
     .status-Delivered { background: #E0F8E5; color: var(--success); }
-    .status-Preparing { background: #FFF4E5; color: #FF9500; }
+    .status-Preparing { background: #FFF4E5; color: var(--warning); }
     .status-New       { background: #EEF2FF; color: var(--cp-accent); }
-    .status-OnWay     { background: #E8F5E9; color: #2E7D32; }
+    .status-OnWay     { background: #E3F0FF; color: var(--primary); }
     .detail-row {
       display: flex; justify-content: space-between;
-      border-bottom: 1px dashed #eee; padding: 12px 0; font-size: 14px;
+      border-bottom: 1px dashed #eee; padding: 11px 0; font-size: 14px;
     }
     .detail-row:last-child { border: none; }
     .detail-label { color: var(--text-sec); }
     .detail-val   { font-weight: 600; text-align: right; }
-    .btn-call { background: var(--success); color: white; width: auto; padding: 8px 16px; font-size: 14px; border-radius: 20px; }
+    .btn-call { background: var(--success); color: white; width: auto; padding: 8px 16px; font-size: 13px; border-radius: 20px; text-decoration: none; font-weight: 700; }
+
+    /* ── Iframe (Store) ── */
+    .full-frame { width: 100%; height: 100%; min-height: 80vh; border: none; border-radius: var(--radius); }
+
+    /* ── User Header Card ── */
+    .user-header-card {
+      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+      border-radius: 16px; padding: 16px 18px; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 14px; color: white;
+      box-shadow: 0 6px 24px rgba(0,122,255,0.25);
+    }
+    .user-avatar-circle {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: rgba(255,255,255,0.25); display: flex;
+      align-items: center; justify-content: center; font-size: 20px;
+      font-weight: 800; flex-shrink: 0; letter-spacing: -1px;
+    }
+    .user-header-name { font-size: 17px; font-weight: 800; }
+    .user-header-sub  { font-size: 12px; opacity: 0.8; margin-top: 2px; }
+
+    /* ── Section Divider ── */
+    .section-title {
+      font-size: 13px; font-weight: 800; color: var(--text-sec);
+      text-transform: uppercase; letter-spacing: 0.6px;
+      margin: 18px 0 10px 2px;
+    }
+
+    /* ── Order card in list ── */
+    .order-card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #F0F0F5;
+    }
+    .order-id { font-weight: 800; font-size: 17px; }
+    .products-box {
+      margin-top: 10px; font-size: 13px; color: #333;
+      background: #F7F7FA; padding: 9px 11px; border-radius: 10px; line-height: 1.5;
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+      text-align: center; padding: 40px 20px;
+    }
+    .empty-state i { font-size: 38px; color: #D1D1D6; margin-bottom: 12px; }
+    .empty-state p { color: var(--text-sec); font-size: 14px; font-weight: 500; }
+
+    /* ── Courier total box ── */
+    .total-summary-box {
+      background: #F7F7FA; border-radius: 12px; padding: 13px 14px;
+      margin-top: 12px; border: 1px solid var(--border);
+    }
+    .total-summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 14px; }
+    .total-summary-row.grand { font-size: 17px; font-weight: 800; margin-top: 8px; padding-top: 8px; border-top: 1.5px dashed var(--border); margin-bottom: 0; }
   </style>
 </head>
 <body>
 
-  <div id="loader" style="display: none;">
+  <!-- Loader -->
+  <div id="loader">
     <div class="spinner"></div>
-    <p id="loaderText" style="margin-top: 15px; font-weight: 600; color: #8E8E93;">Məlumatlar Yüklənir...</p>
+    <p id="loaderText">Məlumatlar Yüklənir...</p>
   </div>
 
-  <!-- ═══════════════════════════════════
-       TAB: STORE (iframe)
-  ═══════════════════════════════════ -->
+  <!-- ═══════════════ TAB: MAĞAZA ═══════════════ -->
   <div id="tab-store" class="view-container">
     <iframe src="partner.html" class="full-frame"></iframe>
   </div>
 
-  <!-- ═══════════════════════════════════
-       TAB: YENİ (New Order — createorder style)
-  ═══════════════════════════════════ -->
+  <!-- ═══════════════ TAB: YENİ SİFARİŞ ═══════════════ -->
   <div id="tab-add" class="view-container active">
     <h2>Yeni Sifariş</h2>
 
-    <form id="customerOrderForm" novalidate>
-
-      <!-- USER INFO CARD (replaces Sales Rep selector — phone from localStorage) -->
-      <div class="card" style="text-align:center; padding:16px;">
-        <label>İstifadəçi / Satış Nümayəndəsi</label>
-        <span id="displayUsername" style="font-weight:700; font-size:18px; color:var(--primary);">...</span>
-        <div style="margin-top:8px;">
-          <label style="margin-bottom:4px;">Telefon Nömrəniz</label>
-          <input type="tel" id="coUserPhone" placeholder="050 000 00 00" style="margin-bottom:0;"
-            oninput="saveUserPhone()" value="">
-          <small style="color:var(--text-sec); font-size:11px;">Bu nömrə brauzerinizdə saxlanılır</small>
-        </div>
-        <input type="hidden" id="salesRep">
+    <!-- User Header -->
+    <div class="user-header-card">
+      <div class="user-avatar-circle" id="avatarCircle">?</div>
+      <div>
+        <div class="user-header-name" id="displayUsername">Yüklənir...</div>
+        <div class="user-header-sub" id="displayUserPhone">Yüklənir...</div>
       </div>
+    </div>
 
-      <!-- 1. CUSTOMER INFO -->
+    <form id="customerOrderForm" novalidate>
+      <input type="hidden" id="salesRep">
+
+      <!-- 1. MÜŞTƏRİ -->
       <div class="card">
-        <h3><i class="fa-regular fa-id-card"></i> Müştəri Məlumatları</h3>
+        <h3><i class="fa-regular fa-id-card" style="color:var(--primary);margin-right:6px;"></i>Müştəri Məlumatları</h3>
 
         <label>Ad və Soyad</label>
         <input type="text" id="custName" placeholder="Əli Vəliyev" required>
@@ -454,31 +477,18 @@
         <input type="tel" id="custPhone" placeholder="050 000 00 00" required>
 
         <label>Instagram Profil Adı
-          <span style="font-weight:400; text-transform:none; color:#aaa;"> — istəyə bağlı</span>
+          <span style="font-weight:400;text-transform:none;color:#bbb;"> — istəyə bağlı</span>
         </label>
         <div style="position:relative;">
-          <span style="position:absolute;left:16px;top:50%;transform:translateY(-55%);
-                       color:var(--text-sec);font-size:15px;pointer-events:none;">@</span>
-          <input type="text" id="instagramHandle" placeholder="username" style="padding-left:36px;">
+          <span style="position:absolute;left:14px;top:50%;transform:translateY(-55%);color:var(--text-sec);font-size:14px;pointer-events:none;">@</span>
+          <input type="text" id="instagramHandle" placeholder="username" style="padding-left:32px;">
         </div>
-
-        <!-- Mənbə -->
-        <label>Mənbə</label>
-        <select id="salesSource" required>
-          <option value="Brendimoaz">Brendimoaz</option>
-          <option value="Brendimo.az">Brendimo.az</option>
-          <option value="Idealhediyyeler">Idealhediyyeler</option>
-          <option value="Idealhediyye.az">Idealhediyye.az</option>
-          <option value="Whatsapp35">Whatsapp35</option>
-          <option value="Whatsapp29">Whatsapp29</option>
-          <option value="Brendimo.lei">Brendimo.lei</option>
-        </select>
       </div>
 
-      <!-- 2. DELIVERY TIME -->
+      <!-- 2. ÇATDIRMA ZAMANI -->
       <div class="card">
-        <h3><i class="fa-regular fa-clock"></i> Çatdırılma Zamanı</h3>
-        <div style="display:flex; gap:10px;">
+        <h3><i class="fa-regular fa-clock" style="color:var(--warning);margin-right:6px;"></i>Çatdırılma Zamanı</h3>
+        <div style="display:flex;gap:10px;">
           <div style="flex:1;">
             <label>Tarix</label>
             <input type="date" id="deliveryDate" required>
@@ -497,12 +507,10 @@
         </div>
       </div>
 
-      <!-- 3. PRODUCT SELECTION -->
+      <!-- 3. MƏHSUL SEÇİMİ -->
       <div class="card">
-        <h3><i class="fa-solid fa-box-open"></i> Məhsul Seçimi</h3>
-        <p style="font-size:12px; color:#888; margin-top:-10px; margin-bottom:15px;">
-          Məhsul kodu və ya adı ilə axtarıb səbətə əlavə edin:
-        </p>
+        <h3><i class="fa-solid fa-box-open" style="color:var(--cp-accent);margin-right:6px;"></i>Məhsul Seçimi</h3>
+        <p style="font-size:12px;color:#999;margin-top:-10px;margin-bottom:14px;">Məhsul kodu və ya adı ilə axtarıb səbətə əlavə edin:</p>
 
         <div class="product-search-wrapper">
           <i class="fa-solid fa-magnifying-glass product-search-icon"></i>
@@ -513,33 +521,45 @@
             onfocus="coSearchProducts()">
         </div>
 
-        <div class="products-loading-note" id="productsLoadingNote">
+        <div id="productsLoadingNote" style="font-size:12px;color:var(--text-sec);text-align:center;padding:7px 0 0;display:none;">
           <i class="fa-solid fa-circle-notch fa-spin"></i> Məhsullar yüklənir...
         </div>
 
         <div class="product-results-list" id="coProductResults"></div>
 
-        <div id="coCartContainer" style="display:none; margin-top:15px;">
-          <h4 style="margin:0 0 10px; font-size:14px; color:var(--cp-accent);">🛒 Səbətdəki Məhsullar:</h4>
+        <!-- Cart Container -->
+        <div id="coCartContainer" style="display:none;margin-top:14px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <i class="fa-solid fa-cart-shopping" style="color:var(--cp-accent);font-size:14px;"></i>
+            <span style="font-weight:700;font-size:14px;color:var(--cp-accent);">Səbət</span>
+          </div>
           <div id="coCartItemsList"></div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:12px; border-top:2px dashed var(--border);">
-            <span style="font-weight:700; font-size:15px;">Ümumi Məbləğ:</span>
-            <span id="coCartTotalPrice" style="font-weight:800; font-size:18px; color:var(--cp-primary);">0.00 ₼</span>
+
+          <div class="total-summary-box">
+            <div class="total-summary-row">
+              <span style="color:var(--text-sec);">Məhsullar:</span>
+              <span id="coCartSubtotal" style="font-weight:600;">0.00 ₼</span>
+            </div>
+            <div class="total-summary-row">
+              <span style="color:var(--text-sec);">Kuriyer:</span>
+              <span id="coCartCourierDisplay" style="font-weight:600;">0.00 ₼</span>
+            </div>
+            <div class="total-summary-row grand">
+              <span>Cəmi:</span>
+              <span id="coCartTotalPrice" style="color:var(--cp-primary);">0.00 ₼</span>
+            </div>
           </div>
         </div>
 
         <!-- Courier cost -->
-        <div style="margin-top:15px; padding-top:10px; border-top:1px solid var(--border);">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <label style="margin:0;">Əlavə Kuriyer Ödənişi (AZN)</label>
-            <input type="number" id="courierCostCo" value="0" step="0.01" style="width:80px; text-align:right; margin:0; border:1px solid var(--border);">
-          </div>
-        </div>
+    <input type="hidden" id="courierCostCo" value="0">
 
+        <!-- Custom Product -->
         <div class="custom-product-section" id="coCustomProductSection">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
             <h4 style="margin:0;"><i class="fa-solid fa-pencil"></i> Əl ilə daxil edin</h4>
-            <button type="button" onclick="coCancelCustomProduct()" style="background:none;border:none;color:var(--text-sec);cursor:pointer;font-size:16px;">
+            <button type="button" onclick="coCancelCustomProduct()"
+              style="background:none;border:none;color:var(--text-sec);cursor:pointer;font-size:17px;padding:0;">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
@@ -547,7 +567,9 @@
           <label>Məhsulun adı</label>
           <input type="text" id="coCustomProductName" placeholder="Məhsulun adını yazın...">
 
-          <label>Qiyməti (₼) <span style="font-weight:400;text-transform:none;color:#aaa;"> — bilmirsinizsə 0 saxlayın</span></label>
+          <label>Qiyməti (₼)
+            <span style="font-weight:400;text-transform:none;color:#aaa;"> — bilmirsinizsə 0 saxlayın</span>
+          </label>
           <input type="number" id="coCustomProductPrice" placeholder="Məs: 25.50" step="0.01" min="0">
 
           <label>Məhsulun şəkli
@@ -561,97 +583,80 @@
               <div class="image-upload-text">Şəkil əlavə et</div>
             </div>
           </div>
+
           <button type="button" class="btn btn-map" style="margin-top:12px;" onclick="coAddCustomProductToCart()">
             <i class="fa-solid fa-plus"></i> Səbətə Əlavə Et
           </button>
         </div>
       </div>
 
-      <!-- 4. ADDRESS -->
+      <!-- 4. ÜNVAN -->
       <div class="card">
-        <h3><i class="fa-solid fa-map-location-dot"></i> Ünvan</h3>
-        <p style="font-size:12px; color:var(--cp-primary); font-weight:600; margin-top:-10px; margin-bottom:12px;">
+        <h3><i class="fa-solid fa-map-location-dot" style="color:var(--danger);margin-right:6px;"></i>Çatdırılma Ünvanı</h3>
+        <p style="font-size:12px;color:var(--cp-primary);font-weight:600;margin-top:-10px;margin-bottom:12px;">
           <i class="fa-solid fa-circle-info"></i> Aşağıdakı seçimlərdən MÜTLƏQBİRİNİ seçin:
         </p>
 
         <div class="loc-tabs">
-          <div class="loc-tab active" onclick="coSwitchLoc('metro', this)">Metro</div>
-          <div class="loc-tab" onclick="coSwitchLoc('landmark', this)">Nişangah</div>
-          <div class="loc-tab" onclick="coSwitchLoc('rayon', this)">Rayonlar</div>
+          <button type="button" class="loc-tab active" onclick="coSwitchLoc('metro', this)">Metro</button>
+          <button type="button" class="loc-tab" onclick="coSwitchLoc('landmark', this)">Nişangah</button>
+          <button type="button" class="loc-tab" onclick="coSwitchLoc('rayon', this)">Rayonlar</button>
         </div>
 
-        <div id="co-loc-metro" class="loc-content active">
+    <div id="co-loc-metro" class="loc-content active">
           <label>Metro Stansiyası</label>
-          <select id="coMetroSelect">
+          <select id="coMetroSelect" onchange="coUpdateDeliveryCost()">
             <option value="">Stansiyanı seçin...</option>
-            <option value="28 May">28 May</option>
-            <option value="Gənclik">Gənclik</option>
-            <option value="Nərimanov">Nəriman Nərimanov</option>
-            <option value="Elmlər">Elmlər Akademiyası</option>
-            <option value="Nizami">Nizami</option>
-            <option value="İçərişəhər">İçərişəhər</option>
-            <option value="Sahil">Sahil</option>
-            <option value="Koroğlu">Koroğlu</option>
-            <option value="Neftçilər">Neftçilər</option>
-            <option value="Xalqlar">Xalqlar Dostluğu</option>
-            <option value="Əhmədli">Əhmədli</option>
-            <option value="Həzi Aslanov">Həzi Aslanov</option>
-            <option value="Memar Əcəmi">Memar Əcəmi</option>
-            <option value="20 Yanvar">20 Yanvar</option>
-            <option value="İnşaatçılar">İnşaatçılar</option>
+            <option>28 May</option><option>Gənclik</option><option>Nəriman Nərimanov</option>
+            <option>Elmlər Akademiyası</option><option>Nizami</option><option>İçərişəhər</option>
+            <option>Sahil</option><option>Koroğlu</option><option>Neftçilər</option>
+            <option>Xalqlar Dostluğu</option><option>Əhmədli</option><option>Həzi Aslanov</option>
+            <option>Memar Əcəmi</option><option>20 Yanvar</option><option>İnşaatçılar</option>
           </select>
         </div>
 
         <div id="co-loc-landmark" class="loc-content">
           <label>Məşhur Yer / Nişangah</label>
-          <select id="coLandmarkSelect">
-            <option value="">Nişangahı seçin...</option>
-          </select>
+          <select id="coLandmarkSelect" onchange="coUpdateDeliveryCost()"><option value="">Nişangahı seçin...</option></select>
         </div>
 
         <div id="co-loc-rayon" class="loc-content">
-          <label>Rayon / Şəhər Seçin (+4.00 ₼)</label>
-          <select id="coRayonSelect">
-            <option value="">Siyahıdan seçin...</option>
-          </select>
+          <label>Rayon / Şəhər Seçin <span style="color:var(--cp-primary);">(+4.00 ₼)</span></label>
+          <select id="coRayonSelect" onchange="coUpdateDeliveryCost()"><option value="">Siyahıdan seçin...</option></select>
         </div>
 
-        <!-- Optional map toggle -->
+        <!-- Map toggle -->
         <div class="map-toggle-row" onclick="coToggleMapSection()">
           <span class="map-toggle-icon"><i class="fa-solid fa-location-crosshairs"></i></span>
           <span class="map-toggle-label">
             Dəqiq ünvanı xəritədə göstər
-            <span style="font-weight:400; color:#888;"> — istəyə bağlı</span>
+            <span style="font-weight:400;color:#88a;"> — istəyə bağlı</span>
           </span>
           <div class="map-toggle-check" id="coMapToggleCheck"></div>
         </div>
 
         <div class="map-optional-section" id="coMapOptionalSection">
-          <div style="height:12px;"></div>
-          <p style="font-size:12px; color:#888; margin:0 0 8px;">
-            Pin-i (📍) sürüşdürərək dəqiq qapınızı seçin.
-          </p>
-          <div id="coMap" style="height:280px; width:100%; border-radius:12px; border:1px solid #ddd; z-index:1;"></div>
-          <div style="height:10px;"></div>
+          <p style="font-size:12px;color:#999;margin:0 0 8px;">Pin-i (📍) sürüşdürərək dəqiq qapınızı seçin.</p>
+          <div id="coMap" style="height:260px;width:100%;border-radius:12px;border:1px solid #ddd;"></div>
+          <div style="height:8px;"></div>
           <button type="button" class="btn btn-map" onclick="coGetCurrentLocation()">
             <i class="fa-solid fa-location-crosshairs"></i> Cari Mövqeyimi Tap
           </button>
           <div id="coLocationStatus"
-               style="margin-top:10px; font-size:13px; font-weight:600; color:var(--success); display:none; text-align:center;">
+            style="margin-top:10px;font-size:13px;font-weight:600;color:var(--success);display:none;text-align:center;">
             <i class="fa-solid fa-check"></i> Ünvan seçildi!
           </div>
           <input type="hidden" id="coMapCoordinatesLink">
         </div>
 
-        <div style="height:16px;"></div>
+        <div style="height:14px;"></div>
         <label>Əlavə Ünvan Qeydi</label>
-        <input type="text" id="coAddressDetails"
-          placeholder="Məs: Küçə 45, Mənzil 12, 3-cü mərtəbə">
+        <input type="text" id="coAddressDetails" placeholder="Məs: Küçə 45, Mənzil 12, 3-cü mərtəbə" style="margin-bottom:0;">
       </div>
 
-      <!-- 5. PAYMENT -->
+      <!-- 5. ÖDƏNİŞ -->
       <div class="card">
-        <h3><i class="fa-regular fa-credit-card"></i> Ödəniş Üsulu</h3>
+        <h3><i class="fa-regular fa-credit-card" style="color:var(--success);margin-right:6px;"></i>Ödəniş Üsulu</h3>
 
         <label>Ödəniş növü seçin</label>
         <select id="coPayMethod" onchange="coHandlePaymentChange()">
@@ -659,7 +664,7 @@
           <option value="card">Kart (Köçürmə)</option>
         </select>
 
-        <!-- CASH: Deposit offer -->
+        <!-- Cash: Deposit offer -->
         <div class="deposit-offer-box" id="coDepositOfferBox">
           <div class="deposit-offer-header">
             <span class="deposit-offer-icon">🎁</span>
@@ -675,7 +680,7 @@
           </div>
 
           <div class="discount-badge" id="coDiscountBadge">
-            <span class="discount-badge-icon">✅</span>
+            <span>✅</span>
             <span class="discount-badge-text">4 ₼ endirim tətbiq ediləcək!</span>
           </div>
 
@@ -692,7 +697,7 @@
           </div>
         </div>
 
-        <!-- CARD: Required receipt -->
+        <!-- Card: Required receipt -->
         <div class="card-receipt-box" id="coCardReceiptBox">
           <div class="receipt-required-label">
             <i class="fa-solid fa-circle-exclamation"></i>
@@ -709,68 +714,74 @@
         </div>
       </div>
 
-      <!-- 6. ORDER PHOTO (from original sellerprofile) -->
+      <!-- 6. XÜSUSİ QEYDLƏR -->
       <div class="card">
-        <label>Sifariş Fotosu (Skrinşot)</label>
-        <div class="image-upload-area" id="coOrderImgArea">
-          <input type="file" id="coOrderImageFile" accept="image/*"
-            onchange="coHandleOrderImageChange(event)">
-          <div id="coOrderImgContent">
-            <div class="image-upload-icon">📸</div>
-            <div class="image-upload-text">Sifariş skrinşotunu əlavə et (Məcburidir)</div>
-          </div>
-        </div>
-
-        <label style="margin-top:15px;">Xüsusi Qeydlər</label>
-        <textarea id="coSpecialInstructions" rows="3" placeholder="Məs: Məhsul, paketləmə və ya çatdırılma barədə əlavə qeydlər..."></textarea>
+        <label>Xüsusi Qeydlər</label>
+        <textarea id="coSpecialInstructions" rows="3"
+          placeholder="Məs: Məhsul, paketləmə və ya çatdırılma barədə əlavə qeydlər..."></textarea>
       </div>
 
       <!-- 7. SUBMIT -->
-      <button type="submit" class="btn btn-co-primary" style="margin-bottom:20px;">
-        Sifarişi Təsdiqlə <i class="fa-solid fa-arrow-right"></i>
+      <button type="submit" class="btn btn-co-primary" style="margin-bottom:24px;">
+        Sifarişi Təsdiqlə &nbsp;<i class="fa-solid fa-arrow-right"></i>
       </button>
 
     </form>
   </div>
 
-  <!-- ═══════════════════════════════════
-       TAB: SİYAHI (Orders List)
-  ═══════════════════════════════════ -->
+  <!-- ═══════════════ TAB: SİYAHI ═══════════════ -->
   <div id="tab-list" class="view-container">
     <h2>Sifarişlər</h2>
 
-    <div class="card">
-      <label>Tarix Aralığı</label>
-      <div class="date-row">
-        <input type="date" id="filterStart">
-        <input type="date" id="filterEnd">
+    <!-- Quick Filter Chips -->
+    <div class="card" style="padding:14px 16px;">
+      <div class="date-chip-row" id="dateChipRow">
+        <button class="date-chip" onclick="applyDateFilter('next5', this)">Növbəti 5 Gün</button>
+        <button class="date-chip active" onclick="applyDateFilter('today', this)">Bu Gün</button>
+        <button class="date-chip" onclick="applyDateFilter('thisMonth', this)">Bu Ay</button>
+        <button class="date-chip" onclick="applyDateFilter('nextMonth', this)">Növbəti Ay</button>
+        <button class="date-chip" onclick="applyDateFilter('custom', this)">Xüsusi</button>
       </div>
-      <button onclick="renderOrderList()" class="btn btn-primary btn-sm" style="margin-top:5px;">Yenilə</button>
+
+      <div id="customDateRow" style="display:none;gap:10px;display:none;">
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;">
+            <label>Başlanğıc</label>
+            <input type="date" id="filterStart" style="margin-bottom:0;">
+          </div>
+          <div style="flex:1;">
+            <label>Son</label>
+            <input type="date" id="filterEnd" style="margin-bottom:0;">
+          </div>
+        </div>
+        <button onclick="renderOrderList()" class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;">
+          <i class="fa-solid fa-rotate"></i> Axtar
+        </button>
+      </div>
     </div>
 
-    <div class="stats-grid" style="margin-bottom: 20px;">
-      <div class="stat-card" style="background: var(--primary); color: white;">
+    <!-- Stats Row -->
+    <div class="stats-grid" style="margin-bottom:14px;">
+      <div class="stat-card" style="background:var(--primary);color:white;">
+        <div class="stat-label" style="color:rgba(255,255,255,0.75);">Sifariş Sayı</div>
         <div class="stat-val" id="listTotalCount">0</div>
-        <div class="stat-label" style="color: rgba(255,255,255,0.8);">Sifariş Sayı</div>
       </div>
-      <div class="stat-card" style="background: var(--success); color: white;">
+      <div class="stat-card" style="background:var(--success);color:white;">
+        <div class="stat-label" style="color:rgba(255,255,255,0.75);">Toplam Məbləğ</div>
         <div class="stat-val" id="listTotalRevenue">0.00 ₼</div>
-        <div class="stat-label" style="color: rgba(255,255,255,0.8);">Toplam Məbləğ</div>
       </div>
     </div>
 
     <div id="ordersContainer"></div>
   </div>
 
-  <!-- ═══════════════════════════════════
-       TAB: İZLƏMƏ (Track Order)
-  ═══════════════════════════════════ -->
+  <!-- ═══════════════ TAB: İZLƏMƏ ═══════════════ -->
   <div id="tab-track" class="view-container">
     <h2>Sifarişi İzlə</h2>
 
     <div class="card" style="text-align:center;">
       <h3><i class="fa-solid fa-magnifying-glass"></i> Sifarişi İzlə</h3>
-      <p style="color:#888; font-size:13px;">Sifariş kodu və nömrənizi daxil edin.</p>
+      <p style="color:#999;font-size:13px;margin-top:-8px;">Sifariş kodu və nömrənizi daxil edin.</p>
       <input type="number" id="trackId" placeholder="Sifariş Kodu (Məs: 1045)">
       <input type="tel" id="trackPhone" placeholder="Mobil Nömrəniz">
       <button class="btn btn-co-primary" onclick="runTrackOrder()">
@@ -779,36 +790,22 @@
     </div>
 
     <div id="trackResult" class="card track-result">
-      <div style="text-align:center; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:15px;">
-        <div style="font-size:24px; font-weight:800; color:var(--text-main);">#<span id="resId"></span></div>
+      <div style="text-align:center;border-bottom:1px solid #eee;padding-bottom:14px;margin-bottom:14px;">
+        <div style="font-size:22px;font-weight:800;color:var(--text-main);">#<span id="resId"></span></div>
         <div id="resStatus" class="status-badge"></div>
       </div>
-      <div class="detail-row">
-        <span class="detail-label">Tarix:</span>
-        <span class="detail-val" id="resDate"></span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Zaman:</span>
-        <span class="detail-val" id="resTime"></span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Məbləğ:</span>
-        <span class="detail-val" id="resPrice" style="color:var(--cp-primary);"></span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Ödəniş:</span>
-        <span class="detail-val" id="resPayment"></span>
-      </div>
-      <div style="background:#F9F9F9; padding:15px; border-radius:12px; margin-top:15px;">
-        <h4 style="margin:0 0 10px; font-size:14px;">
-          <i class="fa-solid fa-motorcycle"></i> Çatdırılma Məlumatı
-        </h4>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div class="detail-row"><span class="detail-label">Tarix:</span><span class="detail-val" id="resDate"></span></div>
+      <div class="detail-row"><span class="detail-label">Zaman:</span><span class="detail-val" id="resTime"></span></div>
+      <div class="detail-row"><span class="detail-label">Məbləğ:</span><span class="detail-val" id="resPrice" style="color:var(--cp-primary);"></span></div>
+      <div class="detail-row"><span class="detail-label">Ödəniş:</span><span class="detail-val" id="resPayment"></span></div>
+      <div style="background:#F9F9F9;padding:14px;border-radius:12px;margin-top:14px;">
+        <h4 style="margin:0 0 10px;font-size:13px;"><i class="fa-solid fa-motorcycle"></i> Çatdırılma Məlumatı</h4>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
             <div id="resCourierName" style="font-weight:700;">Təyin olunmayıb</div>
-            <div style="font-size:12px; color:#888;">Kuriyer</div>
+            <div style="font-size:11px;color:#999;">Kuriyer</div>
           </div>
-          <a id="resCourierBtn" href="#" class="btn btn-call" style="display:none; text-decoration:none;">
+          <a id="resCourierBtn" href="#" class="btn-call" style="display:none;">
             <i class="fa-solid fa-phone"></i> Zəng Et
           </a>
         </div>
@@ -816,15 +813,13 @@
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════
-       TAB: ANALİZ (Stats)
-  ═══════════════════════════════════ -->
+  <!-- ═══════════════ TAB: ANALİZ ═══════════════ -->
   <div id="tab-stats" class="view-container">
     <h2>Performans Analizi</h2>
 
     <div class="card">
       <label>Dövr</label>
-      <select id="statsPeriod" onchange="renderStats()">
+      <select id="statsPeriod" onchange="renderStats()" style="margin-bottom:0;">
         <option value="today">Bu Gün</option>
         <option value="yesterday">Dünən</option>
         <option value="thisMonth" selected>Bu Ay</option>
@@ -839,10 +834,6 @@
         <div class="stat-val" id="statRevenue" style="color:var(--primary)">0 ₼</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Xalis Gəlir (Təxmini)</div>
-        <div class="stat-val" id="statProfit" style="color:var(--success)">0 ₼</div>
-      </div>
-      <div class="stat-card">
         <div class="stat-label">Sifariş Sayı</div>
         <div class="stat-val" id="statCount">0</div>
       </div>
@@ -850,1066 +841,1023 @@
         <div class="stat-label">Uğurlu Çatdırılma</div>
         <div class="stat-val" id="statRate">0%</div>
       </div>
-      <div class="stat-card" style="grid-column: span 2;">
-        <div class="stat-label">Ortalama Sifariş Dəyəri (AOV)</div>
+      <div class="stat-card">
+        <div class="stat-label">Ort. Sifariş (AOV)</div>
         <div class="stat-val" id="statAOV">0 ₼</div>
+      </div>
+      <div class="stat-card" style="grid-column:span 2;">
+        <div class="stat-label">Bu Ayki Hədəf Proqresi</div>
+        <div id="statProgressBar" style="margin:10px 0 4px;height:8px;background:#E5E5EA;border-radius:8px;overflow:hidden;">
+          <div id="statProgressFill" style="height:100%;background:var(--primary);border-radius:8px;width:0%;transition:width 0.5s;"></div>
+        </div>
+        <div id="statProgressLabel" style="font-size:12px;color:var(--text-sec);font-weight:600;">0 / 0 ₼</div>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════
-       BOTTOM NAVIGATION (5 tabs)
-  ═══════════════════════════════════ -->
+  <!-- ═══════════════ BOTTOM NAV ═══════════════ -->
   <nav class="bottom-nav">
     <button class="nav-item" onclick="switchTab('tab-store', this)">
       <svg viewBox="0 0 24 24"><path d="M20 4H4v2h16V4zm1 10v-2l-1-5H4l-1 5v2h1v6h10v-6h4v6h2v-6h1zm-9 4H6v-4h6v4z"/></svg>
       <span>Mağaza</span>
     </button>
-
     <button class="nav-item active" onclick="switchTab('tab-add', this)">
       <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
       <span>Yeni</span>
     </button>
-
     <button class="nav-item" onclick="switchTab('tab-list', this)">
       <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
       <span>Siyahı</span>
     </button>
-
     <button class="nav-item" onclick="switchTab('tab-track', this)">
       <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>
       <span>İzləmə</span>
     </button>
-
     <button class="nav-item" onclick="switchTab('tab-stats', this)">
       <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
       <span>Analiz</span>
     </button>
   </nav>
 
-  <!-- Leaflet CSS + JS for map -->
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- SweetAlert2 for beautiful popups -->
+  <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
-    /* ═══════════════════════════════════════════════════════════
-       API ENDPOINTS
-    ═══════════════════════════════════════════════════════════ */
-    // Staff / Order management API (original sellerprofile)
-    const STAFF_API   = 'https://script.google.com/macros/s/AKfycbxzYNQMOtV5Bk96fhRNTAeb7ZAx92dW-3F4h8jGuFXlemwM_3RfzPSbl1qY6Y3xbqsSjg/exec';
+  /* ═══════════════════════════════════════════════════
+     API ENDPOINTS
+  ═══════════════════════════════════════════════════ */
+  const ORDERS_API  = 'https://script.google.com/macros/s/AKfycbxzYNQMOtV5Bk96fhRNTAeb7ZAx92dW-3F4h8jGuFXlemwM_3RfzPSbl1qY6Y3xbqsSjg/exec';
+  const CATALOG_API = 'https://script.google.com/macros/s/AKfycbzgGiOg7Rp3Y7bDmNNhlbK2PZDl-qwlU8oecz0lGrVouKigoLzlfWleg02H83chkXt53g/exec';
 
-    // Orders API (createorder — Backend 2)
-    const ORDERS_API  = 'https://script.google.com/macros/s/AKfycbxzYNQMOtV5Bk96fhRNTAeb7ZAx92dW-3F4h8jGuFXlemwM_3RfzPSbl1qY6Y3xbqsSjg/exec';
+  /* ═══════════════════════════════════════════════════
+     STATIC DATA
+  ═══════════════════════════════════════════════════ */
+  const LANDMARK_DATA = [
+    { name:"Park Bulvar",price:1},{ name:"Dəniz Mall",price:2},{ name:"Port Baku",price:1},
+    { name:"Badamdar",price:2},{ name:"Bakıxanov (Razin)",price:2},{ name:"Balaxanı",price:3},
+    { name:"Zığ",price:8},{ name:"Heydər Əliyev Liseyi",price:5},{ name:"Sulutəpə",price:2},
+    { name:"Hökməli",price:5},{ name:"Qobu",price:8},{ name:"Babək prospekti",price:1},
+    { name:"8 noyabr prospekti",price:3},{ name:"Günəşli",price:2},{ name:"Xırdalan",price:2},
+    { name:"Zirə",price:8},{ name:"Zabrat",price:8},{ name:"Türkan",price:8},
+    { name:"Şüvəlan",price:10},{ name:"Şağan",price:8},{ name:"Suraxanı",price:3},
+    { name:"Yeni Suraxanı",price:3},{ name:"Saray",price:6},{ name:"Sabunçu",price:2},
+    { name:"Ramana",price:2},{ name:"Qaraçuxur",price:2},{ name:"Qala",price:8},
+    { name:"Pirşağı",price:6},{ name:"Novxanı",price:10},{ name:"Nardaran",price:10},
+    { name:"Mərdəkan",price:10},{ name:"Məhəmmədi",price:1},{ name:"Mehdiabad",price:6},
+    { name:"Maştağa",price:10},{ name:"Masazır",price:2},{ name:"Lökbatan",price:10},
+    { name:"Kürdəxanı",price:10},{ name:"Hövsan",price:10},{ name:"Görədil",price:10},
+    { name:"Fatmayı",price:10},{ name:"Əmircan",price:10},{ name:"Əhmədli (Kənd)",price:10},
+    { name:"Digah",price:10},{ name:"Buzovna",price:10},{ name:"Binəqədi",price:6},
+    { name:"Binə",price:8},{ name:"Bilgəh",price:10},{ name:"Biləcəri",price:2},
+    { name:"Bibiheybət",price:10},{ name:"Bayıl",price:3},{ name:"Lökbatan Dairəsi",price:5},
+    { name:"Şıxov",price:5},{ name:"Baksol Yolu",price:2},{ name:"Müşviq",price:10},
+    { name:"Keşlə",price:2}
+  ];
 
-    // Catalog API (createorder — Backend 1)
-    const CATALOG_API = 'https://script.google.com/macros/s/AKfycbzgGiOg7Rp3Y7bDmNNhlbK2PZDl-qwlU8oecz0lGrVouKigoLzlfWleg02H83chkXt53g/exec';
+  const RAYON_DATA = [
+    "Abşeron","Ağcabədi","Ağdam","Ağdaş","Ağstafa","Ağsu","Astara","Babək","Balakən",
+    "Beyləqan","Bərdə","Biləsuvar","Cəbrayıl","Cəlilabad","Culfa","Daşkəsən","Füzuli",
+    "Gədəbəy","Gəncə","Goranboy","Göyçay","Göygöl","Hacıqabul","Xaçmaz","Xankəndi",
+    "Xocavənd","Xocalı","Xızı","İmişli","İsmayıllı","Kəlbəcər","Kəngərli","Kürdəmir",
+    "Qax","Qazax","Qəbələ","Qobustan","Quba","Qubadlı","Qusar","Laçın","Lerik","Lənkəran",
+    "Masallı","Mingəçevir","Naftalan","Naxçıvan","Neftçala","Oğuz","Ordubad","Saatlı",
+    "Sabirabad","Salyan","Samux","Sədərək","Siyəzən","Sumqayıt","Şabran","Şahbuz",
+    "Şamaxı","Şəki","Şəmkir","Şərur","Şirvan","Şuşa","Tərtər","Tovuz","Ucar",
+    "Yardımlı","Yevlax","Zaqatala","Zəngilan","Zərdab"
+  ];
 
-    /* ═══════════════════════════════════════════════════════════
-       STATIC LOCATION DATA (from createorder)
-    ═══════════════════════════════════════════════════════════ */
-    const landmarkData = [
-      { name: "Park Bulvar",          price: 1.00 },
-      { name: "Dəniz Mall",           price: 2.00 },
-      { name: "Port Baku",            price: 1.00 },
-      { name: "Badamdar",             price: 2.00 },
-      { name: "Bakıxanov (Razin)",    price: 2.00 },
-      { name: "Balaxanı",             price: 3.00 },
-      { name: "Zığ",                  price: 8.00 },
-      { name: "Heydər Əliyev Liseyi", price: 5.00 },
-      { name: "Sulutəpə",             price: 2.00 },
-      { name: "Hökməli",              price: 5.00 },
-      { name: "Qobu",                 price: 8.00 },
-      { name: "Babək prospekti",      price: 1.00 },
-      { name: "8 noyabr prospekti",   price: 3.00 },
-      { name: "Günəşli",              price: 2.00 },
-      { name: "Xırdalan",             price: 2.00 },
-      { name: "Zirə",                 price: 8.00 },
-      { name: "Zabrat",               price: 8.00 },
-      { name: "Türkan",               price: 8.00 },
-      { name: "Şüvəlan",              price: 10.00 },
-      { name: "Şağan",                price: 8.00 },
-      { name: "Suraxanı",             price: 3.00 },
-      { name: "Yeni Suraxanı",        price: 3.00 },
-      { name: "Saray",                price: 6.00 },
-      { name: "Sabunçu",              price: 2.00 },
-      { name: "Ramana",               price: 2.00 },
-      { name: "Qaraçuxur",            price: 2.00 },
-      { name: "Qala",                 price: 8.00 },
-      { name: "Pirşağı",              price: 6.00 },
-      { name: "Novxanı",              price: 10.00 },
-      { name: "Nardaran",             price: 10.00 },
-      { name: "Mərdəkan",             price: 10.00 },
-      { name: "Məhəmmədi",            price: 1.00 },
-      { name: "Mehdiabad",            price: 6.00 },
-      { name: "Maştağa",              price: 10.00 },
-      { name: "Masazır",              price: 2.00 },
-      { name: "Lökbatan",             price: 10.00 },
-      { name: "Kürdəxanı",            price: 10.00 },
-      { name: "Hövsan",               price: 10.00 },
-      { name: "Görədil",              price: 10.00 },
-      { name: "Fatmayı",              price: 10.00 },
-      { name: "Əmircan",              price: 10.00 },
-      { name: "Əhmədli (Kənd)",       price: 10.00 },
-      { name: "Digah",                price: 10.00 },
-      { name: "Buzovna",              price: 10.00 },
-      { name: "Binəqədi",             price: 6.00 },
-      { name: "Binə",                 price: 8.00 },
-      { name: "Bilgəh",               price: 10.00 },
-      { name: "Biləcəri",             price: 2.00 },
-      { name: "Bibiheybət",           price: 10.00 },
-      { name: "Bayıl",                price: 3.00 },
-      { name: "Lökbatan Dairəsi",     price: 5.00 },
-      { name: "Şıxov",                price: 5.00 },
-      { name: "Baksol Yolu",          price: 2.00 },
-      { name: "Müşviq",               price: 10.00 },
-      { name: "Keşlə",                price: 2.00 }
-    ];
+  /* ═══════════════════════════════════════════════════
+     STATE
+  ═══════════════════════════════════════════════════ */
+  let currentUser      = '';
+  let currentUserPhone = '';
+  let globalOrdersData = [];
+  let coProductsCache  = [];
+  let coCart           = [];
+  let coDepositChecked = false;
+  let coReceiptImageB64 = '';
+  let coCustomProductImageB64 = '';
+  let coMapInstance    = null;
+  let coMarkerInstance = null;
+  let coMapOpen        = false;
+  let activeDateFilter = 'today';
 
-    const rayonData = [
-      "Abşeron","Ağcabədi","Ağdam","Ağdaş","Ağstafa","Ağsu","Astara",
-      "Babək","Balakən","Beyləqan","Bərdə","Biləsuvar",
-      "Cəbrayıl","Cəlilabad","Culfa",
-      "Daşkəsən","Füzuli",
-      "Gədəbəy","Gəncə","Goranboy","Göyçay","Göygöl",
-      "Hacıqabul","Xaçmaz","Xankəndi","Xocavənd","Xocalı","Xızı",
-      "İmişli","İsmayıllı",
-      "Kəlbəcər","Kəngərli","Kürdəmir",
-      "Qax","Qazax","Qəbələ","Qobustan","Quba","Qubadlı","Qusar",
-      "Laçın","Lerik","Lənkəran",
-      "Masallı","Mingəçevir",
-      "Naftalan","Naxçıvan","Neftçala",
-      "Oğuz","Ordubad",
-      "Saatlı","Sabirabad","Salyan","Samux","Sədərək","Siyəzən","Sumqayıt",
-      "Şabran","Şahbuz","Şamaxı","Şəki","Şəmkir","Şərur","Şirvan","Şuşa",
-      "Tərtər","Tovuz","Ucar",
-      "Yardımlı","Yevlax","Zaqatala","Zəngilan","Zərdab"
-    ];
+  /* ═══════════════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════════════ */
+  window.addEventListener('DOMContentLoaded', () => {
 
-    /* ═══════════════════════════════════════════════════════════
-       APPLICATION STATE
-    ═══════════════════════════════════════════════════════════ */
-    let currentUser      = '';
-    let globalOrdersData = [];
+    // ── 1. Read user from myprofile1 localStorage keys ──
+    // myprofile1.html stores user phone in browser localStorage via the partner login
+    const partnerUser = localStorage.getItem('partner_user') || null;
+    let partnerPhone  = '';
+    let partnerName   = '';
 
-    // createorder state
-    let coProductsCache        = [];
-    let coCart                 = [];
-    let coDepositChecked       = false;
-    let coReceiptImageB64      = '';
-    let coCustomProductImageB64 = '';
-    let coOrderImageB64        = '';
-    let coMapInstance          = null;
-    let coMarkerInstance       = null;
-    let coMapOpen              = false;
-
-    /* ═══════════════════════════════════════════════════════════
-       INITIALIZATION
-    ═══════════════════════════════════════════════════════════ */
-    window.addEventListener('DOMContentLoaded', () => {
-
-      // 1. Detect Username from URL or localStorage
-      const params  = new URLSearchParams(window.location.search);
-      const urlUser = params.get('username') || params.get('user');
-
-      if (urlUser) {
-        currentUser = urlUser;
-        localStorage.setItem('staff_username', currentUser);
-      } else {
-        currentUser = localStorage.getItem('staff_username') || '';
+    if (partnerUser) {
+      try {
+        const parsed = JSON.parse(partnerUser);
+        partnerPhone = parsed.phone || '';
+        partnerName  = parsed.name  || '';
+      } catch(_) {
+        // maybe it's stored as plain phone string
+        partnerPhone = partnerUser;
       }
+    }
 
-      const displayUser = currentUser ? currentUser : "Admin Modu (Hamısı)";
-      document.getElementById('displayUsername').textContent = displayUser;
+    // Also check common storage keys that partner portals use
+    if (!partnerPhone) partnerPhone = localStorage.getItem('partner_phone') || localStorage.getItem('user_phone') || localStorage.getItem('staff_userphone') || '';
+    if (!partnerName)  partnerName  = localStorage.getItem('partner_name')  || localStorage.getItem('user_name')  || localStorage.getItem('staff_username') || '';
 
-      // 2. Set salesRep hidden field = currentUser (staff username)
-      document.getElementById('salesRep').value = currentUser;
+    // URL param override (for staff links)
+    const params  = new URLSearchParams(window.location.search);
+    const urlUser = params.get('username') || params.get('user') || params.get('name') || '';
+    const urlPhone= params.get('phone') || '';
 
-      // 3. Load saved user phone from localStorage → fill input + use as salesRep phone
-      const savedPhone = localStorage.getItem('staff_userphone') || '';
-      document.getElementById('coUserPhone').value = savedPhone;
+    if (urlUser)  partnerName  = urlUser;
+    if (urlPhone) partnerPhone = urlPhone;
 
-      // 4. Set Default Dates
-      const today    = new Date().toISOString().split('T')[0];
-      const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+    currentUser      = partnerName  || partnerPhone || 'Satış Nümayəndəsi';
+    currentUserPhone = partnerPhone || '';
 
-      document.getElementById('deliveryDate').valueAsDate = (() => { const d = new Date(); d.setDate(d.getDate()+1); return d; })();
-      document.getElementById('filterStart').value = today;
-      document.getElementById('filterEnd').value   = tomorrow;
+    // Persist
+    if (partnerName)  localStorage.setItem('staff_username',  partnerName);
+    if (partnerPhone) localStorage.setItem('staff_userphone', partnerPhone);
 
-      // 5. Populate location dropdowns
-      const lmSel = document.getElementById('coLandmarkSelect');
-      landmarkData.forEach(item => {
-        const opt = document.createElement('option');
-        opt.value = item.name;
-        opt.text  = `${item.name} (+${item.price.toFixed(2)} ₼)`;
-        lmSel.appendChild(opt);
-      });
+    // ── 2. Update UI ──
+    const initials = currentUser.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    document.getElementById('avatarCircle').textContent   = initials || '?';
+    document.getElementById('displayUsername').textContent = currentUser;
+    document.getElementById('displayUserPhone').textContent = currentUserPhone || 'Nömrə qeydiyyatda yoxdur';
+    document.getElementById('salesRep').value              = currentUserPhone || currentUser;
 
-      const raySel = document.getElementById('coRayonSelect');
-      [...rayonData].sort().forEach(city => {
-        const opt = document.createElement('option');
-        opt.value = city;
-        opt.text  = `${city} (+4.00 ₼)`;
-        raySel.appendChild(opt);
-      });
-
-      // 6. Trigger payment UI
-      coHandlePaymentChange();
-
-      // 7. Load staff orders data
-      fetchAllData();
-
-      // 8. Load product catalog (non-blocking)
-      coLoadProducts();
+    // ── 3. Populate dropdowns ──
+    const lmSel = document.getElementById('coLandmarkSelect');
+    LANDMARK_DATA.forEach(item => {
+      const opt = new Option(`${item.name} (+${item.price.toFixed(2)} ₼)`, item.name);
+      lmSel.appendChild(opt);
     });
 
-    /* ═══════════════════════════════════════════════════════════
-       SAVE USER PHONE to localStorage
-    ═══════════════════════════════════════════════════════════ */
-    function saveUserPhone() {
-      const phone = document.getElementById('coUserPhone').value;
-      localStorage.setItem('staff_userphone', phone);
-    }
+    const raySel = document.getElementById('coRayonSelect');
+    [...RAYON_DATA].sort().forEach(city => {
+      const opt = new Option(`${city} (+4.00 ₼)`, city);
+      raySel.appendChild(opt);
+    });
 
-    /* ═══════════════════════════════════════════════════════════
-       NAVIGATION
-    ═══════════════════════════════════════════════════════════ */
-    function switchTab(tabId, btn) {
-      document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      btn.classList.add('active');
+    // ── 4. Default dates ──
+    const tom = new Date(); tom.setDate(tom.getDate() + 1);
+    document.getElementById('deliveryDate').valueAsDate = tom;
 
-      if (tabId === 'tab-list')  renderOrderList();
-      if (tabId === 'tab-stats') renderStats();
-    }
+    // ── 5. Default list filter: today ──
+    applyDateFilter('today', document.querySelector('.date-chip.active'));
 
-    /* ═══════════════════════════════════════════════════════════
-       STAFF DATA FETCHING (original sellerprofile logic)
-    ═══════════════════════════════════════════════════════════ */
-    async function fetchAllData() {
-      toggleLoader(true);
-      try {
-        const response = await fetch(`${STAFF_API}?action=getGlobalStats`);
-        const json     = await response.json();
+    // ── 6. Trigger payment UI ──
+    coHandlePaymentChange();
 
-        if (json.success) {
-          globalOrdersData = json.data;
-          if (currentUser) {
-            globalOrdersData = globalOrdersData.filter(o => o.staff === currentUser);
-          }
-          renderOrderList();
-          renderStats();
-        } else {
-          alert("Məlumatları yükləmək mümkün olmadı.");
+    // ── 7. Fetch data ──
+    fetchAllData();
+
+    // ── 8. Load catalog async ──
+    coLoadProducts();
+  });
+
+  /* ═══════════════════════════════════════════════════
+     NAVIGATION
+  ═══════════════════════════════════════════════════ */
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+
+    if (tabId === 'tab-list')  renderOrderList();
+    if (tabId === 'tab-stats') renderStats();
+  }
+
+  /* ═══════════════════════════════════════════════════
+     DATA FETCH
+  ═══════════════════════════════════════════════════ */
+  async function fetchAllData() {
+    toggleLoader(true);
+    try {
+      const res  = await fetch(`${ORDERS_API}?action=getGlobalStats`);
+      const json = await res.json();
+
+      if (json.success) {
+        globalOrdersData = json.data || [];
+
+        // Filter by sales rep phone or username
+        if (currentUserPhone) {
+          globalOrdersData = globalOrdersData.filter(o =>
+            o.staff === currentUserPhone ||
+            o.staff === currentUser ||
+            o.salesRepPhone === currentUserPhone
+          );
+        } else if (currentUser && currentUser !== 'Satış Nümayəndəsi') {
+          globalOrdersData = globalOrdersData.filter(o => o.staff === currentUser);
         }
-      } catch (error) {
-        console.error(error);
-        alert("İnternet xətası.");
-      } finally {
-        toggleLoader(false);
+
+        renderOrderList();
+        renderStats();
       }
+    } catch (err) {
+      console.error('fetchAllData:', err);
+    } finally {
+      toggleLoader(false);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════
+     DATE FILTER (List)
+  ═══════════════════════════════════════════════════ */
+  function applyDateFilter(type, btn) {
+    activeDateFilter = type;
+
+    // Update chip styles
+    document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    let start, end;
+
+    const fmt = d => d.toISOString().split('T')[0];
+
+    if (type === 'today') {
+      start = end = fmt(today);
+    } else if (type === 'next5') {
+      start = fmt(today);
+      const e = new Date(today); e.setDate(e.getDate() + 4);
+      end = fmt(e);
+    } else if (type === 'thisMonth') {
+      start = fmt(new Date(today.getFullYear(), today.getMonth(), 1));
+      end   = fmt(new Date(today.getFullYear(), today.getMonth() + 1, 0));
+    } else if (type === 'nextMonth') {
+      start = fmt(new Date(today.getFullYear(), today.getMonth() + 1, 1));
+      end   = fmt(new Date(today.getFullYear(), today.getMonth() + 2, 0));
+    } else if (type === 'custom') {
+      document.getElementById('customDateRow').style.display = 'block';
+      return; // Don't render yet; user picks dates
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       PRODUCT CATALOG — CATALOG_API (createorder logic)
-    ═══════════════════════════════════════════════════════════ */
-    async function coLoadProducts() {
-      const noteEl = document.getElementById('productsLoadingNote');
-      noteEl.style.display = 'block';
-      try {
-        const res  = await fetch(`${CATALOG_API}?action=getProductList`);
-        const data = await res.json();
-        if (data.success && Array.isArray(data.products)) {
-          coProductsCache = data.products;
-        }
-      } catch (err) {
-        console.warn('Product catalog unavailable:', err.message);
-      } finally {
-        noteEl.style.display = 'none';
-      }
+    document.getElementById('customDateRow').style.display = 'none';
+    document.getElementById('filterStart').value = start;
+    document.getElementById('filterEnd').value   = end;
+    renderOrderList();
+  }
+
+  /* ═══════════════════════════════════════════════════
+     RENDER ORDER LIST
+  ═══════════════════════════════════════════════════ */
+  function renderOrderList() {
+    const container = document.getElementById('ordersContainer');
+    const start = document.getElementById('filterStart').value;
+    const end   = document.getElementById('filterEnd').value;
+
+    container.innerHTML = '';
+
+    if (!start || !end) {
+      container.innerHTML = '<div class="empty-state"><i class="fa-regular fa-calendar-xmark"></i><p>Tarix aralığı seçin</p></div>';
+      return;
     }
 
-    function coSearchProducts() {
-      const query = document.getElementById('co-productSearch').value.toLowerCase().trim();
-      const list  = document.getElementById('coProductResults');
+    const filtered = globalOrdersData
+      .filter(o => o.date >= start && o.date <= end)
+      .sort((a, b) => (b.id || 0) - (a.id || 0));
 
-      if (!query) { list.style.display = 'none'; return; }
+    let totalRev = 0;
 
-      const matches = coProductsCache
-        .filter(p =>
-          (p.name && p.name.toLowerCase().includes(query)) ||
-          (p.code && String(p.code).toLowerCase().includes(query))
-        )
-        .slice(0, 10);
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-box-open"></i><p>Bu tarixdə sifariş tapılmadı</p></div>';
+    } else {
+      filtered.forEach(o => {
+        totalRev += parseFloat(o.revenue || 0);
 
-      let html = '';
+        const statusMap = {
+          Delivered: 'Delivered', delivered: 'Delivered',
+          Preparing: 'Preparing', pending: 'Pending', Pending: 'Pending',
+          New: 'Pending', new: 'Pending',
+          OnWay: 'OnWay', onway: 'OnWay',
+          Deleted: 'Deleted', deleted: 'Deleted'
+        };
+        const badgeClass = statusMap[o.status] || 'Pending';
+        const statusLabel = {
+          Delivered:'Çatdırıldı', Preparing:'Hazırlanır', Pending:'Gözləyir',
+          OnWay:'Yoldadır', Deleted:'Ləğv'
+        }[badgeClass] || o.status;
 
-      if (matches.length > 0) {
-        html = matches.map(p => {
-          const safeData = encodeURIComponent(JSON.stringify(p));
-          const imgTag   = p.image
-            ? `<img src="${coEscapeHtml(p.image)}" class="product-result-img" onerror="this.style.display='none'">`
-            : `<div class="product-result-img-placeholder"><i class="fa-solid fa-box"></i></div>`;
+        const revenueNum = parseFloat(o.revenue || 0);
 
-          return `
-            <div class="product-result-item"
-                 onclick="coSelectProduct(JSON.parse(decodeURIComponent('${safeData}')))">
-              ${imgTag}
-              <div style="min-width:0; flex:1;">
-                <div class="product-result-name">${coEscapeHtml(p.name || '')}</div>
-                <div class="product-result-meta">Kod: ${coEscapeHtml(String(p.code || '—'))}</div>
-                <div class="product-result-price">${parseFloat(p.price || 0).toFixed(2)} ₼</div>
-              </div>
-            </div>`;
-        }).join('');
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="order-card-header">
+            <span class="order-id">#${o.id || '—'}</span>
+            <span class="badge ${badgeClass}">${statusLabel}</span>
+          </div>
+
+          <div class="row-detail">
+            <span class="label-detail">Müştəri</span>
+            <span class="val-detail">${esc(o.name || '—')}</span>
+          </div>
+          ${o.phone ? `<div class="row-detail">
+            <span class="label-detail">Telefon</span>
+            <span class="val-detail"><a href="tel:${esc(o.phone)}" style="color:var(--primary);text-decoration:none;font-weight:700;">${esc(o.phone)}</a></span>
+          </div>` : ''}
+          <div class="row-detail">
+            <span class="label-detail">Məbləğ</span>
+            <span class="val-detail" style="color:var(--primary);font-weight:800;">${revenueNum.toFixed(2)} ₼</span>
+          </div>
+          ${o.address ? `<div class="row-detail">
+            <span class="label-detail">Ünvan</span>
+            <span class="val-detail">${esc(o.address)}</span>
+          </div>` : ''}
+          ${o.timeSlot ? `<div class="row-detail">
+            <span class="label-detail">Vaxt</span>
+            <span class="val-detail">${esc(o.timeSlot)}</span>
+          </div>` : ''}
+          ${o.courier ? `<div class="row-detail">
+            <span class="label-detail">Kuriyer</span>
+            <span class="val-detail">${esc(o.courier)}</span>
+          </div>` : ''}
+
+          ${o.products ? `<div style="margin-top:8px;">
+            <div class="label-detail" style="display:block;margin-bottom:5px;">Məhsullar</div>
+            <div class="products-box">${esc(o.products)}</div>
+          </div>` : ''}
+
+          <div class="note-area" style="margin-top:12px;">
+            <label style="margin-bottom:5px;">Qeyd</label>
+            <textarea id="note-${o.id}" rows="2" class="note-textarea"
+              placeholder="Qeyd əlavə et...">${esc(o.note || '')}</textarea>
+            <div style="text-align:right;margin-top:6px;">
+              <button class="btn btn-primary btn-sm" onclick="saveNote('${o.id}')">
+                <i class="fa-solid fa-floppy-disk"></i> Saxla
+              </button>
+            </div>
+          </div>
+
+          <div style="text-align:right;font-size:11px;color:#C7C7CC;margin-top:8px;">${o.date || ''}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    document.getElementById('listTotalCount').textContent   = filtered.length;
+    document.getElementById('listTotalRevenue').textContent = totalRev.toFixed(2) + ' ₼';
+  }
+
+  /* ═══════════════════════════════════════════════════
+     SAVE NOTE
+  ═══════════════════════════════════════════════════ */
+  async function saveNote(orderId) {
+    const field = document.getElementById(`note-${orderId}`);
+    const newNote = field.value;
+    const btn = field.nextElementSibling.querySelector('button');
+    const orig = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+
+    const form = new URLSearchParams();
+    form.append('action',  'updateOrderNote');
+    form.append('orderId', orderId);
+    form.append('newNote', newNote);
+
+    try {
+      const res  = await fetch(ORDERS_API, { method: 'POST', body: form });
+      const data = await res.json();
+
+      if (data.success) {
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Saxlandı';
+        btn.style.background = 'var(--success)';
+        const order = globalOrdersData.find(o => o.id == orderId);
+        if (order) order.note = newNote;
+        setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; btn.disabled = false; }, 2200);
+      } else {
+        alert('Xəta: ' + (data.message || ''));
+        btn.innerHTML = orig; btn.disabled = false;
       }
+    } catch (err) {
+      alert('İnternet xətası');
+      btn.innerHTML = orig; btn.disabled = false;
+    }
+  }
 
-      html += `
-        <div class="product-not-found-row">
-          <p>${matches.length > 0 ? 'Başqa məhsul axtarırsınız?' : 'Məhsul tapılmadı.'}</p>
-          <button type="button" class="btn-custom-product" onclick="coShowCustomProduct()">
-            <i class="fa-solid fa-plus"></i> Əl ilə daxil et
+  /* ═══════════════════════════════════════════════════
+     RENDER STATS
+  ═══════════════════════════════════════════════════ */
+  function renderStats() {
+    const period = document.getElementById('statsPeriod').value;
+    const now    = new Date();
+    let start, end;
+    const fmt = d => d.toISOString().split('T')[0];
+
+    if (period === 'today') {
+      start = end = fmt(now);
+    } else if (period === 'yesterday') {
+      const y = new Date(now); y.setDate(y.getDate()-1); start = end = fmt(y);
+    } else if (period === 'thisMonth') {
+      start = fmt(new Date(now.getFullYear(), now.getMonth(), 1));
+      end   = fmt(new Date(now.getFullYear(), now.getMonth()+1, 0));
+    } else if (period === 'lastMonth') {
+      start = fmt(new Date(now.getFullYear(), now.getMonth()-1, 1));
+      end   = fmt(new Date(now.getFullYear(), now.getMonth(), 0));
+    } else {
+      start = '2020-01-01'; end = '2030-12-31';
+    }
+
+    const orders   = globalOrdersData.filter(o => o.date >= start && o.date <= end && o.status !== 'Deleted' && o.status !== 'deleted');
+    const count    = orders.length;
+    const revenue  = orders.reduce((s, o) => s + (parseFloat(o.revenue) || 0), 0);
+    const delivered = orders.filter(o => o.status === 'Delivered' || o.status === 'delivered').length;
+    const rate     = count > 0 ? ((delivered / count) * 100).toFixed(0) : 0;
+    const aov      = count > 0 ? (revenue / count).toFixed(2) : '0.00';
+
+    document.getElementById('statRevenue').textContent = revenue.toFixed(2) + ' ₼';
+    document.getElementById('statCount').textContent   = count;
+    document.getElementById('statRate').textContent    = `${rate}% (${delivered})`;
+    document.getElementById('statAOV').textContent     = aov + ' ₼';
+
+    // Progress bar (target: 5000 AZN/month)
+    const target = 5000;
+    const pct    = Math.min((revenue / target) * 100, 100).toFixed(1);
+    document.getElementById('statProgressFill').style.width = pct + '%';
+    document.getElementById('statProgressLabel').textContent = `${revenue.toFixed(2)} / ${target} ₼`;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     PRODUCT CATALOG
+  ═══════════════════════════════════════════════════ */
+  async function coLoadProducts() {
+    const note = document.getElementById('productsLoadingNote');
+    note.style.display = 'block';
+    try {
+      const res  = await fetch(`${CATALOG_API}?action=getProductList`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.products)) {
+        coProductsCache = data.products;
+      }
+    } catch(e) {
+      console.warn('Catalog unavailable:', e.message);
+    } finally {
+      note.style.display = 'none';
+    }
+  }
+
+  function coSearchProducts() {
+    const query = document.getElementById('co-productSearch').value.toLowerCase().trim();
+    const list  = document.getElementById('coProductResults');
+
+    if (!query) { list.style.display = 'none'; return; }
+
+    const matches = coProductsCache.filter(p =>
+      (p.name && p.name.toLowerCase().includes(query)) ||
+      (p.code && String(p.code).toLowerCase().includes(query))
+    ).slice(0, 10);
+
+    let html = '';
+
+    if (matches.length > 0) {
+      html = matches.map(p => {
+        const safeData = encodeURIComponent(JSON.stringify(p));
+        const imgTag   = p.image
+          ? `<img src="${esc(p.image)}" class="product-result-img" onerror="this.style.display='none'">`
+          : `<div class="product-result-img-placeholder"><i class="fa-solid fa-box"></i></div>`;
+        return `
+          <div class="product-result-item"
+            onclick="coSelectProduct(JSON.parse(decodeURIComponent('${safeData}')))">
+            ${imgTag}
+            <div style="min-width:0;flex:1;">
+              <div class="product-result-name">${esc(p.name || '')}</div>
+              <div class="product-result-meta">Kod: ${esc(String(p.code || '—'))}</div>
+              <div class="product-result-price">${parseFloat(p.price || 0).toFixed(2)} ₼</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    html += `
+      <div class="product-not-found-row">
+        <p>${matches.length > 0 ? 'Başqa məhsul axtarırsınız?' : 'Məhsul tapılmadı.'}</p>
+        <button type="button" class="btn-custom-product" onclick="coShowCustomProduct()">
+          <i class="fa-solid fa-plus"></i> Əl ilə daxil et
+        </button>
+      </div>`;
+
+    list.innerHTML     = html;
+    list.style.display = 'block';
+  }
+
+  function coSelectProduct(product) {
+    coCart.push({
+      name:     product.name  || '',
+      code:     product.code  || '—',
+      price:    parseFloat(product.price || 0),
+      image:    product.image || '',
+      isCustom: false
+    });
+
+    document.getElementById('coProductResults').style.display = 'none';
+    document.getElementById('co-productSearch').value = '';
+    document.getElementById('coCustomProductSection').style.display = 'none';
+
+    coRenderCart();
+    Swal.fire({ toast:true, position:'top-end', showConfirmButton:false, timer:1400, icon:'success', title:'Səbətə əlavə edildi' });
+  }
+
+  function coShowCustomProduct() {
+    document.getElementById('coProductResults').style.display = 'none';
+    document.getElementById('coCustomProductSection').style.display = 'block';
+  }
+
+  function coCancelCustomProduct() {
+    document.getElementById('coCustomProductSection').style.display = 'none';
+    document.getElementById('coCustomProductName').value  = '';
+    document.getElementById('coCustomProductPrice').value = '';
+    coCustomProductImageB64 = '';
+    resetUploadArea('coCustomProductUploadArea', 'coCustomProductUploadContent', '📷', 'Şəkil əlavə et');
+  }
+
+  function coAddCustomProductToCart() {
+    const name  = document.getElementById('coCustomProductName').value.trim();
+    let   price = parseFloat(document.getElementById('coCustomProductPrice').value);
+    if (!name) return Swal.fire('Diqqət', 'Məhsulun adını yazın.', 'warning');
+    if (isNaN(price) || price < 0) price = 0;
+
+    coCart.push({ name, code:'CUSTOM', price, image: coCustomProductImageB64 || '', isCustom:true });
+    coCancelCustomProduct();
+    coRenderCart();
+    Swal.fire({ toast:true, position:'top-end', showConfirmButton:false, timer:1400, icon:'success', title:'Səbətə əlavə edildi' });
+  }
+
+  function coRenderCart() {
+    const container = document.getElementById('coCartContainer');
+    const list      = document.getElementById('coCartItemsList');
+
+    if (coCart.length === 0) { container.style.display = 'none'; coUpdateCartTotals(); return; }
+
+    container.style.display = 'block';
+    list.innerHTML = coCart.map((item, i) => {
+      const imgHtml = item.image
+        ? `<img src="${esc(item.image)}" class="cart-item-img" onerror="this.style.display='none'">`
+        : `<div class="cart-item-img-placeholder"><i class="fa-solid fa-box"></i></div>`;
+      return `
+        <div class="cart-item-card">
+          ${imgHtml}
+          <div class="cart-item-info">
+            <div class="cart-item-name">${esc(item.name)}</div>
+            <div class="cart-item-code">Kod: ${esc(item.code)}</div>
+            <div class="cart-item-price">${item.price.toFixed(2)} ₼</div>
+          </div>
+          <button type="button" class="cart-item-remove" onclick="coRemoveFromCart(${i})">
+            <i class="fa-solid fa-trash"></i>
           </button>
         </div>`;
+    }).join('');
 
-      list.innerHTML     = html;
-      list.style.display = 'block';
+    coUpdateCartTotals();
+  }
+
+  function coUpdateCartTotals() {
+    const subtotal  = coCart.reduce((s, p) => s + p.price, 0);
+    const courier   = parseFloat(document.getElementById('courierCostCo').value) || 0;
+    const total     = subtotal + courier;
+
+    document.getElementById('coCartSubtotal')?.innerText     && (document.getElementById('coCartSubtotal').innerText = subtotal.toFixed(2) + ' ₼');
+    document.getElementById('coCartCourierDisplay')?.innerText && (document.getElementById('coCartCourierDisplay').innerText = courier.toFixed(2) + ' ₼');
+    document.getElementById('coCartTotalPrice')?.innerText   && (document.getElementById('coCartTotalPrice').innerText = total.toFixed(2) + ' ₼');
+  }
+
+  function coRemoveFromCart(index) {
+    coCart.splice(index, 1);
+    coRenderCart();
+  }
+
+  function coHandleCustomProductImageChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    compressImage(file, (b64, preview) => {
+      coCustomProductImageB64 = b64;
+      updateUploadArea('coCustomProductUploadArea', 'coCustomProductUploadContent', preview);
+    });
+  }
+
+
+/* ═══════════════════════════════════════════════════
+     LOCATION / MAP
+  ═══════════════════════════════════════════════════ */
+  function coSwitchLoc(type, btn) {
+    document.querySelectorAll('.loc-content').forEach(el => el.classList.remove('active'));
+    document.getElementById('co-loc-' + type).classList.add('active');
+    document.querySelectorAll('.loc-tab').forEach(el => el.classList.remove('active'));
+    btn.classList.add('active');
+    coUpdateDeliveryCost();
+  }
+
+  function coUpdateDeliveryCost() {
+    const isLandmark = document.getElementById('co-loc-landmark').classList.contains('active');
+    const isRayon    = document.getElementById('co-loc-rayon').classList.contains('active');
+
+    let cost = 0;
+
+    if (isLandmark) {
+      const landmark = document.getElementById('coLandmarkSelect').value;
+      const lm = LANDMARK_DATA.find(i => i.name === landmark);
+      if (lm) cost = lm.price;
+    } else if (isRayon) {
+      const rayon = document.getElementById('coRayonSelect').value;
+      if (rayon) cost = 4;
+    } // Metro is always 0
+
+    const costInput = document.getElementById('courierCostCo');
+    if (costInput) {
+      costInput.value = cost;
+      coUpdateCartTotals();
     }
+  }
 
-    function coSelectProduct(product) {
-      coCart.push({
-        name:     product.name || '',
-        code:     product.code || '—',
-        price:    parseFloat(product.price || 0),
-        image:    product.image || '',
-        isCustom: false
-      });
-
-      document.getElementById('coProductResults').style.display = 'none';
-      document.getElementById('co-productSearch').value = '';
-      document.getElementById('coCustomProductSection').style.display = 'none';
-
-      coRenderCart();
-      Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, icon: 'success', title: 'Səbətə əlavə edildi' });
+  function coToggleMapSection() {
+    coMapOpen = !coMapOpen;
+    const sec   = document.getElementById('coMapOptionalSection');
+    const check = document.getElementById('coMapToggleCheck');
+    if (coMapOpen) {
+      sec.style.display = 'block';
+      check.classList.add('checked');
+      check.innerHTML = '<i class="fa-solid fa-check" style="font-size:10px;"></i>';
+      setTimeout(() => { coInitMap(); if (coMapInstance) coMapInstance.invalidateSize(); }, 320);
+    } else {
+      sec.style.display = 'none';
+      check.classList.remove('checked');
+      check.innerHTML = '';
+      document.getElementById('coMapCoordinatesLink').value     = '';
+      document.getElementById('coLocationStatus').style.display = 'none';
     }
+  }
 
-    function coShowCustomProduct() {
-      document.getElementById('coProductResults').style.display = 'none';
-      document.getElementById('coCustomProductSection').style.display = 'block';
+  function coInitMap() {
+    if (coMapInstance) return;
+    coMapInstance    = L.map('coMap').setView([40.4093, 49.8671], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:'© OpenStreetMap', maxZoom:19
+    }).addTo(coMapInstance);
+    coMarkerInstance = L.marker([40.4093, 49.8671], { draggable:true }).addTo(coMapInstance);
+    coMarkerInstance.on('dragend', () => coSaveMapLoc(coMarkerInstance.getLatLng()));
+    coMapInstance.on('click', e => { coMarkerInstance.setLatLng(e.latlng); coSaveMapLoc(e.latlng); });
+  }
+
+  function coSaveMapLoc(latlng) {
+    document.getElementById('coMapCoordinatesLink').value     = `https://maps.google.com/?q=${latlng.lat},${latlng.lng}`;
+    document.getElementById('coLocationStatus').style.display = 'block';
+  }
+
+  function coGetCurrentLocation() {
+    if (!navigator.geolocation) return Swal.fire('Xəta', 'Brauzeriniz mövqe dəstəkləmir.', 'error');
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const ll = new L.LatLng(pos.coords.latitude, pos.coords.longitude);
+        if (coMarkerInstance) { coMarkerInstance.setLatLng(ll); coMapInstance.setView(ll, 16); }
+        coSaveMapLoc(ll);
+      },
+      () => Swal.fire('Xəta', 'Mövqe götürülə bilmədi.', 'error')
+    );
+  }
+
+  /* ═══════════════════════════════════════════════════
+     PAYMENT UI
+  ═══════════════════════════════════════════════════ */
+  function coHandlePaymentChange() {
+    const method = document.getElementById('coPayMethod').value;
+    document.getElementById('coDepositOfferBox').style.display = method === 'cash' ? 'block' : 'none';
+    document.getElementById('coCardReceiptBox').style.display  = method === 'card' ? 'block' : 'none';
+
+    if (method === 'card') {
+      if (coDepositChecked) coToggleDeposit();
+      coReceiptImageB64 = '';
     }
+  }
 
-    function coCancelCustomProduct() {
-      document.getElementById('coCustomProductSection').style.display = 'none';
-      document.getElementById('coCustomProductName').value  = '';
-      document.getElementById('coCustomProductPrice').value = '';
-      coCustomProductImageB64 = '';
-      coResetUploadArea('coCustomProductUploadArea', 'coCustomProductUploadContent', '📷', 'Şəkil əlavə et');
+  function coToggleDeposit() {
+    coDepositChecked = !coDepositChecked;
+    const cb    = document.getElementById('coDepositCheckbox');
+    const badge = document.getElementById('coDiscountBadge');
+    const sec   = document.getElementById('coDepositReceiptSection');
+
+    if (coDepositChecked) {
+      cb.classList.add('checked');
+      cb.innerHTML        = '<i class="fa-solid fa-check" style="font-size:10px;"></i>';
+      badge.style.display = 'flex';
+      sec.style.display   = 'block';
+    } else {
+      cb.classList.remove('checked');
+      cb.innerHTML        = '';
+      badge.style.display = 'none';
+      sec.style.display   = 'none';
+      coReceiptImageB64   = '';
+      document.getElementById('coDepositReceiptInput').value = '';
+      resetUploadArea('coDepositReceiptUploadArea', 'coDepositReceiptContent', '🧾', 'Ödəniş qəbzini əlavə et');
     }
+  }
 
-    function coAddCustomProductToCart() {
-      const nameInput  = document.getElementById('coCustomProductName');
-      const priceInput = document.getElementById('coCustomProductPrice');
-      const name       = nameInput.value.trim();
-      let   price      = parseFloat(priceInput.value);
+  function coHandleReceiptImageChange(event, type) {
+    const file      = event.target.files[0];
+    if (!file) return;
+    const areaId    = type === 'deposit' ? 'coDepositReceiptUploadArea' : 'coCardReceiptUploadArea';
+    const contentId = type === 'deposit' ? 'coDepositReceiptContent'    : 'coCardReceiptContent';
 
-      if (!name) return Swal.fire('Diqqət', 'Məhsulun adını yazın.', 'warning');
-      if (isNaN(price) || price < 0) price = 0;
-
-      coCart.push({
-        name:     name,
-        code:     'CUSTOM',
-        price:    price,
-        image:    coCustomProductImageB64 || '',
-        isCustom: true
-      });
-
-      coCancelCustomProduct();
-      coRenderCart();
-      Swal.fire({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, icon: 'success', title: 'Səbətə əlavə edildi' });
-    }
-
-    function coRenderCart() {
-      const container = document.getElementById('coCartContainer');
-      const list      = document.getElementById('coCartItemsList');
-      const totalEl   = document.getElementById('coCartTotalPrice');
-
-      if (coCart.length === 0) {
-        container.style.display = 'none';
-        return;
-      }
-
-      container.style.display = 'block';
-      let html  = '';
-      let total = 0;
-
-      coCart.forEach((item, index) => {
-        total += item.price;
-        const imgHtml = item.image
-          ? `<img src="${coEscapeHtml(item.image)}" class="selected-product-img" onerror="this.style.display='none'">`
-          : `<div class="selected-product-img-placeholder"><i class="fa-solid fa-box"></i></div>`;
-
-        html += `
-          <div class="selected-product-card" style="display:flex; margin-top:8px;">
-            <div class="selected-product-inner" style="flex:1;">
-              ${imgHtml}
-              <div class="selected-product-info">
-                <div class="selected-product-name">${coEscapeHtml(item.name)}</div>
-                <div class="selected-product-code">Kod: ${coEscapeHtml(item.code)}</div>
-                <div class="selected-product-price">${item.price.toFixed(2)} ₼</div>
-              </div>
-            </div>
-            <button type="button" class="clear-product-btn" onclick="coRemoveFromCart(${index})">
-              <i class="fa-solid fa-trash" style="color:var(--cp-primary);"></i>
-            </button>
-          </div>`;
-      });
-
-      list.innerHTML       = html;
-      totalEl.innerText    = total.toFixed(2) + ' ₼';
-    }
-
-    function coRemoveFromCart(index) {
-      coCart.splice(index, 1);
-      coRenderCart();
-    }
-
-    function coHandleCustomProductImageChange(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      coCompressImage(file, (b64, preview) => {
-        coCustomProductImageB64 = b64;
-        coUpdateUploadArea('coCustomProductUploadArea', 'coCustomProductUploadContent', preview);
-      });
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       ORDER IMAGE (from original sellerprofile: mandatory screenshot)
-    ═══════════════════════════════════════════════════════════ */
-    function coHandleOrderImageChange(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      coCompressImage(file, (b64, preview) => {
-        coOrderImageB64 = b64;
-        coUpdateUploadArea('coOrderImgArea', 'coOrderImgContent', preview);
-      });
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       LOCATION / MAP
-    ═══════════════════════════════════════════════════════════ */
-    function coSwitchLoc(type, btn) {
-      document.querySelectorAll('.loc-content').forEach(el => el.classList.remove('active'));
-      document.getElementById('co-loc-' + type).classList.add('active');
-      document.querySelectorAll('.loc-tab').forEach(el => el.classList.remove('active'));
-      btn.classList.add('active');
-    }
-
-    function coToggleMapSection() {
-      coMapOpen = !coMapOpen;
-      const sec   = document.getElementById('coMapOptionalSection');
-      const check = document.getElementById('coMapToggleCheck');
-
-      if (coMapOpen) {
-        sec.style.display = 'block';
-        check.classList.add('checked');
-        check.innerHTML = '<i class="fa-solid fa-check" style="font-size:11px;"></i>';
-        setTimeout(() => { coInitMap(); if (coMapInstance) coMapInstance.invalidateSize(); }, 300);
-      } else {
-        sec.style.display = 'none';
-        check.classList.remove('checked');
-        check.innerHTML = '';
-        document.getElementById('coMapCoordinatesLink').value      = '';
-        document.getElementById('coLocationStatus').style.display = 'none';
-      }
-    }
-
-    function coInitMap() {
-      if (coMapInstance) return;
-      coMapInstance = L.map('coMap').setView([40.4093, 49.8671], 12);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap', maxZoom: 19
-      }).addTo(coMapInstance);
-      coMarkerInstance = L.marker([40.4093, 49.8671], { draggable: true }).addTo(coMapInstance);
-      coMarkerInstance.on('dragend', () => coSaveMapLoc(coMarkerInstance.getLatLng()));
-      coMapInstance.on('click', e => { coMarkerInstance.setLatLng(e.latlng); coSaveMapLoc(e.latlng); });
-    }
-
-    function coSaveMapLoc(latlng) {
-      document.getElementById('coMapCoordinatesLink').value      = `https://maps.google.com/?q=${latlng.lat},${latlng.lng}`;
-      document.getElementById('coLocationStatus').style.display = 'block';
-    }
-
-    function coGetCurrentLocation() {
-      if (!navigator.geolocation) return Swal.fire('Xəta', 'Brauzeriniz mövqe dəstəkləmir.', 'error');
-      const btn  = document.querySelector('#coMapOptionalSection .btn-map');
-      const orig = btn.innerHTML;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Təyin edilir...';
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          const ll = new L.LatLng(pos.coords.latitude, pos.coords.longitude);
-          if (coMarkerInstance) { coMarkerInstance.setLatLng(ll); coMapInstance.setView(ll, 16); }
-          coSaveMapLoc(ll);
-          btn.innerHTML = orig;
-        },
-        () => { btn.innerHTML = orig; Swal.fire('Xəta', 'Mövqe götürülə bilmədi.', 'error'); }
-      );
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       PAYMENT UI
-    ═══════════════════════════════════════════════════════════ */
-    function coHandlePaymentChange() {
-      const method     = document.getElementById('coPayMethod').value;
-      const depositBox = document.getElementById('coDepositOfferBox');
-      const cardBox    = document.getElementById('coCardReceiptBox');
-
-      if (method === 'cash') {
-        depositBox.style.display = 'block';
-        cardBox.style.display    = 'none';
-        coReceiptImageB64 = '';
-        document.getElementById('coCardReceiptInput').value = '';
-        coResetUploadArea('coCardReceiptUploadArea', 'coCardReceiptContent', '🧾', 'Bank köçürmə qəbzini əlavə et');
-      } else {
-        depositBox.style.display = 'none';
-        cardBox.style.display    = 'block';
-        if (coDepositChecked) coToggleDeposit();
-      }
-    }
-
-    function coToggleDeposit() {
-      coDepositChecked = !coDepositChecked;
-      const cb    = document.getElementById('coDepositCheckbox');
-      const badge = document.getElementById('coDiscountBadge');
-      const sec   = document.getElementById('coDepositReceiptSection');
-
-      if (coDepositChecked) {
-        cb.classList.add('checked');
-        cb.innerHTML        = '<i class="fa-solid fa-check" style="font-size:11px;"></i>';
-        badge.style.display = 'flex';
-        sec.style.display   = 'block';
-      } else {
-        cb.classList.remove('checked');
-        cb.innerHTML        = '';
-        badge.style.display = 'none';
-        sec.style.display   = 'none';
-        coReceiptImageB64   = '';
-        document.getElementById('coDepositReceiptInput').value = '';
-        coResetUploadArea('coDepositReceiptUploadArea', 'coDepositReceiptContent', '🧾', 'Ödəniş qəbzini əlavə et');
-      }
-    }
-
-    function coHandleReceiptImageChange(event, type) {
-      const file      = event.target.files[0];
-      if (!file) return;
-      const areaId    = type === 'deposit' ? 'coDepositReceiptUploadArea' : 'coCardReceiptUploadArea';
-      const contentId = type === 'deposit' ? 'coDepositReceiptContent'    : 'coCardReceiptContent';
-
-      if (file.type === 'application/pdf') {
-        const reader = new FileReader();
-        reader.onload = ev => {
-          coReceiptImageB64 = ev.target.result;
-          document.getElementById(areaId).classList.add('has-image');
-          document.getElementById(contentId).innerHTML = `
-            <div style="font-size:36px;">📄</div>
-            <div class="image-upload-text" style="color:var(--success);font-weight:700;">${coEscapeHtml(file.name)}</div>`;
-        };
-        reader.readAsDataURL(file);
-      } else {
-        coCompressImage(file, (b64, preview) => {
-          coReceiptImageB64 = b64;
-          coUpdateUploadArea(areaId, contentId, preview);
-        });
-      }
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       IMAGE HELPERS
-    ═══════════════════════════════════════════════════════════ */
-    function coCompressImage(file, callback) {
+    if (file.type === 'application/pdf') {
       const reader = new FileReader();
       reader.onload = ev => {
-        const img = new Image();
-        img.onload = () => {
-          const MAX = 1200;
-          let w = img.width, h = img.height;
-          if (w > MAX || h > MAX) {
-            if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-            else        { w = Math.round(w * MAX / h); h = MAX; }
-          }
-          const cvs = document.createElement('canvas');
-          cvs.width = w; cvs.height = h;
-          cvs.getContext('2d').drawImage(img, 0, 0, w, h);
-          const b64 = cvs.toDataURL('image/jpeg', 0.75);
-          callback(b64, b64);
-        };
-        img.src = ev.target.result;
+        coReceiptImageB64 = ev.target.result;
+        document.getElementById(areaId).classList.add('has-image');
+        document.getElementById(contentId).innerHTML = `
+          <div style="font-size:32px;">📄</div>
+          <div class="image-upload-text" style="color:var(--success);font-weight:700;">${esc(file.name)}</div>`;
       };
       reader.readAsDataURL(file);
+    } else {
+      compressImage(file, (b64, preview) => {
+        coReceiptImageB64 = b64;
+        updateUploadArea(areaId, contentId, preview);
+      });
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════
+     FORM SUBMIT
+  ═══════════════════════════════════════════════════ */
+  document.getElementById('customerOrderForm').addEventListener('submit', async e => {
+    e.preventDefault();
+
+    // Validations
+    if (!document.getElementById('custName').value.trim())
+      return Swal.fire('Diqqət', 'Ad və Soyadı daxil edin.', 'warning');
+    if (!document.getElementById('custPhone').value.trim())
+      return Swal.fire('Diqqət', 'Əlaqə nömrəsini daxil edin.', 'warning');
+    if (!document.getElementById('timeSlot').value)
+      return Swal.fire('Diqqət', 'Çatdırılma saat aralığını seçin.', 'warning');
+    if (coCart.length === 0)
+      return Swal.fire('Diqqət', 'Səbətə ən azı bir məhsul əlavə edin.', 'warning');
+
+    // Address validation
+    const isMetro    = document.getElementById('co-loc-metro').classList.contains('active');
+    const isLandmark = document.getElementById('co-loc-landmark').classList.contains('active');
+    const isRayon    = document.getElementById('co-loc-rayon').classList.contains('active');
+
+    const metro    = document.getElementById('coMetroSelect').value;
+    const landmark = document.getElementById('coLandmarkSelect').value;
+    const rayon    = document.getElementById('coRayonSelect').value;
+
+    let finalAddress = '';
+    let deliveryCost = 0;
+
+    if (isMetro) {
+      if (!metro) return Swal.fire('Diqqət', 'Metro stansiyasını seçin.', 'warning');
+      finalAddress = `Metro: ${metro}`;
+    } else if (isLandmark) {
+      if (!landmark) return Swal.fire('Diqqət', 'Nişangahı seçin.', 'warning');
+      finalAddress = `Nişangah: ${landmark}`;
+      const lm = LANDMARK_DATA.find(i => i.name === landmark);
+      if (lm) deliveryCost = lm.price;
+    } else if (isRayon) {
+      if (!rayon) return Swal.fire('Diqqət', 'Rayon/şəhər seçin.', 'warning');
+      finalAddress = `Rayon: ${rayon}`;
+      deliveryCost = 4;
     }
 
-    function coUpdateUploadArea(areaId, contentId, previewUrl) {
-      document.getElementById(areaId).classList.add('has-image');
-      document.getElementById(contentId).innerHTML = `
-        <img src="${previewUrl}" class="image-preview-thumb">
-        <div class="image-upload-text" style="color:var(--success); font-weight:700;">
-          <i class="fa-solid fa-check"></i> Əlavə olundu
-        </div>`;
-    }
+    const extraDetails = document.getElementById('coAddressDetails').value.trim();
+    if (extraDetails) finalAddress += `, ${extraDetails}`;
 
-    function coResetUploadArea(areaId, contentId, icon, text) {
-      const area = document.getElementById(areaId);
-      const cont = document.getElementById(contentId);
-      if (area) area.classList.remove('has-image');
-      if (cont) cont.innerHTML = `
-        <div class="image-upload-icon">${icon}</div>
-        <div class="image-upload-text">${text}</div>`;
-    }
+    const manualCourier = parseFloat(document.getElementById('courierCostCo').value) || 0;
+    if (manualCourier > 0) deliveryCost = manualCourier;
 
-    function coEscapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    }
+    // Payment validation
+    const payMethod = document.getElementById('coPayMethod').value;
+    if (payMethod === 'card' && !coReceiptImageB64)
+      return Swal.fire('Diqqət', 'Kart ilə ödəniş üçün bank köçürmə qəbzini əlavə edin.', 'warning');
+    if (payMethod === 'cash' && coDepositChecked && !coReceiptImageB64)
+      return Swal.fire('Diqqət', 'Beh ödənişinin qəbzini əlavə edin.', 'warning');
 
-    /* ═══════════════════════════════════════════════════════════
-       FORM SUBMISSION
-      Sends to ORDERS_API (createorder Backend 2)
-      Also includes staff order data sent to STAFF_API for the list/stats
-    ═══════════════════════════════════════════════════════════ */
-    document.getElementById('customerOrderForm').addEventListener('submit', async e => {
-      e.preventDefault();
+    // Build product fields
+    const productName  = coCart.map(p => p.name).join(' + ');
+    const productCode  = coCart.map(p => p.code).join(', ');
+    const productPrice = coCart.reduce((s, p) => s + p.price, 0);
+    const customImage  = coCart.find(p => p.isCustom && p.image)?.image || '';
 
-      // — Sales rep / user phone —
-      const salesRepPhone = document.getElementById('coUserPhone').value.trim();
-      if (!salesRepPhone) {
-        return Swal.fire('Diqqət', 'Zəhmət olmasa telefon nömrənizi daxil edin.', 'warning');
-      }
+    const discountApplied = (payMethod === 'cash' && coDepositChecked) ? 4  : 0;
+    const depositPaid     = (payMethod === 'cash' && coDepositChecked) ? 10 : 0;
 
-      // — Customer name & phone —
-      if (!document.getElementById('custName').value.trim()) {
-        return Swal.fire('Diqqət', 'Ad və Soyadı daxil edin.', 'warning');
-      }
-      if (!document.getElementById('custPhone').value.trim()) {
-        return Swal.fire('Diqqət', 'Əlaqə nömrəsini daxil edin.', 'warning');
-      }
+    toggleLoader(true, 'Sifariş serverə göndərilir... Pəncərəni bağlamayın.');
 
-      // — Time slot —
-      if (!document.getElementById('timeSlot').value) {
-        return Swal.fire('Diqqət', 'Çatdırılma saat aralığını seçin.', 'warning');
-      }
+    try {
+      const payload = {
+        action:              'createCustomerOrder',
+        customerName:        document.getElementById('custName').value.trim(),
+        contactInfo:         document.getElementById('custPhone').value.trim(),
+        instagramHandle:     document.getElementById('instagramHandle').value.trim(),
+        deliveryDate:        document.getElementById('deliveryDate').value,
+        timeSlot:            document.getElementById('timeSlot').value,
+        address:             finalAddress,
+        specialInstructions: document.getElementById('coSpecialInstructions').value.trim(),
+        courieradditional:   deliveryCost,
+        mapLink:             document.getElementById('coMapCoordinatesLink').value,
+        paymentMethod:       payMethod,
+        salesRep:            currentUserPhone || currentUser,
+        salesRepPhone:       currentUserPhone,
+        salesSource:         'Staff',
+        productName,
+        productCode,
+        productPrice,
+        discountApplied,
+        depositPaid,
+        receiptImage:       coReceiptImageB64,
+        customProductImage: customImage
+      };
 
-      // — Cart —
-      if (coCart.length === 0) {
-        return Swal.fire('Diqqət', 'Səbətə ən azı bir məhsul əlavə edin.', 'warning');
-      }
+      const form = new URLSearchParams();
+      Object.entries(payload).forEach(([k,v]) => {
+        if (v !== '' && v !== null && v !== undefined) form.append(k, v);
+      });
 
-      // — Order image (mandatory, from original sellerprofile) —
-      if (!coOrderImageB64) {
-        return Swal.fire('Diqqət', 'Zəhmət olmasa sifarişin fotosunu (skrinşot) mütləq əlavə edin!', 'warning');
-      }
+      const res  = await fetch(ORDERS_API, { method:'POST', body:form });
+      const data = await res.json();
 
-      // — Address validation —
-      const isMetro    = document.getElementById('co-loc-metro').classList.contains('active');
-      const isLandmark = document.getElementById('co-loc-landmark').classList.contains('active');
-      const isRayon    = document.getElementById('co-loc-rayon').classList.contains('active');
+      toggleLoader(false);
 
-      const metro    = document.getElementById('coMetroSelect').value;
-      const landmark = document.getElementById('coLandmarkSelect').value;
-      const rayon    = document.getElementById('coRayonSelect').value;
-
-      let finalAddress = '';
-      let deliveryCost = 0;
-
-      if (isMetro) {
-        if (!metro) return Swal.fire('Diqqət', 'Metro stansiyasını seçin.', 'warning');
-        finalAddress = `Metro: ${metro}`;
-      } else if (isLandmark) {
-        if (!landmark) return Swal.fire('Diqqət', 'Nişangahı seçin.', 'warning');
-        finalAddress = `Nişangah: ${landmark}`;
-        const lm = landmarkData.find(i => i.name === landmark);
-        if (lm) deliveryCost = lm.price;
-      } else if (isRayon) {
-        if (!rayon) return Swal.fire('Diqqət', 'Rayon/şəhər seçin.', 'warning');
-        finalAddress = `Rayon: ${rayon}`;
-        deliveryCost = 4.00;
-      }
-
-      // Add manual courier override if set
-      const manualCourier = parseFloat(document.getElementById('courierCostCo').value) || 0;
-      if (manualCourier > 0) deliveryCost = manualCourier;
-
-      // — Payment receipt validation —
-      const payMethod = document.getElementById('coPayMethod').value;
-      if (payMethod === 'card' && !coReceiptImageB64) {
-        return Swal.fire('Diqqət', 'Kart ilə ödəniş üçün bank köçürmə qəbzini əlavə edin.', 'warning');
-      }
-      if (payMethod === 'cash' && coDepositChecked && !coReceiptImageB64) {
-        return Swal.fire('Diqqət', 'Beh ödənişinin qəbzini əlavə edin.', 'warning');
-      }
-
-      // — Build product fields —
-      let productName  = coCart.map(p => p.name).join(' + ');
-      let productCode  = coCart.map(p => p.code).join(', ');
-      let productPrice = coCart.reduce((sum, p) => sum + p.price, 0);
-      let finalCustomImage = coCart.find(p => p.isCustom && p.image)?.image || '';
-
-      const discountApplied = (payMethod === 'cash' && coDepositChecked) ? 4 : 0;
-      const depositPaid     = (payMethod === 'cash' && coDepositChecked) ? 10 : 0;
-
-      toggleLoader(true, 'Sifariş və Şəkil serverə yüklənir... Zəhmət olmasa pəncərəni bağlamayın.');
-
-      try {
-        // Build payload for ORDERS_API (createorder backend)
-        const payload = {
-          action:              'createCustomerOrder',
-          customerName:        document.getElementById('custName').value.trim(),
-          contactInfo:         document.getElementById('custPhone').value.trim(),
-          instagramHandle:     document.getElementById('instagramHandle').value.trim(),
-          deliveryDate:        document.getElementById('deliveryDate').value,
-          timeSlot:            document.getElementById('timeSlot').value,
-          address:             finalAddress,
-          specialInstructions: document.getElementById('coSpecialInstructions').value.trim(),
-          courieradditional:   deliveryCost,
-          mapLink:             document.getElementById('coMapCoordinatesLink').value,
-          paymentMethod:       payMethod,
-          salesRep:            currentUser || salesRepPhone,   // username or phone as rep identifier
-          salesRepPhone:       salesRepPhone,
-          salesSource:         document.getElementById('salesSource').value,
-          productName,
-          productCode,
-          productPrice,
-          discountApplied,
-          depositPaid,
-          receiptImage:        coReceiptImageB64,
-          customProductImage:  finalCustomImage,
-          orderImage:          coOrderImageB64
-        };
-
-        toggleLoader(true, 'Serverə göndərilir...');
-
-        const form = new URLSearchParams();
-        for (const k in payload) {
-          if (payload[k] !== '' && payload[k] !== null && payload[k] !== undefined) {
-            form.append(k, payload[k]);
-          }
-        }
-
-        const res  = await fetch(ORDERS_API, { method: 'POST', body: form });
-        const data = await res.json();
-
-        toggleLoader(false);
-
-        if (data.success) {
-          await Swal.fire({
-            title: 'Təşəkkür edirik! 🎉',
-            html:  `Sifarişiniz qəbul olundu!<br><b>Sifariş Kodunuz: #${data.orderId}</b>`,
-            icon:  'success',
-            confirmButtonColor: '#FF2D55'
-          });
-          coResetForm();
-
-          // Refresh staff data and navigate to list
-          await fetchAllData();
-          const listBtn = document.querySelectorAll('.nav-item')[2];
-          switchTab('tab-list', listBtn);
-        } else {
-          Swal.fire('Xəta', data.message || 'Xəta baş verdi.', 'error');
-        }
-      } catch (err) {
-        console.error(err);
-        toggleLoader(false);
-        Swal.fire('Xəta', 'İnternet əlaqəsini yoxlayın: ' + err.message, 'error');
-      }
-    });
-
-    /* ═══════════════════════════════════════════════════════════
-       FORM RESET
-    ═══════════════════════════════════════════════════════════ */
-    function coResetForm() {
-      document.getElementById('customerOrderForm').reset();
-
-      // Re-load saved phone
-      const savedPhone = localStorage.getItem('staff_userphone') || '';
-      document.getElementById('coUserPhone').value = savedPhone;
-      document.getElementById('salesRep').value    = currentUser;
-
-      coCart                 = [];
-      coDepositChecked       = false;
-      coReceiptImageB64      = '';
-      coCustomProductImageB64 = '';
-      coOrderImageB64        = '';
-
-      coRenderCart();
-      coCancelCustomProduct();
-
-      coSwitchLoc('metro', document.querySelector('.loc-tab'));
-      document.getElementById('coLocationStatus').style.display   = 'none';
-      document.getElementById('coMapCoordinatesLink').value        = '';
-      if (coMapOpen) coToggleMapSection();
-
-      const cb = document.getElementById('coDepositCheckbox');
-      cb.classList.remove('checked'); cb.innerHTML = '';
-      document.getElementById('coDiscountBadge').style.display          = 'none';
-      document.getElementById('coDepositReceiptSection').style.display  = 'none';
-      coResetUploadArea('coDepositReceiptUploadArea', 'coDepositReceiptContent', '🧾', 'Ödəniş qəbzini əlavə et');
-      coResetUploadArea('coCardReceiptUploadArea',    'coCardReceiptContent',    '🧾', 'Bank köçürmə qəbzini əlavə et');
-      coResetUploadArea('coOrderImgArea',             'coOrderImgContent',       '📸', 'Sifariş skrinşotunu əlavə et (Məcburidir)');
-      coHandlePaymentChange();
-
-      const tom = new Date();
-      tom.setDate(tom.getDate() + 1);
-      document.getElementById('deliveryDate').valueAsDate = tom;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       TRACK ORDER — GET request to ORDERS_API (Backend 2)
-    ═══════════════════════════════════════════════════════════ */
-    async function runTrackOrder() {
-      const id    = document.getElementById('trackId').value.trim();
-      const phone = document.getElementById('trackPhone').value.trim();
-
-      if (!id || !phone) return Swal.fire('Diqqət', 'Kod və Nömrəni daxil edin.', 'warning');
-
-      toggleLoader(true, 'Axtarılır...');
-      document.getElementById('trackResult').style.display = 'none';
-
-      try {
-        const res  = await fetch(
-          `${ORDERS_API}?action=trackOrder&orderId=${encodeURIComponent(id)}&phone=${encodeURIComponent(phone)}`
-        );
-        const data = await res.json();
-
-        if (data.success) {
-          const o      = data.order;
-          const labels = { New:'Yeni', Preparing:'Hazırlanır', OnWay:'Yoldadır', Delivered:'Təhvil Verildi', Deleted:'Ləğv Edildi' };
-
-          document.getElementById('resId').innerText      = o.id;
-          const statusEl  = document.getElementById('resStatus');
-          statusEl.innerText  = labels[o.status] || o.status;
-          statusEl.className  = `status-badge status-${o.status}`;
-
-          document.getElementById('resDate').innerText    = o.date     || '—';
-          document.getElementById('resTime').innerText    = o.timeSlot || 'Gün ərzində';
-          document.getElementById('resPrice').innerText   = (o.price   || 0) + ' ₼';
-          document.getElementById('resPayment').innerText = o.payment === 'cash' ? 'Nağd' : 'Kart';
-
-          const nameEl = document.getElementById('resCourierName');
-          const btnEl  = document.getElementById('resCourierBtn');
-          if (o.courier && String(o.courier).trim()) {
-            nameEl.innerText = String(o.courier).toUpperCase();
-            if (o.courierPhone) {
-              btnEl.style.display = 'inline-block';
-              btnEl.href = `tel:${o.courierPhone}`;
-            } else {
-              btnEl.style.display = 'none';
-            }
-          } else {
-            nameEl.innerText    = 'Təyin olunmayıb';
-            btnEl.style.display = 'none';
-          }
-
-          document.getElementById('trackResult').style.display = 'block';
-        } else {
-          Swal.fire('Tapılmadı', 'Sifariş kodu və ya nömrə yanlışdır.', 'error');
-        }
-      } catch (err) {
-        Swal.fire('Xəta', 'Server ilə əlaqə kəsildi.', 'error');
-      } finally {
-        toggleLoader(false);
-      }
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       ORDERS LIST TAB (original sellerprofile logic)
-    ═══════════════════════════════════════════════════════════ */
-    function renderOrderList() {
-      const container = document.getElementById('ordersContainer');
-      const start     = document.getElementById('filterStart').value;
-      const end       = document.getElementById('filterEnd').value;
-      const today     = new Date().toISOString().split('T')[0];
-
-      container.innerHTML = '';
-
-      const filtered = globalOrdersData.filter(o => o.date >= start && o.date <= end);
-      filtered.sort((a, b) => b.id - a.id);
-
-      let totalRev = 0;
-      let totalCnt = 0;
-
-      if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:20px; color:#8E8E93">Sifariş tapılmadı</div>';
-      } else {
-        filtered.forEach(o => {
-          totalCnt++;
-          totalRev += parseFloat(o.revenue || 0);
-
-          let badgeClass = 'Pending';
-          if (o.status === 'Delivered') badgeClass = 'Delivered';
-          if (o.status === 'Deleted')   badgeClass = 'Deleted';
-
-          const isEditable = (o.date >= today);
-          const disabledAttr = isEditable ? '' : 'disabled';
-          const btnDisplay   = isEditable ? 'inline-block' : 'none';
-          const bgColor      = isEditable ? '#fff' : '#f5f5f5';
-
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-              <span style="font-weight:800; font-size:18px;">#${o.id}</span>
-              <span class="badge ${badgeClass}">${o.status}</span>
-            </div>
-
-            <div class="row-detail">
-              <span class="label-detail">Müştəri:</span>
-              <span class="val-detail">${o.name}</span>
-            </div>
-            <div class="row-detail">
-              <span class="label-detail">Məbləğ:</span>
-              <span class="val-detail" style="color:var(--primary); font-weight:700;">${parseFloat(o.revenue).toFixed(2)} ₼</span>
-            </div>
-            <div class="row-detail">
-              <span class="label-detail">Ünvan:</span>
-              <span class="val-detail">${o.address || '-'}</span>
-            </div>
-            <div class="row-detail">
-              <span class="label-detail">Çatdırıcı:</span>
-              <span class="val-detail">${o.courier || '-'}</span>
-            </div>
-
-            <div style="margin-top:10px;">
-              <span class="label-detail" style="display:block; margin-bottom:4px;">Məhsullar:</span>
-              <div style="font-size:13px; color:#333; background:#f9f9f9; padding:8px; border-radius:8px;">${o.products}</div>
-            </div>
-
-            <div class="note-area">
-              <label style="margin-bottom:5px;">Xüsusi Təlimatlar (Qeyd)</label>
-              <textarea id="note-${o.id}" rows="2" class="note-textarea" style="background:${bgColor}" ${disabledAttr}>${o.note || ''}</textarea>
-              <div style="text-align:right; margin-top:5px; display:${btnDisplay}">
-                <button class="btn btn-primary btn-sm" onclick="saveNote('${o.id}')" style="padding:6px 15px; font-size:12px;">Yadda Saxla</button>
-              </div>
-            </div>
-
-            <div style="text-align:right; font-size:11px; color:#aaa; margin-top:8px;">${o.date}</div>
-          `;
-          container.appendChild(card);
+      if (data.success) {
+        await Swal.fire({
+          title: 'Təşəkkür edirik! 🎉',
+          html:  `Sifariş qəbul olundu!<br><b style="font-size:20px;">Kod: #${data.orderId}</b>`,
+          icon:  'success',
+          confirmButtonColor:'#FF2D55'
         });
-      }
-
-      document.getElementById('listTotalCount').textContent   = totalCnt;
-      document.getElementById('listTotalRevenue').textContent = totalRev.toFixed(2) + " ₼";
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       SAVE NOTE (original sellerprofile logic)
-    ═══════════════════════════════════════════════════════════ */
-    async function saveNote(orderId) {
-      const noteField  = document.getElementById(`note-${orderId}`);
-      const newNote    = noteField.value;
-      const btn        = noteField.nextElementSibling.querySelector('button');
-      const originalText = btn.textContent;
-
-      btn.disabled    = true;
-      btn.textContent = '...';
-
-      const formData = new URLSearchParams();
-      formData.append('action',  'updateOrderNote');
-      formData.append('orderId', orderId);
-      formData.append('newNote', newNote);
-
-      try {
-        const res  = await fetch(STAFF_API, { method: 'POST', body: formData });
-        const data = await res.json();
-
-        if (data.success) {
-          btn.textContent  = '✓';
-          btn.style.background = 'var(--success)';
-
-          const order = globalOrdersData.find(o => o.id == orderId);
-          if (order) order.note = newNote;
-
-          setTimeout(() => {
-            btn.textContent  = originalText;
-            btn.style.background = '';
-            btn.disabled = false;
-          }, 2000);
-        } else {
-          alert('Xəta: ' + data.message);
-          btn.disabled    = false;
-          btn.textContent = originalText;
-        }
-      } catch (e) {
-        console.error(e);
-        alert('İnternet xətası');
-        btn.disabled    = false;
-        btn.textContent = originalText;
-      }
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       STATS TAB (original sellerprofile logic)
-    ═══════════════════════════════════════════════════════════ */
-    function renderStats() {
-      const period = document.getElementById('statsPeriod').value;
-      const now    = new Date();
-      let start, end;
-
-      if (period === 'today') {
-        start = end = now.toISOString().split('T')[0];
-      } else if (period === 'yesterday') {
-        const y = new Date(now); y.setDate(y.getDate() - 1);
-        start = end = y.toISOString().split('T')[0];
-      } else if (period === 'thisMonth') {
-        start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-        end   = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-      } else if (period === 'lastMonth') {
-        start = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
-        end   = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];
+        coResetForm();
+        await fetchAllData();
+        switchTab('tab-list', document.querySelectorAll('.nav-item')[2]);
       } else {
-        start = '2020-01-01'; end = '2030-12-31';
+        Swal.fire('Xəta', data.message || 'Xəta baş verdi.', 'error');
       }
-
-      const relevantOrders = globalOrdersData.filter(o =>
-        o.date >= start && o.date <= end && o.status !== 'Deleted'
-      );
-
-      const count          = relevantOrders.length;
-      const revenue        = relevantOrders.reduce((acc, o) => acc + (parseFloat(o.revenue) || 0), 0);
-      const profit         = 0; // Always show 0 as per original
-      const deliveredCount = relevantOrders.filter(o => o.status === 'Delivered').length;
-      const rate           = count > 0 ? ((deliveredCount / count) * 100).toFixed(0) : 0;
-      const aov            = count > 0 ? (revenue / count).toFixed(2) : 0;
-
-      document.getElementById('statRevenue').textContent = revenue.toFixed(2) + " ₼";
-      document.getElementById('statProfit').textContent  = profit.toFixed(2) + " ₼";
-      document.getElementById('statCount').textContent   = count;
-      document.getElementById('statRate').textContent    = `${rate}% (${deliveredCount})`;
-      document.getElementById('statAOV').textContent     = aov + " ₼";
+    } catch (err) {
+      console.error(err);
+      toggleLoader(false);
+      Swal.fire('Xəta', 'İnternet əlaqəsini yoxlayın: ' + err.message, 'error');
     }
+  });
 
-    /* ═══════════════════════════════════════════════════════════
-       LOADER
-    ═══════════════════════════════════════════════════════════ */
-    function toggleLoader(show, message = 'Məlumatlar Yüklənir...') {
-      const loader = document.getElementById('loader');
-      const text   = document.getElementById('loaderText');
-      if (text) text.textContent = message;
-      loader.style.display = show ? 'flex' : 'none';
-    }
+  /* ═══════════════════════════════════════════════════
+     RESET FORM
+  ═══════════════════════════════════════════════════ */
+  function coResetForm() {
+    document.getElementById('customerOrderForm').reset();
+    document.getElementById('salesRep').value = currentUserPhone || currentUser;
 
-    /* ═══════════════════════════════════════════════════════════
-       CLOSE SEARCH RESULTS WHEN CLICKING ELSEWHERE
-    ═══════════════════════════════════════════════════════════ */
-    document.addEventListener('click', ev => {
-      const inp = document.getElementById('co-productSearch');
-      const lst = document.getElementById('coProductResults');
-      if (inp && lst && !inp.contains(ev.target) && !lst.contains(ev.target)) {
-        lst.style.display = 'none';
+    coCart                 = [];
+    coDepositChecked       = false;
+    coReceiptImageB64      = '';
+    coCustomProductImageB64 = '';
+
+    coRenderCart();
+    coCancelCustomProduct();
+
+    // Reset loc to metro
+    const metroTab = document.querySelector('.loc-tab');
+    coSwitchLoc('metro', metroTab);
+    metroTab.classList.add('active');
+
+    document.getElementById('coLocationStatus').style.display  = 'none';
+    document.getElementById('coMapCoordinatesLink').value       = '';
+    if (coMapOpen) coToggleMapSection();
+
+    const cb = document.getElementById('coDepositCheckbox');
+    cb.classList.remove('checked'); cb.innerHTML = '';
+    document.getElementById('coDiscountBadge').style.display          = 'none';
+    document.getElementById('coDepositReceiptSection').style.display  = 'none';
+    resetUploadArea('coDepositReceiptUploadArea','coDepositReceiptContent','🧾','Ödəniş qəbzini əlavə et');
+    resetUploadArea('coCardReceiptUploadArea','coCardReceiptContent','🧾','Bank köçürmə qəbzini əlavə et');
+    coHandlePaymentChange();
+
+    const tom = new Date(); tom.setDate(tom.getDate()+1);
+    document.getElementById('deliveryDate').valueAsDate = tom;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     TRACK ORDER
+  ═══════════════════════════════════════════════════ */
+  async function runTrackOrder() {
+    const id    = document.getElementById('trackId').value.trim();
+    const phone = document.getElementById('trackPhone').value.trim();
+    if (!id || !phone) return Swal.fire('Diqqət', 'Kod və Nömrəni daxil edin.', 'warning');
+
+    toggleLoader(true, 'Axtarılır...');
+    document.getElementById('trackResult').style.display = 'none';
+
+    try {
+      const res  = await fetch(`${ORDERS_API}?action=trackOrder&orderId=${encodeURIComponent(id)}&phone=${encodeURIComponent(phone)}`);
+      const data = await res.json();
+
+      if (data.success) {
+        const o = data.order;
+        const labels = { New:'Yeni', Preparing:'Hazırlanır', OnWay:'Yoldadır', Delivered:'Təhvil Verildi', Deleted:'Ləğv Edildi' };
+        document.getElementById('resId').innerText      = o.id;
+        const statusEl = document.getElementById('resStatus');
+        statusEl.innerText  = labels[o.status] || o.status;
+        statusEl.className  = `status-badge status-${o.status}`;
+        document.getElementById('resDate').innerText    = o.date     || '—';
+        document.getElementById('resTime').innerText    = o.timeSlot || 'Gün ərzində';
+        document.getElementById('resPrice').innerText   = (o.price   || 0) + ' ₼';
+        document.getElementById('resPayment').innerText = o.payment === 'cash' ? 'Nağd' : 'Kart';
+
+        const nameEl = document.getElementById('resCourierName');
+        const btnEl  = document.getElementById('resCourierBtn');
+        if (o.courier && String(o.courier).trim()) {
+          nameEl.innerText = String(o.courier).toUpperCase();
+          if (o.courierPhone) {
+            btnEl.style.display = 'inline-block';
+            btnEl.href = `tel:${o.courierPhone}`;
+          } else { btnEl.style.display = 'none'; }
+        } else {
+          nameEl.innerText    = 'Təyin olunmayıb';
+          btnEl.style.display = 'none';
+        }
+
+        document.getElementById('trackResult').style.display = 'block';
+      } else {
+        Swal.fire('Tapılmadı', 'Sifariş kodu və ya nömrə yanlışdır.', 'error');
       }
-    });
+    } catch(err) {
+      Swal.fire('Xəta', 'Server ilə əlaqə kəsildi.', 'error');
+    } finally {
+      toggleLoader(false);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════
+     IMAGE HELPERS
+  ═══════════════════════════════════════════════════ */
+  function compressImage(file, callback) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else        { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const cvs = document.createElement('canvas');
+        cvs.width = w; cvs.height = h;
+        cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+        const b64 = cvs.toDataURL('image/jpeg', 0.76);
+        callback(b64, b64);
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function updateUploadArea(areaId, contentId, previewUrl) {
+    document.getElementById(areaId).classList.add('has-image');
+    document.getElementById(contentId).innerHTML = `
+      <img src="${previewUrl}" class="image-preview-thumb">
+      <div class="image-upload-text" style="color:var(--success);font-weight:700;">
+        <i class="fa-solid fa-check"></i> Əlavə olundu
+      </div>`;
+  }
+
+  function resetUploadArea(areaId, contentId, icon, text) {
+    const area = document.getElementById(areaId);
+    const cont = document.getElementById(contentId);
+    if (area) area.classList.remove('has-image');
+    if (cont) cont.innerHTML = `<div class="image-upload-icon">${icon}</div><div class="image-upload-text">${text}</div>`;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     HELPERS
+  ═══════════════════════════════════════════════════ */
+  function esc(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function toggleLoader(show, msg = 'Yüklənir...') {
+    const el   = document.getElementById('loader');
+    const text = document.getElementById('loaderText');
+    if (text) text.textContent = msg;
+    el.style.display = show ? 'flex' : 'none';
+  }
+
+  /* Close search on outside click */
+  document.addEventListener('click', ev => {
+    const inp = document.getElementById('co-productSearch');
+    const lst = document.getElementById('coProductResults');
+    if (inp && lst && !inp.contains(ev.target) && !lst.contains(ev.target)) {
+      lst.style.display = 'none';
+    }
+  });
   </script>
 </body>
 </html>
