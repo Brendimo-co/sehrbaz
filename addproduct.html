@@ -1456,7 +1456,7 @@
 ════════════════════════════════════════════════════════════════ */
 
 /* ── CONFIGURATION ─────────────────────────────────────────── */
-const API_URL   = 'https://script.google.com/macros/s/AKfycbzLoHdzT84Dwrr_8GgbTPJdklw8Nqo9gxgKwiWCSLf9nyKr6Tq9_Befx55Yl3THSxkmjg/exec';
+const API_URL   = 'https://script.google.com/macros/s/AKfycbwRSg-NIZMaXqXimGVAaQ8FtoFZBwz8Z4GxuIGVSsILKW1znRFuyUvbySohilHO8F8rug/exec';
 const FOLDER_ID = '1Rd6HW3MgRrqDPsufsqdLOCiOGbMI8Q4K';
 
 // IMPORTANT: Replace this with your actual Google OAuth 2.0 Client ID
@@ -1813,75 +1813,116 @@ async function callAPI(action, data) {
 /* ══════════════════════════════════════════
    SUBMIT NEW PRODUCT
 ══════════════════════════════════════════ */
-async function submitProduct() {
-  const name     = document.getElementById('product-name').value.trim();
-  const desc     = document.getElementById('product-desc').value.trim();
-  const price    = parseFloat(document.getElementById('product-price').value) || 0;
-  const cost     = parseFloat(document.getElementById('product-cost').value)  || 0;
-  const tag      = document.getElementById('product-tag').value;
-  const pid      = document.getElementById('product-id').value;
-  const code     = document.getElementById('product-code').value;
-  const manualUrl = document.getElementById('product-image-url').value.trim();
+/* ════════════════════════════════════════════════════════════════
+   GOOGLE DRIVE UPLOAD (BASE64 METODU - CLIENT ID OLMADAN)
+════════════════════════════════════════════════════════════════ */
+// Şəkli Base64 formatına çevirən köməkçi funksiya
+function getBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = error => reject(error);
+  });
+}
 
-  // Validation
-  if (!name) {
-    toast('Məhsul adı mütləqdir!', 'error');
-    return;
+// Şəkli serverə göndərən əsas funksiya
+async function uploadFileToDrive(file, nameBase) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  const fileName = `${nameBase}.${ext}`;
+
+  setProgress(20, `"${fileName}" oxunur...`);
+  const base64Data = await getBase64(file);
+
+  setProgress(50, 'Drive-a yüklənir (gözləyin)...');
+
+  const payload = {
+    action: 'uploadImage',
+    filename: fileName,
+    mimeType: file.type,
+    base64: base64Data
+  };
+
+  const resp = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload),
+    redirect: 'follow'
+  });
+
+  const result = await resp.json().catch(() => ({ success: false, error: "Server xətası" }));
+  
+  if (!result.success) {
+    throw new Error(result.error || 'Yüklənmə xətası');
   }
-  if (!pid || pid === '...' || pid === 'Xəta') {
-    toast('Məhsul ID hələ yüklənməyib. Bir az gözləyin...', 'warning');
-    return;
-  }
-  if (!tag) {
-    toast('Hədəf auditoriya seçin!', 'error');
-    return;
-  }
+
+  setProgress(100, 'Tamamlandı!');
+  setTimeout(() => setProgress(0), 1800);
+
+  return result.url;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SUBMIT PRODUCT
+════════════════════════════════════════════════════════════════ */
+async function submitProduct() {
+  const name  = document.getElementById('product-name').value.trim();
+  const desc  = document.getElementById('product-desc').value.trim();
+  const price = parseFloat(document.getElementById('product-price').value) || 0;
+  const cost  = parseFloat(document.getElementById('product-cost').value)  || 0;
+  const tag   = document.getElementById('product-tag').value;
+  const pid   = document.getElementById('product-id').value;
+  const code  = document.getElementById('product-code').value;
+
+  if (!name) { toast('Məhsul adı mütləqdir!', 'error'); return; }
+  if (!pid || pid === '—' || pid === 'Xəta') { toast('Məhsul ID hələ yüklənməyib. Bir az gözləyin...', 'warning'); return; }
+  if (!tag) { toast('Hədəf auditoriya seçin!', 'error'); return; }
 
   setBusy(true);
 
   try {
-    let imageUrl = manualUrl; // Start with manually entered URL
+    let imageUrl = '';
 
-    // Try to upload to Drive if connected and files selected
-    if (selectedFiles.length > 0 && accessToken) {
+    // Şəkil varsa API vasitəsilə yükləyirik
+    if (selectedFiles.length > 0) {
       try {
-        imageUrl = await uploadFileToDrive(selectedFiles[0], pid, accessToken);
+        // Əsas şəklin yüklənməsi
+        imageUrl = await uploadFileToDrive(selectedFiles[0], pid);
         toast('Əsas şəkil Drive-a yükləndi!', 'success');
 
-        // Upload additional images with suffix letters (a, b, c…)
+        // Əlavə şəkillər varsa (variantlar) yükləyirik
         for (let i = 1; i < selectedFiles.length; i++) {
           const suffix = String.fromCharCode(97 + i - 1); // a, b, c...
-          await uploadFileToDrive(selectedFiles[i], pid + suffix, accessToken);
+          await uploadFileToDrive(selectedFiles[i], pid + suffix);
         }
       } catch (driveErr) {
-        console.error('Drive upload failed:', driveErr);
-        toast(`Şəkil yükləmə xətası: ${driveErr.message}. URL-i əl ilə daxil edə bilərsiniz.`, 'warning', 7000);
-        // imageUrl stays as manualUrl — don't block the save
+        toast('Şəkil Drive-a yüklənmədi: ' + driveErr.message, 'warning', 6000);
       }
-    } else if (selectedFiles.length > 0 && !accessToken) {
-      toast('Drive qoşulmayıb — şəkil URL-i əl ilə daxil edilir.', 'info', 4000);
     }
 
-    // Save product to Google Sheets via Apps Script
-    await callAPI('addProduct', {
+    const productPayload = {
+      type:        'addProduct',
       id:          pid,
       name:        name,
       description: desc,
       cost:        cost,
       price:       price,
       image:       imageUrl,
-      imagepreview: imageUrl,
+      imagepreview:imageUrl,
       tag:         tag,
       productcode: code
-    });
+    };
 
-    toast(`Məhsul #${pid} "${name}" uğurla əlavə edildi!`, 'success', 5000);
-
+    const result = await callAPI('addProduct', productPayload);
+    if(result && result.success === false) throw new Error(result.error);
+    
+    toast(`✅ Məhsul #${pid} "${name}" uğurla əlavə edildi!`, 'success');
+    
     resetForm();
     fetchNextIdAndCode();
 
   } catch (e) {
-    toast('Xəta: ' + e.message, 'error', 6000);
+    toast('Xəta: ' + e.message, 'error');
   } finally {
     setBusy(false);
   }
