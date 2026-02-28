@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brendimo — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:           #08080d;
+    --surface:      #0f0f18;
+    --surface2:     #17172280;
+    --surface3:     #1e1e2e;
+    --border:       #272736;
+    --border2:      #32324a;
+    --accent:       #c21a1a;
+    --accent2:      #e63030;
+    --accent-glow:  rgba(194,26,26,0.18);
+    --gold:         #f5c842;
+    --text:         #eeeef8;
+    --text2:        #b0b0cc;
+    --muted:        #686888;
+    --success:      #22c55e;
+    --warning:      #f59e0b;
+    --info:         #60a5fa;
+    --radius:       14px;
+    --radius-sm:    8px;
+    --font-head:    'Syne', sans-serif;
+    --font-body:    'DM Sans', sans-serif;
+    --nav-h:        64px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── AMBIENT GLOW ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 900px 700px at 15% -5%, rgba(194,26,26,0.09) 0%, transparent 60%),
+      radial-gradient(ellipse 700px 500px at 85% 105%, rgba(194,26,26,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 500px 400px at 50% 50%, rgba(10,10,30,0.6) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .shell { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* ══════════════════════════════════════════
+     NAVIGATION
+  ══════════════════════════════════════════ */
+  nav {
+    background: rgba(8,8,13,0.92);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 36px;
+    display: flex;
+    align-items: center;
+    height: var(--nav-h);
+    position: sticky;
+    top: 0;
+    z-index: 200;
+  }
+
+  .nav-brand {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 17px;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: auto;
+    flex-shrink: 0;
+  }
+
+  .nav-brand-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(194,26,26,0.4);
+  }
+
+  .nav-brand-icon svg { width: 16px; height: 16px; color: white; }
+
+  .nav-brand-text { display: flex; align-items: baseline; gap: 1px; }
+  .nav-brand-text em { font-style: normal; color: var(--accent); }
+  .nav-brand-sub {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-left: 2px;
+    align-self: center;
+    opacity: 0.6;
+  }
+
+  .nav-tabs { display: flex; height: 100%; gap: 2px; }
+
+  .nav-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 22px;
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text2);
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .nav-tab svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .nav-tab:hover { color: var(--text); }
+
+  .nav-tab.active {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+  }
+
+  .nav-tab.active::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    filter: blur(4px);
+  }
+
+  /* ══════════════════════════════════════════
+     TOAST SYSTEM
+  ══════════════════════════════════════════ */
+  #toast-container {
+    position: fixed;
+    top: calc(var(--nav-h) + 12px);
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  .toast {
+    background: var(--surface3);
+    border: 1px solid var(--border2);
+    border-left: 3px solid var(--success);
+    border-radius: var(--radius-sm);
+    padding: 13px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    min-width: 260px;
+    max-width: 380px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+    animation: toastIn 0.35s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    pointer-events: auto;
+    line-height: 1.4;
+  }
+
+  .toast.error   { border-left-color: var(--accent); }
+  .toast.warning { border-left-color: var(--warning); }
+  .toast.info    { border-left-color: var(--info); }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(20px) scale(0.95); }
+    to   { opacity: 1; transform: translateX(0) scale(1); }
+  }
+
+  @keyframes toastOut {
+    to { opacity: 0; transform: translateX(20px) scale(0.95); }
+  }
+
+  /* ══════════════════════════════════════════
+     MAIN LAYOUT
+  ══════════════════════════════════════════ */
+  main {
+    flex: 1;
+    padding: 36px;
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .page { display: none; }
+  .page.active { display: block; animation: pageUp 0.3s ease forwards; }
+
+  @keyframes pageUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ══════════════════════════════════════════
+     PAGE HEADER
+  ══════════════════════════════════════════ */
+  .page-header { margin-bottom: 32px; }
+
+  .page-header h1 {
+    font-family: var(--font-head);
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+
+  .page-header h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .page-header p {
+    color: var(--text2);
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ══════════════════════════════════════════
+     CARDS
+  ══════════════════════════════════════════ */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+  }
+
+  .card-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text2);
+  }
+
+  .card-title-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ══════════════════════════════════════════
+     OAUTH STATUS BANNER
+  ══════════════════════════════════════════ */
+  .oauth-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    margin-bottom: 20px;
+    border: 1px solid;
+    transition: all 0.3s;
+  }
+
+  .oauth-banner.disconnected {
+    background: rgba(245,158,11,0.08);
+    border-color: rgba(245,158,11,0.25);
+    color: var(--warning);
+  }
+
+  .oauth-banner.connected {
+    background: rgba(34,197,94,0.08);
+    border-color: rgba(34,197,94,0.25);
+    color: var(--success);
+  }
+
+  .oauth-banner svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  .oauth-banner-text { flex: 1; line-height: 1.4; }
+
+  .oauth-banner-text strong { display: block; font-weight: 600; margin-bottom: 2px; }
+
+  .oauth-banner-text span { opacity: 0.8; font-size: 12px; }
+
+  .btn-connect {
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid currentColor;
+    background: transparent;
+    color: inherit;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    opacity: 0.9;
+  }
+
+  .btn-connect:hover { opacity: 1; background: rgba(255,255,255,0.08); }
+
+  /* ══════════════════════════════════════════
+     FORM ELEMENTS
+  ══════════════════════════════════════════ */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .form-grid.cols-1 { grid-template-columns: 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text2);
+    opacity: 0.8;
+  }
+
+  label .req { color: var(--accent); margin-left: 3px; }
+  label .note {
+    font-size: 10px;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--muted);
+    font-weight: 400;
+    margin-left: 4px;
+    opacity: 0.7;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  textarea,
+  select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 12px 15px;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    outline: none;
+    width: 100%;
+    backdrop-filter: blur(10px);
+  }
+
+  input::placeholder, textarea::placeholder { color: rgba(184,184,204,0.3); }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(194,26,26,0.1);
+    background: rgba(23,23,34,0.9);
+  }
+
+  input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  textarea { resize: vertical; min-height: 92px; line-height: 1.6; }
+  select option { background: #1e1e2e; }
+
+  .id-display {
+    background: rgba(194,26,26,0.06) !important;
+    border-color: rgba(194,26,26,0.25) !important;
+    color: var(--accent) !important;
+    font-family: 'Courier New', monospace !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    letter-spacing: 1px;
+  }
+
+  .code-display {
+    background: rgba(245,200,66,0.04) !important;
+    border-color: rgba(245,200,66,0.25) !important;
+    color: var(--gold) !important;
+    font-family: 'Courier New', monospace !important;
+    font-weight: 700 !important;
+    font-size: 16px !important;
+    letter-spacing: 1px;
+  }
+
+  /* ══════════════════════════════════════════
+     TAG SELECTOR
+  ══════════════════════════════════════════ */
+  .tag-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .tag-btn {
+    padding: 8px 18px;
+    border-radius: 100px;
+    border: 1px solid var(--border2);
+    background: rgba(23,23,34,0.5);
+    color: var(--text2);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .tag-btn:hover {
+    border-color: rgba(194,26,26,0.5);
+    color: var(--text);
+    background: rgba(194,26,26,0.06);
+  }
+
+  .tag-btn.selected {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(194,26,26,0.3);
+  }
+
+  /* ══════════════════════════════════════════
+     UPLOAD ZONE
+  ══════════════════════════════════════════ */
+  .upload-zone {
+    border: 2px dashed var(--border2);
+    border-radius: var(--radius);
+    padding: 52px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    background: rgba(23,23,34,0.3);
+  }
+
+  .upload-zone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(194,26,26,0.03) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .upload-zone:hover::before,
+  .upload-zone.dragover::before { opacity: 1; }
+
+  .upload-zone:hover,
+  .upload-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(194,26,26,0.04);
+  }
+
+  .upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+  }
+
+  .upload-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: rgba(194,26,26,0.1);
+    border: 1px solid rgba(194,26,26,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    transition: all 0.3s;
+  }
+
+  .upload-zone:hover .upload-icon {
+    background: rgba(194,26,26,0.15);
+    transform: scale(1.05);
+  }
+
+  .upload-icon svg { width: 24px; height: 24px; color: var(--accent); }
+
+  .upload-zone h3 {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .upload-zone p { color: var(--text2); font-size: 13px; line-height: 1.6; }
+  .upload-hint { font-size: 12px !important; color: var(--text2) !important; opacity: 0.6; margin-top: 4px !important; }
+
+  /* ── PREVIEW GRID ── */
+  .preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .preview-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    animation: popIn 0.25s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .preview-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .preview-remove {
+    position: absolute;
+    top: 5px; right: 5px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: rgba(194,26,26,0.92);
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s, opacity 0.15s;
+    opacity: 0;
+  }
+
+  .preview-item:hover .preview-remove { opacity: 1; }
+  .preview-remove:hover { transform: scale(1.2); }
+
+  .preview-badge {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(194,26,26,0.85));
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-align: center;
+    padding: 12px 4px 4px;
+    text-transform: uppercase;
+  }
+
+  /* ══════════════════════════════════════════
+     PROGRESS BAR
+  ══════════════════════════════════════════ */
+  .progress-wrap {
+    display: none;
+    margin-top: 18px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    height: 5px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold), var(--accent));
+    background-size: 200% 100%;
+    border-radius: 100px;
+    transition: width 0.4s ease;
+    width: 0%;
+    animation: progressShimmer 2s linear infinite;
+  }
+
+  @keyframes progressShimmer {
+    0%   { background-position: 200% center; }
+    100% { background-position: -200% center; }
+  }
+
+  .progress-label {
+    display: none;
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 8px;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  /* ══════════════════════════════════════════
+     BUTTONS
+  ══════════════════════════════════════════ */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .btn:active::after { opacity: 0.05; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 4px 14px rgba(194,26,26,0.25);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: var(--accent2);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(194,26,26,0.35);
+  }
+
+  .btn-primary:active:not(:disabled) { transform: translateY(0); }
+
+  .btn-secondary {
+    background: var(--surface2);
+    border-color: var(--border2);
+    color: var(--text);
+    backdrop-filter: blur(10px);
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    border-color: rgba(194,26,26,0.4);
+    background: rgba(194,26,26,0.06);
+  }
+
+  .btn-danger {
+    background: rgba(194,26,26,0.1);
+    border-color: rgba(194,26,26,0.25);
+    color: #e05050;
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border-color: transparent;
+    color: var(--text2);
+    padding: 8px 12px;
+  }
+
+  .btn-ghost:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+
+  .btn-sm { padding: 8px 14px; font-size: 12px; border-radius: 6px; }
+
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .btn-group { display: flex; gap: 10px; align-items: center; margin-top: 26px; flex-wrap: wrap; }
+
+  /* ══════════════════════════════════════════
+     SPINNER
+  ══════════════════════════════════════════ */
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: none;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ══════════════════════════════════════════
+     PRODUCT TABLE
+  ══════════════════════════════════════════ */
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .search-wrap { position: relative; flex: 1; min-width: 200px; }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text2);
+    width: 15px;
+    height: 15px;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .search-wrap input { padding-left: 40px; }
+
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+
+  table { width: 100%; border-collapse: collapse; min-width: 750px; }
+  thead { background: rgba(23,23,34,0.9); }
+
+  th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    opacity: 0.8;
+  }
+
+  td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(39,39,54,0.5);
+    vertical-align: middle;
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background 0.15s; }
+  tbody tr:hover { background: rgba(42,42,60,0.35); }
+
+  .product-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    display: block;
+    transition: transform 0.2s;
+  }
+
+  tbody tr:hover .product-thumb { transform: scale(1.05); }
+
+  .product-thumb-placeholder {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .product-name {
+    font-weight: 600;
+    color: var(--text);
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+
+  .badge-xanim  { background: rgba(236,72,153,0.12); color: #e879a0; border: 1px solid rgba(236,72,153,0.2); }
+  .badge-bey    { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
+  .badge-usaq   { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+  .badge-hemkar { background: rgba(245,200,66,0.12); color: #f5c842; border: 1px solid rgba(245,200,66,0.2); }
+  .badge-none   { background: rgba(104,104,136,0.12); color: var(--text2); border: 1px solid rgba(104,104,136,0.2); }
+
+  .id-pill {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: var(--text2);
+    background: rgba(23,23,34,0.8);
+    padding: 3px 9px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .code-pill {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    background: rgba(245,200,66,0.08);
+    padding: 3px 9px;
+    border-radius: 6px;
+    border: 1px solid rgba(245,200,66,0.18);
+    white-space: nowrap;
+  }
+
+  .price-text { font-weight: 700; color: var(--text); }
+
+  /* ══════════════════════════════════════════
+     STATS ROW
+  ══════════════════════════════════════════ */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .stat-card:hover { border-color: var(--border2); }
+
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+    transform-origin: left;
+  }
+
+  .stat-card:hover::after { transform: scaleX(1); }
+
+  .stat-value {
+    font-family: var(--font-head);
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    color: var(--text2);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+  }
+
+  /* ══════════════════════════════════════════
+     EDIT MODAL
+  ══════════════════════════════════════════ */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.72);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-overlay.open {
+    display: flex;
+    animation: overlayIn 0.2s ease forwards;
+  }
+
+  @keyframes overlayIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 18px;
+    padding: 34px;
+    width: 100%;
+    max-width: 660px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    animation: modalIn 0.35s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+    position: relative;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.94) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+  }
+
+  .modal-title {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.3px;
+  }
+
+  .modal-subtitle {
+    color: var(--text2);
+    font-size: 12px;
+    margin-top: 4px;
+    font-family: 'Courier New', monospace;
+    opacity: 0.7;
+  }
+
+  .modal-close {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface3);
+    color: var(--text2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .modal-close:hover {
+    color: var(--text);
+    border-color: var(--accent);
+    background: rgba(194,26,26,0.1);
+  }
+
+  /* ══════════════════════════════════════════
+     EMPTY STATE
+  ══════════════════════════════════════════ */
+  .empty-state {
+    text-align: center;
+    padding: 70px 24px;
+    color: var(--text2);
+  }
+
+  .empty-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin: 0 auto 18px;
+  }
+
+  .empty-state h3 {
+    font-family: var(--font-head);
+    color: var(--text);
+    margin-bottom: 8px;
+    font-size: 17px;
+  }
+
+  .empty-state p { font-size: 13px; opacity: 0.7; }
+
+  /* ══════════════════════════════════════════
+     LOADING DOTS
+  ══════════════════════════════════════════ */
+  .loading-dots {
+    display: inline-flex;
+    gap: 5px;
+    align-items: center;
+    margin-left: 8px;
+  }
+
+  .loading-dots span {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: dotBounce 1s ease infinite;
+  }
+
+  .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes dotBounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40%           { transform: scale(1);   opacity: 1; }
+  }
+
+  /* ══════════════════════════════════════════
+     SCROLLBAR
+  ══════════════════════════════════════════ */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(194,26,26,0.5); }
+
+  /* ══════════════════════════════════════════
+     UPLOAD LAYOUT
+  ══════════════════════════════════════════ */
+  .upload-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.35fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ══════════════════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════════════════ */
+  @media (max-width: 860px) {
+    .upload-layout { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 680px) {
+    nav { padding: 0 18px; }
+    main { padding: 20px 16px; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: 1; }
+    .nav-tab .nav-tab-label { display: none; }
+    .nav-tab { padding: 0 16px; }
+    .modal { padding: 24px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ════════════════════════════════════════
+       NAVIGATION
+  ════════════════════════════════════════ -->
+  <nav>
+    <div class="nav-brand">
+      <div class="nav-brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="12,2 22,20 2,20"/>
+        </svg>
+      </div>
+      <div class="nav-brand-text">
+        Brendimo<em>.</em>
+        <span class="nav-brand-sub">admin</span>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('upload')" id="tab-upload">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <span class="nav-tab-label">Məhsul Əlavə Et</span>
+      </button>
+      <button class="nav-tab" onclick="showPage('modify')" id="tab-modify">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        <span class="nav-tab-label">Məhsulları İdarə Et</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <main>
+
+    <!-- ════════════════════════════════════════
+         PAGE: UPLOAD — Add Product
+    ════════════════════════════════════════ -->
+    <div class="page active" id="page-upload">
+      <div class="page-header">
+        <h1>Yeni Məhsul <em>Əlavə Et</em></h1>
+        <p>Şəkili yükləyin, məlumatları doldurun — Google Sheets-ə avtomatik əlavə ediləcək.</p>
+      </div>
+
+      <div class="upload-layout">
+
+        <!-- LEFT: Image Upload -->
+        <div>
+          <div class="card">
+            <div class="card-title">
+              <div class="card-title-dot"></div>
+              Məhsul Şəkilləri
+            </div>
+
+            <!-- OAuth Status Banner -->
+            <div class="oauth-banner disconnected" id="oauth-banner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              <div class="oauth-banner-text">
+                <strong>Google Drive qoşulmayıb</strong>
+                <span>Şəkilləri Drive-a yükləmək üçün Google hesabınıza daxil olun.</span>
+              </div>
+              <button class="btn-connect" onclick="requestDriveAccess()" id="oauth-btn">Qoşul</button>
+            </div>
+
+            <div class="upload-zone" id="dropzone">
+              <input type="file" id="file-input" accept="image/*" multiple>
+              <div class="upload-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </div>
+              <h3>Şəkil Seçin</h3>
+              <p>Sürüşdürüb buraxın və ya klikləyin</p>
+              <p class="upload-hint">JPG, PNG, WEBP · Maksimum 10 MB / şəkil</p>
+            </div>
+
+            <div class="preview-grid" id="preview-grid"></div>
+
+            <div class="progress-wrap" id="progress-wrap">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-label" id="progress-label"></div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Product Info -->
+        <div>
+          <div class="card">
+            <div class="card-title">
+              <div class="card-title-dot"></div>
+              Məhsul Məlumatları
+            </div>
+
+            <div class="form-grid">
+
+              <div class="form-group">
+                <label>Məhsul ID <span class="note">(Avtomatik)</span></label>
+                <input type="text" id="product-id" class="id-display" placeholder="Yüklənir..." disabled>
+              </div>
+
+              <div class="form-group">
+                <label>Məhsul Kodu <span class="note">(Avtomatik)</span></label>
+                <input type="text" id="product-code" class="code-display" placeholder="Yüklənir..." disabled>
+              </div>
+
+              <div class="form-group full">
+                <label>Məhsul Adı <span class="req">*</span></label>
+                <input type="text" id="product-name" placeholder="Məhsulun adını daxil edin...">
+              </div>
+
+              <div class="form-group full">
+                <label>Açıqlama</label>
+                <textarea id="product-desc" placeholder="Məhsul haqqında qısa açıqlama yazın..."></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Satış Qiyməti (₼) <span class="req">*</span></label>
+                <input type="number" id="product-price" placeholder="0.00" step="0.01" min="0">
+              </div>
+
+              <div class="form-group">
+                <label>Maya Dəyəri (₼) <span class="note">(Daxili)</span></label>
+                <input type="number" id="product-cost" placeholder="0.00" step="0.01" min="0">
+              </div>
+
+              <div class="form-group full">
+                <label>Şəkil URL <span class="note">(Drive olmadıqda əl ilə daxil edin)</span></label>
+                <input type="text" id="product-image-url" placeholder="https://lh3.googleusercontent.com/d/...">
+              </div>
+
+              <div class="form-group full">
+                <label>Hədəf Auditoriya <span class="req">*</span></label>
+                <div class="tag-group" id="tag-group">
+                  <button class="tag-btn" onclick="selectTag(this,'Xanım')">👩 Xanım</button>
+                  <button class="tag-btn" onclick="selectTag(this,'Bəy')">👨 Bəy</button>
+                  <button class="tag-btn" onclick="selectTag(this,'Uşaq')">👦 Uşaq</button>
+                  <button class="tag-btn" onclick="selectTag(this,'Həmkar')">👔 Həmkar</button>
+                </div>
+                <input type="hidden" id="product-tag" value="">
+              </div>
+
+            </div><!-- /form-grid -->
+
+            <div class="btn-group">
+              <button class="btn btn-primary" id="submit-btn" onclick="submitProduct()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                  <polyline points="17 21 17 13 7 13 7 21"/>
+                  <polyline points="7 3 7 8 15 8"/>
+                </svg>
+                Məhsulu Yadda Saxla
+                <div class="spinner" id="submit-spinner"></div>
+              </button>
+
+              <button class="btn btn-secondary" onclick="resetForm()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="1 4 1 10 7 10"/>
+                  <path d="M3.51 15a9 9 0 1 0 .49-3"/>
+                </svg>
+                Sıfırla
+              </button>
+            </div>
+
+          </div><!-- /card -->
+        </div>
+
+      </div><!-- /upload-layout -->
+    </div><!-- /page-upload -->
+
+    <!-- ════════════════════════════════════════
+         PAGE: MODIFY — Manage Products
+    ════════════════════════════════════════ -->
+    <div class="page" id="page-modify">
+      <div class="page-header">
+        <h1>Məhsulları <em>İdarə Et</em></h1>
+        <p>Mövcud məhsulların məlumatlarını dəyişdirin, qiymətləri yeniləyin.</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row" id="stats-row">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-label">Ümumi</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-xanim">—</div>
+          <div class="stat-label">👩 Xanım</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-bey">—</div>
+          <div class="stat-label">👨 Bəy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-usaq">—</div>
+          <div class="stat-label">👦 Uşaq</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-hemkar">—</div>
+          <div class="stat-label">👔 Həmkar</div>
+        </div>
+      </div>
+
+      <!-- Table Card -->
+      <div class="card" style="padding: 24px;">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="search-input" placeholder="Ad, ID və ya kod ilə axtar..." oninput="filterProducts()">
+          </div>
+
+          <select id="filter-tag" onchange="filterProducts()" style="width:auto; min-width:160px;">
+            <option value="">Bütün Kateqoriyalar</option>
+            <option value="Xanım">👩 Xanım</option>
+            <option value="Bəy">👨 Bəy</option>
+            <option value="Uşaq">👦 Uşaq</option>
+            <option value="Həmkar">👔 Həmkar</option>
+          </select>
+
+          <button class="btn btn-secondary btn-sm" onclick="loadProducts()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 .49-3"/>
+            </svg>
+            Yenilə
+          </button>
+        </div>
+
+        <div class="table-wrap" id="products-table-wrap">
+          <div class="empty-state">
+            <div class="empty-icon">📦</div>
+            <h3>Məhsullar yüklənir<span class="loading-dots"><span></span><span></span><span></span></span></h3>
+            <p>Bir az gözləyin</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-modify -->
+
+  </main>
+</div><!-- /shell -->
+
+<!-- ════════════════════════════════════════
+     EDIT MODAL
+════════════════════════════════════════ -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Məhsulu Dəyiş</div>
+        <div class="modal-subtitle" id="modal-product-id">ID yüklənir...</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()" title="Bağla">✕</button>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Məhsul Adı <span class="req">*</span></label>
+        <input type="text" id="edit-name" placeholder="Ad daxil edin...">
+      </div>
+
+      <div class="form-group full">
+        <label>Açıqlama</label>
+        <textarea id="edit-desc" placeholder="Açıqlama..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Satış Qiyməti (₼)</label>
+        <input type="number" id="edit-price" step="0.01" min="0" placeholder="0.00">
+      </div>
+
+      <div class="form-group">
+        <label>Maya Dəyəri (₼)</label>
+        <input type="number" id="edit-cost" step="0.01" min="0" placeholder="0.00">
+      </div>
+
+      <div class="form-group full">
+        <label>Şəkil URL</label>
+        <input type="text" id="edit-image" placeholder="https://lh3.googleusercontent.com/d/...">
+      </div>
+
+      <div class="form-group full">
+        <label>Məhsul Kodu</label>
+        <input type="text" id="edit-code" placeholder="BRD-0001"
+               style="font-family: 'Courier New', monospace; color: var(--gold);">
+      </div>
+
+      <div class="form-group full">
+        <label>Hədəf Auditoriya</label>
+        <div class="tag-group" id="edit-tag-group">
+          <button class="tag-btn" onclick="selectEditTag(this,'Xanım')">👩 Xanım</button>
+          <button class="tag-btn" onclick="selectEditTag(this,'Bəy')">👨 Bəy</button>
+          <button class="tag-btn" onclick="selectEditTag(this,'Uşaq')">👦 Uşaq</button>
+          <button class="tag-btn" onclick="selectEditTag(this,'Həmkar')">👔 Həmkar</button>
+        </div>
+        <input type="hidden" id="edit-tag">
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-primary" id="save-edit-btn" onclick="saveEdit()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/>
+          <polyline points="7 3 7 8 15 8"/>
+        </svg>
+        Yadda Saxla
+        <div class="spinner" id="save-spinner"></div>
+      </button>
+      <button class="btn btn-danger" onclick="closeModal()">Ləğv Et</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     GOOGLE IDENTITY SERVICES SCRIPT
+     (loaded after page is ready)
+════════════════════════════════════════ -->
+<script>
+/* ════════════════════════════════════════════════════════════════
+   BRENDIMO ADMIN — JS v2.0 (All bugs fixed)
+
+   FIXES vs original:
+   1. Drive URL template literal was broken → fixed
+   2. tokenClient was never initialized → now properly set up with GIS
+   3. No addProduct / updateProduct in Apps Script → both added via POST
+   4. Manual image URL field added as fallback when Drive not connected
+   5. OAuth banner shows connection state clearly
+   6. All API calls now properly use POST with JSON body
+   7. Removed the broken GET-based save fallback chain
+════════════════════════════════════════════════════════════════ */
+
+/* ── CONFIGURATION ─────────────────────────────────────────── */
+const API_URL   = 'https://script.google.com/macros/s/AKfycbzLoHdzT84Dwrr_8GgbTPJdklw8Nqo9gxgKwiWCSLf9nyKr6Tq9_Befx55Yl3THSxkmjg/exec';
+const FOLDER_ID = '1Rd6HW3MgRrqDPsufsqdLOCiOGbMI8Q4K';
+
+// IMPORTANT: Replace this with your actual Google OAuth 2.0 Client ID
+// from https://console.cloud.google.com → APIs & Services → Credentials
+// Make sure https://drive.googleapis.com/auth/drive.file scope is enabled.
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_OAUTH_CLIENT_ID_HERE.apps.googleusercontent.com';
+
+/* ── STATE ─────────────────────────────────────────────────── */
+let selectedFiles    = [];
+let allProducts      = [];
+let editingRowIndex  = null;
+let editingProductId = null;
+let accessToken      = null;
+let tokenClient      = null;
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'modify') loadProducts();
+}
+
+/* ══════════════════════════════════════════
+   TOAST NOTIFICATIONS
+══════════════════════════════════════════ */
+function toast(msg, type = 'success', duration = 4000) {
+  const iconMap = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${iconMap[type] || 'ℹ️'}</span><span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => {
+    el.style.animation = 'toastOut 0.3s ease forwards';
+    setTimeout(() => el.remove(), 300);
+  }, duration);
+}
+
+/* ══════════════════════════════════════════
+   ID + CODE GENERATION
+══════════════════════════════════════════ */
+function generateCode(numericId) {
+  return 'BRD-' + String(numericId).padStart(4, '0');
+}
+
+async function fetchNextIdAndCode() {
+  const idInput   = document.getElementById('product-id');
+  const codeInput = document.getElementById('product-code');
+  idInput.value   = '...';
+  codeInput.value = '...';
+
+  try {
+    const products = await fetchProducts();
+    let nextId = 1;
+
+    if (products && products.length > 0) {
+      // Determine next ID from existing product IDs
+      const ids = products
+        .map(p => parseInt(p.id || '', 10))
+        .filter(n => !isNaN(n) && n > 0);
+      if (ids.length > 0) nextId = Math.max(...ids) + 1;
+
+      // Also check product codes (BRD-XXXX) to avoid conflicts
+      const codeNums = products
+        .map(p => {
+          const code = String(p.productcode || p.v || '');
+          const match = code.match(/BRD-0*(\d+)/i);
+          return match ? parseInt(match[1], 10) : 0;
+        })
+        .filter(n => n > 0);
+
+      if (codeNums.length > 0) {
+        nextId = Math.max(nextId, Math.max(...codeNums) + 1);
+      }
+    }
+
+    idInput.value   = nextId;
+    codeInput.value = generateCode(nextId);
+    return nextId;
+
+  } catch (e) {
+    idInput.value   = 'Xəta';
+    codeInput.value = 'Xəta';
+    toast('ID yüklənmədi. Şəbəkə bağlantınızı yoxlayın.', 'warning');
+    return null;
+  }
+}
+
+/* ══════════════════════════════════════════
+   FETCH PRODUCTS FROM SHEETS
+══════════════════════════════════════════ */
+async function fetchProducts() {
+  const r = await fetch(API_URL + '?action=getProducts', {
+    method: 'GET',
+    redirect: 'follow'
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const data = await r.json();
+  return data.products || [];
+}
+
+/* ══════════════════════════════════════════
+   GOOGLE OAUTH 2.0 — DRIVE ACCESS
+   FIX: tokenClient is now properly initialized
+   using Google Identity Services (GIS).
+══════════════════════════════════════════ */
+function initGoogleIdentityServices() {
+  // Only init if the GIS library has loaded and we have a real Client ID
+  if (typeof google === 'undefined' || !google.accounts || !GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID.includes('YOUR_GOOGLE')) {
+    console.warn('Google Identity Services not available or Client ID not set.');
+    return;
+  }
+
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/drive.file',
+    callback: (response) => {
+      if (response.access_token) {
+        accessToken = response.access_token;
+        updateOAuthBanner(true);
+        toast('Google Drive-a uğurla qoşuldu!', 'success');
+      } else {
+        toast('Google girişi alınmadı. Yenidən cəhd edin.', 'error');
+      }
+    },
+    error_callback: (err) => {
+      console.error('OAuth error:', err);
+      toast('OAuth xətası: ' + (err.message || err.type || 'Naməlum xəta'), 'error');
+    }
+  });
+}
+
+function requestDriveAccess() {
+  if (!tokenClient) {
+    // If GIS is not configured, explain what's needed
+    if (GOOGLE_CLIENT_ID.includes('YOUR_GOOGLE')) {
+      toast('GOOGLE_CLIENT_ID konfiqurasiya edilməyib. Şəkil URL-ni əl ilə daxil edin.', 'warning', 6000);
+    } else {
+      toast('Google API yüklənir, bir az gözləyin...', 'info');
+    }
+    return;
+  }
+
+  if (accessToken) {
+    // Already connected — offer to disconnect
+    accessToken = null;
+    updateOAuthBanner(false);
+    toast('Google Drive-dan çıxıldı.', 'info');
+    return;
+  }
+
+  tokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+function updateOAuthBanner(connected) {
+  const banner = document.getElementById('oauth-banner');
+  const btn    = document.getElementById('oauth-btn');
+
+  if (connected) {
+    banner.className = 'oauth-banner connected';
+    banner.querySelector('svg').innerHTML = `
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+      <polyline points="22 4 12 14.01 9 11.01"/>
+    `;
+    banner.querySelector('strong').textContent = 'Google Drive qoşulub';
+    banner.querySelector('span').textContent   = 'Şəkillər avtomatik yüklənəcək.';
+    btn.textContent = 'Çıx';
+  } else {
+    banner.className = 'oauth-banner disconnected';
+    banner.querySelector('svg').innerHTML = `
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    `;
+    banner.querySelector('strong').textContent = 'Google Drive qoşulmayıb';
+    banner.querySelector('span').textContent   = 'Şəkilləri Drive-a yükləmək üçün qoşulun.';
+    btn.textContent = 'Qoşul';
+  }
+}
+
+/* ══════════════════════════════════════════
+   FILE DRAG + DROP HANDLING
+══════════════════════════════════════════ */
+const dropzone  = document.getElementById('dropzone');
+const fileInput = document.getElementById('file-input');
+
+dropzone.addEventListener('dragover',  e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', e => { if (!dropzone.contains(e.relatedTarget)) dropzone.classList.remove('dragover'); });
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+function handleFiles(files) {
+  let added = 0;
+  for (const f of files) {
+    if (!f.type.startsWith('image/')) {
+      toast(`"${f.name}" şəkil faylı deyil`, 'error');
+      continue;
+    }
+    if (f.size > 10 * 1024 * 1024) {
+      toast(`"${f.name}" 10 MB-dan böyükdür`, 'error');
+      continue;
+    }
+    const isDup = selectedFiles.some(sf => sf.name === f.name && sf.size === f.size);
+    if (!isDup) { selectedFiles.push(f); added++; }
+  }
+  if (added > 0) {
+    renderPreviews();
+    toast(`${added} şəkil əlavə edildi`, 'success');
+    // Auto-fetch ID if not yet loaded
+    const pid = document.getElementById('product-id').value;
+    if (!pid || pid === '...' || pid === 'Xəta') {
+      fetchNextIdAndCode();
+    }
+  }
+}
+
+function renderPreviews() {
+  const grid = document.getElementById('preview-grid');
+  grid.innerHTML = '';
+  selectedFiles.forEach((f, i) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const item = document.createElement('div');
+      item.className = 'preview-item';
+      item.innerHTML = `
+        <img src="${e.target.result}" alt="${f.name}" title="${f.name}">
+        ${i === 0 ? '<div class="preview-badge">Əsas</div>' : ''}
+        <button class="preview-remove" onclick="removeFile(${i})" title="Sil">✕</button>
+      `;
+      grid.appendChild(item);
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+function removeFile(i) {
+  selectedFiles.splice(i, 1);
+  renderPreviews();
+  if (selectedFiles.length === 0) toast('Bütün şəkillər silindi', 'info');
+}
+
+/* ══════════════════════════════════════════
+   TAG SELECTORS
+══════════════════════════════════════════ */
+function selectTag(btn, val) {
+  document.querySelectorAll('#tag-group .tag-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('product-tag').value = val;
+}
+
+function selectEditTag(btn, val) {
+  document.querySelectorAll('#edit-tag-group .tag-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('edit-tag').value = val;
+}
+
+/* ══════════════════════════════════════════
+   PROGRESS BAR
+══════════════════════════════════════════ */
+function setProgress(pct, label = '') {
+  const wrap = document.getElementById('progress-wrap');
+  const fill = document.getElementById('progress-fill');
+  const lbl  = document.getElementById('progress-label');
+  const show = pct > 0;
+  wrap.style.display = show ? 'block' : 'none';
+  lbl.style.display  = show ? 'block' : 'none';
+  fill.style.width   = pct + '%';
+  lbl.textContent    = label;
+}
+
+/* ══════════════════════════════════════════
+   DRIVE UPLOAD
+   FIX: Template literal was broken in original.
+   `http://googleusercontent.com/profile/picture/3{uploaded.id}`
+   is now correct: `https://lh3.googleusercontent.com/d/${uploaded.id}`
+══════════════════════════════════════════ */
+async function uploadFileToDrive(file, nameBase, token) {
+  const ext      = file.name.split('.').pop().toLowerCase();
+  const fileName = `${nameBase}.${ext}`;
+
+  setProgress(20, `"${fileName}" hazırlanır...`);
+
+  const metadata = JSON.stringify({
+    name:    fileName,
+    parents: [FOLDER_ID]
+  });
+
+  const form = new FormData();
+  form.append('metadata', new Blob([metadata], { type: 'application/json' }));
+  form.append('file', file);
+
+  setProgress(50, 'Yüklənir...');
+
+  const resp = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+    method:  'POST',
+    headers: { 'Authorization': 'Bearer ' + token },
+    body:    form
+  });
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Upload xətası: HTTP ${resp.status}`);
+  }
+
+  const uploaded = await resp.json();
+  setProgress(80, 'İcazələr tənzimlənir...');
+
+  // Make the file publicly readable so it can be used as an image src
+  await fetch(`https://www.googleapis.com/drive/v3/files/${uploaded.id}/permissions`, {
+    method:  'POST',
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body:    JSON.stringify({ role: 'reader', type: 'anyone' })
+  });
+
+  setProgress(100, 'Tamamlandı!');
+  setTimeout(() => setProgress(0), 1800);
+
+  // ✅ FIXED: Correct lh3.googleusercontent.com URL with proper template literal
+  return `https://lh3.googleusercontent.com/d/${uploaded.id}`;
+}
+
+/* ══════════════════════════════════════════
+   API — POST to Apps Script
+   All write operations use POST with JSON body.
+   The Apps Script doPost handler must support
+   addProduct and updateProduct actions.
+══════════════════════════════════════════ */
+async function callAPI(action, data) {
+  const resp = await fetch(API_URL, {
+    method:   'POST',
+    headers:  { 'Content-Type': 'text/plain;charset=utf-8' },
+    body:     JSON.stringify({ action, ...data }),
+    redirect: 'follow'
+  });
+
+  if (!resp.ok) throw new Error(`API xətası: HTTP ${resp.status}`);
+
+  const result = await resp.json().catch(() => ({ success: true }));
+
+  if (result.success === false) {
+    throw new Error(result.error || 'API xətası baş verdi');
+  }
+
+  return result;
+}
+
+/* ══════════════════════════════════════════
+   SUBMIT NEW PRODUCT
+══════════════════════════════════════════ */
+async function submitProduct() {
+  const name     = document.getElementById('product-name').value.trim();
+  const desc     = document.getElementById('product-desc').value.trim();
+  const price    = parseFloat(document.getElementById('product-price').value) || 0;
+  const cost     = parseFloat(document.getElementById('product-cost').value)  || 0;
+  const tag      = document.getElementById('product-tag').value;
+  const pid      = document.getElementById('product-id').value;
+  const code     = document.getElementById('product-code').value;
+  const manualUrl = document.getElementById('product-image-url').value.trim();
+
+  // Validation
+  if (!name) {
+    toast('Məhsul adı mütləqdir!', 'error');
+    return;
+  }
+  if (!pid || pid === '...' || pid === 'Xəta') {
+    toast('Məhsul ID hələ yüklənməyib. Bir az gözləyin...', 'warning');
+    return;
+  }
+  if (!tag) {
+    toast('Hədəf auditoriya seçin!', 'error');
+    return;
+  }
+
+  setBusy(true);
+
+  try {
+    let imageUrl = manualUrl; // Start with manually entered URL
+
+    // Try to upload to Drive if connected and files selected
+    if (selectedFiles.length > 0 && accessToken) {
+      try {
+        imageUrl = await uploadFileToDrive(selectedFiles[0], pid, accessToken);
+        toast('Əsas şəkil Drive-a yükləndi!', 'success');
+
+        // Upload additional images with suffix letters (a, b, c…)
+        for (let i = 1; i < selectedFiles.length; i++) {
+          const suffix = String.fromCharCode(97 + i - 1); // a, b, c...
+          await uploadFileToDrive(selectedFiles[i], pid + suffix, accessToken);
+        }
+      } catch (driveErr) {
+        console.error('Drive upload failed:', driveErr);
+        toast(`Şəkil yükləmə xətası: ${driveErr.message}. URL-i əl ilə daxil edə bilərsiniz.`, 'warning', 7000);
+        // imageUrl stays as manualUrl — don't block the save
+      }
+    } else if (selectedFiles.length > 0 && !accessToken) {
+      toast('Drive qoşulmayıb — şəkil URL-i əl ilə daxil edilir.', 'info', 4000);
+    }
+
+    // Save product to Google Sheets via Apps Script
+    await callAPI('addProduct', {
+      id:          pid,
+      name:        name,
+      description: desc,
+      cost:        cost,
+      price:       price,
+      image:       imageUrl,
+      imagepreview: imageUrl,
+      tag:         tag,
+      productcode: code
+    });
+
+    toast(`Məhsul #${pid} "${name}" uğurla əlavə edildi!`, 'success', 5000);
+
+    resetForm();
+    fetchNextIdAndCode();
+
+  } catch (e) {
+    toast('Xəta: ' + e.message, 'error', 6000);
+  } finally {
+    setBusy(false);
+  }
+}
+
+function setBusy(busy) {
+  const btn     = document.getElementById('submit-btn');
+  const spinner = document.getElementById('submit-spinner');
+  btn.disabled             = busy;
+  spinner.style.display    = busy ? 'block' : 'none';
+}
+
+function resetForm() {
+  document.getElementById('product-name').value      = '';
+  document.getElementById('product-desc').value      = '';
+  document.getElementById('product-price').value     = '';
+  document.getElementById('product-cost').value      = '';
+  document.getElementById('product-tag').value       = '';
+  document.getElementById('product-image-url').value = '';
+  document.querySelectorAll('#tag-group .tag-btn').forEach(b => b.classList.remove('selected'));
+  selectedFiles = [];
+  document.getElementById('preview-grid').innerHTML = '';
+  document.getElementById('file-input').value = '';
+  setProgress(0);
+}
+
+/* ══════════════════════════════════════════
+   LOAD + RENDER PRODUCTS TABLE
+══════════════════════════════════════════ */
+async function loadProducts() {
+  const wrap = document.getElementById('products-table-wrap');
+  wrap.innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">⏳</div>
+      <h3>Yüklənir<span class="loading-dots"><span></span><span></span><span></span></span></h3>
+      <p>Google Sheets-dən məlumatlar alınır</p>
+    </div>`;
+
+  try {
+    allProducts = await fetchProducts();
+    updateStats(allProducts);
+    renderTable(allProducts);
+    if (allProducts.length > 0) {
+      toast(`${allProducts.length} məhsul yükləndi`, 'success', 2500);
+    }
+  } catch (e) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">❌</div>
+        <h3>Yüklənmə xətası</h3>
+        <p>${e.message}</p>
+      </div>`;
+    toast('Məhsullar yüklənə bilmədi: ' + e.message, 'error');
+  }
+}
+
+function updateStats(products) {
+  const count = tag => products.filter(p => (p.tag || p.l || '') === tag).length;
+  document.getElementById('stat-total').textContent  = products.length;
+  document.getElementById('stat-xanim').textContent  = count('Xanım');
+  document.getElementById('stat-bey').textContent    = count('Bəy');
+  document.getElementById('stat-usaq').textContent   = count('Uşaq');
+  document.getElementById('stat-hemkar').textContent = count('Həmkar');
+}
+
+function filterProducts() {
+  const q   = document.getElementById('search-input').value.toLowerCase().trim();
+  const tag = document.getElementById('filter-tag').value;
+
+  const filtered = allProducts.filter(p => {
+    const name = (p.name || '').toLowerCase();
+    const id   = String(p.id || '');
+    const code = (p.productcode || p.v || '').toLowerCase();
+    const ptag = p.tag || p.l || '';
+
+    const matchQ   = !q || name.includes(q) || id.includes(q) || code.includes(q);
+    const matchTag = !tag || ptag === tag;
+    return matchQ && matchTag;
+  });
+
+  renderTable(filtered);
+}
+
+function renderTable(products) {
+  const wrap = document.getElementById('products-table-wrap');
+
+  if (!products || products.length === 0) {
+    wrap.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>Nəticə tapılmadı</h3>
+        <p>Axtarış kriteriyasını dəyişin</p>
+      </div>`;
+    return;
+  }
+
+  const tagClass = tag => ({ 'Xanım': 'xanim', 'Bəy': 'bey', 'Uşaq': 'usaq', 'Həmkar': 'hemkar' }[tag] || 'none');
+
+  let html = `
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Şəkil</th>
+          <th>Ad</th>
+          <th>Qiymət</th>
+          <th>Kateqoriya</th>
+          <th>Kod</th>
+          <th>Əməliyyat</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+  products.forEach(p => {
+    const tag      = p.tag || p.l || '';
+    const img      = p.image || p.imagepreview || p.f || '';
+    const price    = p.price || p.e || 0;
+    const code     = p.productcode || p.v || '—';
+    const realIdx  = allProducts.indexOf(p);
+
+    html += `
+      <tr>
+        <td><span class="id-pill">#${p.id}</span></td>
+        <td style="padding: 10px 16px;">
+          ${img
+            ? `<img class="product-thumb" src="${img}" alt="" loading="lazy"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+            : ''}
+          <div class="product-thumb-placeholder" style="${img ? 'display:none' : ''}">📦</div>
+        </td>
+        <td>
+          <div class="product-name" title="${p.name || ''}">${p.name || '—'}</div>
+        </td>
+        <td><span class="price-text">${price ? price + ' ₼' : '—'}</span></td>
+        <td>
+          ${tag
+            ? `<span class="badge badge-${tagClass(tag)}">${tag}</span>`
+            : '<span class="badge badge-none">—</span>'}
+        </td>
+        <td>${code !== '—'
+            ? `<span class="code-pill">${code}</span>`
+            : '<span style="color:var(--text2);opacity:0.4">—</span>'}</td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="openEditModal(${realIdx})">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20h9"/>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            Dəyiş
+          </button>
+        </td>
+      </tr>`;
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+/* ══════════════════════════════════════════
+   EDIT MODAL
+══════════════════════════════════════════ */
+function openEditModal(index) {
+  const p = allProducts[index];
+  if (!p) return;
+
+  editingRowIndex  = index;
+  editingProductId = p.id;
+
+  document.getElementById('modal-product-id').textContent =
+    `ID: #${p.id}  ·  Kod: ${p.productcode || p.v || '—'}`;
+
+  document.getElementById('edit-name').value  = p.name        || '';
+  document.getElementById('edit-desc').value  = p.description || p.c || '';
+  document.getElementById('edit-price').value = p.price       || p.e || '';
+  document.getElementById('edit-cost').value  = p.cost        || p.d || '';
+  document.getElementById('edit-image').value = p.image       || p.imagepreview || p.f || '';
+  document.getElementById('edit-code').value  = p.productcode || p.v || '';
+
+  const currentTag = p.tag || p.l || '';
+  document.getElementById('edit-tag').value = currentTag;
+  document.querySelectorAll('#edit-tag-group .tag-btn').forEach(b => {
+    b.classList.toggle('selected', currentTag !== '' && b.textContent.trim().includes(currentTag));
+  });
+
+  document.getElementById('edit-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+  document.body.style.overflow = '';
+  editingRowIndex  = null;
+  editingProductId = null;
+}
+
+document.getElementById('edit-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('edit-modal')) closeModal();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+/* ══════════════════════════════════════════
+   SAVE EDIT
+══════════════════════════════════════════ */
+async function saveEdit() {
+  if (editingRowIndex === null) return;
+
+  const p = allProducts[editingRowIndex];
+
+  const updatedData = {
+    id:          editingProductId,
+    name:        document.getElementById('edit-name').value.trim(),
+    description: document.getElementById('edit-desc').value.trim(),
+    price:       parseFloat(document.getElementById('edit-price').value) || 0,
+    cost:        parseFloat(document.getElementById('edit-cost').value)  || 0,
+    image:       document.getElementById('edit-image').value.trim(),
+    tag:         document.getElementById('edit-tag').value,
+    productcode: document.getElementById('edit-code').value.trim()
+  };
+
+  if (!updatedData.name) {
+    toast('Ad mütləqdir!', 'error');
+    return;
+  }
+
+  const btn     = document.getElementById('save-edit-btn');
+  const spinner = document.getElementById('save-spinner');
+  btn.disabled           = true;
+  spinner.style.display  = 'block';
+
+  try {
+    await callAPI('updateProduct', updatedData);
+
+    // Optimistically update the local data
+    allProducts[editingRowIndex] = {
+      ...p,
+      name:        updatedData.name,
+      description: updatedData.description,
+      price:       updatedData.price,
+      cost:        updatedData.cost,
+      image:       updatedData.image,
+      imagepreview:updatedData.image,
+      tag:         updatedData.tag,
+      l:           updatedData.tag,
+      productcode: updatedData.productcode,
+      v:           updatedData.productcode
+    };
+
+    updateStats(allProducts);
+    filterProducts();
+    closeModal();
+    toast(`Məhsul #${editingProductId} yeniləndi!`, 'success');
+
+  } catch (e) {
+    toast('Yadda saxlama xətası: ' + e.message, 'error');
+  } finally {
+    btn.disabled           = false;
+    spinner.style.display  = 'none';
+  }
+}
+
+/* ══════════════════════════════════════════
+   INITIALIZATION
+══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  fetchNextIdAndCode();
+
+  // Load Google Identity Services script dynamically
+  if (GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.includes('YOUR_GOOGLE')) {
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.onload = () => {
+      initGoogleIdentityServices();
+    };
+    script.onerror = () => {
+      console.warn('Google Identity Services could not be loaded.');
+    };
+    document.head.appendChild(script);
+  }
+});
+</script>
+</body>
+</html>
