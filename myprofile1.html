@@ -1773,15 +1773,13 @@
         <i class="fa-solid fa-list-check"></i>
         <span>Tapşırıqlar</span>
       </button>
-      <button class="nav-btn locked" id="nav-magaza" onclick="app.nav('magaza', this)">
+      <button class="nav-btn" id="nav-magaza" onclick="app.nav('magaza', this)">
         <i class="fa-solid fa-store"></i>
         <span>Mağaza</span>
-        <div class="nav-lock-badge"><i class="fa-solid fa-lock" style="font-size:7px;"></i></div>
       </button>
-      <button class="nav-btn locked" id="nav-yeni" onclick="app.nav('yeni', this)">
+      <button class="nav-btn" id="nav-yeni" onclick="app.nav('yeni', this)">
         <i class="fa-solid fa-plus"></i>
         <span>Yeni</span>
-        <div class="nav-lock-badge"><i class="fa-solid fa-lock" style="font-size:7px;"></i></div>
       </button>
       <button class="nav-btn" id="nav-sifarisler" onclick="app.nav('sifarisler', this)">
         <i class="fa-solid fa-bag-shopping"></i>
@@ -2052,14 +2050,11 @@
     },
 
     /* ── 3. NAV SWITCHING ── */
+  /* ── 3. NAV SWITCHING ── */
     nav: (page, btnEl) => {
       const maxLevel = app.getMaxUnlockedLevel();
 
-      // Lock check for Mağaza & Yeni
-      if ((page === 'magaza' || page === 'yeni') && maxLevel < 2) {
-        ui.toast('Bu bölmə 2-ci səviyyəyə çatdıqda açılır!');
-        return;
-      }
+      // Deactivate all nav buttons and pages
 
       // Deactivate all nav buttons and pages
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -2076,18 +2071,14 @@
     },
 
     /* ── 4. UNLOCK NAV ── */
+  /* ── 4. UNLOCK NAV ── */
     updateNavLocks: () => {
-      const maxLevel = app.getMaxUnlockedLevel();
       const navMagaza = ui.el('nav-magaza');
       const navYeni   = ui.el('nav-yeni');
 
-      if (maxLevel >= 2) {
-        navMagaza.classList.remove('locked');
-        navYeni.classList.remove('locked');
-      } else {
-        navMagaza.classList.add('locked');
-        navYeni.classList.add('locked');
-      }
+      // Always keep them unlocked
+      if (navMagaza) navMagaza.classList.remove('locked');
+      if (navYeni) navYeni.classList.remove('locked');
     },
 
     /* ── 5. PROFILE SECTION ── */
