@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Poz-Qazan | Hədiyyə Sehrbazı</title>
+<style>
+  :root {
+    --gold: #FFD700;
+    --gold-light: #FFE866;
+    --gold-dark: #B8860B;
+    --purple-deep: #0D0A1E;
+    --purple-mid: #1A1040;
+    --blue-neon: #6C63FF;
+    --pink-neon: #FF6B9D;
+    --text-light: #E8E0FF;
+    --text-muted: #9B8EC4;
+    --success: #00E5A0;
+    --glass-bg: rgba(255,255,255,0.05);
+    --glass-border: rgba(255,255,255,0.12);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { min-height:100%; font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--purple-deep); color:var(--text-light); overflow-x:hidden; }
+  body::before { content:''; position:fixed; inset:0; background: radial-gradient(ellipse 80% 60% at 10% 10%,rgba(108,99,255,.22) 0%,transparent 60%), radial-gradient(ellipse 60% 50% at 90% 80%,rgba(255,107,157,.15) 0%,transparent 60%), radial-gradient(ellipse 50% 40% at 50% 50%,rgba(255,215,0,.06) 0%,transparent 70%); z-index:0; pointer-events:none; }
+  .stars { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .star { position:absolute; background:white; border-radius:50%; animation:twinkle var(--dur,3s) ease-in-out infinite; opacity:0; }
+  @keyframes twinkle { 0%,100%{opacity:0;transform:scale(.8)} 50%{opacity:var(--max-op,.7);transform:scale(1.2)} }
+  header { position:relative; z-index:10; text-align:center; padding:28px 20px 16px; }
+  .logo-badge { display:inline-flex; align-items:center; gap:10px; background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:50px; padding:8px 20px; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); margin-bottom:18px; }
+  .logo-badge .wand { font-size:20px; animation:wandWave 2s ease-in-out infinite; }
+  @keyframes wandWave { 0%,100%{transform:rotate(-10deg)} 50%{transform:rotate(15deg)} }
+  .logo-badge span { font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; background:linear-gradient(135deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .page-title { font-size:clamp(28px,7vw,48px); font-weight:900; letter-spacing:-1px; line-height:1.1; background:linear-gradient(135deg,#fff 30%,var(--gold-light) 70%,var(--gold) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:8px; }
+  .page-subtitle { font-size:14px; color:var(--text-muted); letter-spacing:.5px; }
+  .main { position:relative; z-index:5; max-width:520px; margin:0 auto; padding:0 16px 40px; }
+  .progress-section { margin-bottom:20px; text-align:center; }
+  .progress-label { font-size:13px; color:var(--text-muted); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
+  .progress-label span { color:var(--gold); font-weight:700; }
+  .progress-track { height:6px; background:rgba(255,255,255,.08); border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,.06); }
+  .progress-fill { height:100%; width:0%; border-radius:10px; background:linear-gradient(90deg,var(--blue-neon),var(--gold)); transition:width .15s ease; box-shadow:0 0 8px rgba(108,99,255,.6); }
+  .hint-text { font-size:11px; color:var(--text-muted); margin-top:6px; display:flex; align-items:center; justify-content:center; gap:5px; }
+  .card-wrapper { position:relative; border-radius:24px; overflow:hidden; box-shadow:0 0 0 1px var(--glass-border),0 20px 60px rgba(0,0,0,.6),0 0 80px rgba(108,99,255,.15),inset 0 1px 0 rgba(255,255,255,.1); background:linear-gradient(145deg,#211558,#1A0F3E,#0F0A28); margin-bottom:20px; }
+  .card-header { padding:18px 22px 14px; border-bottom:1px solid rgba(255,255,255,.06); display:flex; align-items:center; justify-content:space-between; }
+  .card-header-left { display:flex; align-items:center; gap:10px; }
+  .card-icon { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--gold-dark),var(--gold)); display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 4px 12px rgba(255,215,0,.3); }
+  .card-header-title { font-size:15px; font-weight:700; }
+  .card-header-sub { font-size:11px; color:var(--text-muted); margin-top:1px; }
+  .card-badge { background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,215,0,.05)); border:1px solid rgba(255,215,0,.3); border-radius:20px; padding:4px 10px; font-size:11px; color:var(--gold); font-weight:700; letter-spacing:.5px; }
+  .scratch-area { position:relative; margin:16px; border-radius:16px; overflow:hidden; cursor:crosshair; user-select:none; -webkit-user-select:none; touch-action:none; }
+  .prize-reveal { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px 20px; background:linear-gradient(135deg,#1C1040,#251555,#1A0D40); text-align:center; gap:10px; z-index:1; }
+  .prize-emoji { font-size:40px; animation:prizeFloat 3s ease-in-out infinite; }
+  @keyframes prizeFloat { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-6px) scale(1.05)} }
+  .prize-name { font-size:clamp(14px,3.5vw,18px); font-weight:900; line-height:1.25; background:linear-gradient(135deg,var(--gold-light),var(--gold),#FFA500); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:-.3px; }
+  .prize-desc { font-size:11px; color:rgba(200,185,255,.8); line-height:1.5; max-width:260px; }
+  .prize-shine { position:absolute; inset:0; background:radial-gradient(ellipse 60% 40% at 50% 50%,rgba(255,215,0,.08) 0%,transparent 70%); pointer-events:none; }
+  canvas#scratchCanvas { position:relative; z-index:2; display:block; width:100%; border-radius:16px; cursor:crosshair; touch-action:none; -webkit-touch-callout:none; }
+  .card-footer { padding:14px 22px 18px; border-top:1px solid rgba(255,255,255,.06); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .footer-info { font-size:11px; color:var(--text-muted); display:flex; align-items:center; gap:5px; }
+  .footer-info .dot { width:6px; height:6px; border-radius:50%; background:var(--success); box-shadow:0 0 6px var(--success); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .auto-reveal-btn { background:linear-gradient(135deg,rgba(108,99,255,.2),rgba(108,99,255,.1)); border:1px solid rgba(108,99,255,.4); border-radius:20px; padding:6px 14px; font-size:11px; font-weight:700; color:#A89BFF; cursor:pointer; transition:all .2s; letter-spacing:.5px; white-space:nowrap; }
+  .auto-reveal-btn:hover { background:linear-gradient(135deg,rgba(108,99,255,.4),rgba(108,99,255,.2)); transform:translateY(-1px); box-shadow:0 4px 12px rgba(108,99,255,.3); }
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  .info-card { background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:14px; padding:14px; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); display:flex; align-items:center; gap:10px; }
+  .info-card .ic-icon { font-size:22px; }
+  .info-card-text .ic-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.8px; }
+  .info-card-text .ic-val { font-size:13px; font-weight:700; color:var(--gold); margin-top:2px; }
+  .disclaimer { background:rgba(255,215,0,.04); border:1px solid rgba(255,215,0,.12); border-radius:12px; padding:12px 14px; font-size:11px; color:rgba(255,215,0,.7); line-height:1.6; display:flex; gap:8px; align-items:flex-start; }
+  .disclaimer .di-icon { font-size:14px; flex-shrink:0; margin-top:1px; }
+  #winModal { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity .4s ease; }
+  #winModal.active { opacity:1; pointer-events:all; }
+  .modal-overlay { position:absolute; inset:0; background:rgba(5,3,18,.88); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+  .modal-box { position:relative; z-index:10; background:linear-gradient(145deg,#1E1248,#170E3D,#221455); border:1px solid rgba(255,215,0,.25); border-radius:28px; padding:36px 28px 28px; max-width:400px; width:100%; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 60px rgba(255,215,0,.08),inset 0 1px 0 rgba(255,255,255,.1); transform:scale(.85) translateY(30px); transition:transform .4s cubic-bezier(.34,1.56,.64,1); }
+  #winModal.active .modal-box { transform:scale(1) translateY(0); }
+  .modal-crown { font-size:52px; margin-bottom:6px; display:block; animation:crownBounce .8s cubic-bezier(.34,1.56,.64,1) forwards; transform:scale(0); }
+  @keyframes crownBounce { to { transform:scale(1) rotate(10deg); } }
+  .modal-congrats { font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:var(--gold); margin-bottom:8px; opacity:0; animation:fadeUp .4s .3s forwards; }
+  .modal-prize-name { font-size:clamp(18px,5vw,24px); font-weight:900; line-height:1.2; background:linear-gradient(135deg,#fff 20%,var(--gold-light) 60%,var(--gold) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:12px; opacity:0; animation:fadeUp .4s .45s forwards; }
+  .modal-divider { height:1px; background:linear-gradient(90deg,transparent,rgba(255,215,0,.3),transparent); margin:14px 0; }
+  .modal-prize-desc { font-size:13px; color:rgba(200,185,255,.85); line-height:1.65; margin-bottom:14px; opacity:0; animation:fadeUp .4s .6s forwards; }
+  .modal-warning { background:rgba(255,215,0,.06); border:1px solid rgba(255,215,0,.15); border-radius:12px; padding:12px 14px; font-size:11px; color:rgba(255,215,0,.75); line-height:1.6; text-align:left; display:flex; gap:8px; margin-bottom:20px; opacity:0; animation:fadeUp .4s .7s forwards; }
+  .modal-warning .mw-icon { font-size:14px; flex-shrink:0; }
+  .modal-actions { display:flex; gap:10px; flex-direction:column; opacity:0; animation:fadeUp .4s .85s forwards; }
+  .btn-primary { background:linear-gradient(135deg,var(--gold-dark),var(--gold),var(--gold-light)); border:none; border-radius:14px; padding:14px 20px; font-size:14px; font-weight:800; color:#1A0A00; cursor:pointer; letter-spacing:.5px; transition:all .2s; box-shadow:0 6px 20px rgba(255,215,0,.35); width:100%; }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(255,215,0,.5); }
+  .btn-secondary { background:var(--glass-bg); border:1px solid var(--glass-border); border-radius:14px; padding:12px 20px; font-size:13px; font-weight:700; color:var(--text-muted); cursor:pointer; transition:all .2s; width:100%; }
+  .btn-secondary:hover { border-color:rgba(255,255,255,.25); color:var(--text-light); }
+  .share-row { display:flex; gap:8px; }
+  .share-row .btn-secondary { flex:1; padding:10px 12px; font-size:12px; display:flex; align-items:center; justify-content:center; gap:6px; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  #alreadyPlayed { position:fixed; inset:0; z-index:900; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity .4s; }
+  #alreadyPlayed.active { opacity:1; pointer-events:all; }
+  .ap-overlay { position:absolute; inset:0; background:rgba(5,3,18,.9); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
+  .ap-box { position:relative; z-index:10; background:linear-gradient(145deg,#1E1248,#170E3D); border:1px solid rgba(255,107,157,.2); border-radius:28px; padding:40px 28px; max-width:380px; width:100%; text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 40px rgba(255,107,157,.08); }
+  .ap-icon { font-size:56px; margin-bottom:12px; display:block; }
+  .ap-title { font-size:20px; font-weight:900; margin-bottom:8px; color:var(--pink-neon); }
+  .ap-desc { font-size:13px; color:var(--text-muted); line-height:1.65; margin-bottom:20px; }
+  .countdown-box { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:16px; margin-bottom:20px; }
+  .countdown-label { font-size:11px; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; }
+  .countdown-timer { font-size:32px; font-weight:900; font-variant-numeric:tabular-nums; background:linear-gradient(135deg,var(--pink-neon),var(--blue-neon)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; letter-spacing:2px; }
+  #confettiCanvas { position:fixed; inset:0; z-index:999; pointer-events:none; }
+  @media(max-width:400px) { .card-header,.card-footer{padding:14px 16px} .scratch-area{margin:12px} .modal-box{padding:28px 20px 22px} }
+</style>
+</head>
+<body>
+<div class="stars" id="starsContainer"></div>
+<canvas id="confettiCanvas"></canvas>
+
+<div id="alreadyPlayed">
+  <div class="ap-overlay"></div>
+  <div class="ap-box">
+    <span class="ap-icon">⏳</span>
+    <div class="ap-title">Bugünkü şansınızı istifadə etdiniz!</div>
+    <div class="ap-desc">Siz artıq bu gün üçün olan şansınızı istifadə etmisiniz. Hər gün yalnız bir cəhd hüququnuz var.</div>
+    <div class="countdown-box">
+      <div class="countdown-label">Növbəti şansınıza qalan vaxt</div>
+      <div class="countdown-timer" id="cdTimer">00:00:00</div>
+    </div>
+    <button class="btn-primary" onclick="document.getElementById('alreadyPlayed').classList.remove('active')" style="max-width:200px;margin:0 auto;display:block;">Anlayıram</button>
+  </div>
+</div>
+
+<div id="winModal">
+  <div class="modal-overlay" onclick="closeModal()"></div>
+  <div class="modal-box">
+    <span class="modal-crown">👑</span>
+    <div class="modal-congrats">TƏBRİKLƏR!</div>
+    <div class="modal-prize-name" id="mPrizeName"></div>
+    <div class="modal-divider"></div>
+    <div class="modal-prize-desc" id="mPrizeDesc"></div>
+    <div class="modal-warning">
+      <span class="mw-icon">ℹ️</span>
+      <span>Qazanılan bütün keşbeklər növbəti alış-verişlərdə hissə-hissə, hər sifarişdə maksimum 10 AZN silinməklə istifadə edilə bilər.</span>
+    </div>
+    <div class="modal-actions">
+      <div class="share-row">
+        <button class="btn-secondary" onclick="shareResult()">📤 Paylaş</button>
+        <button class="btn-secondary" onclick="screenshotResult()">📷 Ekran görüntüsü</button>
+      </div>
+      <button class="btn-primary" onclick="goShopping()">🛍️ İndi Alış-Verişə Get</button>
+      <button class="btn-secondary" onclick="closeModal()">Bağla</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="logo-badge">
+    <span class="wand">🪄</span>
+    <span>sehrbaz.com</span>
+  </div>
+  <h1 class="page-title">Poz &amp; Qazan</h1>
+  <p class="page-subtitle">Səthini pozaraq hədiyyəni aç!</p>
+</header>
+
+<main class="main">
+  <div class="progress-section">
+    <div class="progress-label">
+      <span>Qazıma proqresi</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="hint-text">✏️ &nbsp;Hədiyyəni açmaq üçün <strong style="color:var(--gold);margin-left:3px"> 50%-ni qazıyın</strong></div>
+  </div>
+
+  <div class="card-wrapper">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-icon">🎁</div>
+        <div>
+          <div class="card-header-title">Sehrli Bilet</div>
+          <div class="card-header-sub">Hədiyyə Sehrbazı — Xüsusi Təklif</div>
+        </div>
+      </div>
+      <div class="card-badge">CANLI</div>
+    </div>
+    <div class="scratch-area" id="scratchArea">
+      <div class="prize-reveal" id="prizeReveal">
+        <div class="prize-shine"></div>
+        <div class="prize-emoji" id="prizeEmoji">🎁</div>
+        <div class="prize-name" id="prizeName">Hədiyyəni aç!</div>
+        <div class="prize-desc" id="prizeDesc"></div>
+      </div>
+      <canvas id="scratchCanvas"></canvas>
+    </div>
+    <div class="card-footer">
+      <div class="footer-info">
+        <div class="dot"></div>
+        <span>Bilet aktiv və etibarlıdır</span>
+      </div>
+      <button class="auto-reveal-btn" onclick="autoReveal()">Hamısını Aç ↗</button>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card"><div class="ic-icon">🎯</div><div class="info-card-text"><div class="ic-label">Günlük Cəhd</div><div class="ic-val">1 hüquq</div></div></div>
+    <div class="info-card"><div class="ic-icon">💎</div><div class="info-card-text"><div class="ic-label">Hədiyyə Növü</div><div class="ic-val">10 növ</div></div></div>
+    <div class="info-card"><div class="ic-icon">⚡</div><div class="info-card-text"><div class="ic-label">Uduş Şansı</div><div class="ic-val">100%</div></div></div>
+    <div class="info-card"><div class="ic-icon">🔒</div><div class="info-card-text"><div class="ic-label">Etibarlılıq</div><div class="ic-val">Bu gün</div></div></div>
+  </div>
+
+  <div class="disclaimer">
+    <span class="di-icon">⚠️</span>
+    <span>Qazanılan keşbek və endirimlərin istifadəsi üçün hesabınıza giriş etməlisiniz. Şərtlər <a href="https://sehrbaz.com" style="color:var(--gold);text-decoration:none">sehrbaz.com</a> saytında mövcuddur.</span>
+  </div>
+</main>
+
+<script>
+const PRIZES=[{emoji:"💳",name:"50 AZN-lik Qızıl Keşbek Kartı",desc:"Balansınıza şərtsiz 50 AZN yüklənir. Növbəti sifarişlərinizdə istifadə edə bilərsiniz."},{emoji:"🎁",name:"10 AZN Endirim + 10 AZN Keşbek",desc:"60 AZN və üzəri alış-veriş etdikdə kassanızdan anında 10 AZN silinir və balansınıza əlavə 10 AZN keşbek qayıdır."},{emoji:"🛍️",name:"100 AZN-lik məhsul seç, 80 AZN ödə!",desc:"Səbətiniz 100 AZN-ə çatdıqda, biz dərhal 20 AZN endirim edirik."},{emoji:"💯",name:"Nə alsan, Məbləğin Tamamı Keşbek kimi qayıdır!",desc:"Bu gün ödədiyiniz məbləğ tam 100% keşbek olaraq balansınıza oturur. Maks. 100 AZN."},{emoji:"✨",name:"5 AZN Endirim + 15 AZN Keşbek",desc:"40 AZN və üzəri sifarişlərdə dərhal 5 AZN az ödəyirsiniz, gələcək üçün 15 AZN qazanırsınız."},{emoji:"🏆",name:"150 AZN-lik səbət topla, cəmi 120 AZN ödə!",desc:"150 AZN-lik səbətə anında 40 AZN nağd endirim tətbiq edilir."},{emoji:"🔥",name:"Ödənişin Yarısı (-50%) Keşbek Kimi Qayıdır!",desc:"Bu gün etdiyiniz alış-verişin 50%-i dərhal keşbek balansınıza yüklənir."},{emoji:"⭐",name:"15 AZN Endirim + 20 AZN Keşbek",desc:"80 AZN və üzəri alış-verişlərdə böyük nağd endirim alır və balansınıza yüksək keşbek qazanırsınız."},{emoji:"🎀",name:"2-ci məhsula 15 AZN Endirim + 10 AZN Keşbek",desc:"Səbətinizdəki ikinci məhsul yarı qiymətinə düşür və balansınıza 10 AZN keşbek əlavə olunur."},{emoji:"💰",name:"70 AZN ödəniş et, Anında 30 AZN Keşbek qazan!",desc:"70 AZN və üzəri sifarişinizi tamamlayın, növbəti alış-verişlər üçün balansınızda dərhal 30 AZN yaransın."}];
+
+// Stars
+(function(){const c=document.getElementById('starsContainer');for(let i=0;i<80;i++){const s=document.createElement('div');s.className='star';const sz=Math.random()*2.5+.5;s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--dur:${(Math.random()*4+2).toFixed(1)}s;--max-op:${(Math.random()*.6+.2).toFixed(2)};animation-delay:${(Math.random()*5).toFixed(2)}s;`;c.appendChild(s);}})();
+
+// Anti-cheat
+const SKEY='sehrbaz_played_v1';
+const TODAY=new Date().toDateString();
+function checkPlayed(){try{const d=JSON.parse(localStorage.getItem(SKEY)||'null');return d&&d.date===TODAY;}catch(e){return false;}}
+function markPlayed(){try{localStorage.setItem(SKEY,JSON.stringify({date:TODAY,ts:Date.now()}));}catch(e){}}
+function getNextMidnight(){const n=new Date(),m=new Date(n);m.setHours(24,0,0,0);return m.getTime()-n.getTime();}
+function startCountdown(){function u(){const ms=getNextMidnight(),h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);document.getElementById('cdTimer').textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}u();setInterval(u,1000);}
+
+// Scratch
+const canvas=document.getElementById('scratchCanvas'),ctx=canvas.getContext('2d'),scratchArea=document.getElementById('scratchArea');
+let isDrawing=false,scratchedPixels=null,totalPixels=0,scratchedCount=0,revealed=false,lastX=0,lastY=0;
+const THRESHOLD=50,RADIUS=22,SAMPLE=2;
+let selectedPrize=null;
+
+function selectPrize(){const idx=Math.floor(Math.random()*PRIZES.length);selectedPrize=PRIZES[idx];document.getElementById('prizeEmoji').textContent=selectedPrize.emoji;document.getElementById('prizeName').textContent=selectedPrize.name;document.getElementById('prizeDesc').textContent=selectedPrize.desc;}
+
+function initCanvas(){
+  const W=Math.round(scratchArea.offsetWidth||320),H=220;
+  canvas.width=W;canvas.height=H;canvas.style.height=H+'px';
+  document.getElementById('prizeReveal').style.height=H+'px';
+  totalPixels=W*H;scratchedPixels=new Uint8Array(totalPixels);scratchedCount=0;
+  const g=ctx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,'#3D2870');g.addColorStop(.35,'#4A2F8A');g.addColorStop(.65,'#3A2268');g.addColorStop(1,'#2D1A55');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  for(let i=0;i<3000;i++){const x=Math.random()*W,y=Math.random()*H,r=Math.random()*1.2;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=Math.random()>.5?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.1)';ctx.fill();}
+  ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=30){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=30){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  ctx.save();
+  ctx.fillStyle='rgba(255,255,255,0.92)';ctx.font=`bold ${Math.min(21,W*.062)}px "Segoe UI",sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.shadowColor='rgba(255,215,0,0.5)';ctx.shadowBlur=15;ctx.fillText('🪙 POZUN & QAZANIN 🪙',W/2,H/2-18);
+  ctx.shadowBlur=0;ctx.font=`${Math.min(13,W*.037)}px "Segoe UI",sans-serif`;ctx.fillStyle='rgba(200,180,255,0.75)';ctx.fillText('50%-ni qazıyın, hədiyyənizi görün',W/2,H/2+14);
+  ctx.font=`${Math.min(17,W*.048)}px serif`;ctx.fillStyle='rgba(255,215,0,0.28)';
+  ctx.fillText('💎',26,30);ctx.fillText('⭐',W-26,30);ctx.fillText('🎁',26,H-26);ctx.fillText('✨',W-26,H-26);
+  ctx.restore();
+  ctx.globalCompositeOperation='destination-out';
+}
+
+function getPos(e){const r=canvas.getBoundingClientRect(),sx=canvas.width/r.width,sy=canvas.height/r.height;if(e.touches&&e.touches[0])return{x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy};return{x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy};}
+
+function scratch(x,y){if(revealed)return;ctx.beginPath();ctx.arc(x,y,RADIUS,0,Math.PI*2);ctx.fill();const r=RADIUS;for(let dx=-r;dx<=r;dx+=SAMPLE){for(let dy=-r;dy<=r;dy+=SAMPLE){if(dx*dx+dy*dy<=r*r){const px=Math.round(x+dx),py=Math.round(y+dy);if(px>=0&&px<canvas.width&&py>=0&&py<canvas.height){const idx=py*canvas.width+px;if(!scratchedPixels[idx]){scratchedPixels[idx]=1;scratchedCount++;}}}}}updateProgress();}
+
+function scratchLine(x1,y1,x2,y2){const d=Math.sqrt((x2-x1)**2+(y2-y1)**2),steps=Math.max(1,Math.floor(d/(RADIUS*.5)));for(let i=0;i<=steps;i++){const t=i/steps;scratch(x1+(x2-x1)*t,y1+(y2-y1)*t);}}
+
+function updateProgress(){const pct=Math.min(100,Math.round(scratchedCount/totalPixels*100));document.getElementById('progressFill').style.width=pct+'%';document.getElementById('progressPct').textContent=pct+'%';if(pct>=THRESHOLD&&!revealed)autoReveal(true);}
+
+function autoReveal(fromScratch=false){if(revealed)return;revealed=true;ctx.globalCompositeOperation='destination-out';let alpha=0;const fi=setInterval(()=>{alpha+=.08;ctx.globalAlpha=Math.min(alpha,1);ctx.fillStyle='rgba(0,0,0,1)';ctx.fillRect(0,0,canvas.width,canvas.height);if(alpha>=1){clearInterval(fi);canvas.style.opacity='0';canvas.style.transition='opacity 0.4s';document.getElementById('progressFill').style.width='100%';document.getElementById('progressPct').textContent='100%';setTimeout(()=>{launchConfetti();setTimeout(showWinModal,700);},300);}},20);}
+
+canvas.addEventListener('mousedown',e=>{if(revealed)return;isDrawing=true;const p=getPos(e);lastX=p.x;lastY=p.y;scratch(p.x,p.y);});
+canvas.addEventListener('mousemove',e=>{if(!isDrawing||revealed)return;e.preventDefault();const p=getPos(e);scratchLine(lastX,lastY,p.x,p.y);lastX=p.x;lastY=p.y;});
+canvas.addEventListener('mouseup',()=>isDrawing=false);
+canvas.addEventListener('mouseleave',()=>isDrawing=false);
+canvas.addEventListener('touchstart',e=>{if(revealed)return;e.preventDefault();isDrawing=true;const p=getPos(e);lastX=p.x;lastY=p.y;scratch(p.x,p.y);},{passive:false});
+canvas.addEventListener('touchmove',e=>{if(!isDrawing||revealed)return;e.preventDefault();const p=getPos(e);scratchLine(lastX,lastY,p.x,p.y);lastX=p.x;lastY=p.y;},{passive:false});
+canvas.addEventListener('touchend',()=>isDrawing=false);
+
+// Modal
+function showWinModal(){
+  document.getElementById('mPrizeName').textContent=selectedPrize.name;
+  document.getElementById('mPrizeDesc').textContent=selectedPrize.emoji+' '+selectedPrize.desc;
+  const modal=document.getElementById('winModal');
+  modal.querySelectorAll('.modal-crown,.modal-congrats,.modal-prize-name,.modal-prize-desc,.modal-warning,.modal-actions').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation='';});
+  modal.classList.add('active');
+  markPlayed();
+}
+function closeModal(){document.getElementById('winModal').classList.remove('active');}
+function goShopping(){window.open('https://sehrbaz.com','_blank');}
+
+async function shareResult(){const text=`🎉 Hədiyyə Sehrbazı - Poz-Qazan!\n\nMən "${selectedPrize.name}" qazandım! ${selectedPrize.emoji}\n\n${selectedPrize.desc}\n\nsehrbaz.com saytına keçin siz də qazanın!`;if(navigator.share){try{await navigator.share({title:'Hədiyyə Sehrbazı - Qazandım!',text});}catch(e){}}else{try{await navigator.clipboard.writeText(text);alert('Mətn kopyalandı!');}catch(e){alert(text);}}}
+
+function screenshotResult(){const W=600,H=400,sc=document.createElement('canvas');sc.width=W;sc.height=H;const s=sc.getContext('2d');const bg=s.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#0D0A1E');bg.addColorStop(.5,'#1A1040');bg.addColorStop(1,'#0D0A1E');s.fillStyle=bg;s.fillRect(0,0,W,H);s.strokeStyle='rgba(255,215,0,0.4)';s.lineWidth=2;s.beginPath();s.moveTo(30,10);s.lineTo(W-30,10);s.quadraticCurveTo(W-10,10,W-10,30);s.lineTo(W-10,H-30);s.quadraticCurveTo(W-10,H-10,W-30,H-10);s.lineTo(30,H-10);s.quadraticCurveTo(10,H-10,10,H-30);s.lineTo(10,30);s.quadraticCurveTo(10,10,30,10);s.closePath();s.stroke();s.fillStyle='#FFD700';s.font='bold 13px Segoe UI,sans-serif';s.textAlign='center';s.fillText('🪄 HƏDIYYƏ SEHRBAZI — sehrbaz.com',W/2,46);s.fillStyle='white';s.font='bold 28px Segoe UI,sans-serif';s.fillText('🎉 TƏBRİKLƏR!',W/2,96);s.font='52px serif';s.fillText(selectedPrize.emoji,W/2,164);s.fillStyle='#FFE866';s.font='bold 17px Segoe UI,sans-serif';const words=selectedPrize.name.split(' ');let line='',y=220;for(const w of words){const t=line+w+' ';if(s.measureText(t).width>W-80&&line!==''){s.fillText(line.trim(),W/2,y);line=w+' ';y+=26;}else line=t;}s.fillText(line.trim(),W/2,y);s.fillStyle='rgba(200,185,255,0.6)';s.font='12px Segoe UI,sans-serif';s.fillText(new Date().toLocaleDateString('az-AZ'),W/2,H-34);s.fillStyle='rgba(255,215,0,0.5)';s.fillText('sehrbaz.com',W/2,H-16);const a=document.createElement('a');a.download='sehrbaz-qazandim.png';a.href=sc.toDataURL('image/png');a.click();}
+
+// Confetti
+const cc=document.getElementById('confettiCanvas'),cctx=cc.getContext('2d');
+let pieces=[],cRunning=false,cFrame;
+const COLS=['#FFD700','#FF6B9D','#6C63FF','#00E5A0','#FF9500','#FF3B57','#00C6FF','#FFEE58','#B39DDB','#81C784'];
+function launchConfetti(){cc.width=window.innerWidth;cc.height=window.innerHeight;pieces=[];cRunning=true;for(let i=0;i<180;i++)pieces.push({x:Math.random()*cc.width,y:-10-Math.random()*200,vx:(Math.random()-.5)*5,vy:Math.random()*3+2,w:Math.random()*10+6,h:Math.random()*6+4,color:COLS[Math.floor(Math.random()*COLS.length)],rot:Math.random()*Math.PI*2,rs:(Math.random()-.5)*.2,op:1,shape:Math.random()>.5?'r':'c',g:Math.random()*.15+.05,wb:Math.random()*Math.PI*2,ws:Math.random()*.1+.05});cancelAnimationFrame(cFrame);animC();setTimeout(()=>{cRunning=false;setTimeout(()=>{cctx.clearRect(0,0,cc.width,cc.height);},2000);},4000);}
+function animC(){cctx.clearRect(0,0,cc.width,cc.height);pieces.forEach(p=>{p.vy+=p.g;p.wb+=p.ws;p.x+=p.vx+Math.sin(p.wb)*.8;p.y+=p.vy;p.rot+=p.rs;if(!cRunning)p.op-=.01;cctx.save();cctx.globalAlpha=Math.max(0,p.op);cctx.translate(p.x,p.y);cctx.rotate(p.rot);cctx.fillStyle=p.color;if(p.shape==='c'){cctx.beginPath();cctx.arc(0,0,p.w/2,0,Math.PI*2);cctx.fill();}else cctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cctx.restore();});pieces=pieces.filter(p=>p.y<cc.height+20&&p.op>0);if(pieces.length>0)cFrame=requestAnimationFrame(animC);}
+
+// INIT
+window.addEventListener('load',()=>{
+  if(checkPlayed()){document.getElementById('alreadyPlayed').classList.add('active');startCountdown();return;}
+  selectPrize();
+  setTimeout(initCanvas,60);
+});
+window.addEventListener('resize',()=>{if(!revealed){scratchedCount=0;if(scratchedPixels)scratchedPixels=new Uint8Array(scratchedPixels.length);initCanvas();}cc.width=window.innerWidth;cc.height=window.innerHeight;});
+</script>
+</body>
+</html>
