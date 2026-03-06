@@ -5,10 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Hədiyyə Sehrbazı | Brendimo</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <style>
     /* ═══════════════════════════════════════════════
-       DESIGN TOKENS & ROOT VARIABLES
+       DESIGN TOKENS
     ═══════════════════════════════════════════════ */
     :root {
       --ink:       #0D0D0D;
@@ -28,9 +30,19 @@
       --r-md: 16px;
       --r-lg: 24px;
       --transition: all 0.28s cubic-bezier(0.4,0,0.2,1);
+      /* Order form colors */
+      --primary:      #FF2D55;
+      --primary-dark: #D61F44;
+      --accent:       #5856D6;
+      --success:      #34C759;
+      --bg:           #F2F2F7;
+      --card-bg:      #FFFFFF;
+      --text-main:    #1C1C1E;
+      --text-sec:     #8E8E93;
+      --nav-height:   80px;
     }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html { scroll-behavior: smooth; }
 
     body {
@@ -40,605 +52,184 @@
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
-      padding-bottom: 80px; /* space for bottom nav */
+      padding-bottom: 80px;
     }
 
     /* ═══════════════════════════════════════════════
-       TOP NAVIGATION BAR
+       TOP NAV
     ═══════════════════════════════════════════════ */
     .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 200;
+      position: sticky; top: 0; z-index: 200;
       background: rgba(13,13,13,0.97);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(201,168,76,0.2);
-      padding: 0 24px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
+      padding: 0 24px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
     }
+    .navbar-brand { display: flex; flex-direction: column; gap: 1px; flex-shrink: 0; }
+    .navbar-brand .brand-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--white); letter-spacing: 0.5px; line-height: 1; }
+    .navbar-brand .brand-sub  { font-size: 0.62rem; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; line-height: 1; }
 
-    .navbar-brand {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      flex-shrink: 0;
-    }
-
-    .navbar-brand .brand-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.2rem;
-      color: var(--white);
-      letter-spacing: 0.5px;
-      line-height: 1;
-    }
-
-    .navbar-brand .brand-sub {
-      font-size: 0.62rem;
-      color: var(--gold);
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      line-height: 1;
-    }
-
-    .navbar-search {
-      flex: 1;
-      max-width: 380px;
-      position: relative;
-    }
-
+    .navbar-search { flex: 1; max-width: 380px; position: relative; }
     .navbar-search input {
-      width: 100%;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 50px;
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.88rem;
-      padding: 9px 18px 9px 40px;
-      outline: none;
-      transition: var(--transition);
+      width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 50px; color: var(--white); font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem; padding: 9px 18px 9px 40px; outline: none; transition: var(--transition);
     }
     .navbar-search input::placeholder { color: rgba(255,255,255,0.35); }
-    .navbar-search input:focus {
-      background: rgba(255,255,255,0.11);
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px var(--gold-glow);
-    }
+    .navbar-search input:focus { background: rgba(255,255,255,0.11); border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-glow); }
+    .navbar-search .search-ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.35); pointer-events: none; font-size: 14px; }
 
-    .navbar-search .search-ico {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: rgba(255,255,255,0.35);
-      pointer-events: none;
-      font-size: 14px;
-    }
-
-    .navbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
+    .navbar-actions { display: flex; align-items: center; gap: 8px; }
     .nav-btn {
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px;
-      color: rgba(255,255,255,0.8);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.78rem;
-      font-weight: 500;
-      padding: 8px 12px;
-      transition: var(--transition);
-      white-space: nowrap;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      color: rgba(255,255,255,0.8); cursor: pointer; display: flex; align-items: center; gap: 6px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 500; padding: 8px 12px;
+      transition: var(--transition); white-space: nowrap;
     }
-    .nav-btn:hover {
-      background: rgba(201,168,76,0.15);
-      border-color: var(--gold);
-      color: var(--gold);
-    }
-    .nav-btn.active {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: var(--ink);
-    }
+    .nav-btn:hover { background: rgba(201,168,76,0.15); border-color: var(--gold); color: var(--gold); }
+    .nav-btn.active { background: var(--gold); border-color: var(--gold); color: var(--ink); }
     .nav-btn .badge {
-      background: var(--gold);
-      color: var(--ink);
-      border-radius: 50%;
-      width: 18px;
-      height: 18px;
-      font-size: 0.68rem;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-left: 2px;
+      background: var(--gold); color: var(--ink); border-radius: 50%; width: 18px; height: 18px;
+      font-size: 0.68rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; margin-left: 2px;
     }
-    .nav-btn.active .badge {
-      background: var(--ink);
-      color: var(--gold);
-    }
+    .nav-btn.active .badge { background: var(--ink); color: var(--gold); }
 
     /* ═══════════════════════════════════════════════
-       BOTTOM NAVIGATION BAR
+       BOTTOM NAV
     ═══════════════════════════════════════════════ */
     .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 300;
-      background: rgba(13,13,13,0.98);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(201,168,76,0.2);
-      height: 72px;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      padding: 0 8px;
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 300;
+      background: rgba(13,13,13,0.98); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(201,168,76,0.2); height: 72px;
+      display: flex; align-items: center; justify-content: space-around; padding: 0 8px;
       padding-bottom: env(safe-area-inset-bottom, 0px);
     }
-
     .bottom-nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      cursor: pointer;
-      padding: 8px 20px;
-      border-radius: 12px;
-      transition: var(--transition);
-      color: rgba(255,255,255,0.45);
-      text-decoration: none;
-      flex: 1;
-      max-width: 100px;
-      min-height: 56px;
-      position: relative;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      cursor: pointer; padding: 8px 20px; border-radius: 12px; transition: var(--transition);
+      color: rgba(255,255,255,0.45); text-decoration: none; flex: 1; max-width: 100px; min-height: 56px; position: relative;
     }
-    .bottom-nav-item:hover {
-      color: rgba(255,255,255,0.7);
-      background: rgba(255,255,255,0.05);
-    }
-    .bottom-nav-item.active {
-      color: var(--gold);
-    }
+    .bottom-nav-item:hover { color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.05); }
+    .bottom-nav-item.active { color: var(--gold); }
     .bottom-nav-item.active::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 24px;
-      height: 2px;
-      background: var(--gold);
-      border-radius: 0 0 2px 2px;
+      content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 24px; height: 2px; background: var(--gold); border-radius: 0 0 2px 2px;
     }
-    .bottom-nav-item svg {
-      width: 22px;
-      height: 22px;
-      flex-shrink: 0;
-    }
-    .bottom-nav-item span {
-      font-size: 0.65rem;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
+    .bottom-nav-item svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .bottom-nav-item span { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
 
     /* ═══════════════════════════════════════════════
-       PAGES / TABS
+       PAGES
     ═══════════════════════════════════════════════ */
-    .page {
-      display: none;
-    }
-    .page.active {
-      display: block;
-    }
+    .page { display: none; }
+    .page.active { display: block; }
 
     /* ═══════════════════════════════════════════════
-       FILTER PANEL
+       FILTER BAR
     ═══════════════════════════════════════════════ */
     .filter-bar {
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      height: 56px;
+      background: var(--white); border-bottom: 1px solid var(--border); padding: 0 24px;
+      display: flex; align-items: center; gap: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; height: 56px;
     }
     .filter-bar::-webkit-scrollbar { display: none; }
-
-    .filter-section {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .filter-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--ink-faint);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      white-space: nowrap;
-    }
-
-    .filter-divider {
-      width: 1px;
-      height: 24px;
-      background: var(--border);
-      flex-shrink: 0;
-    }
-
+    .filter-section { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .filter-label { font-size: 0.72rem; font-weight: 600; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+    .filter-divider { width: 1px; height: 24px; background: var(--border); flex-shrink: 0; }
     .chip {
-      background: var(--surface);
-      border: 1.5px solid transparent;
-      border-radius: 50px;
-      color: var(--ink-soft);
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 500;
-      padding: 5px 14px;
-      transition: var(--transition);
-      white-space: nowrap;
-      user-select: none;
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      background: var(--surface); border: 1.5px solid transparent; border-radius: 50px;
+      color: var(--ink-soft); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.8rem;
+      font-weight: 500; padding: 5px 14px; transition: var(--transition); white-space: nowrap;
+      user-select: none; display: flex; align-items: center; gap: 5px;
     }
     .chip:hover { border-color: var(--gold); color: var(--ink); }
-    .chip.active {
-      background: var(--ink);
-      color: var(--white);
-      border-color: var(--ink);
-    }
+    .chip.active { background: var(--ink); color: var(--white); border-color: var(--ink); }
     .chip .chip-emoji { font-size: 0.9rem; }
-
     .price-select, .sort-select {
-      appearance: none;
-      background: var(--surface);
-      border: 1.5px solid transparent;
-      border-radius: 50px;
-      color: var(--ink-soft);
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 500;
-      padding: 5px 28px 5px 14px;
+      appearance: none; background: var(--surface); border: 1.5px solid transparent; border-radius: 50px;
+      color: var(--ink-soft); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.8rem;
+      font-weight: 500; padding: 5px 28px 5px 14px;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%239A9A9A' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      outline: none;
-      transition: var(--transition);
+      background-repeat: no-repeat; background-position: right 10px center; outline: none; transition: var(--transition);
     }
-    .price-select:focus, .price-select:hover,
-    .sort-select:focus, .sort-select:hover {
-      border-color: var(--gold);
-      color: var(--ink);
-    }
-
+    .price-select:focus, .price-select:hover, .sort-select:focus, .sort-select:hover { border-color: var(--gold); color: var(--ink); }
     .filter-clear {
-      background: none;
-      border: 1.5px dashed var(--border);
-      border-radius: 50px;
-      color: var(--ink-faint);
-      cursor: pointer;
-      font-size: 0.75rem;
-      font-weight: 500;
-      padding: 4px 12px;
-      transition: var(--transition);
-      white-space: nowrap;
-      flex-shrink: 0;
+      background: none; border: 1.5px dashed var(--border); border-radius: 50px; color: var(--ink-faint);
+      cursor: pointer; font-size: 0.75rem; font-weight: 500; padding: 4px 12px; transition: var(--transition); white-space: nowrap; flex-shrink: 0;
     }
     .filter-clear:hover { border-color: #e74c3c; color: #e74c3c; }
 
     /* ═══════════════════════════════════════════════
        RESULTS BAR
     ═══════════════════════════════════════════════ */
-    .results-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 24px 8px;
-      gap: 12px;
-    }
-
-    .results-count {
-      font-size: 0.82rem;
-      color: var(--ink-faint);
-      font-weight: 500;
-    }
+    .results-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px 8px; gap: 12px; }
+    .results-count { font-size: 0.82rem; color: var(--ink-faint); font-weight: 500; }
     .results-count strong { color: var(--ink); }
-
     .view-toggle { display: flex; gap: 4px; }
-    .view-btn {
-      background: none;
-      border: 1.5px solid var(--border);
-      border-radius: 6px;
-      cursor: pointer;
-      padding: 5px 8px;
-      color: var(--ink-faint);
-      transition: var(--transition);
-    }
-    .view-btn.active {
-      background: var(--ink);
-      border-color: var(--ink);
-      color: var(--white);
-    }
+    .view-btn { background: none; border: 1.5px solid var(--border); border-radius: 6px; cursor: pointer; padding: 5px 8px; color: var(--ink-faint); transition: var(--transition); }
+    .view-btn.active { background: var(--ink); border-color: var(--ink); color: var(--white); }
 
     /* ═══════════════════════════════════════════════
-       MAIN GRID
+       GRID
     ═══════════════════════════════════════════════ */
-    .main {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 0 20px 20px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
-    }
+    .main { max-width: 1280px; margin: 0 auto; padding: 0 20px 20px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
     .grid.list-view { grid-template-columns: 1fr; }
 
     /* ═══════════════════════════════════════════════
        PRODUCT CARD
     ═══════════════════════════════════════════════ */
     .card {
-      background: var(--white);
-      border-radius: var(--r-md);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      position: relative;
-      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
+      background: var(--white); border-radius: var(--r-md); border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm); cursor: pointer; display: flex; flex-direction: column;
+      overflow: hidden; position: relative; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease;
       animation: cardIn 0.4s both;
     }
-    @keyframes cardIn {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes cardIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-
-    .card.selected {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 2px var(--gold), var(--shadow-sm);
-    }
+    .card.selected { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold), var(--shadow-sm); }
     .card.selected::after {
-      content: '✓';
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 26px;
-      height: 26px;
-      background: var(--gold);
-      color: var(--ink);
-      border-radius: 50%;
-      font-size: 0.75rem;
-      font-weight: 800;
-      z-index: 10;
-      display: grid;
-      place-items: center;
+      content: '✓'; position: absolute; top: 10px; right: 10px; width: 26px; height: 26px;
+      background: var(--gold); color: var(--ink); border-radius: 50%; font-size: 0.75rem; font-weight: 800;
+      z-index: 10; display: grid; place-items: center;
     }
-
-    .grid.list-view .card {
-      flex-direction: row;
-      height: 120px;
-    }
-    .grid.list-view .card-img-wrap {
-      width: 120px;
-      min-width: 120px;
-      height: 100%;
-    }
-    .grid.list-view .card-body {
-      padding: 14px 16px;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-    }
+    .grid.list-view .card { flex-direction: row; height: 120px; }
+    .grid.list-view .card-img-wrap { width: 120px; min-width: 120px; height: 100%; }
+    .grid.list-view .card-body { padding: 14px 16px; flex-direction: row; align-items: center; justify-content: space-between; }
     .grid.list-view .card-info { flex: 1; }
-    .grid.list-view .card-footer {
-      border: none;
-      padding: 0;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 8px;
-      min-width: 110px;
-    }
+    .grid.list-view .card-footer { border: none; padding: 0; flex-direction: column; align-items: flex-end; gap: 8px; min-width: 110px; }
     .grid.list-view .card-actions { flex-direction: column; }
-
-    .card-img-wrap {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: var(--surface);
-      overflow: hidden;
-      position: relative;
-      flex-shrink: 0;
-    }
-
-    .card-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
-    }
+    .card-img-wrap { width: 100%; aspect-ratio: 1/1; background: var(--surface); overflow: hidden; position: relative; flex-shrink: 0; }
+    .card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94); }
     .card:hover .card-img { transform: scale(1.06); }
-
-    .badge-targets {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      z-index: 2;
-      align-items: flex-end;
-    }
-    .badge-target {
-      background: rgba(13,13,13,0.72);
-      backdrop-filter: blur(4px);
-      color: var(--white);
-      font-size: 0.6rem;
-      font-weight: 600;
-      padding: 2px 7px;
-      border-radius: 4px;
-      letter-spacing: 0.3px;
-    }
-
-    .badge-code {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(4px);
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: var(--ink-soft);
-      padding: 3px 8px;
-      border-radius: 5px;
-      z-index: 2;
-      letter-spacing: 0.5px;
-    }
-
-    .is-new-label {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: var(--gold);
-      color: var(--ink);
-      font-size: 0.6rem;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 4px;
-      z-index: 3;
-    }
-
-    .card-body {
-      padding: 14px 16px 12px;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-
-    .card-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--ink);
-      line-height: 1.35;
-      margin-bottom: 4px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .card-desc {
-      font-size: 0.78rem;
-      color: var(--ink-faint);
-      line-height: 1.5;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .card-footer {
-      margin-top: auto;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .price {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--ink);
-      line-height: 1;
-    }
-    .price-currency {
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: var(--gold);
-      font-family: 'DM Sans', sans-serif;
-      margin-left: 2px;
-    }
-
+    .badge-targets { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 3px; z-index: 2; align-items: flex-end; }
+    .badge-target { background: rgba(13,13,13,0.72); backdrop-filter: blur(4px); color: var(--white); font-size: 0.6rem; font-weight: 600; padding: 2px 7px; border-radius: 4px; letter-spacing: 0.3px; }
+    .badge-code { position: absolute; bottom: 10px; left: 10px; background: rgba(255,255,255,0.92); backdrop-filter: blur(4px); font-size: 0.68rem; font-weight: 700; color: var(--ink-soft); padding: 3px 8px; border-radius: 5px; z-index: 2; letter-spacing: 0.5px; }
+    .is-new-label { position: absolute; top: 10px; left: 10px; background: var(--gold); color: var(--ink); font-size: 0.6rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; z-index: 3; }
+    .card-body { padding: 14px 16px 12px; display: flex; flex-direction: column; flex: 1; }
+    .card-title { font-size: 0.95rem; font-weight: 600; color: var(--ink); line-height: 1.35; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-desc { font-size: 0.78rem; color: var(--ink-faint); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card-footer { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .price { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: var(--ink); line-height: 1; }
+    .price-currency { font-size: 0.7rem; font-weight: 600; color: var(--gold); font-family: 'DM Sans', sans-serif; margin-left: 2px; }
     .card-actions { display: flex; gap: 4px; }
-
     .icon-btn {
-      background: none;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      color: var(--ink-faint);
-      cursor: pointer;
-      width: 32px;
-      height: 32px;
-      display: grid;
-      place-items: center;
-      transition: var(--transition);
-      flex-shrink: 0;
+      background: none; border: 1.5px solid var(--border); border-radius: 8px; color: var(--ink-faint);
+      cursor: pointer; width: 32px; height: 32px; display: grid; place-items: center; transition: var(--transition); flex-shrink: 0;
     }
     .icon-btn:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
     .icon-btn.select-btn.selected-state { background: var(--gold-glow); border-color: var(--gold); color: var(--gold); }
     .icon-btn svg { width: 15px; height: 15px; fill: currentColor; }
 
     /* ═══════════════════════════════════════════════
-       LOADER & STATES
+       LOADER
     ═══════════════════════════════════════════════ */
-    .loader-wrap {
-      grid-column: 1 / -1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 80px 20px;
-      gap: 16px;
-    }
-
-    .spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid var(--border);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
+    .loader-wrap { grid-column: 1/-1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; gap: 16px; }
+    .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 60px 20px;
-    }
+    .empty-state { grid-column: 1/-1; text-align: center; padding: 60px 20px; }
     .empty-state-icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
     .empty-state h3 { font-size: 1.1rem; margin-bottom: 6px; color: var(--ink-soft); }
     .empty-state p { font-size: 0.85rem; color: var(--ink-faint); }
@@ -647,541 +238,155 @@
        PRODUCT MODAL
     ═══════════════════════════════════════════════ */
     .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.72);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      transition: opacity 0.3s ease;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.72); backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px); z-index: 1000; display: none; align-items: center;
+      justify-content: center; padding: 20px; opacity: 0; transition: opacity 0.3s ease;
     }
     .modal-overlay.open { display: flex; opacity: 1; }
-
     .modal {
-      background: var(--white);
-      border-radius: var(--r-lg);
-      display: flex;
-      max-height: 90vh;
-      max-width: 860px;
-      overflow: hidden;
-      position: relative;
-      width: 100%;
-      box-shadow: var(--shadow-lg);
+      background: var(--white); border-radius: var(--r-lg); display: flex; max-height: 90vh;
+      max-width: 860px; overflow: hidden; position: relative; width: 100%; box-shadow: var(--shadow-lg);
       animation: modalIn 0.38s cubic-bezier(0.16,1,0.3,1);
     }
-    @keyframes modalIn {
-      from { opacity: 0; transform: scale(0.94) translateY(20px); }
-      to   { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
+    @keyframes modalIn { from { opacity: 0; transform: scale(0.94) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
     .modal-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: rgba(255,255,255,0.9);
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      width: 36px;
-      height: 36px;
-      display: grid;
-      place-items: center;
-      z-index: 10;
-      box-shadow: var(--shadow-sm);
-      transition: var(--transition);
-      font-size: 1.2rem;
-      color: var(--ink);
+      position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.9); border: none;
+      border-radius: 50%; cursor: pointer; width: 36px; height: 36px; display: grid; place-items: center;
+      z-index: 10; box-shadow: var(--shadow-sm); transition: var(--transition); font-size: 1.2rem; color: var(--ink);
     }
     .modal-close:hover { background: var(--ink); color: var(--white); }
-
-    .modal-img-col {
-      width: 50%;
-      min-height: 440px;
-      background: var(--surface);
-      position: relative;
-      flex-shrink: 0;
-    }
-
-    .modal-img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      padding: 24px;
-    }
-
-    .modal-info-col {
-      flex: 1;
-      padding: 32px 28px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .modal-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 14px;
-    }
-    .modal-tag {
-      font-size: 0.68rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      padding: 3px 9px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-      color: var(--ink-soft);
-    }
+    .modal-img-col { width: 50%; min-height: 440px; background: var(--surface); position: relative; flex-shrink: 0; }
+    .modal-img { width: 100%; height: 100%; object-fit: contain; padding: 24px; }
+    .modal-info-col { flex: 1; padding: 32px 28px; overflow-y: auto; display: flex; flex-direction: column; }
+    .modal-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .modal-tag { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; padding: 3px 9px; border-radius: 4px; border: 1px solid var(--border); color: var(--ink-soft); }
     .modal-tag.target { background: #FFF8E1; border-color: #FFE082; color: #8B6914; }
     .modal-tag.code-tag { background: var(--surface); color: var(--ink-soft); }
     .modal-tag.new-tag { background: var(--ink); color: var(--white); border-color: var(--ink); }
-
-    .modal-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.8rem;
-      line-height: 1.2;
-      margin-bottom: 12px;
-      color: var(--ink);
-    }
-
-    .modal-price {
-      font-family: 'Playfair Display', serif;
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: var(--gold);
-      margin-bottom: 16px;
-      line-height: 1;
-    }
-    .modal-price span {
-      font-size: 1rem;
-      font-family: 'DM Sans', sans-serif;
-      color: var(--ink-faint);
-      font-weight: 400;
-      margin-left: 4px;
-    }
-
-    .modal-divider {
-      height: 1px;
-      background: var(--border);
-      margin: 16px 0;
-    }
-
-    .modal-desc {
-      font-size: 0.88rem;
-      color: var(--ink-soft);
-      line-height: 1.65;
-      margin-bottom: 20px;
-      flex: 1;
-    }
-
-    /* Product permalink */
+    .modal-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; line-height: 1.2; margin-bottom: 12px; color: var(--ink); }
+    .modal-price { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; color: var(--gold); margin-bottom: 16px; line-height: 1; }
+    .modal-price span { font-size: 1rem; font-family: 'DM Sans', sans-serif; color: var(--ink-faint); font-weight: 400; margin-left: 4px; }
+    .modal-divider { height: 1px; background: var(--border); margin: 16px 0; }
+    .modal-desc { font-size: 0.88rem; color: var(--ink-soft); line-height: 1.65; margin-bottom: 20px; }
     .modal-permalink {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 12px;
-      margin-bottom: 12px;
-      font-size: 0.72rem;
-      color: var(--ink-faint);
-      word-break: break-all;
-      font-family: monospace;
+      display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; font-size: 0.72rem; color: var(--ink-faint);
+      word-break: break-all; font-family: monospace;
     }
-    .modal-permalink-copy {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--gold);
-      flex-shrink: 0;
-      padding: 2px;
-      font-size: 0.75rem;
-      transition: var(--transition);
-    }
+    .modal-permalink-copy { background: none; border: none; cursor: pointer; color: var(--gold); flex-shrink: 0; padding: 2px; font-size: 0.75rem; transition: var(--transition); }
     .modal-permalink-copy:hover { color: var(--ink); }
-
-    .share-title {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: var(--ink-faint);
-      margin-bottom: 12px;
-    }
-
-    .share-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
+    .share-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--ink-faint); margin-bottom: 12px; }
+    .share-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
     .share-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      border: none;
-      border-radius: var(--r-sm);
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 600;
-      padding: 10px 12px;
-      transition: var(--transition);
-      color: white;
+      display: flex; align-items: center; justify-content: center; gap: 8px; border: none;
+      border-radius: var(--r-sm); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.82rem;
+      font-weight: 600; padding: 10px 12px; transition: var(--transition); color: white;
     }
     .share-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
     .share-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
     .share-btn:active { transform: translateY(0); }
-
     .share-btn-whatsapp { background: #25D366; }
     .share-btn-telegram { background: #0088CC; }
     .share-btn-instagram { background: linear-gradient(135deg, #E1306C, #833AB4); }
-    .share-btn-copy {
-      background: var(--surface);
-      color: var(--ink);
-      border: 1.5px solid var(--border);
-    }
+    .share-btn-copy { background: var(--surface); color: var(--ink); border: 1.5px solid var(--border); }
     .share-btn-copy:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); filter: none; }
-    .share-btn-native {
-      background: var(--ink);
-      grid-column: 1 / -1;
+    .share-btn-native { background: var(--ink); grid-column: 1/-1; }
+
+    /* ORDER Button in Modal */
+    .modal-order-btn {
+      margin-top: 10px; width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border: none; border-radius: var(--r-sm); cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem; font-weight: 700; padding: 13px; color: white; transition: var(--transition);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 4px 15px rgba(255,45,85,0.3);
     }
+    .modal-order-btn:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,45,85,0.4); }
 
     .modal-select-btn {
-      margin-top: 10px;
-      width: 100%;
-      background: none;
-      border: 2px solid var(--border);
-      border-radius: var(--r-sm);
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 600;
-      padding: 10px;
-      color: var(--ink-soft);
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      margin-top: 8px; width: 100%; background: none; border: 2px solid var(--border); border-radius: var(--r-sm);
+      cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600; padding: 10px;
+      color: var(--ink-soft); transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .modal-select-btn:hover { border-color: var(--gold); color: var(--gold); }
     .modal-select-btn.selected { border-color: var(--gold); background: var(--gold-glow); color: var(--ink); }
 
     /* ═══════════════════════════════════════════════
-       COLLECTION PANEL (Slide-out)
+       COLLECTION PANEL
     ═══════════════════════════════════════════════ */
     .collection-panel {
-      position: fixed;
-      top: 0;
-      right: -420px;
-      width: 400px;
-      height: 100vh;
-      background: var(--white);
-      box-shadow: -8px 0 40px rgba(0,0,0,0.15);
-      z-index: 500;
-      display: flex;
-      flex-direction: column;
-      transition: right 0.38s cubic-bezier(0.16,1,0.3,1);
-      overflow: hidden;
+      position: fixed; top: 0; right: -420px; width: 400px; height: 100vh; background: var(--white);
+      box-shadow: -8px 0 40px rgba(0,0,0,0.15); z-index: 500; display: flex; flex-direction: column;
+      transition: right 0.38s cubic-bezier(0.16,1,0.3,1); overflow: hidden;
     }
     .collection-panel.open { right: 0; }
-
-    .panel-header {
-      background: var(--ink);
-      color: var(--white);
-      padding: 20px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-    .panel-header h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.2rem;
-    }
+    .panel-header { background: var(--ink); color: var(--white); padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .panel-header h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; }
     .panel-header p { font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
-    .panel-close {
-      background: rgba(255,255,255,0.1);
-      border: none;
-      border-radius: 50%;
-      color: white;
-      cursor: pointer;
-      width: 36px;
-      height: 36px;
-      display: grid;
-      place-items: center;
-      font-size: 1.2rem;
-      transition: var(--transition);
-    }
+    .panel-close { background: rgba(255,255,255,0.1); border: none; border-radius: 50%; color: white; cursor: pointer; width: 36px; height: 36px; display: grid; place-items: center; font-size: 1.2rem; transition: var(--transition); }
     .panel-close:hover { background: rgba(255,255,255,0.2); }
-
     .panel-body { flex: 1; overflow-y: auto; padding: 16px; }
-
-    .panel-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px;
-      border-radius: var(--r-sm);
-      border: 1px solid var(--border);
-      background: var(--cream);
-      margin-bottom: 8px;
-      transition: var(--transition);
-    }
+    .panel-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: var(--r-sm); border: 1px solid var(--border); background: var(--cream); margin-bottom: 8px; transition: var(--transition); }
     .panel-item:hover { border-color: var(--gold); }
-    .panel-item img {
-      width: 52px;
-      height: 52px;
-      object-fit: cover;
-      border-radius: 8px;
-      background: var(--surface);
-    }
+    .panel-item img { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; background: var(--surface); }
     .panel-item-info { flex: 1; min-width: 0; }
-    .panel-item-name {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--ink);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+    .panel-item-name { font-size: 0.85rem; font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .panel-item-price { font-size: 0.78rem; color: var(--gold); font-weight: 600; margin-top: 2px; }
-    .panel-item-remove {
-      background: none;
-      border: none;
-      color: var(--ink-faint);
-      cursor: pointer;
-      font-size: 1.1rem;
-      padding: 4px;
-      transition: var(--transition);
-    }
+    .panel-item-remove { background: none; border: none; color: var(--ink-faint); cursor: pointer; font-size: 1.1rem; padding: 4px; transition: var(--transition); }
     .panel-item-remove:hover { color: #e74c3c; }
-
-    .panel-footer {
-      padding: 16px;
-      border-top: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-
-    .panel-total {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
+    .panel-footer { padding: 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .panel-total { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
     .panel-total .label { font-size: 0.82rem; color: var(--ink-faint); font-weight: 500; }
-    .panel-total .value {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--ink);
-    }
-
+    .panel-total .value { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--ink); }
     .panel-actions { display: grid; gap: 8px; }
-
-    .panel-btn {
-      border: none;
-      border-radius: var(--r-sm);
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 600;
-      padding: 12px;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
+    .panel-btn { border: none; border-radius: var(--r-sm); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; padding: 12px; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; }
     .panel-btn-primary { background: var(--ink); color: white; }
     .panel-btn-primary:hover { background: #222; }
-    .panel-btn-secondary {
-      background: var(--surface);
-      color: var(--ink-soft);
-      border: 1.5px solid var(--border);
-    }
+    .panel-btn-secondary { background: var(--surface); color: var(--ink-soft); border: 1.5px solid var(--border); }
     .panel-btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
-
-    .panel-empty {
-      text-align: center;
-      padding: 48px 16px;
-      color: var(--ink-faint);
-    }
+    .panel-empty { text-align: center; padding: 48px 16px; color: var(--ink-faint); }
     .panel-empty-icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.5; }
 
     /* ═══════════════════════════════════════════════
        COLLECTION LINK MODAL
     ═══════════════════════════════════════════════ */
-    .link-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(8px);
-      z-index: 1500;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+    .link-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1500; display: none; align-items: center; justify-content: center; padding: 20px; }
     .link-modal.open { display: flex; }
-
-    .link-modal-box {
-      background: var(--white);
-      border-radius: var(--r-lg);
-      padding: 32px;
-      max-width: 560px;
-      width: 100%;
-      box-shadow: var(--shadow-lg);
-      animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1);
-    }
-    .link-modal-box h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      margin-bottom: 6px;
-    }
+    .link-modal-box { background: var(--white); border-radius: var(--r-lg); padding: 32px; max-width: 560px; width: 100%; box-shadow: var(--shadow-lg); animation: modalIn 0.3s cubic-bezier(0.16,1,0.3,1); }
+    .link-modal-box h3 { font-family: 'Playfair Display', serif; font-size: 1.5rem; margin-bottom: 6px; }
     .link-modal-box p { font-size: 0.85rem; color: var(--ink-faint); margin-bottom: 20px; }
-
-    .link-preview {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--r-sm);
-      padding: 12px 16px;
-      font-size: 0.78rem;
-      color: var(--ink-soft);
-      word-break: break-all;
-      margin-bottom: 16px;
-      font-family: monospace;
-      max-height: 80px;
-      overflow-y: auto;
-    }
-
+    .link-preview { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 12px 16px; font-size: 0.78rem; color: var(--ink-soft); word-break: break-all; margin-bottom: 16px; font-family: monospace; max-height: 80px; overflow-y: auto; }
     .link-modal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
-    .lm-btn {
-      flex: 1;
-      min-width: 120px;
-      border: none;
-      border-radius: var(--r-sm);
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 600;
-      padding: 11px 16px;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-    }
+    .lm-btn { flex: 1; min-width: 120px; border: none; border-radius: var(--r-sm); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600; padding: 11px 16px; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 7px; }
     .lm-btn-primary { background: var(--ink); color: white; }
     .lm-btn-primary:hover { background: #222; }
     .lm-btn-wa { background: #25D366; color: white; }
     .lm-btn-tg { background: #0088CC; color: white; }
     .lm-btn-cancel { background: var(--surface); color: var(--ink-soft); border: 1.5px solid var(--border); }
-
-    .link-modal-preview-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    .link-preview-thumb {
-      aspect-ratio: 1;
-      border-radius: 8px;
-      object-fit: cover;
-      background: var(--surface);
-    }
+    .link-modal-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px,1fr)); gap: 8px; margin-bottom: 16px; }
+    .link-preview-thumb { aspect-ratio: 1; border-radius: 8px; object-fit: cover; background: var(--surface); }
 
     /* ═══════════════════════════════════════════════
-       COLLECTION SHARED VIEW
+       COLLECTION VIEW
     ═══════════════════════════════════════════════ */
-    .collection-view {
-      display: none;
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 0 20px;
-    }
+    .collection-view { display: none; max-width: 1280px; margin: 0 auto; padding: 0 20px; }
     .collection-view.visible { display: block; }
-
-    .collection-hero {
-      background: var(--ink);
-      color: white;
-      border-radius: var(--r-lg);
-      padding: 32px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-    }
+    .collection-hero { background: var(--ink); color: white; border-radius: var(--r-lg); padding: 32px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
     .collection-hero h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 4px; }
     .collection-hero p { color: rgba(255,255,255,0.6); font-size: 0.88rem; }
-    .back-btn {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: var(--r-sm);
-      color: white;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 600;
-      padding: 10px 18px;
-      transition: var(--transition);
-      white-space: nowrap;
-    }
+    .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: var(--r-sm); color: white; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600; padding: 10px 18px; transition: var(--transition); white-space: nowrap; }
     .back-btn:hover { background: rgba(255,255,255,0.2); }
 
     /* ═══════════════════════════════════════════════
        PANEL OVERLAY
     ═══════════════════════════════════════════════ */
-    .panel-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      z-index: 499;
-      display: none;
-    }
+    .panel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 499; display: none; }
     .panel-overlay.open { display: block; }
 
     /* ═══════════════════════════════════════════════
        TOAST
     ═══════════════════════════════════════════════ */
-    .toast-container {
-      position: fixed;
-      bottom: 90px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 2000;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: none;
-    }
-
-    .toast {
-      background: var(--ink);
-      color: white;
-      border-radius: 50px;
-      font-size: 0.82rem;
-      font-weight: 500;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: var(--shadow-md);
-      animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1);
-      white-space: nowrap;
-    }
+    .toast-container { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); z-index: 2000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+    .toast { background: var(--ink); color: white; border-radius: 50px; font-size: 0.82rem; font-weight: 500; padding: 10px 20px; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-md); animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1); white-space: nowrap; }
     @keyframes toastIn { from { opacity: 0; transform: translateY(12px); } }
     .toast.success { background: #16a34a; }
     .toast.error   { background: #dc2626; }
@@ -1189,379 +394,150 @@
     /* ═══════════════════════════════════════════════
        REELS PAGE
     ═══════════════════════════════════════════════ */
-    #reelsPage {
-      background: #000;
-      min-height: calc(100vh - 64px - 72px);
-      overflow: hidden;
-    }
-
-    .reels-container {
-      width: 100%;
-      height: calc(100vh - 64px - 72px);
-      overflow-y: scroll;
-      scroll-snap-type: y mandatory;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      background: #000;
-    }
+    #reelsPage { background: #000; min-height: calc(100vh - 64px - 72px); overflow: hidden; }
+    .reels-container { width: 100%; height: calc(100vh - 64px - 72px); overflow-y: scroll; scroll-snap-type: y mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; background: #000; }
     .reels-container::-webkit-scrollbar { display: none; }
-
-    .reel-item {
-      width: 100%;
-      height: calc(100vh - 64px - 72px);
-      scroll-snap-align: start;
-      position: relative;
-      overflow: hidden;
-      background: #111;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .reel-media {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    /* Gradient overlay bottom */
-    .reel-item::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 50%;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
-      pointer-events: none;
-    }
-
-    .reel-info {
-      position: absolute;
-      bottom: 20px;
-      left: 16px;
-      right: 80px;
-      z-index: 10;
-      color: white;
-    }
-
-    .reel-product-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 4px;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
-    }
-
-    .reel-product-price {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--gold);
-      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
-    }
-
-    .reel-product-code {
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.65);
-      margin-top: 2px;
-    }
-
-    /* Reel action buttons (right side) */
-    .reel-actions {
-      position: absolute;
-      right: 12px;
-      bottom: 20px;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .reel-action-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: white;
-      padding: 0;
-    }
-
-    .reel-action-icon {
-      width: 44px;
-      height: 44px;
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(8px);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--transition);
-    }
-    .reel-action-btn:hover .reel-action-icon {
-      background: rgba(255,255,255,0.25);
-      transform: scale(1.1);
-    }
-    .reel-action-btn.liked .reel-action-icon {
-      background: rgba(255,59,92,0.4);
-    }
-    .reel-action-icon svg {
-      width: 20px;
-      height: 20px;
-      fill: white;
-    }
-    .reel-action-label {
-      font-size: 0.65rem;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-    }
-
-    /* Reel view button */
-    .reel-view-btn {
-      position: absolute;
-      bottom: 80px;
-      left: 16px;
-      z-index: 10;
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 50px;
-      color: white;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 600;
-      padding: 8px 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: var(--transition);
-    }
-    .reel-view-btn:hover {
-      background: rgba(201,168,76,0.4);
-      border-color: var(--gold);
-    }
-
-    /* Reel loading state */
-    .reel-loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      gap: 16px;
-      color: rgba(255,255,255,0.5);
-    }
-    .reel-loading .spinner {
-      border-color: rgba(255,255,255,0.2);
-      border-top-color: var(--gold);
-    }
-
-    /* Reels header bar */
-    .reels-topbar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 20;
-      padding: 16px 16px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
-    }
-    .reels-topbar-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.1rem;
-      color: white;
-      font-weight: 700;
-    }
-
-    /* Reel progress dots */
-    .reel-progress {
-      position: absolute;
-      top: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 4px;
-      z-index: 20;
-    }
-    .reel-dot {
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.4);
-      transition: all 0.3s;
-    }
-    .reel-dot.active {
-      background: white;
-      width: 16px;
-      border-radius: 2px;
-    }
+    .reel-item { width: 100%; height: calc(100vh - 64px - 72px); scroll-snap-align: start; position: relative; overflow: hidden; background: #111; display: flex; align-items: center; justify-content: center; }
+    .reel-media { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .reel-item::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%); pointer-events: none; }
+    .reel-info { position: absolute; bottom: 20px; left: 16px; right: 80px; z-index: 10; color: white; }
+    .reel-product-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+    .reel-product-price { font-size: 0.9rem; font-weight: 600; color: var(--gold); text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+    .reel-product-code { font-size: 0.75rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
+    .reel-actions { position: absolute; right: 12px; bottom: 20px; z-index: 10; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+    .reel-action-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; color: white; padding: 0; }
+    .reel-action-icon { width: 44px; height: 44px; background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+    .reel-action-btn:hover .reel-action-icon { background: rgba(255,255,255,0.25); transform: scale(1.1); }
+    .reel-action-btn.liked .reel-action-icon { background: rgba(255,59,92,0.4); }
+    .reel-action-icon svg { width: 20px; height: 20px; fill: white; }
+    .reel-action-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.3px; }
+    .reel-view-btn { position: absolute; bottom: 80px; left: 16px; z-index: 10; background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.3); border-radius: 50px; color: white; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600; padding: 8px 20px; display: flex; align-items: center; gap: 8px; transition: var(--transition); }
+    .reel-view-btn:hover { background: rgba(201,168,76,0.4); border-color: var(--gold); }
+    .reel-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 16px; color: rgba(255,255,255,0.5); }
+    .reels-topbar { position: absolute; top: 0; left: 0; right: 0; z-index: 20; padding: 16px 16px 0; display: flex; align-items: center; justify-content: space-between; background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%); }
+    .reels-topbar-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: white; font-weight: 700; }
 
     /* ═══════════════════════════════════════════════
-       PROFILE / HESABIM PAGE
+       PROFILE PAGE
     ═══════════════════════════════════════════════ */
-    #profilePage {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 24px 20px 20px;
-    }
-
-    .profile-header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 32px 24px;
-      background: var(--white);
-      border-radius: var(--r-lg);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 16px;
-    }
-
-    .profile-avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--gold), #8B6914);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 16px;
-      font-size: 2rem;
-    }
-
-    .profile-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      margin-bottom: 4px;
-    }
-
-    .profile-sub {
-      font-size: 0.82rem;
-      color: var(--ink-faint);
-    }
-
-    .profile-stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 20px;
-      width: 100%;
-    }
-
-    .profile-stat {
-      background: var(--surface);
-      border-radius: var(--r-sm);
-      padding: 12px 8px;
-      text-align: center;
-    }
-
-    .profile-stat-value {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--ink);
-    }
-
-    .profile-stat-label {
-      font-size: 0.7rem;
-      color: var(--ink-faint);
-      margin-top: 2px;
-    }
-
-    .profile-section-title {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: var(--ink-faint);
-      margin-bottom: 10px;
-      margin-top: 20px;
-    }
-
-    .profile-menu {
-      background: var(--white);
-      border-radius: var(--r-md);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .profile-menu-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: var(--transition);
-      color: var(--ink);
-      text-decoration: none;
-    }
+    #profilePage { max-width: 600px; margin: 0 auto; padding: 24px 20px 20px; }
+    .profile-header { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 32px 24px; background: var(--white); border-radius: var(--r-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-bottom: 16px; }
+    .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), #8B6914); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 2rem; }
+    .profile-name { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 4px; }
+    .profile-sub { font-size: 0.82rem; color: var(--ink-faint); }
+    .profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; width: 100%; }
+    .profile-stat { background: var(--surface); border-radius: var(--r-sm); padding: 12px 8px; text-align: center; }
+    .profile-stat-value { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; color: var(--ink); }
+    .profile-stat-label { font-size: 0.7rem; color: var(--ink-faint); margin-top: 2px; }
+    .profile-section-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--ink-faint); margin-bottom: 10px; margin-top: 20px; }
+    .profile-menu { background: var(--white); border-radius: var(--r-md); border: 1px solid var(--border); overflow: hidden; box-shadow: var(--shadow-sm); }
+    .profile-menu-item { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: var(--transition); color: var(--ink); text-decoration: none; }
     .profile-menu-item:last-child { border-bottom: none; }
     .profile-menu-item:hover { background: var(--surface); }
-
-    .profile-menu-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 1.1rem;
-    }
-
+    .profile-menu-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.1rem; }
     .profile-menu-text { flex: 1; }
     .profile-menu-text strong { display: block; font-size: 0.9rem; font-weight: 600; }
     .profile-menu-text span { font-size: 0.75rem; color: var(--ink-faint); }
-
-    .profile-menu-arrow {
-      color: var(--ink-faint);
-      font-size: 1rem;
-    }
+    .profile-menu-arrow { color: var(--ink-faint); font-size: 1rem; }
 
     /* ═══════════════════════════════════════════════
-       MOBILE RESPONSIVE
+       ORDER MODAL OVERLAY
+    ═══════════════════════════════════════════════ */
+    .order-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px); z-index: 2000; display: none; align-items: flex-end;
+      justify-content: center; transition: opacity 0.3s ease; opacity: 0;
+    }
+    .order-modal-overlay.open { display: flex; opacity: 1; }
+    .order-modal {
+      background: var(--bg); border-radius: 24px 24px 0 0; width: 100%; max-width: 640px;
+      max-height: 92vh; overflow-y: auto; box-shadow: 0 -20px 60px rgba(0,0,0,0.3);
+      animation: slideUp 0.42s cubic-bezier(0.16,1,0.3,1); position: relative;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .order-modal-handle { width: 40px; height: 4px; background: #ccc; border-radius: 2px; margin: 12px auto 0; }
+    .order-modal-header { padding: 16px 20px 0; display: flex; align-items: center; justify-content: space-between; }
+    .order-modal-header h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--text-main); }
+    .order-modal-close { background: #F2F2F7; border: none; border-radius: 50%; width: 32px; height: 32px; display: grid; place-items: center; cursor: pointer; font-size: 1rem; color: var(--text-sec); transition: var(--transition); }
+    .order-modal-close:hover { background: var(--primary); color: white; }
+
+    /* Pre-filled product info bar */
+    .order-product-bar {
+      margin: 14px 20px; background: linear-gradient(135deg,#FFF5F7,#F5F5FF); border: 1.5px solid #FFD6E0;
+      border-radius: 14px; padding: 14px; display: flex; align-items: center; gap: 14px;
+    }
+    .order-product-bar img { width: 60px; height: 60px; border-radius: 10px; object-fit: cover; background: #f0f0f0; flex-shrink: 0; }
+    .order-product-bar-info .name  { font-size: 15px; font-weight: 700; color: var(--text-main); }
+    .order-product-bar-info .code  { font-size: 11px; color: var(--text-sec); margin-top: 2px; }
+    .order-product-bar-info .price { font-size: 17px; font-weight: 800; color: var(--primary); margin-top: 4px; }
+
+    /* Inner order form */
+    .order-form-inner { padding: 0 20px 20px; }
+    .order-card { background: var(--card-bg); border-radius: var(--radius, 16px); padding: 18px; box-shadow: var(--shadow,0 4px 20px rgba(0,0,0,0.06)); margin-bottom: 16px; }
+    .order-card h4 { margin: 0 0 14px; font-size: 15px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .order-label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-sec); margin-bottom: 6px; margin-left: 4px; }
+    .order-input, .order-select {
+      width: 100%; padding: 14px; background: #F9F9F9; border: 1px solid #E5E5EA; border-radius: 12px;
+      font-size: 15px; color: var(--text-main); font-family: 'DM Sans', sans-serif; margin-bottom: 12px;
+      transition: 0.2s; -webkit-appearance: none; outline: none;
+    }
+    .order-input:focus, .order-select:focus { background: #fff; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255,45,85,0.1); }
+    .order-row { display: flex; gap: 10px; }
+    .order-row > * { flex: 1; }
+    .order-submit-btn {
+      width: 100%; padding: 17px; border-radius: 14px; border: none; font-weight: 700; font-size: 16px;
+      cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white;
+      box-shadow: 0 4px 15px rgba(255,45,85,0.3); transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+    }
+    .order-submit-btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .order-submit-btn:active { transform: scale(0.98); }
+
+    /* loc tabs in order */
+    .loc-tabs { display: flex; background: #EFEFF4; border-radius: 10px; padding: 4px; margin-bottom: 12px; }
+    .loc-tab { flex: 1; text-align: center; padding: 8px; font-size: 12px; font-weight: 600; color: var(--text-sec); border-radius: 8px; cursor: pointer; transition: 0.2s; }
+    .loc-tab.active { background: #fff; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .loc-content { display: none; }
+    .loc-content.active { display: block; }
+
+    /* Deposit */
+    .deposit-offer-box { display: none; background: linear-gradient(135deg,#FFF8E1,#FFFBF0); border: 1.5px solid #FFD600; border-radius: 14px; padding: 14px; margin-top: 10px; }
+    .deposit-checkbox-row { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 8px 0; }
+    .deposit-checkbox { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #ccc; background: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.2s; font-size: 11px; color: transparent; }
+    .deposit-checkbox.checked { background: var(--success); border-color: var(--success); color: white; }
+    .discount-badge { display: none; align-items: center; gap: 8px; background: #E0F8E5; border: 1px solid var(--success); border-radius: 10px; padding: 8px 12px; margin-top: 6px; font-size: 12px; font-weight: 700; color: #1E7E34; }
+    .card-receipt-box { display: none; background: #F0F4FF; border: 1.5px solid #D2E3FC; border-radius: 14px; padding: 14px; margin-top: 10px; }
+    .image-upload-area { border: 2px dashed #E5E5EA; border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: 0.2s; background: #F9F9F9; position: relative; overflow: hidden; }
+    .image-upload-area:hover { border-color: var(--primary); background: #FFF5F7; }
+    .image-upload-area.has-image { border-style: solid; border-color: var(--success); background: #F0FFF4; }
+    .image-upload-area input[type="file"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; margin: 0; padding: 0; border: none; }
+
+    /* Global loader */
+    #globalLoader { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.92); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; display: none; }
+    .loader-spinner { width: 50px; height: 50px; border: 5px solid #eee; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .loader-text { margin-top: 15px; font-weight: 600; color: var(--text-sec); }
+
+    /* ═══════════════════════════════════════════════
+       MOBILE
     ═══════════════════════════════════════════════ */
     @media (max-width: 767px) {
       .navbar { padding: 0 16px; gap: 10px; }
       .navbar-brand .brand-sub { display: none; }
       .nav-btn span { display: none; }
       .nav-btn { padding: 8px; }
-
       .filter-bar { padding: 0 16px; gap: 10px; }
-
       .main { padding: 0 12px 20px; }
-      .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-
+      .grid { grid-template-columns: repeat(2,1fr); gap: 12px; }
       .modal { flex-direction: column; max-height: 92vh; border-radius: var(--r-md); }
       .modal-img-col { width: 100%; min-height: 220px; max-height: 240px; }
       .modal-info-col { padding: 20px 18px; }
       .modal-title { font-size: 1.3rem; }
       .modal-price { font-size: 1.7rem; }
-
       .collection-panel { width: 100%; right: -110%; }
-
       .results-bar { padding: 10px 12px 4px; }
       .share-grid { grid-template-columns: 1fr 1fr; }
     }
-
-    @media (max-width: 480px) {
-      .grid { grid-template-columns: 1fr; gap: 10px; }
-    }
-
-    /* ═══════════════════════════════════════════════
-       SCROLLBAR
-    ═══════════════════════════════════════════════ */
+    @media (max-width: 480px) { .grid { grid-template-columns: 1fr; gap: 10px; } }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--surface); }
     ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
@@ -1570,56 +546,44 @@
 </head>
 <body>
 
-<!-- ═══ TOP NAVIGATION ═══ -->
+<!-- GLOBAL LOADER -->
+<div id="globalLoader">
+  <div class="loader-spinner"></div>
+  <p class="loader-text" id="globalLoaderText">Sehr edilir...</p>
+</div>
+
+<!-- ═══ TOP NAV ═══ -->
 <nav class="navbar">
   <div class="navbar-brand">
     <span class="brand-name">Brendimo</span>
     <span class="brand-sub">Hədiyyə Sehrbazı</span>
   </div>
-
   <div class="navbar-search" id="shopSearchWrap">
     <svg class="search-ico" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
       <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
     </svg>
     <input type="text" id="searchInput" placeholder="Məhsul adı, kodu..." autocomplete="off">
   </div>
-
   <div class="navbar-actions">
     <button class="nav-btn" id="selectionBtn" onclick="toggleCollectionPanel()">
-      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
       <span>Kolleksiya</span>
       <span class="badge" id="collectionBadge" style="display:none">0</span>
     </button>
   </div>
 </nav>
 
-<!-- ═══ FILTER BAR (only visible on shop page) ═══ -->
+<!-- ═══ FILTER BAR ═══ -->
 <div class="filter-bar" id="filterBar">
-  <!-- Target Audience -->
   <div class="filter-section">
     <span class="filter-label">Kimə</span>
-    <div class="chip active" data-filter="target" data-value="all" onclick="setFilter('target','all',this)">
-      <span class="chip-emoji">🎁</span> Hamısı
-    </div>
-    <div class="chip" data-filter="target" data-value="Xanım" onclick="setFilter('target','Xanım',this)">
-      <span class="chip-emoji">👩</span> Xanım
-    </div>
-    <div class="chip" data-filter="target" data-value="Bəy" onclick="setFilter('target','Bəy',this)">
-      <span class="chip-emoji">👨</span> Bəy
-    </div>
-    <div class="chip" data-filter="target" data-value="Uşaq" onclick="setFilter('target','Uşaq',this)">
-      <span class="chip-emoji">🧒</span> Uşaq
-    </div>
-    <div class="chip" data-filter="target" data-value="Həmkar" onclick="setFilter('target','Həmkar',this)">
-      <span class="chip-emoji">🤝</span> Həmkar
-    </div>
+    <div class="chip active" data-filter="target" data-value="all" onclick="setFilter('target','all',this)"><span class="chip-emoji">🎁</span> Hamısı</div>
+    <div class="chip" data-filter="target" data-value="Xanım" onclick="setFilter('target','Xanım',this)"><span class="chip-emoji">👩</span> Xanım</div>
+    <div class="chip" data-filter="target" data-value="Bəy" onclick="setFilter('target','Bəy',this)"><span class="chip-emoji">👨</span> Bəy</div>
+    <div class="chip" data-filter="target" data-value="Uşaq" onclick="setFilter('target','Uşaq',this)"><span class="chip-emoji">🧒</span> Uşaq</div>
+    <div class="chip" data-filter="target" data-value="Həmkar" onclick="setFilter('target','Həmkar',this)"><span class="chip-emoji">🤝</span> Həmkar</div>
   </div>
-
   <div class="filter-divider"></div>
-
-  <!-- Price Range -->
   <div class="filter-section">
     <span class="filter-label">Qiymət</span>
     <select class="price-select" id="priceFilter" onchange="applyFilters()">
@@ -1630,10 +594,7 @@
       <option value="100-999999">100+ AZN</option>
     </select>
   </div>
-
   <div class="filter-divider"></div>
-
-  <!-- Sort -->
   <div class="filter-section">
     <span class="filter-label">Sırala</span>
     <select class="sort-select" id="sortSelect" onchange="applyFilters()">
@@ -1644,31 +605,23 @@
       <option value="name-asc">A → Z</option>
     </select>
   </div>
-
-  <!-- Clear filters -->
   <button class="filter-clear" id="clearFiltersBtn" onclick="clearAllFilters()" style="display:none">✕ Sıfırla</button>
 </div>
 
-<!-- ═══ MAIN CONTENT ═══ -->
+<!-- ═══ SHOP PAGE ═══ -->
 <div id="shopPage" class="page active">
   <div class="results-bar">
     <p class="results-count" id="resultsCount"><strong>0</strong> məhsul</p>
     <div class="view-toggle">
       <button class="view-btn active" id="gridViewBtn" onclick="setViewMode('grid')" title="Grid">
-        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"/>
-        </svg>
+        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"/></svg>
       </button>
       <button class="view-btn" id="listViewBtn" onclick="setViewMode('list')" title="List">
-        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
-        </svg>
+        <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/></svg>
       </button>
     </div>
   </div>
-
   <main class="main" id="mainContent">
-    <!-- Collection view (shown when ?collection= param is in URL) -->
     <div class="collection-view" id="collectionView">
       <div class="collection-hero">
         <div>
@@ -1678,8 +631,6 @@
         <button class="back-btn" onclick="exitCollectionView()">← Geri</button>
       </div>
     </div>
-
-    <!-- Product grid -->
     <div class="grid" id="productGrid">
       <div class="loader-wrap">
         <div class="spinner"></div>
@@ -1705,81 +656,44 @@
     <div class="profile-avatar">🎁</div>
     <div class="profile-name">Brendimo</div>
     <div class="profile-sub">Hədiyyə Sehrbazı</div>
-
     <div class="profile-stats">
-      <div class="profile-stat">
-        <div class="profile-stat-value" id="statsProducts">—</div>
-        <div class="profile-stat-label">Məhsul</div>
-      </div>
-      <div class="profile-stat">
-        <div class="profile-stat-value" id="statsCollection">0</div>
-        <div class="profile-stat-label">Seçilmiş</div>
-      </div>
-      <div class="profile-stat">
-        <div class="profile-stat-value" id="statsReels">—</div>
-        <div class="profile-stat-label">Reels</div>
-      </div>
+      <div class="profile-stat"><div class="profile-stat-value" id="statsProducts">—</div><div class="profile-stat-label">Məhsul</div></div>
+      <div class="profile-stat"><div class="profile-stat-value" id="statsCollection">0</div><div class="profile-stat-label">Seçilmiş</div></div>
+      <div class="profile-stat"><div class="profile-stat-value" id="statsReels">—</div><div class="profile-stat-label">Reels</div></div>
     </div>
   </div>
-
   <p class="profile-section-title">Hesabım</p>
-
   <div class="profile-menu">
-    <a class="profile-menu-item" href="myprofile1.html">
-      <div class="profile-menu-icon" style="background:#FFF8E1">👤</div>
-      <div class="profile-menu-text">
-        <strong>Profilim</strong>
-        <span>Şəxsi məlumatlarım</span>
-      </div>
-      <span class="profile-menu-arrow">›</span>
-    </a>
     <div class="profile-menu-item" onclick="toggleCollectionPanel()">
       <div class="profile-menu-icon" style="background:#EEF7FF">⭐</div>
-      <div class="profile-menu-text">
-        <strong>Kolleksiyam</strong>
-        <span id="profileCollectionCount">0 məhsul seçilib</span>
-      </div>
+      <div class="profile-menu-text"><strong>Kolleksiyam</strong><span id="profileCollectionCount">0 məhsul seçilib</span></div>
       <span class="profile-menu-arrow">›</span>
     </div>
     <div class="profile-menu-item" onclick="switchTab('reels')">
       <div class="profile-menu-icon" style="background:#FFF0F0">🎬</div>
-      <div class="profile-menu-text">
-        <strong>Reels</strong>
-        <span>Məhsul videoları</span>
-      </div>
+      <div class="profile-menu-text"><strong>Reels</strong><span>Məhsul videoları</span></div>
       <span class="profile-menu-arrow">›</span>
     </div>
     <div class="profile-menu-item" onclick="switchTab('shop')">
       <div class="profile-menu-icon" style="background:#F0FFF0">🛍️</div>
-      <div class="profile-menu-text">
-        <strong>Mağaza</strong>
-        <span>Bütün məhsullara bax</span>
-      </div>
+      <div class="profile-menu-text"><strong>Mağaza</strong><span>Bütün məhsullara bax</span></div>
       <span class="profile-menu-arrow">›</span>
     </div>
   </div>
 </div>
 
-<!-- ═══ BOTTOM NAVIGATION ═══ -->
+<!-- ═══ BOTTOM NAV ═══ -->
 <nav class="bottom-nav">
   <div class="bottom-nav-item active" id="navShop" onclick="switchTab('shop')">
-    <svg viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm0 10c-1.66 0-3-1.34-3-3h2c0 .55.45 1 1 1s1-.45 1-1h2c0 1.66-1.34 3-3 3z"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm0 10c-1.66 0-3-1.34-3-3h2c0 .55.45 1 1 1s1-.45 1-1h2c0 1.66-1.34 3-3 3z"/></svg>
     <span>Mağaza</span>
   </div>
-
   <div class="bottom-nav-item" id="navReels" onclick="switchTab('reels')">
-    <svg viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>
     <span>Reels</span>
   </div>
-
   <div class="bottom-nav-item" id="navProfile" onclick="switchTab('profile')">
-    <svg viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-    </svg>
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
     <span>Hesabım</span>
   </div>
 </nav>
@@ -1788,11 +702,9 @@
 <div class="modal-overlay" id="productModal" onclick="handleModalOverlayClick(event)">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">×</button>
-
     <div class="modal-img-col">
       <img class="modal-img" id="modalImg" src="" alt="">
     </div>
-
     <div class="modal-info-col">
       <div class="modal-tags" id="modalTags"></div>
       <h2 class="modal-title" id="modalTitle"></h2>
@@ -1800,7 +712,6 @@
       <div class="modal-divider"></div>
       <p class="modal-desc" id="modalDesc"></p>
 
-      <!-- Product permalink -->
       <div class="modal-permalink" id="modalPermalink">
         <span id="modalPermalinkUrl" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
         <button class="modal-permalink-copy" onclick="copyPermalink()" title="Linki kopyala">
@@ -1833,6 +744,12 @@
         </button>
       </div>
 
+      <!-- ORDER BUTTON -->
+      <button class="modal-order-btn" onclick="openOrderModal()">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+        Sifariş Yarat
+      </button>
+
       <button class="modal-select-btn" id="modalSelectBtn" onclick="toggleSelectFromModal()">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
         Kolleksiyaya əlavə et
@@ -1843,16 +760,11 @@
 
 <!-- ═══ COLLECTION PANEL ═══ -->
 <div class="panel-overlay" id="panelOverlay" onclick="toggleCollectionPanel()"></div>
-
 <div class="collection-panel" id="collectionPanel">
   <div class="panel-header">
-    <div>
-      <h3>Mənim Kolleksiyam</h3>
-      <p id="panelSubtitle">0 məhsul seçilib</p>
-    </div>
+    <div><h3>Mənim Kolleksiyam</h3><p id="panelSubtitle">0 məhsul seçilib</p></div>
     <button class="panel-close" onclick="toggleCollectionPanel()">×</button>
   </div>
-
   <div class="panel-body" id="panelBody">
     <div class="panel-empty">
       <div class="panel-empty-icon">⭐</div>
@@ -1860,7 +772,6 @@
       <p style="font-size:0.78rem;margin-top:6px;color:var(--ink-faint)">Kartın üzərindəki ulduz düyməsinə basın</p>
     </div>
   </div>
-
   <div class="panel-footer" id="panelFooter" style="display:none">
     <div class="panel-total">
       <span class="label">Ümumi qiymət</span>
@@ -1871,9 +782,7 @@
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
         Link Yarat
       </button>
-      <button class="panel-btn panel-btn-secondary" onclick="clearCollection()">
-        Kolleksiyanı Sil
-      </button>
+      <button class="panel-btn panel-btn-secondary" onclick="clearCollection()">Kolleksiyanı Sil</button>
     </div>
   </div>
 </div>
@@ -1883,39 +792,163 @@
   <div class="link-modal-box">
     <h3>🔗 Kolleksiya Linki</h3>
     <p>Bu linki paylaşaraq seçdiyiniz məhsulları göstərə bilərsiniz</p>
-
     <div class="link-modal-preview-grid" id="linkPreviewGrid"></div>
     <div class="link-preview" id="linkPreviewUrl"></div>
-
     <div class="link-modal-actions">
       <button class="lm-btn lm-btn-primary" onclick="copyCollectionLink()">
         <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
         Kopyala
       </button>
-      <button class="lm-btn lm-btn-wa" onclick="shareCollectionVia('whatsapp')">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-        WhatsApp
-      </button>
-      <button class="lm-btn lm-btn-tg" onclick="shareCollectionVia('telegram')">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-        Telegram
-      </button>
+      <button class="lm-btn lm-btn-wa" onclick="shareCollectionVia('whatsapp')">WhatsApp</button>
+      <button class="lm-btn lm-btn-tg" onclick="shareCollectionVia('telegram')">Telegram</button>
       <button class="lm-btn lm-btn-cancel" onclick="closeLinkModal()">Bağla</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ TOAST CONTAINER ═══ -->
+<!-- ═══ ORDER MODAL ═══ -->
+<div class="order-modal-overlay" id="orderModalOverlay" onclick="handleOrderOverlayClick(event)">
+  <div class="order-modal" id="orderModalInner">
+    <div class="order-modal-handle"></div>
+    <div class="order-modal-header">
+      <h3>🛒 Sifariş Yarat</h3>
+      <button class="order-modal-close" onclick="closeOrderModal()">×</button>
+    </div>
+
+    <!-- Pre-filled product bar -->
+    <div class="order-product-bar" id="orderProductBar">
+      <img id="orderProductImg" src="" alt="" onerror="this.style.display='none'">
+      <div class="order-product-bar-info">
+        <div class="name" id="orderProductName"></div>
+        <div class="code" id="orderProductCode"></div>
+        <div class="price" id="orderProductPrice"></div>
+      </div>
+    </div>
+
+    <div class="order-form-inner">
+      <form id="orderInlineForm" novalidate>
+
+        <!-- Customer info -->
+        <div class="order-card">
+          <h4><i class="fa-regular fa-id-card"></i> Sizin Məlumatlar</h4>
+          <label class="order-label">Ad və Soyad</label>
+          <input class="order-input" type="text" id="oi_custName" placeholder="Məs: Əli Vəliyev" required>
+          <label class="order-label">Əlaqə Nömrəsi</label>
+          <input class="order-input" type="tel" id="oi_custPhone" placeholder="050 000 00 00" required>
+          <label class="order-label">Instagram <span style="font-weight:400;text-transform:none;color:#aaa;font-size:10px">— istəyə bağlı</span></label>
+          <input class="order-input" type="text" id="oi_instagram" placeholder="@username">
+        </div>
+
+        <!-- Delivery time -->
+        <div class="order-card">
+          <h4><i class="fa-regular fa-clock"></i> Çatdırılma Zamanı</h4>
+          <div class="order-row">
+            <div>
+              <label class="order-label">Tarix</label>
+              <input class="order-input" type="date" id="oi_date" required>
+            </div>
+            <div>
+              <label class="order-label">Saat Aralığı</label>
+              <select class="order-select" id="oi_time" required>
+                <option value="">Seçin...</option>
+                <option value="12:00 - 14:00">12:00 - 14:00</option>
+                <option value="14:00 - 16:00">14:00 - 16:00</option>
+                <option value="16:00 - 18:00">16:00 - 18:00</option>
+                <option value="18:00 - 20:00">18:00 - 20:00</option>
+                <option value="20:00 - 21:00">20:00 - 21:00</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Address -->
+        <div class="order-card">
+          <h4><i class="fa-solid fa-map-location-dot"></i> Ünvan</h4>
+          <div class="loc-tabs">
+            <div class="loc-tab active" onclick="oiSwitchLoc('metro',this)">Metro</div>
+            <div class="loc-tab" onclick="oiSwitchLoc('landmark',this)">Nişangah</div>
+            <div class="loc-tab" onclick="oiSwitchLoc('rayon',this)">Rayon</div>
+          </div>
+          <div id="oi_loc_metro" class="loc-content active">
+            <label class="order-label">Metro Stansiyası</label>
+            <select class="order-select" id="oi_metro">
+              <option value="">Stansiyanı seçin...</option>
+              <option>28 May</option><option>Gənclik</option><option>Nəriman Nərimanov</option>
+              <option>Elmlər Akademiyası</option><option>Nizami</option><option>İçərişəhər</option>
+              <option>Sahil</option><option>Koroğlu</option><option>Neftçilər</option>
+              <option>Xalqlar Dostluğu</option><option>Əhmədli</option><option>Həzi Aslanov</option>
+              <option>Memar Əcəmi</option><option>20 Yanvar</option><option>İnşaatçılar</option>
+            </select>
+          </div>
+          <div id="oi_loc_landmark" class="loc-content">
+            <label class="order-label">Nişangah</label>
+            <select class="order-select" id="oi_landmark">
+              <option value="">Seçin...</option>
+            </select>
+          </div>
+          <div id="oi_loc_rayon" class="loc-content">
+            <label class="order-label">Rayon / Şəhər <span style="color:#888;font-size:10px">(+4.00 AZN)</span></label>
+            <select class="order-select" id="oi_rayon">
+              <option value="">Seçin...</option>
+            </select>
+          </div>
+          <label class="order-label" style="margin-top:8px">Əlavə Ünvan Qeydi</label>
+          <input class="order-input" type="text" id="oi_addressNote" placeholder="Küçə, mənzil, mərtəbə...">
+        </div>
+
+        <!-- Payment -->
+        <div class="order-card">
+          <h4><i class="fa-regular fa-credit-card"></i> Ödəniş Üsulu</h4>
+          <label class="order-label">Ödəniş növü</label>
+          <select class="order-select" id="oi_payMethod" onchange="oiHandlePayment()">
+            <option value="cash">Nağd (Qapıda)</option>
+            <option value="card">Kart (Köçürmə)</option>
+          </select>
+          <!-- Cash deposit offer -->
+          <div class="deposit-offer-box" id="oi_depositBox">
+            <div style="font-size:13px;font-weight:700;color:#B8860B;margin-bottom:8px">🎁 4 AZN Endirim Qazanın! — 10 AZN beh ödəyin</div>
+            <div class="deposit-checkbox-row" onclick="oiToggleDeposit()">
+              <div class="deposit-checkbox" id="oi_depCb"></div>
+              <span style="font-size:13px;font-weight:600">Bəli, 10 AZN beh ödəmək istəyirəm</span>
+            </div>
+            <div class="discount-badge" id="oi_discBadge">✅ 4 AZN endirim tətbiq ediləcək!</div>
+            <div id="oi_depReceiptSection" style="display:none;margin-top:10px">
+              <label class="order-label">Beh Qəbzi</label>
+              <div class="image-upload-area" id="oi_depReceiptArea">
+                <input type="file" accept="image/*,application/pdf" onchange="oiHandleReceipt(event,'deposit')">
+                <div id="oi_depReceiptContent"><div style="font-size:24px">🧾</div><div style="font-size:12px;color:#888">Ödəniş qəbzini əlavə et</div></div>
+              </div>
+            </div>
+          </div>
+          <!-- Card receipt -->
+          <div class="card-receipt-box" id="oi_cardReceiptBox">
+            <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">⚠️ Kart ödənişi üçün qəbz mütləqdir</div>
+            <div class="image-upload-area" id="oi_cardReceiptArea">
+              <input type="file" accept="image/*,application/pdf" onchange="oiHandleReceipt(event,'card')">
+              <div id="oi_cardReceiptContent"><div style="font-size:24px">🧾</div><div style="font-size:12px;color:#888">Bank köçürmə qəbzini əlavə et</div></div>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="order-submit-btn">
+          Sifarişi Göndər <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- ═══════════════════════════════════════════════
-     JAVASCRIPT
-═══════════════════════════════════════════════ -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
 /* ─────────────────────────────────────────────
-   CONFIGURATION
+   CONFIG
 ───────────────────────────────────────────── */
-const API_URL = "https://script.google.com/macros/s/AKfycbzgGiOg7Rp3Y7bDmNNhlbK2PZDl-qwlU8oecz0lGrVouKigoLzlfWleg02H83chkXt53g/exec";
+const API_URL     = "https://script.google.com/macros/s/AKfycbzgGiOg7Rp3Y7bDmNNhlbK2PZDl-qwlU8oecz0lGrVouKigoLzlfWleg02H83chkXt53g/exec";
+const ORDERS_API  = "https://script.google.com/macros/s/AKfycbzXzKPYagW6FPncTr1zfluTiS66dyUH0vXMuQQyw1VTeFLjEQszF1OhAlFSrNd9KoJu/exec";
 const DRIVE_MEDIA_FOLDER = "1Rd6HW3MgRrqDPsufsqdLOCiOGbMI8Q4K";
 const PLACEHOLDER = "https://placehold.co/600x600/F4F1EB/9A9A9A?text=Brendimo";
 const NEW_THRESHOLD = 10;
@@ -1923,21 +956,53 @@ const NEW_THRESHOLD = 10;
 /* ─────────────────────────────────────────────
    STATE
 ───────────────────────────────────────────── */
-let allProducts     = [];
+let allProducts      = [];
 let filteredProducts = [];
-let currentProduct  = null;
-let collection      = new Set();
-let viewMode        = 'grid';
-let reelsLoaded     = false;
-let reelMediaFiles  = [];
-let currentTab      = 'shop';
+let currentProduct   = null;
+let collection       = new Set();
+let viewMode         = 'grid';
+let reelsLoaded      = false;
+let reelMediaFiles   = [];
+let currentTab       = 'shop';
 
-const filters = {
-  target:   'all',
-  price:    'all',
-  sort:     'newest',
-  query:    ''
-};
+const filters = { target: 'all', price: 'all', sort: 'newest', query: '' };
+
+// Order modal state
+let oiDepositChecked = false;
+let oiReceiptB64     = '';
+
+// Location data
+const landmarkData = [
+  {name:"Park Bulvar",price:1},{name:"Dəniz Mall",price:2},{name:"Port Baku",price:1},
+  {name:"Badamdar",price:2},{name:"Bakıxanov (Razin)",price:2},{name:"Balaxanı",price:3},
+  {name:"Zığ",price:8},{name:"Heydər Əliyev Liseyi",price:5},{name:"Sulutəpə",price:2},
+  {name:"Hökməli",price:5},{name:"Qobu",price:8},{name:"Babək prospekti",price:1},
+  {name:"8 noyabr prospekti",price:3},{name:"Günəşli",price:2},{name:"Xırdalan",price:2},
+  {name:"Zirə",price:8},{name:"Zabrat",price:8},{name:"Türkan",price:8},
+  {name:"Şüvəlan",price:10},{name:"Şağan",price:8},{name:"Suraxanı",price:3},
+  {name:"Yeni Suraxanı",price:3},{name:"Saray",price:6},{name:"Sabunçu",price:2},
+  {name:"Ramana",price:2},{name:"Qaraçuxur",price:2},{name:"Qala",price:8},
+  {name:"Pirşağı",price:6},{name:"Novxanı",price:10},{name:"Nardaran",price:10},
+  {name:"Mərdəkan",price:10},{name:"Məhəmmədi",price:1},{name:"Mehdiabad",price:6},
+  {name:"Maştağa",price:10},{name:"Masazır",price:2},{name:"Lökbatan",price:10},
+  {name:"Kürdəxanı",price:10},{name:"Hövsan",price:10},{name:"Görədil",price:10},
+  {name:"Fatmayı",price:10},{name:"Əmircan",price:10},{name:"Əhmədli (Kənd)",price:10},
+  {name:"Digah",price:10},{name:"Buzovna",price:10},{name:"Binəqədi",price:6},
+  {name:"Binə",price:8},{name:"Bilgəh",price:10},{name:"Biləcəri",price:2},
+  {name:"Bibiheybət",price:10},{name:"Bayıl",price:3},{name:"Keşlə",price:2}
+];
+
+const rayonData = [
+  "Abşeron","Ağcabədi","Ağdam","Ağdaş","Ağstafa","Ağsu","Astara","Babək","Balakən",
+  "Beyləqan","Bərdə","Biləsuvar","Cəbrayıl","Cəlilabad","Culfa","Daşkəsən","Füzuli",
+  "Gədəbəy","Gəncə","Goranboy","Göyçay","Göygöl","Hacıqabul","Xaçmaz","Xankəndi",
+  "Xocavənd","Xocalı","Xızı","İmişli","İsmayıllı","Kəlbəcər","Kəngərli","Kürdəmir",
+  "Qax","Qazax","Qəbələ","Qobustan","Quba","Qubadlı","Qusar","Laçın","Lerik",
+  "Lənkəran","Masallı","Mingəçevir","Naftalan","Naxçıvan","Neftçala","Oğuz","Ordubad",
+  "Saatlı","Sabirabad","Salyan","Samux","Sədərək","Siyəzən","Sumqayıt","Şabran",
+  "Şahbuz","Şamaxı","Şəki","Şəmkir","Şərur","Şirvan","Şuşa","Tərtər","Tovuz",
+  "Ucar","Yardımlı","Yevlax","Zaqatala","Zəngilan","Zərdab"
+];
 
 /* ─────────────────────────────────────────────
    INIT
@@ -1945,39 +1010,50 @@ const filters = {
 document.addEventListener('DOMContentLoaded', () => {
   fetchProducts();
 
-  // Search with debounce
-  const input = document.getElementById('searchInput');
-  let debounceTimer;
-  input.addEventListener('input', e => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      filters.query = e.target.value.toLowerCase().trim();
-      applyFilters();
-    }, 280);
+  // Populate order modal dropdowns
+  const lmSel = document.getElementById('oi_landmark');
+  landmarkData.forEach(item => {
+    const opt = document.createElement('option');
+    opt.value = item.name;
+    opt.text  = `${item.name} (+${item.price.toFixed(2)} AZN)`;
+    lmSel.appendChild(opt);
+  });
+  const raySel = document.getElementById('oi_rayon');
+  [...rayonData].sort().forEach(city => {
+    const opt = document.createElement('option');
+    opt.value = city; opt.text = `${city} (+4.00 AZN)`;
+    raySel.appendChild(opt);
   });
 
-  // Parse URL params on load
-  const urlParams = new URLSearchParams(window.location.search);
-  const sharedCodes = urlParams.get('collection');
-  const sharedProduct = urlParams.get('product');
+  // Default delivery date = tomorrow
+  const tom = new Date();
+  tom.setDate(tom.getDate() + 1);
+  document.getElementById('oi_date').valueAsDate = tom;
 
-  if (sharedCodes) {
-    window._sharedCodes = sharedCodes.split(',').map(c => c.trim()).filter(Boolean);
-  }
-  if (sharedProduct) {
-    window._sharedProduct = sharedProduct.trim();
-  }
+  oiHandlePayment();
+
+  // Search
+  const input = document.getElementById('searchInput');
+  let dbt;
+  input.addEventListener('input', e => {
+    clearTimeout(dbt);
+    dbt = setTimeout(() => { filters.query = e.target.value.toLowerCase().trim(); applyFilters(); }, 280);
+  });
+
+  // URL params
+  const params = new URLSearchParams(window.location.search);
+  const sharedCodes   = params.get('collection');
+  const sharedProduct = params.get('product');
+  if (sharedCodes)   window._sharedCodes   = sharedCodes.split(',').map(c => c.trim()).filter(Boolean);
+  if (sharedProduct) window._sharedProduct = sharedProduct.trim();
 });
 
 /* ─────────────────────────────────────────────
-   TAB NAVIGATION
+   TAB NAV
 ───────────────────────────────────────────── */
 function switchTab(tab) {
   currentTab = tab;
-
-  // Hide all pages
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  // Deactivate all nav items
   document.querySelectorAll('.bottom-nav-item').forEach(n => n.classList.remove('active'));
 
   if (tab === 'shop') {
@@ -2001,9 +1077,9 @@ function switchTab(tab) {
 }
 
 function updateProfileStats() {
-  document.getElementById('statsProducts').textContent = allProducts.length || '—';
+  document.getElementById('statsProducts').textContent   = allProducts.length || '—';
   document.getElementById('statsCollection').textContent = collection.size;
-  document.getElementById('statsReels').textContent = reelMediaFiles.length || '—';
+  document.getElementById('statsReels').textContent      = reelMediaFiles.length || '—';
   document.getElementById('profileCollectionCount').textContent = `${collection.size} məhsul seçilib`;
 }
 
@@ -2012,75 +1088,62 @@ function updateProfileStats() {
 ───────────────────────────────────────────── */
 async function fetchProducts() {
   try {
-    const res = await fetch(`${API_URL}?action=getProducts`);
+    const res  = await fetch(`${API_URL}?action=getProducts`);
     if (!res.ok) throw new Error('Network error');
-
     const data = await res.json();
-    const raw = data.products || data;
+    const raw  = data.products || data;
 
     if (!Array.isArray(raw) || raw.length === 0) {
-      showEmpty('Hazırda aktiv məhsul yoxdur.');
-      return;
+      showEmpty('Hazırda aktiv məhsul yoxdur.'); return;
     }
 
     allProducts = raw.map((p, i) => ({ ...p, _index: i }));
-
     applyFilters();
 
-    // Handle shared collection view
-    if (window._sharedCodes && window._sharedCodes.length > 0) {
-      showCollectionView(window._sharedCodes);
-    }
-
-    // Handle single product deep link
+    if (window._sharedCodes && window._sharedCodes.length > 0) showCollectionView(window._sharedCodes);
     if (window._sharedProduct) {
-      const product = allProducts.find(p =>
-        (p.productcode || p.code || '') === window._sharedProduct
-      );
-      if (product) {
-        setTimeout(() => openModal(product), 400);
-      }
+      const product = allProducts.find(p => (p.productcode || p.code || '') === window._sharedProduct);
+      if (product) setTimeout(() => openModal(product), 400);
     }
-
   } catch (err) {
     console.error(err);
     document.getElementById('productGrid').innerHTML = `
       <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#dc2626">
         <p style="font-size:1.5rem;margin-bottom:8px">⚠️</p>
         <p style="font-weight:600">Kataloq yüklənmədi</p>
-        <p style="font-size:0.82rem;color:var(--ink-faint);margin-top:4px">Səhifəni yeniləyin və ya internet bağlantınızı yoxlayın</p>
+        <p style="font-size:0.82rem;color:var(--ink-faint);margin-top:4px">Səhifəni yeniləyin</p>
       </div>`;
   }
 }
 
 /* ─────────────────────────────────────────────
-   PRODUCT PERMALINK BUILDER
-   Each product gets a unique link via ?product=CODE
+   PRODUCT URL — FIX: builds absolute URL for sharing
 ───────────────────────────────────────────── */
 function buildProductUrl(product) {
   const code = product.productcode || product.code || product.id || '';
-  const base = window.location.origin + window.location.pathname;
-  return code ? `${base}?product=${encodeURIComponent(code)}` : base;
+  if (!code) return window.location.origin + window.location.pathname;
+  // Use current origin + pathname (works on any host)
+  const base = window.location.origin + window.location.pathname.replace(/\/$/, '');
+  return `${base}?product=${encodeURIComponent(code)}`;
 }
 
 /* ─────────────────────────────────────────────
    FILTERS
 ───────────────────────────────────────────── */
-function setFilter(filterKey, value, chipEl) {
-  filters[filterKey] = value;
-  document.querySelectorAll(`[data-filter="${filterKey}"]`).forEach(c => c.classList.remove('active'));
-  if (chipEl) chipEl.classList.add('active');
-  updateClearButton();
+function setFilter(key, value, chip) {
+  filters[key] = value;
+  document.querySelectorAll(`[data-filter="${key}"]`).forEach(c => c.classList.remove('active'));
+  if (chip) chip.classList.add('active');
+  updateClearBtn();
   applyFilters();
 }
 
 function applyFilters() {
   filters.price = document.getElementById('priceFilter').value;
   filters.sort  = document.getElementById('sortSelect').value;
-  updateClearButton();
+  updateClearBtn();
 
   let result = allProducts.filter(p => {
-    // Search
     if (filters.query) {
       const name = (p.name || '').toLowerCase();
       const code = (p.productcode || p.code || '').toString().toLowerCase();
@@ -2088,25 +1151,18 @@ function applyFilters() {
       const terms = filters.query.split(/\s+/);
       if (!terms.every(t => name.includes(t) || code.includes(t) || desc.includes(t))) return false;
     }
-
-    // Target
     if (filters.target !== 'all') {
-      const targets = String(p.target || p.l || '').split(',').map(t => t.trim());
+      const targets = String(p.target || '').split(',').map(t => t.trim());
       if (!targets.includes(filters.target)) return false;
     }
-
-    // Price
     if (filters.price !== 'all') {
       const [min, max] = filters.price.split('-').map(Number);
       const price = parseFloat(p.price) || 0;
       if (price < min || price > max) return false;
     }
-
     return true;
   });
 
-  // Sort
-  const total = allProducts.length;
   result.sort((a, b) => {
     switch (filters.sort) {
       case 'newest':    return b._index - a._index;
@@ -2119,24 +1175,21 @@ function applyFilters() {
   });
 
   filteredProducts = result;
-  renderProducts(result, total);
+  renderProducts(result, allProducts.length);
   document.getElementById('resultsCount').innerHTML = `<strong>${result.length}</strong> məhsul`;
 }
 
 function clearAllFilters() {
-  filters.target = 'all';
-  filters.query  = '';
-  document.getElementById('searchInput').value = '';
-  document.getElementById('priceFilter').value = 'all';
-  document.getElementById('sortSelect').value  = 'newest';
-  document.querySelectorAll('.chip').forEach(c => {
-    c.classList.toggle('active', c.dataset.value === 'all');
-  });
-  updateClearButton();
+  filters.target = 'all'; filters.query = '';
+  document.getElementById('searchInput').value  = '';
+  document.getElementById('priceFilter').value  = 'all';
+  document.getElementById('sortSelect').value   = 'newest';
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.value === 'all'));
+  updateClearBtn();
   applyFilters();
 }
 
-function updateClearButton() {
+function updateClearBtn() {
   const active = filters.target !== 'all' || filters.price !== 'all' || filters.query !== '';
   document.getElementById('clearFiltersBtn').style.display = active ? 'block' : 'none';
 }
@@ -2149,39 +1202,30 @@ function renderProducts(products, totalCount) {
   grid.innerHTML = '';
 
   if (!products || products.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state-icon">🔍</div>
-        <h3>Məhsul tapılmadı</h3>
-        <p>Fərqli axtarış sözü və ya filtr seçin</p>
-      </div>`;
+    grid.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔍</div><h3>Məhsul tapılmadı</h3><p>Fərqli axtarış sözü seçin</p></div>`;
     return;
   }
 
-  const fragment = document.createDocumentFragment();
-
+  const frag = document.createDocumentFragment();
   products.forEach((p, i) => {
-    const name  = p.name || p.Name || 'Adsız';
-    const code  = p.productcode || p.code || p.id || '';
-    const price = parseFloat(p.price || 0);
-    const desc  = p.description || '';
-
-    let imgSrc = (p.image || p.img || '').toString().trim();
-    if (!imgSrc) imgSrc = PLACEHOLDER;
-
-    const targets = String(p.target || '').split(',').map(t => t.trim()).filter(Boolean);
-    const isNew = p._index >= (totalCount - NEW_THRESHOLD);
-    const isSelected = collection.has(code);
+    const name     = p.name || 'Adsız';
+    const code     = p.productcode || p.code || p.id || '';
+    const price    = parseFloat(p.price || 0);
+    const desc     = p.description || '';
+    const imgSrc   = (p.image || p.img || '').toString().trim() || PLACEHOLDER;
+    const targets  = String(p.target || '').split(',').map(t => t.trim()).filter(Boolean);
+    const isNew    = p._index >= (totalCount - NEW_THRESHOLD);
+    const isSel    = collection.has(code);
 
     const card = document.createElement('div');
-    card.className = 'card' + (isSelected ? ' selected' : '');
+    card.className = 'card' + (isSel ? ' selected' : '');
     card.dataset.code = code;
     card.style.animationDelay = `${Math.min(i, 12) * 40}ms`;
 
     card.innerHTML = `
       <div class="card-img-wrap">
         ${isNew ? `<span class="is-new-label">YENİ</span>` : ''}
-        ${targets.length ? `<div class="badge-targets">${targets.slice(0,2).map(t => `<span class="badge-target">${targetEmoji(t)} ${t}</span>`).join('')}</div>` : ''}
+        ${targets.length ? `<div class="badge-targets">${targets.slice(0,2).map(t=>`<span class="badge-target">${targetEmoji(t)} ${t}</span>`).join('')}</div>` : ''}
         <img class="card-img" src="${imgSrc}" alt="${name}" loading="lazy" onerror="imgError(this)">
         ${code ? `<span class="badge-code">${code}</span>` : ''}
       </div>
@@ -2193,65 +1237,48 @@ function renderProducts(products, totalCount) {
         <div class="card-footer">
           <div class="price">${price.toFixed(2)}<span class="price-currency">AZN</span></div>
           <div class="card-actions">
-            <button class="icon-btn select-btn ${isSelected ? 'selected-state' : ''}"
-              onclick="toggleSelect(event,'${escapeAttr(code)}')"
-              title="${isSelected ? 'Kolleksiyadan çıxar' : 'Kolleksiyaya əlavə et'}">
+            <button class="icon-btn select-btn ${isSel ? 'selected-state' : ''}" onclick="toggleSelect(event,'${escAttr(code)}')" title="Kolleksiyaya əlavə et">
               <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             </button>
-            <button class="icon-btn" onclick="quickShare(event,'${escapeAttr(code)}')" title="Paylaş">
+            <button class="icon-btn" onclick="quickShare(event,'${escAttr(code)}')" title="Paylaş">
               <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
             </button>
           </div>
         </div>
       </div>`;
 
-    card.querySelector('.card-body').addEventListener('click', (e) => {
-      if (!e.target.closest('button')) openModal(p);
-    });
+    card.querySelector('.card-body').addEventListener('click', e => { if (!e.target.closest('button')) openModal(p); });
     card.querySelector('.card-img-wrap').addEventListener('click', () => openModal(p));
-
-    fragment.appendChild(card);
+    frag.appendChild(card);
   });
 
-  grid.appendChild(fragment);
+  grid.appendChild(frag);
 }
 
 function showEmpty(msg) {
-  document.getElementById('productGrid').innerHTML =
-    `<div class="empty-state"><div class="empty-state-icon">📦</div><h3>${msg}</h3></div>`;
+  document.getElementById('productGrid').innerHTML = `<div class="empty-state"><div class="empty-state-icon">📦</div><h3>${msg}</h3></div>`;
 }
 
 /* ─────────────────────────────────────────────
    HELPERS
 ───────────────────────────────────────────── */
-function targetEmoji(t) {
-  return { 'Xanım': '👩', 'Bəy': '👨', 'Uşaq': '🧒', 'Həmkar': '🤝' }[t] || '';
-}
-
-function escapeAttr(str) {
-  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
-}
-
-function imgError(img) {
-  if (img.dataset.tried) return;
-  img.dataset.tried = '1';
-  img.src = PLACEHOLDER;
-  img.onerror = null;
-}
+function targetEmoji(t) { return {'Xanım':'👩','Bəy':'👨','Uşaq':'🧒','Həmkar':'🤝'}[t]||''; }
+function escAttr(s)  { return String(s).replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+function escHtml(s)  { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function imgError(img) { if (img.dataset.tried) return; img.dataset.tried='1'; img.src=PLACEHOLDER; img.onerror=null; }
 
 /* ─────────────────────────────────────────────
    VIEW MODE
 ───────────────────────────────────────────── */
 function setViewMode(mode) {
   viewMode = mode;
-  const grid = document.getElementById('productGrid');
-  grid.classList.toggle('list-view', mode === 'list');
+  document.getElementById('productGrid').classList.toggle('list-view', mode === 'list');
   document.getElementById('gridViewBtn').classList.toggle('active', mode === 'grid');
   document.getElementById('listViewBtn').classList.toggle('active', mode === 'list');
 }
 
 /* ─────────────────────────────────────────────
-   MODAL — with per-product permalink
+   MODAL
 ───────────────────────────────────────────── */
 function openModal(product) {
   currentProduct = product;
@@ -2259,46 +1286,38 @@ function openModal(product) {
   const code  = product.productcode || product.code || '';
   const price = parseFloat(product.price || 0).toFixed(2);
   const desc  = product.description || 'Məhsul haqqında ətraflı məlumat yoxdur.';
-  let imgSrc  = (product.image || '').trim() || PLACEHOLDER;
+  const img   = (product.image || '').trim() || PLACEHOLDER;
 
-  // Build tags
-  const tagsEl = document.getElementById('modalTags');
+  // Tags
   let tagsHTML = '';
   if (code) tagsHTML += `<span class="modal-tag code-tag">📦 ${code}</span>`;
-
-  const targets = String(product.target || '').split(',').map(t => t.trim()).filter(Boolean);
-  targets.forEach(t => {
+  String(product.target || '').split(',').map(t=>t.trim()).filter(Boolean).forEach(t => {
     tagsHTML += `<span class="modal-tag target">${targetEmoji(t)} ${t}</span>`;
   });
-
-  if (product.occasion) {
-    String(product.occasion).split(',').forEach(o => {
-      if (o.trim()) tagsHTML += `<span class="modal-tag" style="background:#EEF7FF;border-color:#BFDBFE;color:#1E40AF">🎉 ${o.trim()}</span>`;
-    });
-  }
-
+  if (product.occasion) String(product.occasion).split(',').forEach(o => {
+    if (o.trim()) tagsHTML += `<span class="modal-tag" style="background:#EEF7FF;border-color:#BFDBFE;color:#1E40AF">🎉 ${o.trim()}</span>`;
+  });
   const isNew = product._index >= (allProducts.length - NEW_THRESHOLD);
   if (isNew) tagsHTML += `<span class="modal-tag new-tag">✨ YENİ</span>`;
 
-  tagsEl.innerHTML = tagsHTML;
+  document.getElementById('modalTags').innerHTML = tagsHTML;
   document.getElementById('modalTitle').textContent = name;
   document.getElementById('modalPrice').innerHTML   = `${price}<span>AZN</span>`;
   document.getElementById('modalDesc').textContent  = desc;
-  document.getElementById('modalImg').src = imgSrc;
+  document.getElementById('modalImg').src = img;
   document.getElementById('modalImg').onerror = function() { this.src = PLACEHOLDER; };
 
-  // Set product permalink (unique URL for this product)
+  // FIX: proper permalink
   const productUrl = buildProductUrl(product);
   document.getElementById('modalPermalinkUrl').textContent = productUrl;
 
-  // Update browser URL without reloading (pushState)
+  // FIX: update URL with pushState
   if (code) {
     const url = new URL(window.location.href);
     url.searchParams.set('product', code);
     window.history.pushState({ product: code }, '', url.toString());
   }
 
-  // Select button
   const selectBtn = document.getElementById('modalSelectBtn');
   if (collection.has(code)) {
     selectBtn.classList.add('selected');
@@ -2317,47 +1336,32 @@ function openModal(product) {
 function closeModal() {
   const overlay = document.getElementById('productModal');
   overlay.classList.remove('open');
-  setTimeout(() => {
-    overlay.style.display = 'none';
-    document.body.style.overflow = '';
-  }, 300);
-
-  // Remove product param from URL on close
+  setTimeout(() => { overlay.style.display = 'none'; document.body.style.overflow = ''; }, 300);
   const url = new URL(window.location.href);
   url.searchParams.delete('product');
   window.history.replaceState({}, '', url.toString());
 }
 
-function handleModalOverlayClick(e) {
-  if (e.target === e.currentTarget) closeModal();
-}
+function handleModalOverlayClick(e) { if (e.target === e.currentTarget) closeModal(); }
 
 /* ─────────────────────────────────────────────
    PERMALINK COPY
 ───────────────────────────────────────────── */
 function copyPermalink() {
   if (!currentProduct) return;
-  const url = buildProductUrl(currentProduct);
-  navigator.clipboard.writeText(url)
+  navigator.clipboard.writeText(buildProductUrl(currentProduct))
     .then(() => toast('Məhsul linki kopyalandı! 🔗', 'success'))
     .catch(() => toast('Kopyalamaq mümkün olmadı', 'error'));
 }
 
 /* ─────────────────────────────────────────────
-   COLLECTION (SELECTION)
+   COLLECTION
 ───────────────────────────────────────────── */
 function toggleSelect(e, code) {
   e.stopPropagation();
   if (!code) return;
-
-  if (collection.has(code)) {
-    collection.delete(code);
-    toast('Kolleksiyadan çıxarıldı');
-  } else {
-    collection.add(code);
-    toast('Kolleksiyaya əlavə edildi ⭐', 'success');
-  }
-
+  if (collection.has(code)) { collection.delete(code); toast('Kolleksiyadan çıxarıldı'); }
+  else                       { collection.add(code);    toast('Kolleksiyaya əlavə edildi ⭐', 'success'); }
   updateCollectionUI();
   refreshCardStates();
 }
@@ -2366,20 +1370,18 @@ function toggleSelectFromModal() {
   if (!currentProduct) return;
   const code = currentProduct.productcode || currentProduct.code || '';
   if (!code) return;
-
-  const selectBtn = document.getElementById('modalSelectBtn');
+  const btn = document.getElementById('modalSelectBtn');
   if (collection.has(code)) {
     collection.delete(code);
-    selectBtn.classList.remove('selected');
-    selectBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Kolleksiyaya əlavə et`;
+    btn.classList.remove('selected');
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Kolleksiyaya əlavə et`;
     toast('Kolleksiyadan çıxarıldı');
   } else {
     collection.add(code);
-    selectBtn.classList.add('selected');
-    selectBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Kolleksiyadan çıxar`;
+    btn.classList.add('selected');
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Kolleksiyadan çıxar`;
     toast('Kolleksiyaya əlavə edildi ⭐', 'success');
   }
-
   updateCollectionUI();
   refreshCardStates();
 }
@@ -2409,89 +1411,57 @@ function renderCollectionPanel() {
   const footer = document.getElementById('panelFooter');
 
   if (collection.size === 0) {
-    body.innerHTML = `
-      <div class="panel-empty">
-        <div class="panel-empty-icon">⭐</div>
-        <p>Hələ heç bir məhsul seçilməyib.</p>
-        <p style="font-size:0.78rem;margin-top:6px;color:var(--ink-faint)">Kartın üzərindəki ulduz düyməsinə basın</p>
-      </div>`;
+    body.innerHTML = `<div class="panel-empty"><div class="panel-empty-icon">⭐</div><p>Hələ heç bir məhsul seçilməyib.</p></div>`;
     footer.style.display = 'none';
     return;
   }
 
   footer.style.display = 'block';
-
-  let total = 0;
-  let html = '';
-
+  let total = 0, html = '';
   collection.forEach(code => {
     const p = allProducts.find(prod => (prod.productcode || prod.code || '') == code);
     if (!p) return;
-    const name  = p.name || 'Adsız';
     const price = parseFloat(p.price || 0);
     const img   = (p.image || '').trim() || PLACEHOLDER;
     total += price;
-
     html += `
       <div class="panel-item">
-        <img src="${img}" alt="${name}" onerror="this.src='${PLACEHOLDER}'">
+        <img src="${img}" alt="${p.name||''}" onerror="this.src='${PLACEHOLDER}'">
         <div class="panel-item-info">
-          <div class="panel-item-name">${name}</div>
+          <div class="panel-item-name">${p.name||'Adsız'}</div>
           <div class="panel-item-price">${price.toFixed(2)} AZN</div>
         </div>
-        <button class="panel-item-remove" onclick="removeFromCollection('${escapeAttr(code)}')" title="Çıxar">×</button>
+        <button class="panel-item-remove" onclick="removeFromCollection('${escAttr(code)}')">×</button>
       </div>`;
   });
-
   body.innerHTML = html;
   document.getElementById('panelTotal').textContent = `${total.toFixed(2)} AZN`;
 }
 
-function removeFromCollection(code) {
-  collection.delete(code);
-  updateCollectionUI();
-  refreshCardStates();
-}
-
-function clearCollection() {
-  collection.clear();
-  updateCollectionUI();
-  refreshCardStates();
-  toast('Kolleksiya silindi');
-}
+function removeFromCollection(code) { collection.delete(code); updateCollectionUI(); refreshCardStates(); }
+function clearCollection()           { collection.clear();       updateCollectionUI(); refreshCardStates(); toast('Kolleksiya silindi'); }
 
 function toggleCollectionPanel() {
   const panel   = document.getElementById('collectionPanel');
   const overlay = document.getElementById('panelOverlay');
   const isOpen  = panel.classList.contains('open');
-
   panel.classList.toggle('open', !isOpen);
   overlay.classList.toggle('open', !isOpen);
-
-  if (!isOpen) {
-    renderCollectionPanel();
-    document.body.style.overflow = 'hidden';
-  } else {
-    document.body.style.overflow = '';
-  }
+  if (!isOpen) { renderCollectionPanel(); document.body.style.overflow = 'hidden'; }
+  else          { document.body.style.overflow = ''; }
 }
 
 /* ─────────────────────────────────────────────
-   COLLECTION LINK — Fixed: uses correct base URL
-   and encodes all selected product codes correctly
+   COLLECTION LINK — FIX: uses window.location.origin + pathname
 ───────────────────────────────────────────── */
 function generateCollectionLink() {
-  if (collection.size === 0) {
-    toast('Heç bir məhsul seçilməyib', 'error');
-    return;
-  }
+  if (collection.size === 0) { toast('Heç bir məhsul seçilməyib', 'error'); return; }
 
-  // Build the collection URL with all selected codes
+  // FIX: build URL using origin + pathname (not href which may have existing params)
   const codes = Array.from(collection).join(',');
-  const base  = window.location.origin + window.location.pathname;
+  const base  = window.location.origin + window.location.pathname.replace(/\/$/, '');
   const url   = `${base}?collection=${encodeURIComponent(codes)}`;
 
-  // Preview thumbnails
   const previewEl = document.getElementById('linkPreviewGrid');
   previewEl.innerHTML = '';
   collection.forEach(code => {
@@ -2500,7 +1470,6 @@ function generateCollectionLink() {
     const img = document.createElement('img');
     img.className = 'link-preview-thumb';
     img.src = (p.image || '').trim() || PLACEHOLDER;
-    img.alt = p.name || '';
     img.onerror = () => { img.src = PLACEHOLDER; };
     previewEl.appendChild(img);
   });
@@ -2508,22 +1477,16 @@ function generateCollectionLink() {
   document.getElementById('linkPreviewUrl').textContent = url;
   document.getElementById('linkModal').classList.add('open');
 
-  // Close the panel
-  const panel   = document.getElementById('collectionPanel');
-  const panelOv = document.getElementById('panelOverlay');
-  panel.classList.remove('open');
-  panelOv.classList.remove('open');
+  // Close panel
+  document.getElementById('collectionPanel').classList.remove('open');
+  document.getElementById('panelOverlay').classList.remove('open');
   document.body.style.overflow = 'hidden';
 }
 
-function closeLinkModal() {
-  document.getElementById('linkModal').classList.remove('open');
-  document.body.style.overflow = '';
-}
+function closeLinkModal() { document.getElementById('linkModal').classList.remove('open'); document.body.style.overflow = ''; }
 
 function copyCollectionLink() {
-  const url = document.getElementById('linkPreviewUrl').textContent;
-  navigator.clipboard.writeText(url)
+  navigator.clipboard.writeText(document.getElementById('linkPreviewUrl').textContent)
     .then(() => toast('Kolleksiya linki kopyalandı! 🔗', 'success'))
     .catch(() => toast('Kopyalamaq mümkün olmadı', 'error'));
 }
@@ -2531,33 +1494,22 @@ function copyCollectionLink() {
 function shareCollectionVia(platform) {
   const url  = document.getElementById('linkPreviewUrl').textContent;
   const text = `Brendimo Hədiyyə Sehrbazı — Kolleksiyama baxın 🎁`;
-  let shareUrl;
-  if (platform === 'whatsapp') {
-    shareUrl = `https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`;
-  } else if (platform === 'telegram') {
-    shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-  }
-  if (shareUrl) window.open(shareUrl, '_blank');
+  const shareUrl = platform === 'whatsapp'
+    ? `https://wa.me/?text=${encodeURIComponent(text+'\n'+url)}`
+    : `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+  window.open(shareUrl, '_blank');
 }
 
 /* ─────────────────────────────────────────────
-   COLLECTION SHARED VIEW (from ?collection= URL param)
+   COLLECTION VIEW (from URL ?collection=)
 ───────────────────────────────────────────── */
 function showCollectionView(codes) {
   const colView = document.getElementById('collectionView');
   colView.classList.add('visible');
-
-  const sharedProducts = codes
-    .map(code => allProducts.find(p => (p.productcode || p.code || '') == code))
-    .filter(Boolean);
-
-  document.getElementById('collectionViewDesc').textContent =
-    `${sharedProducts.length} məhsul seçilib — Brendimo Hədiyyə Sehrbazı`;
-
-  renderProducts(sharedProducts, allProducts.length);
-  document.getElementById('resultsCount').innerHTML =
-    `<strong>${sharedProducts.length}</strong> məhsul (kolleksiya)`;
-
+  const shared = codes.map(c => allProducts.find(p => (p.productcode||p.code||'') == c)).filter(Boolean);
+  document.getElementById('collectionViewDesc').textContent = `${shared.length} məhsul seçilib — Brendimo`;
+  renderProducts(shared, allProducts.length);
+  document.getElementById('resultsCount').innerHTML = `<strong>${shared.length}</strong> məhsul (kolleksiya)`;
   colView.scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -2570,245 +1522,328 @@ function exitCollectionView() {
 }
 
 /* ─────────────────────────────────────────────
-   SHARING — Fixed: shares product's own URL
+   SHARING — FIX: shares product's own unique URL
 ───────────────────────────────────────────── */
-function buildShareText(product) {
-  const name  = product.name || '';
-  const code  = product.productcode || product.code || '';
-  const price = parseFloat(product.price || 0).toFixed(2);
-  const img   = (product.image || '').trim();
-  const url   = buildProductUrl(product);   // ← unique product URL
-  return { name, code, price, img, url };
-}
-
 function shareVia(platform) {
   if (!currentProduct) return;
-  const { name, code, price, img, url } = buildShareText(currentProduct);
-  const text = `🎁 *${name}*\n📦 Kod: ${code}\n💰 Qiymət: ${price} AZN\n\n_Brendimo Hədiyyə Sehrbazı_`;
+  const name  = currentProduct.name || '';
+  const code  = currentProduct.productcode || currentProduct.code || '';
+  const price = parseFloat(currentProduct.price || 0).toFixed(2);
+  const url   = buildProductUrl(currentProduct); // ← unique product URL
+
+  const text  = `🎁 *${name}*\n📦 Kod: ${code}\n💰 Qiymət: ${price} AZN\n\n_Brendimo Hədiyyə Sehrbazı_`;
 
   switch (platform) {
     case 'whatsapp':
-      window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
-      break;
+      window.open(`https://wa.me/?text=${encodeURIComponent(text+'\n'+url)}`, '_blank'); break;
     case 'telegram':
-      window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
-      break;
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank'); break;
     case 'instagram':
-      copyProductInfo();
-      toast('Mətn kopyalandı! Instagram-da paylaşın 📸', 'success');
-      break;
+      copyProductInfo(); toast('Mətn kopyalandı! Instagram-da paylaşın 📸', 'success'); break;
     case 'native':
-      if (navigator.share) {
-        navigator.share({ title: `Brendimo: ${name}`, text, url }).catch(() => {});
-      } else {
-        copyProductInfo();
-      }
+      if (navigator.share) navigator.share({ title: `Brendimo: ${name}`, text, url }).catch(()=>{});
+      else copyProductInfo();
       break;
   }
 }
 
 function quickShare(e, code) {
   e.stopPropagation();
-  const p = allProducts.find(prod => (prod.productcode || prod.code || '') == code);
+  const p = allProducts.find(prod => (prod.productcode||prod.code||'') == code);
   if (!p) return;
-
-  const name  = p.name || '';
-  const pcode = p.productcode || p.code || '';
-  const price = parseFloat(p.price || 0).toFixed(2);
-  const url   = buildProductUrl(p);    // ← unique product URL
-  const text  = `🎁 *${name}*\n📦 Kod: ${pcode}\n💰 Qiymət: ${price} AZN\n\n_Brendimo Hədiyyə Sehrbazı_`;
-
-  if (navigator.share) {
-    navigator.share({ title: `Brendimo: ${name}`, text, url }).catch(() => {});
-  } else {
-    window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
-  }
+  const url  = buildProductUrl(p);
+  const text = `🎁 *${p.name||''}*\n📦 Kod: ${p.productcode||p.code||''}\n💰 ${parseFloat(p.price||0).toFixed(2)} AZN\n\n_Brendimo Hədiyyə Sehrbazı_`;
+  if (navigator.share) navigator.share({ title: p.name, text, url }).catch(()=>{});
+  else window.open(`https://wa.me/?text=${encodeURIComponent(text+'\n'+url)}`, '_blank');
 }
 
 function copyProductInfo() {
   if (!currentProduct) return;
-  const { name, code, price, url } = buildShareText(currentProduct);
-  const text = `🎁 ${name}\n📦 Kod: ${code}\n💰 Qiymət: ${price} AZN\n🔗 ${url}`;
+  const url  = buildProductUrl(currentProduct);
+  const code = currentProduct.productcode || currentProduct.code || '';
+  const text = `🎁 ${currentProduct.name||''}\n📦 Kod: ${code}\n💰 ${parseFloat(currentProduct.price||0).toFixed(2)} AZN\n🔗 ${url}`;
   navigator.clipboard.writeText(text)
     .then(() => toast('Kopyalandı! 📋', 'success'))
     .catch(() => toast('Kopyalamaq mümkün olmadı', 'error'));
 }
 
 /* ─────────────────────────────────────────────
-   REELS — Instagram-style vertical feed
-   Loads media from Google Drive folder
+   ORDER MODAL
+───────────────────────────────────────────── */
+function openOrderModal() {
+  if (!currentProduct) return;
+  const p     = currentProduct;
+  const name  = p.name || 'Adsız';
+  const code  = p.productcode || p.code || '';
+  const price = parseFloat(p.price || 0).toFixed(2);
+  const img   = (p.image || '').trim() || PLACEHOLDER;
+
+  document.getElementById('orderProductImg').src  = img;
+  document.getElementById('orderProductName').textContent  = name;
+  document.getElementById('orderProductCode').textContent  = code ? `Kod: ${code}` : '';
+  document.getElementById('orderProductPrice').textContent = `${price} AZN`;
+
+  // Reset form
+  document.getElementById('orderInlineForm').reset();
+  oiDepositChecked = false;
+  oiReceiptB64     = '';
+  oiResetDepositUI();
+  oiHandlePayment();
+  const tom = new Date();
+  tom.setDate(tom.getDate() + 1);
+  document.getElementById('oi_date').valueAsDate = tom;
+
+  // Show overlay
+  const overlay = document.getElementById('orderModalOverlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  document.body.style.overflow = 'hidden';
+}
+
+function closeOrderModal() {
+  const overlay = document.getElementById('orderModalOverlay');
+  overlay.classList.remove('open');
+  setTimeout(() => { overlay.style.display = 'none'; document.body.style.overflow = ''; }, 350);
+}
+
+function handleOrderOverlayClick(e) { if (e.target === e.currentTarget) closeOrderModal(); }
+
+/* Location tabs inside order modal */
+function oiSwitchLoc(type, btn) {
+  document.querySelectorAll('#orderModalInner .loc-content').forEach(el => el.classList.remove('active'));
+  document.getElementById('oi_loc_' + type).classList.add('active');
+  btn.closest('.loc-tabs').querySelectorAll('.loc-tab').forEach(el => el.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* Payment toggle */
+function oiHandlePayment() {
+  const method = document.getElementById('oi_payMethod').value;
+  document.getElementById('oi_depositBox').style.display    = method === 'cash' ? 'block' : 'none';
+  document.getElementById('oi_cardReceiptBox').style.display = method === 'card' ? 'block' : 'none';
+  if (method === 'card' && oiDepositChecked) { oiDepositChecked = false; oiResetDepositUI(); }
+}
+
+function oiToggleDeposit() {
+  oiDepositChecked = !oiDepositChecked;
+  const cb   = document.getElementById('oi_depCb');
+  const badge= document.getElementById('oi_discBadge');
+  const sec  = document.getElementById('oi_depReceiptSection');
+  if (oiDepositChecked) {
+    cb.classList.add('checked'); cb.innerHTML = '✓';
+    badge.style.display = 'flex'; sec.style.display = 'block';
+  } else {
+    oiResetDepositUI();
+  }
+}
+
+function oiResetDepositUI() {
+  const cb = document.getElementById('oi_depCb');
+  if (cb) { cb.classList.remove('checked'); cb.innerHTML = ''; }
+  const badge = document.getElementById('oi_discBadge');
+  if (badge) badge.style.display = 'none';
+  const sec = document.getElementById('oi_depReceiptSection');
+  if (sec) sec.style.display = 'none';
+  oiReceiptB64 = '';
+}
+
+function oiHandleReceipt(event, type) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const areaId    = type === 'deposit' ? 'oi_depReceiptArea'   : 'oi_cardReceiptArea';
+  const contentId = type === 'deposit' ? 'oi_depReceiptContent': 'oi_cardReceiptContent';
+  const reader = new FileReader();
+  reader.onload = ev => {
+    oiReceiptB64 = ev.target.result;
+    document.getElementById(areaId).classList.add('has-image');
+    document.getElementById(contentId).innerHTML = `<div style="font-size:24px">✅</div><div style="font-size:12px;color:var(--success);font-weight:700">Əlavə olundu</div>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* Order form submit */
+document.getElementById('orderInlineForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!currentProduct) return;
+
+  const custName  = document.getElementById('oi_custName').value.trim();
+  const custPhone = document.getElementById('oi_custPhone').value.trim();
+  const timeSlot  = document.getElementById('oi_time').value;
+  const payMethod = document.getElementById('oi_payMethod').value;
+
+  if (!custName)  return alertOi('Ad və Soyadı daxil edin.');
+  if (!custPhone) return alertOi('Əlaqə nömrəsini daxil edin.');
+  if (!timeSlot)  return alertOi('Çatdırılma saat aralığını seçin.');
+
+  // Address
+  const isMetro    = document.getElementById('oi_loc_metro').classList.contains('active');
+  const isLandmark = document.getElementById('oi_loc_landmark').classList.contains('active');
+  const isRayon    = document.getElementById('oi_loc_rayon').classList.contains('active');
+  const metro      = document.getElementById('oi_metro').value;
+  const landmark   = document.getElementById('oi_landmark').value;
+  const rayon      = document.getElementById('oi_rayon').value;
+
+  let finalAddress = '', deliveryCost = 0;
+  if (isMetro)    { if (!metro)    return alertOi('Metro stansiyasını seçin.'); finalAddress = `Metro: ${metro}`; }
+  if (isLandmark) { if (!landmark) return alertOi('Nişangahı seçin.'); finalAddress = `Nişangah: ${landmark}`; const lm = landmarkData.find(i=>i.name===landmark); if(lm) deliveryCost=lm.price; }
+  if (isRayon)    { if (!rayon)    return alertOi('Rayon/şəhər seçin.'); finalAddress = `Rayon: ${rayon}`; deliveryCost=4; }
+
+  if (payMethod === 'card' && !oiReceiptB64) return alertOi('Kart ödənişi üçün bank köçürmə qəbzini əlavə edin.');
+  if (payMethod === 'cash' && oiDepositChecked && !oiReceiptB64) return alertOi('Beh ödənişinin qəbzini əlavə edin.');
+
+  const p       = currentProduct;
+  const pName   = p.name || '';
+  const pCode   = p.productcode || p.code || '';
+  const pPrice  = parseFloat(p.price || 0);
+  const discount= (payMethod === 'cash' && oiDepositChecked) ? 4 : 0;
+  const deposit = (payMethod === 'cash' && oiDepositChecked) ? 10 : 0;
+
+  const payload = {
+    action:              'createCustomerOrder',
+    customerName:         custName,
+    contactInfo:          custPhone,
+    instagramHandle:      document.getElementById('oi_instagram').value.trim(),
+    deliveryDate:         document.getElementById('oi_date').value,
+    timeSlot,
+    address:              finalAddress,
+    specialInstructions:  document.getElementById('oi_addressNote').value.trim(),
+    courieradditional:    deliveryCost,
+    paymentMethod:        payMethod,
+    salesRep:             'catalogue', // auto-set, no manual selection needed
+    productName:          pName,
+    productCode:          pCode,
+    productPrice:         pPrice,
+    discountApplied:      discount,
+    depositPaid:          deposit,
+    receiptImage:         oiReceiptB64,
+    customProductImage:   ''
+  };
+
+  setGlobalLoader(true, 'Sifariş göndərilir...');
+
+  try {
+    const form = new URLSearchParams();
+    for (const k in payload) {
+      if (payload[k] !== '' && payload[k] != null) form.append(k, payload[k]);
+    }
+    const res  = await fetch(ORDERS_API, { method: 'POST', body: form });
+    const data = await res.json();
+    setGlobalLoader(false);
+
+    if (data.success) {
+      closeOrderModal();
+      setTimeout(() => {
+        toast(`🎉 Sifariş qəbul olundu! Kod: #${data.orderId}`, 'success');
+      }, 400);
+    } else {
+      alertOi(data.message || 'Xəta baş verdi.');
+    }
+  } catch (err) {
+    setGlobalLoader(false);
+    alertOi('İnternet əlaqəsini yoxlayın.');
+  }
+});
+
+function alertOi(msg) {
+  toast(msg, 'error');
+}
+
+/* ─────────────────────────────────────────────
+   REELS
 ───────────────────────────────────────────── */
 async function loadReels() {
   const container = document.getElementById('reelsContainer');
-
   try {
-    // Fetch media from Google Drive folder via backend API
-    const res = await fetch(`${API_URL}?action=getDriveMedia&folderId=${DRIVE_MEDIA_FOLDER}`);
+    const res   = await fetch(`${API_URL}?action=getDriveMedia&folderId=${DRIVE_MEDIA_FOLDER}`);
     if (!res.ok) throw new Error('Media fetch failed');
-
-    const data = await res.json();
+    const data  = await res.json();
     const files = data.mediaFiles || [];
 
     if (!files.length) {
-      container.innerHTML = `
-        <div class="reel-loading">
-          <div style="font-size:2rem;margin-bottom:12px">🎬</div>
-          <p>Reels tezliklə əlavə olunacaq</p>
-        </div>`;
-      reelsLoaded = true;
-      return;
+      container.innerHTML = `<div class="reel-loading"><div style="font-size:2rem;margin-bottom:12px">🎬</div><p>Reels tezliklə əlavə olunacaq</p></div>`;
+      reelsLoaded = true; return;
     }
 
     reelMediaFiles = files;
     reelsLoaded = true;
-
-    // Update profile stats
     document.getElementById('statsReels').textContent = files.length;
-
     container.innerHTML = '';
 
-    files.forEach((file, index) => {
-      // Try to find matching product for this media
-      const matchedProduct = allProducts.find(p => {
-        const pid = p.id || p.productcode || p.code || '';
-        return String(pid) === String(file.productId);
-      });
-
-      const reelEl = document.createElement('div');
-      reelEl.className = 'reel-item';
-
-      const isVideo = file.type === 'video';
+    files.forEach((file) => {
+      const matched = allProducts.find(p => String(p.id||p.productcode||p.code||'') === String(file.productId));
+      const reel    = document.createElement('div');
+      reel.className = 'reel-item';
+      const isVideo  = file.type === 'video';
       const mediaUrl = file.url || file.imageUrl || file.videoUrl || '';
+      const pName    = matched ? (matched.name||'') : '';
+      const pPrice   = matched ? parseFloat(matched.price||0).toFixed(2)+' AZN' : '';
+      const pCode    = matched ? (matched.productcode||matched.code||'') : '';
 
-      let mediaHtml = '';
-      if (isVideo) {
-        mediaHtml = `
-          <video class="reel-media" 
-            src="${mediaUrl}" 
-            playsinline 
-            muted 
-            loop 
-            preload="metadata"
-            onerror="this.parentElement.querySelector('.reel-fallback').style.display='flex'">
-          </video>
-          <div class="reel-fallback" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:#111;color:rgba(255,255,255,0.4);flex-direction:column;gap:8px">
-            <span style="font-size:2rem">🎬</span><span style="font-size:0.8rem">Video yüklənəmdi</span>
-          </div>`;
-      } else {
-        mediaHtml = `
-          <img class="reel-media" 
-            src="${mediaUrl}" 
-            alt="${matchedProduct ? matchedProduct.name : 'Brendimo'}"
-            loading="lazy"
-            onerror="this.src='${PLACEHOLDER}'">`;
-      }
-
-      const productName  = matchedProduct ? (matchedProduct.name || '') : '';
-      const productPrice = matchedProduct ? parseFloat(matchedProduct.price || 0).toFixed(2) + ' AZN' : '';
-      const productCode  = matchedProduct ? (matchedProduct.productcode || matchedProduct.code || '') : '';
-
-      reelEl.innerHTML = `
-        ${mediaHtml}
-
-        <div class="reels-topbar">
-          <span class="reels-topbar-title">Brendimo</span>
-        </div>
-
+      reel.innerHTML = `
+        ${isVideo
+          ? `<video class="reel-media" src="${mediaUrl}" playsinline muted loop preload="metadata"></video>`
+          : `<img class="reel-media" src="${mediaUrl}" loading="lazy" onerror="this.src='${PLACEHOLDER}'">`}
+        <div class="reels-topbar"><span class="reels-topbar-title">Brendimo</span></div>
         <div class="reel-info">
-          ${productName ? `<div class="reel-product-name">${productName}</div>` : ''}
-          ${productPrice ? `<div class="reel-product-price">${productPrice}</div>` : ''}
-          ${productCode ? `<div class="reel-product-code">Kod: ${productCode}</div>` : ''}
+          ${pName  ? `<div class="reel-product-name">${pName}</div>` : ''}
+          ${pPrice ? `<div class="reel-product-price">${pPrice}</div>` : ''}
+          ${pCode  ? `<div class="reel-product-code">Kod: ${pCode}</div>` : ''}
         </div>
-
         <div class="reel-actions">
           <button class="reel-action-btn" onclick="reelLike(this)">
-            <div class="reel-action-icon">
-              <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-            </div>
+            <div class="reel-action-icon"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
             <span class="reel-action-label">Bəyən</span>
           </button>
-
-          ${matchedProduct ? `
-          <button class="reel-action-btn" onclick="reelShare('${escapeAttr(productCode)}')">
-            <div class="reel-action-icon">
-              <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
-            </div>
+          ${matched ? `
+          <button class="reel-action-btn" onclick="reelShare('${escAttr(pCode)}')">
+            <div class="reel-action-icon"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg></div>
             <span class="reel-action-label">Paylaş</span>
           </button>
-
-          <button class="reel-action-btn" onclick="reelAddToCollection('${escapeAttr(productCode)}', this)">
-            <div class="reel-action-icon">
-              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            </div>
+          <button class="reel-action-btn" onclick="reelAddToCollection('${escAttr(pCode)}',this)">
+            <div class="reel-action-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
             <span class="reel-action-label">Seç</span>
           </button>
           ` : ''}
         </div>
-
-        ${matchedProduct ? `
-        <button class="reel-view-btn" onclick="reelOpenProduct('${escapeAttr(productCode)}')">
+        ${matched ? `<button class="reel-view-btn" onclick="reelOpenProduct('${escAttr(pCode)}')">
           <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm0 10c-1.66 0-3-1.34-3-3h2c0 .55.45 1 1 1s1-.45 1-1h2c0 1.66-1.34 3-3 3z"/></svg>
-          Məhsula bax
-        </button>
-        ` : ''}`;
+          Məhsula bax</button>` : ''}`;
 
-      container.appendChild(reelEl);
+      container.appendChild(reel);
     });
 
-    // Set up Intersection Observer for auto-play/pause videos
     setupReelObserver();
-
-  } catch (err) {
-    console.error('Reels load error:', err);
+  } catch(err) {
     reelsLoaded = true;
-    container.innerHTML = `
-      <div class="reel-loading">
-        <p style="color:rgba(255,255,255,0.5)">Reels yüklənəmdi</p>
-        <p style="font-size:0.75rem;margin-top:6px;color:rgba(255,255,255,0.3)">İnternet bağlantınızı yoxlayın</p>
-      </div>`;
+    container.innerHTML = `<div class="reel-loading"><p style="color:rgba(255,255,255,0.5)">Reels yüklənəmdi</p></div>`;
   }
 }
 
-/* Auto-play videos as they come into view */
 function setupReelObserver() {
-  const observer = new IntersectionObserver((entries) => {
+  const obs = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-      const video = entry.target.querySelector('video');
-      if (!video) return;
-      if (entry.isIntersecting) {
-        video.play().catch(() => {});
-      } else {
-        video.pause();
-      }
+      const v = entry.target.querySelector('video');
+      if (!v) return;
+      if (entry.isIntersecting) v.play().catch(()=>{});
+      else v.pause();
     });
   }, { threshold: 0.6 });
-
-  document.querySelectorAll('.reel-item').forEach(item => {
-    observer.observe(item);
-  });
+  document.querySelectorAll('.reel-item').forEach(item => obs.observe(item));
 }
 
 function reelLike(btn) {
-  const icon = btn.querySelector('.reel-action-icon');
   btn.classList.toggle('liked');
-  if (btn.classList.contains('liked')) {
-    icon.style.background = 'rgba(255,59,92,0.5)';
-    toast('Bəyəndiniz! ❤️', 'success');
-  } else {
-    icon.style.background = 'rgba(255,255,255,0.15)';
-  }
+  btn.querySelector('.reel-action-icon').style.background = btn.classList.contains('liked') ? 'rgba(255,59,92,0.5)' : 'rgba(255,255,255,0.15)';
+  if (btn.classList.contains('liked')) toast('Bəyəndiniz! ❤️', 'success');
 }
 
 function reelShare(code) {
-  const p = allProducts.find(prod => (prod.productcode || prod.code || '') == code);
+  const p = allProducts.find(prod => (prod.productcode||prod.code||'') == code);
   if (!p) return;
   const url  = buildProductUrl(p);
-  const text = `🎁 *${p.name}*\n💰 ${parseFloat(p.price||0).toFixed(2)} AZN\n\n_Brendimo Hədiyyə Sehrbazı_`;
-  if (navigator.share) {
-    navigator.share({ title: p.name, text, url }).catch(() => {});
-  } else {
-    window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
-  }
+  const text = `🎁 *${p.name}*\n💰 ${parseFloat(p.price||0).toFixed(2)} AZN\n\n_Brendimo_`;
+  if (navigator.share) navigator.share({ title: p.name, text, url }).catch(()=>{});
+  else window.open(`https://wa.me/?text=${encodeURIComponent(text+'\n'+url)}`, '_blank');
 }
 
 function reelAddToCollection(code, btn) {
@@ -2822,51 +1857,49 @@ function reelAddToCollection(code, btn) {
     btn.querySelector('.reel-action-icon').style.background = 'rgba(201,168,76,0.4)';
     toast('Kolleksiyaya əlavə edildi ⭐', 'success');
   }
-  updateCollectionUI();
-  refreshCardStates();
+  updateCollectionUI(); refreshCardStates();
 }
 
 function reelOpenProduct(code) {
-  const p = allProducts.find(prod => (prod.productcode || prod.code || '') == code);
+  const p = allProducts.find(prod => (prod.productcode||prod.code||'') == code);
   if (!p) return;
   switchTab('shop');
   setTimeout(() => openModal(p), 200);
 }
 
 /* ─────────────────────────────────────────────
-   TOAST NOTIFICATIONS
+   TOAST
 ───────────────────────────────────────────── */
-function toast(msg, type = '') {
-  const container = document.getElementById('toastContainer');
+function toast(msg, type='') {
   const el = document.createElement('div');
   el.className = 'toast' + (type ? ` ${type}` : '');
   el.textContent = msg;
-  container.appendChild(el);
-  setTimeout(() => {
-    el.style.opacity = '0';
-    el.style.transition = 'opacity 0.3s';
-    setTimeout(() => el.remove(), 350);
-  }, 2400);
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => { el.style.opacity='0'; el.style.transition='opacity 0.3s'; setTimeout(()=>el.remove(),350); }, 2400);
 }
 
 /* ─────────────────────────────────────────────
-   KEYBOARD SHORTCUTS
+   GLOBAL LOADER
+───────────────────────────────────────────── */
+function setGlobalLoader(visible, text='') {
+  document.getElementById('globalLoader').style.display = visible ? 'flex' : 'none';
+  if (text) document.getElementById('globalLoaderText').textContent = text;
+}
+
+/* ─────────────────────────────────────────────
+   KEYBOARD & BACK BUTTON
 ───────────────────────────────────────────── */
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    if (document.getElementById('productModal').classList.contains('open')) closeModal();
+    if (document.getElementById('orderModalOverlay').classList.contains('open')) closeOrderModal();
+    else if (document.getElementById('productModal').classList.contains('open')) closeModal();
     else if (document.getElementById('linkModal').classList.contains('open')) closeLinkModal();
     else if (document.getElementById('collectionPanel').classList.contains('open')) toggleCollectionPanel();
   }
 });
 
-/* ─────────────────────────────────────────────
-   BROWSER BACK BUTTON — close modal on back
-───────────────────────────────────────────── */
-window.addEventListener('popstate', (event) => {
-  if (document.getElementById('productModal').classList.contains('open')) {
-    closeModal();
-  }
+window.addEventListener('popstate', () => {
+  if (document.getElementById('productModal').classList.contains('open')) closeModal();
 });
 </script>
 </body>
