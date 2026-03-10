@@ -13,7 +13,6 @@
   
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
   
   <style>
 /* ══════════════════════════════════════════
@@ -78,7 +77,8 @@ body {
 .navbar-brand .brand-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--white); letter-spacing: 0.5px; line-height: 1; }
 .navbar-brand .brand-sub  { font-size: 0.62rem; color: var(--gold); letter-spacing: 2.5px; text-transform: uppercase; line-height: 1; }
 
-.navbar-search { flex: 1; max-width: 380px; position: relative; }
+.navbar-search { flex: 1; max-width: 420px; position: relative; display: flex; gap: 8px; }
+.navbar-search-input-wrap { position: relative; flex: 1; }
 .navbar-search input {
   width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
   border-radius: 50px; color: var(--white); font-family: 'DM Sans', sans-serif;
@@ -87,6 +87,15 @@ body {
 .navbar-search input::placeholder { color: rgba(255,255,255,0.35); }
 .navbar-search input:focus { background: rgba(255,255,255,0.11); border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-glow); }
 .navbar-search .search-ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.35); pointer-events: none; font-size: 14px; }
+
+.magic-search-btn {
+  background: linear-gradient(135deg, var(--gold), #8B6914);
+  border: none; border-radius: 50px; color: var(--ink); cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 700; 
+  padding: 0 16px; transition: var(--transition); white-space: nowrap;
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+.magic-search-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
 .navbar-actions { display: flex; align-items: center; gap: 8px; }
 .nav-btn {
@@ -283,6 +292,9 @@ body {
 .modal-divider { height: 1px; background: var(--border); margin: 16px 0; }
 .modal-desc { font-size: 0.88rem; color: var(--ink-soft); line-height: 1.65; margin-bottom: 20px; }
 
+.ai-magic-btn { background: var(--surface); border: 1px solid var(--gold); border-radius: 8px; padding: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: var(--transition); color: var(--ink-soft); }
+.ai-magic-btn:hover { background: var(--gold); color: var(--ink); }
+
 .modal-permalink {
   display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border);
   border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; font-size: 0.72rem; color: var(--ink-faint);
@@ -338,7 +350,7 @@ body {
 .panel-header p { font-size: 0.78rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
 .panel-close { background: rgba(255,255,255,0.1); border: none; border-radius: 50%; color: white; cursor: pointer; width: 36px; height: 36px; display: grid; place-items: center; font-size: 1.2rem; transition: var(--transition); }
 .panel-close:hover { background: rgba(255,255,255,0.2); }
-.panel-body { flex: 1; overflow-y: auto; padding: 16px; }
+.panel-body { flex: 1; overflow-y: auto; padding: 16px; scroll-behavior: smooth; }
 .panel-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: var(--r-sm); border: 1px solid var(--border); background: var(--cream); margin-bottom: 8px; transition: var(--transition); }
 .panel-item:hover { border-color: var(--gold); }
 .panel-item img { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; background: var(--surface); }
@@ -460,6 +472,7 @@ body {
 .savings-card-img.ticket-bg { background: linear-gradient(135deg, #c21a1a, #ff6b6b); }
 .savings-card-img.wheel-bg  { background: linear-gradient(135deg, #1a1a2e, #16213e); }
 .savings-card-img.partnership-bg { background: linear-gradient(135deg, #1e3c72, #2a5298); }
+.savings-card-img.astro-bg { background: linear-gradient(135deg, #4b134f, #c94b4b); }
 
 .savings-card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
 .savings-card-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--ink); margin-bottom: 6px; }
@@ -473,6 +486,7 @@ body {
 .savings-card-btn.red-btn { background: linear-gradient(135deg, #c21a1a, #ff4444); color: white; }
 .savings-card-btn.gold-btn { background: linear-gradient(135deg, var(--ink), #333); color: var(--gold); }
 .savings-card-btn.blue-btn { background: linear-gradient(135deg, #1e3c72, #3a7bd5); color: white; }
+.savings-card-btn.astro-btn { background: linear-gradient(135deg, #c94b4b, #4b134f); color: white; }
 .savings-card-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
 /* ══════════════════════════════════════════
@@ -638,10 +652,15 @@ body {
     <span class="brand-sub">Hədiyyə Sehrbazı</span>
   </div>
   <div class="navbar-search" id="shopSearchWrap">
-    <svg class="search-ico" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
-      <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-    </svg>
-    <input type="text" id="searchInput" placeholder="Məhsul adı, kodu..." autocomplete="off">
+    <div class="navbar-search-input-wrap">
+      <svg class="search-ico" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+      </svg>
+      <input type="text" id="searchInput" placeholder="Sözlə və ya fikirlə axtar..." autocomplete="off">
+    </div>
+    <button class="magic-search-btn" onclick="magicSearch()" title="Ağıllı Sehirli Axtarış ✨">
+      ✨ AI
+    </button>
   </div>
   <div class="navbar-actions">
     <button class="nav-btn" id="selectionBtn" onclick="toggleCollectionPanel()">
@@ -762,6 +781,43 @@ body {
         </button>
       </div>
     </div>
+    
+    <!-- ✨ GEMINI AI: Astro-Hədiyyə ✨ -->
+    <div class="savings-card" id="zodiacCard">
+      <div class="savings-card-img astro-bg">
+        <span>🔮</span>
+      </div>
+      <div class="savings-card-body">
+        <div class="savings-card-title">Astro-Hədiyyə ✨</div>
+        <div class="savings-card-desc" style="margin-bottom:8px;">Bürcünüzü seçin və süni intellektin ulduzlara əsaslanaraq sizə ideal hədiyyəni tapmasına icazə verin.</div>
+        
+        <button id="zodiacInitBtn" class="savings-card-btn astro-btn" onclick="openZodiacSection(event)">
+          <span>🔮</span> Kəşf Et
+        </button>
+        
+        <div id="zodiacSection" style="display:none; margin-top:auto;">
+          <select id="zodiacSelect" class="order-select" style="padding:10px; font-size:0.85rem; margin-bottom:8px;">
+            <option value="Qoç">♈ Qoç (21 Mart - 19 Aprel)</option>
+            <option value="Buğa">♉ Buğa (20 Aprel - 20 May)</option>
+            <option value="Əkizlər">♊ Əkizlər (21 May - 20 İyun)</option>
+            <option value="Xərçəng">♋ Xərçəng (21 İyun - 22 İyul)</option>
+            <option value="Şir">♌ Şir (23 İyul - 22 Avqust)</option>
+            <option value="Qız">♍ Qız (23 Avqust - 22 Sentyabr)</option>
+            <option value="Tərəzi">♎ Tərəzi (23 Sentyabr - 22 Oktyabr)</option>
+            <option value="Əqrəb">♏ Əqrəb (23 Oktyabr - 21 Noyabr)</option>
+            <option value="Oxatan">♐ Oxatan (22 Noyabr - 21 Dekabr)</option>
+            <option value="Oğlaq">♑ Oğlaq (22 Dekabr - 19 Yanvar)</option>
+            <option value="Dolça">♒ Dolça (20 Yanvar - 18 Fevral)</option>
+            <option value="Balıqlar">♓ Balıqlar (19 Fevral - 20 Mart)</option>
+          </select>
+          <button onclick="getZodiacGift(event)" class="savings-card-btn" style="background: linear-gradient(135deg, var(--gold), #8B6914); color: var(--ink);">
+            ✨ Ulduzlara Sor
+          </button>
+          <div id="zodiacResult" style="margin-top:12px; font-size:0.8rem; color:var(--ink-soft); line-height:1.5;"></div>
+        </div>
+      </div>
+    </div>
+    
     <!-- Əməkdaşlıq -->
     <div class="savings-card" onclick="window.location.href='myprofile.html'">
       <div class="savings-card-img partnership-bg">
@@ -849,6 +905,16 @@ body {
       <div class="modal-divider"></div>
       <p class="modal-desc" id="modalDesc"></p>
 
+      <!-- AI Məsləhətçi Bölməsi -->
+      <div class="modal-ai-section" style="background: linear-gradient(145deg, #fff, var(--gold-glow)); border: 1px solid var(--gold); border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+        <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--ink); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">✨ Süni İntellekt Məsləhətçisi</h4>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+          <button onclick="generateProductStory('story')" class="ai-magic-btn" style="flex: 1;">Hekayəsini yaz ✨</button>
+          <button onclick="generateProductStory('audience')" class="ai-magic-btn" style="flex: 1;">Kimə uyğundur? ✨</button>
+        </div>
+        <div id="modalAiResult" style="font-size: 0.8rem; color: var(--ink-soft); line-height: 1.5; display: none; padding-top: 8px; border-top: 1px dashed rgba(201,168,76,0.4);"></div>
+      </div>
+
       <div class="modal-permalink" id="modalPermalink">
         <span id="modalPermalinkUrl" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
         <button class="modal-permalink-copy" onclick="copyPermalink()" title="Linki kopyala">
@@ -909,7 +975,12 @@ body {
       <span class="label">Ümumi qiymət</span>
       <span class="value" id="panelTotal">0 AZN</span>
     </div>
+    
+    <!-- ✨ GEMINI AI: Ağıllı Kombo Yaradıcı ✨ -->
     <div class="panel-actions">
+      <button class="panel-btn" style="background: linear-gradient(135deg, var(--gold), #8B6914); color: var(--ink);" onclick="suggestCombo()">
+        ✨ Kombonu Tamamla (AI)
+      </button>
       <button class="panel-btn panel-btn-primary" onclick="generateCollectionLink()">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
         Link Yarat
@@ -958,6 +1029,24 @@ body {
 
     <div class="order-form-inner">
       <form id="orderInlineForm" novalidate>
+        
+        <!-- ✨ GEMINI AI: Ağıllı Təbrik Yarat Kartı ✨ -->
+        <div class="order-card" style="border: 2px solid var(--gold); background: linear-gradient(180deg, #fff, var(--gold-glow));">
+          <h4><i class="fa-solid fa-envelope-open-text"></i> Hədiyyə Kartı ✨</h4>
+          <p style="font-size:11px; color:var(--text-sec); margin-bottom:12px; line-height:1.4;">Gemini Süni İntellekti ilə seçdiyiniz məhsula və münasibətə uyğun çox səmimi təbrik mətni yaradın.</p>
+          
+          <label class="order-label">Səbəb (məs: Anamın ad günüdür)</label>
+          <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <input class="order-input" type="text" id="oi_greetingContext" placeholder="Sevgililər günü..." style="margin-bottom:0;">
+            <button type="button" class="order-submit-btn" style="background: linear-gradient(135deg, var(--gold), #8B6914); color: var(--ink); width:auto; padding:0 14px; flex-shrink:0;" onclick="generateGreeting()">
+              ✨ Yarat
+            </button>
+          </div>
+
+          <label class="order-label">Kartda yazılacaq mətn</label>
+          <textarea class="order-input" id="oi_greetingCard" rows="3" placeholder="Süni intellektin yazdığı mətn burada görünəcək və ya özünüz yaza bilərsiniz..."></textarea>
+        </div>
+
         <div class="order-card">
           <h4><i class="fa-regular fa-id-card"></i> Sizin Məlumatlar</h4>
           <label class="order-label">Ad və Soyad</label>
@@ -1069,6 +1158,7 @@ const ORDERS_API = "https://script.google.com/macros/s/AKfycbzXzKPYagW6FPncTr1zf
 const DRIVE_MEDIA_FOLDER = "1Rd6HW3MgRrqDPsufsqdLOCiOGbMI8Q4K";
 const PLACEHOLDER = "https://placehold.co/600x600/F4F1EB/9A9A9A?text=Brendimo";
 const NEW_THRESHOLD = 10;
+const apiKey = "";
 
 /* ─────────────────────────────────────────────
    STATE
@@ -1123,6 +1213,256 @@ const rayonData = [
 ];
 
 /* ─────────────────────────────────────────────
+   GEMINI API CALLER ✨
+───────────────────────────────────────────── */
+async function callGemini(userPrompt, systemPrompt = "") {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+  const payload = { 
+    contents: [{ parts: [{ text: userPrompt }] }] 
+  };
+  
+  if (systemPrompt) {
+    payload.systemInstruction = { parts: [{ text: systemPrompt }] };
+  }
+  
+  let delay = 1000;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`API Error ${response.status}: ${errText}`);
+      }
+      
+      const data = await response.json();
+      if (data.candidates && data.candidates[0].content.parts[0].text) {
+        return data.candidates[0].content.parts[0].text;
+      }
+      throw new Error('Invalid Response Structure');
+    } catch (e) {
+      if (attempt === 4) throw e;
+      await new Promise(r => setTimeout(r, delay));
+      delay *= 2;
+    }
+  }
+}
+
+/* ─────────────────────────────────────────────
+   ✨ AI: SEHİRLİ AXTARIŞ (MAGIC SEARCH)
+───────────────────────────────────────────── */
+async function magicSearch() {
+  const query = document.getElementById('searchInput').value.trim();
+  if (!query) { toast('Axtarmaq istədiyiniz hədiyyə növünü yazın ✨', 'error'); return; }
+  
+  setGlobalLoader(true, 'Sehirli Axtarış edilir... ✨');
+  
+  const catalogInfo = allProducts.slice(0, 300).map(p => `Kod: ${p.productcode||p.code||''}, Ad: ${p.name||''}, Kimə: ${p.target||''}`).join('\n');
+  const sysPrompt = `Sən Brendimo hədiyyə mağazasının çox ağıllı və peşəkar axtarış köməkçisisən. 
+Aşağıdakı kataloq siyahısından istifadəçinin axtarışına uyğun ola biləcək ən yaxşı 1-dən 5-ə qədər məhsulu seç. 
+Mənə YALNIZ o məhsulların kodlarını vergüllə ayrılmış formada qaytar (məs: KOD1, KOD2, KOD3). 
+Heç bir giriş, izahat, salamlaşma və ya əlavə söz YAZMA. Əgər doğrudan da heç bir məhsul uyğun gəlmirsə, ancaq "YOX" yaz.
+Kataloq:\n${catalogInfo}`;
+
+  const userPrompt = `Axtarış: "${query}"`;
+  
+  try {
+    const response = await callGemini(userPrompt, sysPrompt);
+    setGlobalLoader(false);
+    
+    const codesStr = response.replace(/```/g, '').trim();
+    if (codesStr === 'YOX' || !codesStr) {
+      showEmpty('Bu sorğuya uyğun sehirli nəticə tapılmadı ✨ Başqa cür cəhd edin.');
+      return;
+    }
+    
+    const codes = codesStr.split(',').map(c => c.trim()).filter(Boolean);
+    isCollectionView = true;
+    collectionProducts = codes.map(c => allProducts.find(p => (p.productcode||p.code||'') == c)).filter(Boolean);
+    
+    document.getElementById('collectionViewDesc').textContent = `Sehirli Axtarış Nəticələri ✨`;
+    document.getElementById('collectionView').classList.add('visible');
+    renderProducts(collectionProducts, allProducts.length);
+    document.getElementById('resultsCount').innerHTML = `<strong>${collectionProducts.length}</strong> məhsul (✨ Sehirli nəticə)`;
+    toast('Sehirli nəticələr hazır! ✨', 'success');
+    
+  } catch(err) {
+    setGlobalLoader(false);
+    console.error(err);
+    toast('Sehirli axtarış zamanı xəta oldu.', 'error');
+  }
+}
+
+/* ─────────────────────────────────────────────
+   ✨ AI: AĞILLI TƏBRİK YARADICI (SMART GREETING)
+───────────────────────────────────────────── */
+async function generateGreeting() {
+  const context = document.getElementById('oi_greetingContext').value.trim();
+  if (!context) {
+    toast('Zəhmət olmasa təbrik üçün səbəbi və ya şəxsi yazın', 'error');
+    document.getElementById('oi_greetingContext').focus();
+    return;
+  }
+  
+  setGlobalLoader(true, 'Təbrik mətni yaradılır... ✨');
+  const pName = currentProduct ? (currentProduct.name || 'hədiyyə') : 'hədiyyə';
+  
+  const sysPrompt = `Sən hədiyyə göndərən insanlar üçün çox səmimi, kreativ və duyğusal təbrik mesajları yazan bir köməkçisən. 
+Mətnin səmimi olmasına diqqət et və emojilərdən istifadə et.
+Mənə sadəcə və yalnız mətni qaytar. Başqa heç bir söz yazma.`;
+
+  const userPrompt = `Mən dostuma/yaxınıma "${pName}" hədiyyəsi alıram. Hədiyyənin məqsədi və ya alan şəxs haqqında məlumat: "${context}". Zəhmət olmasa, bu hədiyyənin üzərinə əlavə ediləcək kiçik karta yazmaq üçün Azərbaycan dilində 2-3 cümləlik çox gözəl və təsirli təbrik mətni yaz.`;
+  
+  try {
+    const response = await callGemini(userPrompt, sysPrompt);
+    setGlobalLoader(false);
+    document.getElementById('oi_greetingCard').value = response.trim();
+    toast('Mətn müvəffəqiyyətlə yaradıldı! ✨', 'success');
+  } catch (err) {
+    setGlobalLoader(false);
+    console.error(err);
+    toast('Süni intellektlə mətn yaradıla bilmədi.', 'error');
+  }
+}
+
+/* ─────────────────────────────────────────────
+   ✨ AI: MƏHSUL ÜÇÜN MƏSLƏHƏTÇİ (AI CONCIERGE)
+───────────────────────────────────────────── */
+async function generateProductStory(type) {
+  if (!currentProduct) return;
+  const resultDiv = document.getElementById('modalAiResult');
+  resultDiv.style.display = 'block';
+  resultDiv.innerHTML = '<span style="color:var(--gold); font-weight: 600;">Düşünür... ✨</span>';
+
+  const pName = currentProduct.name || 'Bu məhsul';
+  const pDesc = currentProduct.description || '';
+
+  let sysPrompt = '';
+  let userPrompt = '';
+  
+  if (type === 'story') {
+      sysPrompt = `Sən Brendimo hədiyyə mağazasının yaradıcı kofirayterisən. Çox qısa, duyğusal və cəlbedici bir təqdimat hekayəsi yaz. Hekayə 2 cümlə olsun və emojilərdən istifadə et. Müştərini bu hədiyyəni almağa həvəsləndir. Başqa heç nə yazma.`;
+      userPrompt = `Məhsul: "${pName}". Məlumat: ${pDesc}. Bu məhsul üçün hekayə yaz.`;
+  } else {
+      sysPrompt = `Sən Brendimo hədiyyə mağazasının peşəkar hədiyyə məsləhətçisisən. Qısa, səmimi və maksimum 3 cümləlik cavab ver. Emojilərdən istifadə et. Başqa heç nə yazma.`;
+      userPrompt = `Məhsul: "${pName}". Məlumat: ${pDesc}. Bu məhsul kimlərə (hansı xarakterli, yaşlı və ya maraqları olan insanlara) və hansı münasibətlərə (ad günü, yubiley və s.) ən çox uyğundur?`;
+  }
+
+  try {
+      const response = await callGemini(userPrompt, sysPrompt);
+      resultDiv.innerHTML = response.replace(/```/g, '').trim();
+  } catch (err) {
+      console.error(err);
+      resultDiv.innerHTML = '<span style="color:red">Xəta baş verdi. Yenidən yoxlayın.</span>';
+  }
+}
+
+/* ─────────────────────────────────────────────
+   ✨ AI: KOMBONU TAMAMLA (BUNDLE CREATOR)
+───────────────────────────────────────────── */
+async function suggestCombo() {
+  if (collection.size === 0) { toast('Kolleksiyanız boşdur', 'error'); return; }
+  
+  setGlobalLoader(true, 'Süni intellekt kombo yaradır... ✨');
+  
+  // Get names of items already in the collection
+  const currentNames = Array.from(collection).map(code => {
+    const p = allProducts.find(prod => (prod.productcode||prod.code||'') == code);
+    return p ? p.name : '';
+  }).filter(Boolean).join(', ');
+  
+  // Prepare a mini catalog of unselected items (limit to 200 to avoid prompt overload)
+  const catalogInfo = allProducts
+    .filter(p => !collection.has(p.productcode||p.code||''))
+    .slice(0, 200)
+    .map(p => `Kod: ${p.productcode||p.code||''}, Ad: ${p.name||''}`)
+    .join('\n');
+    
+  const sysPrompt = `Sən hədiyyə bağlamaları (kombo) yaradan dizaynersən.
+Aşağıdakı kataloqdan verilən məhsullarla vizual və ya məntiqi olaraq ən yaxşı uyğunlaşacaq, kombonu mükəmməl tamamlayacaq cəmi 1 və ya 2 fərqli məhsul seç. 
+Mənə YALNIZ o seçdiyin məhsulların kodlarını vergüllə ayrılmış formada ver (Məsələn: 1045, 2033). Heç bir əlavə söz və ya cümlə yazma. Əgər heç nə uyğun gəlmirsə, "YOX" yaz.
+Kataloq:\n${catalogInfo}`;
+
+  const userPrompt = `Müştərinin hazırda seçdiyi məhsullar: "${currentNames}". Bu məhsulları tamamlayacaq əlavə məhsulları seç.`;
+  
+  try {
+    const response = await callGemini(userPrompt, sysPrompt);
+    setGlobalLoader(false);
+    
+    const codesStr = response.replace(/```/g, '').trim();
+    if(!codesStr || codesStr.toLowerCase().includes('yox')) {
+       toast('Komboya uyğun əlavə məhsul tapılmadı', 'error'); 
+       return;
+    }
+    
+    const codes = codesStr.split(',').map(c => c.trim()).filter(Boolean);
+    let addedCount = 0;
+    
+    codes.forEach(c => {
+       if(!collection.has(c) && allProducts.find(p => String(p.productcode||p.code||'') === c)) {
+           collection.add(c);
+           addedCount++;
+       }
+    });
+    
+    if(addedCount > 0) {
+       updateCollectionUI();
+       refreshCardStates();
+       toast(`✨ Süni intellekt komboya ${addedCount} yeni məhsul əlavə etdi!`, 'success');
+       setTimeout(() => {
+           const panelBody = document.getElementById('panelBody');
+           panelBody.scrollTop = panelBody.scrollHeight;
+       }, 150);
+    } else {
+       toast('Komboya əlavə ediləcək uyğun məhsul tapılmadı', 'error');
+    }
+  } catch(e) {
+    setGlobalLoader(false);
+    console.error(e);
+    toast('AI kombo yarada bilmədi', 'error');
+  }
+}
+
+/* ─────────────────────────────────────────────
+   ✨ AI: ASTRO-HƏDİYYƏ (ZODIAC ORACLE)
+───────────────────────────────────────────── */
+function openZodiacSection(e) {
+   e.stopPropagation();
+   document.getElementById('zodiacSection').style.display = 'block';
+   document.getElementById('zodiacInitBtn').style.display = 'none';
+}
+
+async function getZodiacGift(e) {
+    e.stopPropagation();
+    const sign = document.getElementById('zodiacSelect').value;
+    const resDiv = document.getElementById('zodiacResult');
+    resDiv.style.display = 'block';
+    resDiv.innerHTML = '<span style="color:var(--gold)">Ulduzlar oxunur... ✨</span>';
+    
+    // Only send basic info to Gemini
+    const catalogInfo = allProducts.slice(0, 300).map(p => `Kod: ${p.productcode||p.code||''}, Ad: ${p.name||''}`).join('\n');
+    
+    const sysPrompt = `Sən bir astroloq və hədiyyə ekspertisən. Aşağıdakı kataloqdan seçilmiş bürcün xarakterinə ən ideal uyğun gələn 1 ədəd məhsulu seç.
+Cavabını məhz bu formatda, başqa heç nə əlavə etmədən ver:
+"✨ [Bürcün əsas 1 xüsusiyyəti]. Ulduzlara görə sənə [Məhsulun Adı] (Kod: [Kod]) ideal uyğun gəlir!"
+Kataloq:\n${catalogInfo}`;
+
+    const userPrompt = `Bürc: "${sign}". Bu bürc üçün ideal hədiyyəni tap.`;
+    
+    try {
+        const response = await callGemini(userPrompt, sysPrompt);
+        resDiv.innerHTML = response.replace(/```/g, '').trim();
+    } catch(err) {
+        console.error(err);
+        resDiv.innerHTML = '<span style="color:red">Ulduzlarla əlaqə kəsildi, yenidən cəhd edin.</span>';
+    }
+}
+
+/* ─────────────────────────────────────────────
    DYNAMIC META UPDATER (Best Effort for Tab & modern previewers)
 ───────────────────────────────────────────── */
 function updateMetaTags(title, desc, imageUrl) {
@@ -1165,6 +1505,11 @@ document.addEventListener('DOMContentLoaded', () => {
   input.addEventListener('input', e => {
     clearTimeout(dbt);
     dbt = setTimeout(() => { filters.query = e.target.value.toLowerCase().trim(); applyFilters(); }, 280);
+  });
+  
+  // Enter düyməsi ilə sehirli axtarış işlətsin
+  input.addEventListener('keypress', e => {
+      if(e.key === 'Enter') magicSearch();
   });
 
   // Handle URL params
@@ -1296,7 +1641,7 @@ function applyFilters() {
   filters.sort  = document.getElementById('sortSelect').value;
   updateClearBtn();
 
-  // Yalnız seçilmiş məhsulları göstərmək üçün array seçimi (Collection Mode)
+  // Yalnız seçilmiş məhsulları göstərmək üçün array seçimi (Collection/Sehirli Axtarış Mode)
   let baseArray = isCollectionView ? collectionProducts : allProducts;
 
   let result = baseArray.filter(p => {
@@ -1334,7 +1679,7 @@ function applyFilters() {
   renderProducts(result, allProducts.length);
   
   let countText = `<strong>${result.length}</strong> məhsul`;
-  if (isCollectionView) countText += ` (Kolleksiya)`;
+  if (isCollectionView) countText += ` (Kolleksiya/Sehirli)`;
   document.getElementById('resultsCount').innerHTML = countText;
 }
 
@@ -1460,6 +1805,12 @@ function openModal(product) {
   document.getElementById('modalDesc').textContent  = desc;
   document.getElementById('modalImg').src           = img;
   document.getElementById('modalImg').onerror       = function() { this.src = PLACEHOLDER; };
+
+  const aiResult = document.getElementById('modalAiResult');
+  if (aiResult) {
+    aiResult.style.display = 'none';
+    aiResult.innerHTML = '';
+  }
 
   // Set permalink to product's own unique URL
   const productUrl = buildProductUrl(product);
@@ -1715,6 +2066,8 @@ function exitCollectionView() {
   updateMetaTags('Brendimo | Hədiyyə Sehrbazı', 'Hədiyyə axtarışından yorulmusan? 30 saniyəyə ideal hədiyyəni tap!', null);
   
   // Refresh the grid array backward to show ALL products
+  document.getElementById('searchInput').value = '';
+  filters.query = '';
   applyFilters();
 }
 
@@ -1778,6 +2131,11 @@ function openOrderModal() {
   document.getElementById('orderProductPrice').textContent = `${price} AZN`;
 
   document.getElementById('orderInlineForm').reset();
+  
+  // Təbrik kartı hissələrini sıfırla
+  document.getElementById('oi_greetingContext').value = '';
+  document.getElementById('oi_greetingCard').value = '';
+  
   oiDepositChecked = false;
   oiReceiptB64     = '';
   oiResetDepositUI();
@@ -1859,6 +2217,7 @@ document.getElementById('orderInlineForm').addEventListener('submit', async e =>
   const custPhone = document.getElementById('oi_custPhone').value.trim();
   const timeSlot  = document.getElementById('oi_time').value;
   const payMethod = document.getElementById('oi_payMethod').value;
+  const greetingCard = document.getElementById('oi_greetingCard').value.trim();
 
   if (!custName)  return toast('Ad və Soyadı daxil edin.', 'error');
   if (!custPhone) return toast('Əlaqə nömrəsini daxil edin.', 'error');
@@ -1902,6 +2261,7 @@ document.getElementById('orderInlineForm').addEventListener('submit', async e =>
     discountApplied:     discount,
     depositPaid:         deposit,
     receiptImage:        oiReceiptB64,
+    greetingCard:        greetingCard,
     customProductImage:  ''
   };
 
