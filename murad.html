@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Optimized viewport for mobile games to prevent zooming and handle notches -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Murad's Discovery Dash 🎮</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -13,13 +16,27 @@
   --border:rgba(255,255,255,0.08);--white:#F8FAFF;--gold:#FFD700;
   --shadow-glow:0 0 30px rgba(30,136,229,0.4);
 }
-*{margin:0;padding:0;box-sizing:border-box;user-select:none;}
-body{background:var(--dark);font-family:'Nunito',sans-serif;overflow:hidden;height:100vh;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--white);}
 
-/* ── GAME WRAP ── */
-#wrap{position:relative;width:960px;height:540px;transform-origin:center;transition:transform 0.1s;}
-canvas{display:block;border-radius:16px;box-shadow:0 0 0 3px rgba(30,136,229,0.5),0 0 80px rgba(30,136,229,0.2);}
+/* Base mobile resets */
+*{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+body {
+  background:var(--dark);font-family:'Nunito',sans-serif;overflow:hidden;
+  height:100vh;width:100vw;color:var(--white);
+  /* Prevent pull-to-refresh and bounce scrolling */
+  touch-action:none;overscroll-behavior:none;
+}
+
+/* ── GAME WRAP (Responsively Centered & Scaled) ── */
+#wrap {
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%, -50%);
+  transform-origin:center center;
+  width:960px;height:540px;
+}
+canvas {
+  display:block;border-radius:16px;
+  box-shadow:0 0 0 3px rgba(30,136,229,0.5),0 0 80px rgba(30,136,229,0.2);
+}
 
 /* ── HUD ── */
 #hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;
@@ -53,7 +70,7 @@ canvas{display:block;border-radius:16px;box-shadow:0 0 0 3px rgba(30,136,229,0.5
 .char-bar{height:100%;border-radius:3px;transition:width 0.3s;}
 
 /* ── POWER METER ── */
-#powerWrap{position:absolute;bottom:18px;left:16px;z-index:10;pointer-events:none;
+#powerWrap{position:absolute;top:110px;left:12px;z-index:10;pointer-events:none;
   display:flex;align-items:center;gap:8px;}
 #powerLabel{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--roblox-yellow);}
 #powerTrack{width:120px;height:12px;background:rgba(255,255,255,.1);border-radius:6px;
@@ -96,7 +113,7 @@ canvas{display:block;border-radius:16px;box-shadow:0 0 0 3px rgba(30,136,229,0.5
 /* CHAR SELECT */
 .chars-grid{display:flex;gap:14px;margin-bottom:22px;}
 .char-card{width:190px;background:var(--card);border:2px solid var(--border);border-radius:16px;
-  padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+  padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;touch-action:manipulation;}
 .char-card::before{content:'';position:absolute;inset:0;opacity:0;
   background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.08),transparent 70%);transition:opacity .2s;}
 .char-card:hover::before{opacity:1;}
@@ -113,7 +130,7 @@ canvas{display:block;border-radius:16px;box-shadow:0 0 0 3px rgba(30,136,229,0.5
 
 /* BUTTONS */
 .btn{font-family:'Press Start 2P',monospace;cursor:pointer;border:none;border-radius:10px;
-  transition:all .15s;letter-spacing:.5px;}
+  transition:all .15s;letter-spacing:.5px;touch-action:manipulation;}
 .btn-play{font-size:14px;padding:16px 48px;
   background:linear-gradient(135deg,var(--roblox-green),#2E7D32);color:white;
   box-shadow:0 6px 0 #1B5E20,0 0 24px rgba(67,160,71,.4);}
@@ -154,7 +171,7 @@ canvas{display:block;border-radius:16px;box-shadow:0 0 0 3px rgba(30,136,229,0.5
 .tag-english{background:rgba(124,58,237,.2);color:#a78bfa;border:1px solid var(--roblox-purple);}
 .tag-general{background:rgba(255,109,0,.2);color:var(--roblox-orange);border:1px solid var(--roblox-orange);}
 .answer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
-.ans-btn{font-family:'Press Start 2P',monospace;font-size:11px;padding:14px 10px;
+.ans-btn{font-family:'Press Start 2P',monospace;font-size:11px;padding:16px 10px;
   background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.15);
   border-radius:12px;color:var(--white);cursor:pointer;transition:all .15s;line-height:1.4;}
 .ans-btn:hover:not(:disabled){background:rgba(30,136,229,.2);border-color:var(--roblox-blue);
@@ -194,7 +211,7 @@ canvas{display:block;border-radius:16px;box-shadow:0 0 0 3px rgba(30,136,229,0.5
   text-shadow:0 0 30px rgba(229,62,62,.7);margin-bottom:8px;}
 .go-char{font-size:72px;margin-bottom:8px;animation:wobble 1s ease-in-out infinite;}
 @keyframes wobble{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;width:380px;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;width:380px;max-width:90%;}
 .stat-cell{background:var(--card);border:1px solid var(--border);border-radius:10px;
   padding:12px;text-align:center;}
 .stat-cell .sv{font-family:'Press Start 2P',monospace;font-size:18px;color:var(--gold);}
@@ -206,12 +223,63 @@ canvas{display:block;border-radius:16px;box-shadow:0 0 0 3px rgba(30,136,229,0.5
 .confetti-area{font-size:32px;letter-spacing:4px;animation:confettiBounce .6s ease-in-out infinite alternate;}
 @keyframes confettiBounce{from{transform:translateY(0);}to{transform:translateY(-8px);}}
 
-/* KEYS */
+/* CONTROLS HINT (DESKTOP) */
 #keysHint{position:absolute;bottom:18px;right:14px;z-index:10;pointer-events:none;
-  font-family:'Press Start 2P',monospace;font-size:7px;color:rgba(255,255,255,.2);line-height:2;text-align:right;}
+  font-family:'Press Start 2P',monospace;font-size:7px;color:rgba(255,255,255,.4);line-height:2;text-align:right;}
+
+/* ── MOBILE ONSCREEN CONTROLS ── */
+.mobile-controls { display: none; }
+body.is-touch .mobile-controls { display: block; }
+body.is-touch #keysHint { display: none; }
+
+.mobile-btn {
+  position:absolute; background:rgba(0,0,0,0.5); border:2px solid rgba(255,255,255,0.2);
+  border-radius:50%; color:white; display:flex; align-items:center; justify-content:center;
+  font-size:34px; z-index:15; backdrop-filter:blur(6px); box-shadow:0 4px 16px rgba(0,0,0,0.5);
+  touch-action:none; transition:transform 0.1s, background 0.1s; cursor:pointer;
+}
+.mobile-btn:active { transform:scale(0.85); background:rgba(255,255,255,0.25); }
+
+#btnSlide { bottom:20px; left:20px; width:85px; height:85px; }
+#btnJump  { bottom:20px; right:20px; width:85px; height:85px; }
+#btnPower { bottom:120px; right:20px; width:65px; height:65px; font-size:30px; border-color:rgba(255, 214, 0, 0.5); }
+
+.char-nav-btn {
+  position:absolute; top:125px; width:44px; height:44px; border-radius:22px;
+  background:rgba(0,0,0,0.6); border:2px solid rgba(255,255,255,0.2); color:white;
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+  z-index:15; touch-action:none; transition:transform 0.1s; cursor:pointer;
+}
+.char-nav-btn:active { transform:scale(0.85); }
+#btnCharL { right:65px; }
+#btnCharR { right:12px; }
+
+/* ── PORTRAIT MODE WARNING ── */
+#portraitWarning {
+  display:none; position:fixed; inset:0; z-index:99999;
+  background:var(--dark); flex-direction:column; align-items:center;
+  justify-content:center; text-align:center; padding:30px;
+}
+#portraitWarning .icon { font-size:60px; margin-bottom:20px; animation:rotatePhone 2s infinite ease-in-out; }
+@keyframes rotatePhone { 0% { transform:rotate(0deg); } 50% { transform:rotate(-90deg); } 100% { transform:rotate(-90deg); } }
+#portraitWarning h2 { font-family:'Press Start 2P',monospace; font-size:16px; color:var(--roblox-yellow); margin-bottom:12px; line-height:1.5; }
+#portraitWarning p { font-size:14px; color:var(--white); opacity:0.8; }
+
+@media (orientation: portrait) {
+  #wrap { display:none !important; }
+  #portraitWarning { display:flex; }
+}
 </style>
 </head>
 <body>
+
+<!-- Portrait Warning -->
+<div id="portraitWarning">
+  <div class="icon">📱</div>
+  <h2>PLEASE ROTATE<br>YOUR DEVICE</h2>
+  <p>Murad's Discovery Dash is best played in landscape mode!</p>
+</div>
+
 <div id="wrap">
   <canvas id="gc" width="960" height="540"></canvas>
 
@@ -285,8 +353,17 @@ canvas{display:block;border-radius:16px;box-shadow:0 0 0 3px rgba(30,136,229,0.5
     <span id="powerReady">PRESS P!</span>
   </div>
 
-  <!-- Keys hint -->
+  <!-- Desktop Keys hint -->
   <div id="keysHint">↑ SPACE = JUMP<br>↓ = SLIDE<br>P = POWER<br>← → = AIM</div>
+
+  <!-- Mobile Onscreen Controls -->
+  <div class="mobile-controls">
+    <div class="mobile-btn" id="btnSlide">👇</div>
+    <div class="mobile-btn" id="btnJump">⏫</div>
+    <div class="mobile-btn" id="btnPower">⚡</div>
+    <div class="char-nav-btn" id="btnCharL">◀</div>
+    <div class="char-nav-btn" id="btnCharR">▶</div>
+  </div>
 
   <!-- Toast area -->
   <div id="toastArea"></div>
@@ -377,13 +454,21 @@ canvas{display:block;border-radius:16px;box-shadow:0 0 0 3px rgba(30,136,229,0.5
 </div>
 
 <script>
-// Responsive wrapper scaling
+// Responsive wrapper scaling logic (Fits game proportionally inside any screen)
 function resize() {
-  const scale = Math.min(window.innerWidth / 960, window.innerHeight / 540, 1);
-  document.getElementById('wrap').style.transform = `scale(${scale})`;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  // Calculate scale maintaining the 960x540 16:9 aspect ratio
+  const scale = Math.min(w / 960, h / 540);
+  document.getElementById('wrap').style.transform = `translate(-50%, -50%) scale(${scale})`;
 }
 window.addEventListener('resize', resize);
-resize();
+resize(); // Trigger initially
+
+// Enable touch controls automatically if a touch interface is detected
+if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+  document.body.classList.add('is-touch');
+}
 
 // ═══════════════════════════════════════════════
 // CONSTANTS & CONFIG
@@ -593,7 +678,7 @@ function buildMilestoneMarkers(){
   });
 }
 
-// ── INPUT ──
+// ── INPUTS (Mobile Buttons & Desktop Keyboard) ──
 const keys={};
 document.addEventListener('keydown',e=>{
   if(keys[e.code]) return;
@@ -607,20 +692,23 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('keyup',e=>{keys[e.code]=false;});
 
-// Touch
-let tStartY=0,tStartX=0;
-canvas.addEventListener('touchstart',e=>{tStartY=e.touches[0].clientY;tStartX=e.touches[0].clientX;e.preventDefault();},{passive:false});
-canvas.addEventListener('touchend',e=>{
-  if(!gRunning||fightActive) return;
-  const dy=tStartY-e.changedTouches[0].clientY;
-  const dx=e.changedTouches[0].clientX-tStartX;
-  if(dy>40) doJump();
-  else if(dy<-40) doSlide();
-  else if(dx>40) switchChar(1);
-  else if(dx<-40) switchChar(-1);
-  else doPower();
-  e.preventDefault();
-},{passive:false});
+// Smart UI Button Binder (handles multi-touch instantly)
+function bindBtn(id, actionFn) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  const handler = (e) => {
+    e.preventDefault();
+    if(!gRunning || fightActive || paused) return;
+    actionFn();
+  };
+  el.addEventListener('touchstart', handler, {passive: false});
+  el.addEventListener('mousedown', handler);
+}
+bindBtn('btnJump', doJump);
+bindBtn('btnSlide', doSlide);
+bindBtn('btnPower', doPower);
+bindBtn('btnCharL', () => switchChar(-1));
+bindBtn('btnCharR', () => switchChar(1));
 
 function doJump(){
   if(player.jumpsLeft>0&&!player.sliding){
@@ -1022,11 +1110,11 @@ function update(){
   // Unlock chars mid-game
   if(score>=300&&!bestScores.sananUnlocked){
     bestScores.sananUnlocked=true;saveScores();
-    toast('🔓 SANAN UNLOCKED! Press → to switch!','info');
+    toast('🔓 SANAN UNLOCKED! Press ▶ to switch!','info');
   }
   if(correctAnswers>=5&&!bestScores.leylaUnlocked){
     bestScores.leylaUnlocked=true;saveScores();
-    toast('🔓 LEYLA UNLOCKED! Press ← → to switch!','info');
+    toast('🔓 LEYLA UNLOCKED! Press ◀ ▶ to switch!','info');
   }
 
   updateHUD();
