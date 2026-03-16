@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#060410">
+<title>Hədiyyə Sehrbazı — VIP Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   DESIGN TOKENS
+══════════════════════════════════════════ */
+:root {
+  --bg:        #060410;
+  --bg2:       #0A0718;
+  --bg3:       #0F0B22;
+  --gold:      #C9A84C;
+  --gold-l:    #F5D97A;
+  --gold-d:    #8B6914;
+  --gold-glow: rgba(201,168,76,0.22);
+  --cream:     #FDF6E3;
+  --border:    rgba(201,168,76,0.16);
+  --border-hi: rgba(201,168,76,0.42);
+  --surface:   rgba(255,255,255,0.035);
+  --surface2:  rgba(255,255,255,0.065);
+  --text:      #EDE8D8;
+  --muted:     rgba(237,232,216,0.42);
+  --success:   #27D67B;
+  --danger:    #E8453C;
+  --pink:      #FF6B9D;
+  --purple:    #8B5CF6;
+  --nav-h:     74px;
+  --safe-b:    env(safe-area-inset-bottom, 0px);
+  --font-d:    'Playfair Display', Georgia, serif;
+  --font-b:    'Outfit', sans-serif;
+  --r:         14px;
+  --r-lg:      22px;
+  --ease-b:    cubic-bezier(0.34,1.56,0.64,1);
+  --ease-out:  cubic-bezier(0.16,1,0.3,1);
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html { scroll-behavior:smooth; }
+body {
+  font-family: var(--font-b);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Grain overlay */
+body::before {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity:0.5;
+}
+
+/* Ambient gradients */
+.ambient {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 15%, rgba(201,168,76,0.07) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 50% at 80% 85%, rgba(139,92,246,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 50% at 50% 50%, rgba(255,107,157,0.03) 0%, transparent 70%);
+}
+
+/* ══════════════════════════════════════════
+   SCROLLBAR
+══════════════════════════════════════════ */
+::-webkit-scrollbar { width:3px; height:3px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(201,168,76,0.25); border-radius:2px; }
+
+/* ══════════════════════════════════════════
+   PAGES & ANIMATIONS
+══════════════════════════════════════════ */
+.page { display:none; position:relative; z-index:2; }
+.page.active { display:block; animation:pgIn .35s var(--ease-out); }
+@keyframes pgIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ══════════════════════════════════════════
+   SCROLL AREA
+══════════════════════════════════════════ */
+.scroll-area {
+  height: calc(100dvh - 64px - var(--nav-h) - var(--safe-b));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+.scroll-area::-webkit-scrollbar { display:none; }
+
+/* ══════════════════════════════════════════
+   APP HEADER
+══════════════════════════════════════════ */
+.app-header {
+  position: sticky; top:0; z-index:300;
+  height: 64px;
+  background: rgba(6,4,16,0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items:center; justify-content:space-between;
+  padding: 0 18px;
+}
+
+.hdr-brand { display:flex; align-items:center; gap:10px; cursor:pointer; }
+.hdr-gem {
+  width:38px; height:38px; border-radius:11px;
+  background: linear-gradient(135deg, var(--gold-d), var(--gold), var(--gold-l));
+  display:flex; align-items:center; justify-content:center;
+  font-size:19px;
+  box-shadow: 0 4px 16px rgba(201,168,76,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.hdr-name {
+  font-family: var(--font-d); font-size:1.05rem; font-weight:700;
+  background: linear-gradient(135deg, var(--gold-l), var(--gold));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  line-height:1.1;
+}
+.hdr-sub { font-size:.58rem; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; }
+
+.hdr-right { display:flex; align-items:center; gap:8px; }
+
+.hdr-balance-pill {
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius:30px; padding:5px 12px;
+  display:flex; align-items:center; gap:6px;
+  font-size:.78rem; font-weight:700; color:var(--gold);
+  cursor:pointer; transition:all .2s;
+}
+.hdr-balance-pill:hover { background:rgba(201,168,76,0.18); }
+.live-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--success); box-shadow:0 0 6px var(--success);
+  animation:blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.hdr-login-btn {
+  background:linear-gradient(135deg,var(--gold-d),var(--gold));
+  border:none; border-radius:20px; padding:7px 16px;
+  font-family:var(--font-b); font-size:.75rem; font-weight:700;
+  color:#1A0E00; cursor:pointer; transition:all .2s;
+  display:flex; align-items:center; gap:5px;
+  box-shadow: 0 3px 12px rgba(201,168,76,0.3);
+}
+.hdr-login-btn:hover { filter:brightness(1.1); transform:translateY(-1px); }
+
+/* ══════════════════════════════════════════
+   BOTTOM NAV
+══════════════════════════════════════════ */
+.bottom-nav {
+  position: fixed; bottom:0; left:0; right:0; z-index:300;
+  height: calc(var(--nav-h) + var(--safe-b));
+  background: rgba(6,4,16,0.97);
+  backdrop-filter: blur(24px);
+  border-top: 1px solid var(--border);
+  display:flex; align-items:flex-start;
+  padding-top: 8px;
+  padding-bottom: var(--safe-b);
+}
+.nav-btn {
+  flex:1; background:none; border:none;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px; padding:4px 0;
+  color: rgba(237,232,216,0.3);
+  font-family:var(--font-b); font-size:.58rem; font-weight:700;
+  letter-spacing:.6px; text-transform:uppercase;
+  cursor:pointer; transition:color .25s; position:relative;
+}
+.nav-btn svg { width:22px; height:22px; fill:currentColor; transition:transform .3s var(--ease-b); }
+.nav-btn.active { color:var(--gold); }
+.nav-btn.active svg { transform:scale(1.15); filter:drop-shadow(0 0 6px rgba(201,168,76,0.5)); }
+.nav-btn.active::before {
+  content:''; position:absolute; top:-8px; left:30%; right:30%; height:2px;
+  background:linear-gradient(90deg, transparent, var(--gold), transparent);
+  border-radius:0 0 3px 3px;
+}
+.nav-badge {
+  position:absolute; top:0; right:calc(50% - 18px);
+  background:var(--danger); color:#fff; border-radius:50%;
+  width:14px; height:14px; font-size:.55rem; font-weight:800;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 0 8px rgba(232,69,60,.5);
+}
+
+/* ══════════════════════════════════════════
+   SHARED COMPONENTS
+══════════════════════════════════════════ */
+.glass-card {
+  background: linear-gradient(145deg, rgba(201,168,76,0.06), rgba(255,255,255,0.02));
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  position:relative; overflow:hidden;
+  backdrop-filter: blur(8px);
+}
+.glass-card::before {
+  content:''; position:absolute; top:0; left:8%; right:8%; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(201,168,76,0.35),transparent);
+}
+
+.section-label {
+  font-size:.65rem; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted); display:flex; align-items:center; gap:8px;
+}
+.section-label::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
+
+.section-heading {
+  font-family:var(--font-d); font-size:clamp(1.6rem,6vw,2.2rem); font-weight:800;
+  background: linear-gradient(135deg, var(--cream) 30%, var(--gold-l) 70%, var(--gold));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  line-height:1.1; letter-spacing:-.5px;
+}
+
+.tag-gold {
+  display:inline-flex; align-items:center; gap:4px;
+  background:rgba(201,168,76,.1); border:1px solid rgba(201,168,76,.3);
+  border-radius:20px; padding:3px 10px;
+  font-size:.65rem; font-weight:700; color:var(--gold); letter-spacing:.8px; text-transform:uppercase;
+}
+
+.divider {
+  height:1px; margin:0 20px;
+  background:linear-gradient(90deg,transparent,var(--border),transparent);
+}
+
+/* Buttons */
+.btn-primary {
+  width:100%; padding:15px; border:none; border-radius:14px;
+  background: linear-gradient(135deg, var(--gold-d) 0%, var(--gold) 50%, var(--gold-l) 100%);
+  color:#1A0E00; font-family:var(--font-b); font-size:.9rem; font-weight:700;
+  letter-spacing:.6px; cursor:pointer; position:relative; overflow:hidden;
+  box-shadow: 0 4px 0 rgba(107,83,16,.7), 0 8px 24px rgba(201,168,76,.3);
+  transition:all .2s var(--ease-b);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.btn-primary::after {
+  content:''; position:absolute; top:0; left:-70%; width:50%; height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);
+  transform:skewX(-20deg); transition:left .6s;
+}
+.btn-primary:not(:disabled):hover::after { left:130%; }
+.btn-primary:not(:disabled):hover { box-shadow:0 6px 0 rgba(107,83,16,.7), 0 12px 32px rgba(201,168,76,.45); transform:translateY(-1px); }
+.btn-primary:active { transform:scale(.97)!important; }
+.btn-primary:disabled { opacity:.4; cursor:not-allowed; }
+
+.btn-wa {
+  width:100%; padding:15px; border:none; border-radius:14px;
+  background:linear-gradient(135deg,#128C7E,#25D366);
+  color:#fff; font-family:var(--font-b); font-size:.9rem; font-weight:700;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+  box-shadow:0 4px 0 rgba(9,94,79,.8), 0 8px 24px rgba(37,211,102,.25);
+  transition:all .2s; text-decoration:none; letter-spacing:.3px;
+}
+.btn-wa:not(:disabled):hover { filter:brightness(1.08); transform:translateY(-1px); }
+.btn-wa:active { transform:scale(.97)!important; }
+
+.btn-ghost {
+  background:none; border:1.5px solid var(--border);
+  border-radius:12px; padding:11px 18px;
+  font-family:var(--font-b); font-size:.82rem; font-weight:600;
+  color:var(--muted); cursor:pointer; transition:all .2s;
+}
+.btn-ghost:hover { border-color:var(--border-hi); color:var(--text); }
+
+/* ══════════════════════════════════════════
+   LOGIN OVERLAY
+══════════════════════════════════════════ */
+#loginOverlay {
+  position:fixed; inset:0; z-index:9000;
+  background:rgba(4,2,12,.92);
+  backdrop-filter:blur(20px);
+  display:none; align-items:center; justify-content:flex-end; flex-direction:column;
+  padding:0;
+}
+#loginOverlay.open { display:flex; animation:fadeIn .3s ease; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.login-sheet {
+  background:linear-gradient(180deg,#110C1F,#0A0718);
+  border:1px solid var(--border-hi); border-bottom:none;
+  border-radius:28px 28px 0 0;
+  width:100%; max-width:480px;
+  padding: 0 0 32px;
+  box-shadow: 0 -20px 60px rgba(201,168,76,.08);
+  animation: slideUp .4s var(--ease-out);
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+
+.sheet-handle { width:40px; height:4px; background:rgba(255,255,255,.12); border-radius:2px; margin:14px auto 0; }
+
+.login-sheet-body { padding:24px 24px 8px; }
+.login-sheet-icon {
+  width:64px; height:64px; border-radius:18px; margin:0 auto 20px;
+  background:linear-gradient(135deg,var(--gold-d),var(--gold),var(--gold-l));
+  display:flex; align-items:center; justify-content:center; font-size:30px;
+  box-shadow:0 8px 28px rgba(201,168,76,.35);
+  animation:floatY 3s ease-in-out infinite;
+}
+@keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+.login-sheet-title {
+  font-family:var(--font-d); font-size:1.9rem; font-weight:800; text-align:center;
+  background:linear-gradient(135deg,var(--gold-l),var(--gold));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  margin-bottom:4px;
+}
+.login-sheet-sub { text-align:center; color:var(--muted); font-size:.8rem; margin-bottom:24px; }
+
+.input-field-wrap { position:relative; margin-bottom:12px; }
+.input-field-wrap i {
+  position:absolute; left:15px; top:50%; transform:translateY(-50%);
+  color:var(--gold); font-size:15px; pointer-events:none;
+}
+.input-field-wrap input {
+  width:100%; padding:14px 16px 14px 44px;
+  background:rgba(255,255,255,.04);
+  border:1.5px solid rgba(201,168,76,.2);
+  border-radius:12px;
+  color:var(--text); font-family:var(--font-b); font-size:1rem; font-weight:500;
+  transition:all .25s; outline:none;
+}
+.input-field-wrap input:focus {
+  border-color:var(--gold);
+  background:rgba(255,255,255,.07);
+  box-shadow:0 0 0 3px rgba(201,168,76,.12);
+}
+.input-field-wrap input::placeholder { color:rgba(237,232,216,.25); font-weight:400; }
+.login-error { font-size:.75rem; color:var(--danger); margin:-6px 0 10px 4px; display:none; }
+.login-note {
+  text-align:center; font-size:.72rem; color:var(--muted); margin-top:14px; line-height:1.6;
+}
+.login-note a { color:var(--gold); text-decoration:none; font-weight:600; }
+.loader-spinner-sm {
+  display:inline-block; width:18px; height:18px;
+  border:2px solid rgba(26,14,0,.3); border-top-color:#1A0E00;
+  border-radius:50%; animation:spin .6s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ══════════════════════════════════════════
+   PAGE: LANDING (no login)
+══════════════════════════════════════════ */
+#pageLanding { position:relative; z-index:2; }
+#pageLanding .scroll-area {
+  height:calc(100dvh - 64px - var(--nav-h) - var(--safe-b));
+}
+
+/* Hero */
+.landing-hero {
+  padding:32px 20px 28px;
+  text-align:center;
+  background:radial-gradient(ellipse 90% 60% at 50% -10%, rgba(201,168,76,.08) 0%, transparent 70%);
+}
+.vip-crown-badge {
+  display:inline-flex; align-items:center; gap:7px;
+  background:linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05));
+  border:1px solid rgba(201,168,76,.3);
+  border-radius:30px; padding:6px 16px; margin-bottom:20px;
+  font-size:.7rem; font-weight:700; color:var(--gold); letter-spacing:1.2px; text-transform:uppercase;
+}
+.vip-crown-badge .crown-spin { display:inline-block; animation:crownPulse 2s ease-in-out infinite; }
+@keyframes crownPulse { 0%,100%{transform:rotate(-8deg) scale(1)} 50%{transform:rotate(8deg) scale(1.1)} }
+
+.hero-headline {
+  font-family:var(--font-d);
+  font-size:clamp(2.2rem,9vw,3.2rem); font-weight:900;
+  line-height:1.05; letter-spacing:-1px; margin-bottom:10px;
+}
+.hero-headline .line-gold {
+  background:linear-gradient(135deg,var(--gold-l) 20%,var(--gold) 60%,#FF9D5C 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  display:block;
+}
+.hero-sub { font-size:.9rem; color:var(--muted); line-height:1.65; max-width:340px; margin:0 auto 24px; }
+
+.hero-cta-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.btn-hero-primary {
+  display:inline-flex; align-items:center; gap:8px;
+  background:linear-gradient(135deg,var(--gold-d),var(--gold),var(--gold-l));
+  color:#1A0E00; border:none; border-radius:50px; padding:14px 28px;
+  font-family:var(--font-b); font-size:.9rem; font-weight:800; letter-spacing:.5px;
+  cursor:pointer; transition:all .2s var(--ease-b);
+  box-shadow:0 4px 0 rgba(107,83,16,.6), 0 8px 24px rgba(201,168,76,.3);
+}
+.btn-hero-primary:hover { transform:translateY(-2px); box-shadow:0 6px 0 rgba(107,83,16,.6), 0 12px 32px rgba(201,168,76,.4); }
+.btn-hero-outline {
+  display:inline-flex; align-items:center; gap:8px;
+  background:none; border:1.5px solid rgba(201,168,76,.3); border-radius:50px; padding:13px 22px;
+  font-family:var(--font-b); font-size:.85rem; font-weight:700; color:var(--gold);
+  cursor:pointer; transition:all .2s; letter-spacing:.3px;
+}
+.btn-hero-outline:hover { border-color:var(--gold); background:rgba(201,168,76,.07); }
+
+/* Stats strip */
+.stats-strip {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  border:1px solid var(--border); border-radius:var(--r-lg);
+  overflow:hidden; margin:24px 20px 0;
+  background:linear-gradient(135deg,rgba(201,168,76,.05),rgba(0,0,0,.2));
+}
+.stat-block {
+  padding:16px 12px; text-align:center;
+  border-right:1px solid var(--border);
+}
+.stat-block:last-child { border-right:none; }
+.stat-num {
+  font-family:var(--font-d); font-size:1.6rem; font-weight:800;
+  background:linear-gradient(135deg,var(--gold-l),var(--gold));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  display:block; line-height:1.1; margin-bottom:3px;
+}
+.stat-txt { font-size:.62rem; color:var(--muted); font-weight:600; letter-spacing:.5px; text-transform:uppercase; }
+
+/* Benefits – landing */
+.benefits-section { padding:28px 20px 0; }
+
+.benefit-item {
+  display:flex; gap:14px; align-items:flex-start;
+  padding:16px 0; border-bottom:1px solid rgba(255,255,255,.04);
+  animation:fadeUp .5s both;
+}
+.benefit-item:last-child { border-bottom:none; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+.bi-icon {
+  width:44px; height:44px; border-radius:13px; flex-shrink:0;
+  background:rgba(201,168,76,.08);
+  border:1px solid rgba(201,168,76,.15);
+  display:flex; align-items:center; justify-content:center; font-size:20px;
+}
+.bi-content { flex:1; }
+.bi-title { font-size:.92rem; font-weight:700; color:var(--text); margin-bottom:3px; }
+.bi-desc { font-size:.75rem; color:var(--muted); line-height:1.55; }
+.bi-badge {
+  flex-shrink:0; background:rgba(201,168,76,.1); border:1px solid rgba(201,168,76,.2);
+  border-radius:8px; padding:3px 9px; font-size:.62rem; font-weight:700; color:var(--gold);
+  align-self:center; white-space:nowrap;
+}
+
+/* Pricing card */
+.pricing-card {
+  margin:28px 20px 0;
+  padding:28px 24px;
+  background:linear-gradient(145deg,#140F00,#0D0800,#060410);
+  border:1px solid rgba(201,168,76,.4);
+  border-radius:var(--r-lg); text-align:center; position:relative; overflow:hidden;
+  box-shadow:0 0 60px rgba(201,168,76,.06), 0 20px 60px rgba(0,0,0,.5);
+}
+.pricing-card::after {
+  content:''; position:absolute; top:0; right:0;
+  width:180px; height:180px;
+  background:radial-gradient(circle at 100% 0%,rgba(201,168,76,.1),transparent 60%);
+  pointer-events:none;
+}
+.price-old { font-size:.82rem; color:var(--muted); text-decoration:line-through; margin-bottom:4px; }
+.price-main {
+  font-family:var(--font-d); font-size:3.5rem; font-weight:900; line-height:1;
+  background:linear-gradient(135deg,var(--gold-l),var(--gold));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  margin-bottom:4px;
+}
+.price-main sup { font-size:1.5rem; vertical-align:super; }
+.price-main sub { font-size:1.2rem; vertical-align:baseline; opacity:.7; }
+.price-note { font-size:.78rem; color:var(--muted); margin-bottom:20px; }
+.price-free-note {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(39,214,123,.1); border:1px solid rgba(39,214,123,.25);
+  border-radius:20px; padding:5px 14px; margin-bottom:20px;
+  font-size:.75rem; font-weight:700; color:var(--success); letter-spacing:.5px;
+}
+
+/* ══════════════════════════════════════════
+   PAGE: HOME (logged in)
+══════════════════════════════════════════ */
+.user-hero {
+  padding:24px 20px 20px;
+  background:radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201,168,76,.07) 0%, transparent 65%);
+}
+.welcome-line { font-size:.68rem; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
+.user-name-display {
+  font-family:var(--font-d); font-size:clamp(1.8rem,7vw,2.5rem); font-weight:800;
+  background:linear-gradient(135deg,var(--cream) 20%,var(--gold-l) 60%,var(--gold));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  letter-spacing:-.5px; line-height:1.1; margin-bottom:8px;
+}
+.plan-chip {
+  display:inline-flex; align-items:center; gap:5px;
+  background:linear-gradient(135deg,rgba(201,168,76,.16),rgba(201,168,76,.05));
+  border:1px solid rgba(201,168,76,.3); border-radius:20px; padding:4px 12px;
+  font-size:.72rem; font-weight:700; color:var(--gold); letter-spacing:.8px; text-transform:uppercase;
+}
+
+/* Balance card */
+.balance-card {
+  margin:0 20px 16px;
+  padding:24px;
+  background:linear-gradient(145deg,#1B1400,#120C00,#0A0700);
+  border:1px solid rgba(201,168,76,.38);
+  border-radius:var(--r-lg); position:relative; overflow:hidden;
+  box-shadow:0 0 50px rgba(201,168,76,.05), 0 16px 50px rgba(0,0,0,.55);
+}
+.balance-card::after {
+  content:''; position:absolute; top:-20px; right:-20px;
+  width:160px; height:160px;
+  background:radial-gradient(circle,rgba(201,168,76,.1),transparent 65%);
+  pointer-events:none;
+}
+.balance-card-label { font-size:.62rem; font-weight:700; letter-spacing:1.8px; text-transform:uppercase; color:rgba(201,168,76,.55); margin-bottom:3px; }
+.balance-card-amt {
+  font-family:var(--font-d); font-size:3rem; font-weight:800; line-height:1; margin-bottom:4px;
+  background:linear-gradient(135deg,var(--gold-l),var(--gold));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.balance-card-note { font-size:.7rem; color:rgba(201,168,76,.45); margin-bottom:20px; }
+.balance-actions { display:flex; gap:10px; }
+.ba-btn {
+  flex:1; padding:11px; border-radius:11px; border:none;
+  font-family:var(--font-b); font-size:.78rem; font-weight:700; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:6px; transition:all .2s;
+}
+.ba-use { background:linear-gradient(135deg,var(--gold-d),var(--gold)); color:#1A0E00; }
+.ba-use:hover { filter:brightness(1.1); }
+.ba-wa  { background:rgba(37,211,102,.1); border:1px solid rgba(37,211,102,.25); color:var(--success); }
+.ba-wa:hover { background:rgba(37,211,102,.18); }
+
+/* Quick access row */
+.quick-row {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:10px; padding:0 20px; margin-bottom:20px;
+}
+.quick-item {
+  background:rgba(255,255,255,.03); border:1px solid var(--border);
+  border-radius:14px; padding:14px 6px;
+  display:flex; flex-direction:column; align-items:center; gap:7px;
+  cursor:pointer; transition:all .2s; text-align:center;
+}
+.quick-item:hover { border-color:var(--border-hi); background:rgba(201,168,76,.06); transform:translateY(-2px); }
+.quick-item-icon { font-size:22px; line-height:1; }
+.quick-item-label { font-size:.6rem; font-weight:700; letter-spacing:.4px; color:var(--muted); text-transform:uppercase; }
+
+/* Membership strip */
+.membership-strip {
+  margin:0 20px 20px;
+  padding:16px 18px;
+  background:rgba(255,255,255,.025); border:1px solid var(--border);
+  border-radius:var(--r); display:flex; align-items:center; gap:14px;
+}
+.ms-icon {
+  width:48px; height:48px; border-radius:14px; flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold-d),var(--gold));
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+  box-shadow:0 6px 18px rgba(201,168,76,.28);
+}
+.ms-plan { font-family:var(--font-d); font-size:1.2rem; font-weight:700; color:var(--gold); }
+.ms-since { font-size:.7rem; color:var(--muted); margin-top:2px; }
+.ms-status {
+  margin-left:auto; padding:4px 10px; border-radius:20px;
+  font-size:.65rem; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+}
+.ms-active   { background:rgba(39,214,123,.1); color:var(--success); border:1px solid rgba(39,214,123,.2); }
+.ms-inactive { background:rgba(232,69,60,.1);  color:var(--danger);  border:1px solid rgba(232,69,60,.2); }
+
+/* Home benefits */
+.home-benefits { padding:0 20px 24px; }
+.hb-item {
+  display:flex; align-items:center; gap:12px;
+  padding:13px 0; border-bottom:1px solid rgba(255,255,255,.04);
+}
+.hb-item:last-child { border-bottom:none; }
+.hb-icon {
+  width:38px; height:38px; border-radius:10px; flex-shrink:0;
+  background:rgba(201,168,76,.07); display:flex; align-items:center; justify-content:center; font-size:17px;
+}
+.hb-text { flex:1; }
+.hb-title { font-size:.88rem; font-weight:600; }
+.hb-desc { font-size:.7rem; color:var(--muted); margin-top:1px; line-height:1.4; }
+.hb-pill {
+  background:rgba(201,168,76,.1); border:1px solid rgba(201,168,76,.2);
+  border-radius:7px; padding:2px 8px;
+  font-size:.62rem; font-weight:700; color:var(--gold); white-space:nowrap;
+}
+
+/* ══════════════════════════════════════════
+   PAGE: GAMES
+══════════════════════════════════════════ */
+.games-top {
+  padding:24px 20px 20px;
+  background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(201,168,76,.06) 0%,transparent 65%);
+}
+.games-tab-row {
+  display:flex; gap:8px; padding:0 20px 16px; overflow-x:auto;
+}
+.games-tab-row::-webkit-scrollbar { display:none; }
+.g-tab {
+  flex-shrink:0; padding:7px 18px; border-radius:20px;
+  font-family:var(--font-b); font-size:.78rem; font-weight:700;
+  border:1.5px solid var(--border); background:none; color:var(--muted);
+  cursor:pointer; transition:all .18s; display:flex; align-items:center; gap:6px;
+  white-space:nowrap;
+}
+.g-tab.active { background:var(--gold); color:#1A0E00; border-color:var(--gold); }
+
+/* Game card */
+.g-card {
+  margin:0 20px 14px;
+  border:1px solid var(--border); border-radius:var(--r-lg);
+  background:linear-gradient(145deg,rgba(201,168,76,.06),rgba(0,0,0,.35));
+  overflow:hidden; cursor:pointer; transition:border-color .2s, transform .2s;
+}
+.g-card:hover { border-color:var(--border-hi); transform:translateY(-2px); }
+.g-card-inner { padding:20px; display:flex; align-items:center; gap:14px; }
+.g-card-icon {
+  width:56px; height:56px; border-radius:16px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:26px;
+  box-shadow:0 6px 18px rgba(0,0,0,.4);
+}
+.g-icon-red    { background:linear-gradient(135deg,#6B0000,#C62828); }
+.g-icon-purple { background:linear-gradient(135deg,#2D0060,#7B1FA2); }
+.g-icon-gold   { background:linear-gradient(135deg,#5A3000,var(--gold-d)); }
+.g-card-title  { font-size:1rem; font-weight:700; margin-bottom:3px; }
+.g-card-desc   { font-size:.75rem; color:var(--muted); line-height:1.45; }
+.g-card-arrow  { color:rgba(201,168,76,.35); font-size:16px; margin-left:auto; transition:transform .2s,color .2s; }
+.g-card:hover .g-card-arrow { transform:translateX(4px); color:var(--gold); }
+
+/* Inline game panel */
+.g-panel {
+  display:none;
+  margin:0 20px 16px;
+  border:1px solid var(--border-hi); border-radius:var(--r-lg);
+  background:rgba(0,0,0,.3); overflow:hidden;
+}
+.g-panel.open { display:block; animation:pgIn .3s var(--ease-out); }
+.g-panel-header {
+  padding:14px 18px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.g-panel-title { font-weight:700; font-size:.95rem; display:flex; align-items:center; gap:7px; }
+.g-panel-close {
+  background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer;
+  line-height:1; padding:2px; transition:color .2s;
+}
+.g-panel-close:hover { color:var(--text); }
+
+/* ─── SCRATCH CARD ─── */
+.scratch-body { padding:20px; }
+.scratch-stage {
+  position:relative; border-radius:14px; overflow:hidden;
+  user-select:none; -webkit-user-select:none; touch-action:none;
+  cursor:crosshair; box-shadow:0 8px 24px rgba(0,0,0,.5);
+}
+.scratch-reveal {
+  position:absolute; inset:0; z-index:1;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  background:linear-gradient(145deg,#1A0E00,#110A00,#0D0600); gap:8px; padding:20px;
+  text-align:center;
+}
+.scratch-reveal-emoji { font-size:42px; animation:revealFloat 3s ease-in-out infinite; }
+@keyframes revealFloat { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-6px) scale(1.06)} }
+.scratch-reveal-name {
+  font-family:var(--font-d); font-size:1.25rem; font-weight:800;
+  background:linear-gradient(135deg,var(--gold-l),var(--gold),#FFA500);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  line-height:1.2;
+}
+.scratch-reveal-desc { font-size:.75rem; color:var(--muted); max-width:240px; line-height:1.5; }
+#scratchCanvas { position:relative; z-index:2; display:block; width:100%; border-radius:14px; touch-action:none; }
+
+.scratch-progress-wrap { margin-top:12px; }
+.s-prog-bar { height:5px; background:rgba(255,255,255,.06); border-radius:4px; overflow:hidden; }
+.s-prog-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--gold-d),var(--gold)); transition:width .1s; width:0%; }
+.s-prog-labels { display:flex; justify-content:space-between; margin-top:6px; }
+.s-hint { font-size:.7rem; color:var(--muted); display:flex; align-items:center; gap:4px; }
+.s-pct  { font-size:.7rem; font-weight:700; color:var(--gold); }
+.scratch-actions { display:flex; gap:8px; margin-top:14px; }
+.s-btn {
+  flex:1; padding:11px; border-radius:11px; border:none;
+  font-family:var(--font-b); font-size:.75rem; font-weight:700; cursor:pointer; transition:all .2s;
+}
+.s-reveal { background:rgba(201,168,76,.1); border:1px solid rgba(201,168,76,.2); color:var(--gold); }
+.s-reveal:hover { background:rgba(201,168,76,.2); }
+.s-used { background:rgba(255,255,255,.04); border:1px solid var(--border); color:var(--muted); cursor:not-allowed; font-size:.72rem; }
+
+/* ─── WHEEL ─── */
+.wheel-body { padding:20px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+.wheel-outer {
+  position:relative;
+  width:min(84vw,320px); height:min(84vw,320px);
+}
+.wheel-ring-deco {
+  position:absolute; inset:-14px; border-radius:50%;
+  border:1.5px solid transparent;
+  background:linear-gradient(var(--bg),var(--bg)) padding-box,
+             conic-gradient(from 0deg,var(--gold),#9B4DFF,var(--pink),var(--gold)) border-box;
+  animation:spinRing 7s linear infinite; opacity:.55;
+}
+.wheel-ring-deco2 {
+  position:absolute; inset:-7px; border-radius:50%;
+  border:1px solid transparent;
+  background:linear-gradient(var(--bg),var(--bg)) padding-box,
+             conic-gradient(from 180deg,var(--gold),transparent 40%,var(--gold)) border-box;
+  animation:spinRing 12s linear infinite reverse; opacity:.3;
+}
+@keyframes spinRing { to{transform:rotate(360deg)} }
+.wheel-canvas-frame {
+  width:100%; height:100%; border-radius:50%;
+  border:4px solid rgba(255,255,255,.06);
+  box-shadow:0 0 60px rgba(0,0,0,.8), inset 0 0 24px rgba(0,0,0,.4);
+  position:relative; z-index:2; overflow:hidden;
+}
+#vipWheelCanvas { display:block; width:100%; height:100%; border-radius:50%; }
+.wheel-pointer-el {
+  position:absolute; top:-18px; left:50%; transform:translateX(-50%);
+  z-index:20; filter:drop-shadow(0 4px 10px rgba(201,168,76,.6));
+  animation:pointerBob 2s ease-in-out infinite;
+}
+@keyframes pointerBob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-4px)} }
+#vipSpinBtn {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:80px; height:80px; border-radius:50%; z-index:20; cursor:pointer;
+  background:radial-gradient(circle at 35% 35%,var(--gold-l),var(--gold-d));
+  border:3px solid rgba(255,255,255,.88);
+  color:#1A0E00; font-family:var(--font-b); font-weight:900; font-size:.72rem;
+  letter-spacing:.5px; text-transform:uppercase;
+  box-shadow:0 0 0 6px rgba(201,168,76,.15), 0 10px 26px rgba(201,168,76,.4);
+  transition:all .22s var(--ease-b); -webkit-appearance:none;
+}
+#vipSpinBtn:not(:disabled):hover { transform:translate(-50%,-50%) scale(1.08); box-shadow:0 0 0 10px rgba(201,168,76,.2), 0 14px 36px rgba(201,168,76,.5); }
+#vipSpinBtn:active:not(:disabled) { transform:translate(-50%,-50%) scale(.93)!important; }
+#vipSpinBtn:disabled { background:#1A1020; border-color:rgba(255,255,255,.15); box-shadow:none; cursor:not-allowed; color:rgba(255,255,255,.3); }
+
+.spin-badges-row { display:flex; gap:10px; justify-content:center; }
+.spi-badge {
+  display:flex; flex-direction:column; align-items:center;
+  background:rgba(255,255,255,.03); border:1.5px solid var(--border);
+  border-radius:12px; padding:10px 18px;
+  font-size:.62rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px;
+  transition:all .25s; min-width:72px;
+}
+.spi-badge .spi-n { font-family:var(--font-d); font-size:1.4rem; font-weight:800; color:var(--muted); display:block; line-height:1.1; margin-bottom:2px; }
+.spi-badge.done { border-color:rgba(39,214,123,.3); color:var(--success); }
+.spi-badge.done .spi-n { color:var(--success); text-shadow:0 0 12px rgba(39,214,123,.4); }
+.spi-badge.curr { border-color:rgba(201,168,76,.4); color:var(--gold); }
+.spi-badge.curr .spi-n { color:var(--gold); text-shadow:0 0 12px rgba(201,168,76,.4); }
+
+/* ══════════════════════════════════════════
+   PAGE: STORE
+══════════════════════════════════════════ */
+.store-top {
+  padding:24px 20px 20px;
+  background:radial-gradient(ellipse 70% 40% at 50% -5%,rgba(201,168,76,.06) 0%,transparent 65%);
+}
+.store-notice {
+  margin:0 20px 16px; padding:14px 16px;
+  background:rgba(201,168,76,.06); border:1px solid rgba(201,168,76,.2); border-radius:12px;
+  display:flex; gap:10px;
+}
+.store-notice-txt { font-size:.78rem; color:rgba(201,168,76,.85); line-height:1.6; }
+.store-notice-txt b { color:var(--gold); }
+.free-used-bar {
+  margin:0 20px 14px; padding:12px 16px;
+  background:rgba(232,69,60,.08); border:1px solid rgba(232,69,60,.2);
+  border-radius:12px; font-size:.78rem; color:rgba(232,69,60,.9); text-align:center; display:none;
+}
+.free-used-bar.show { display:block; }
+
+.cat-row { display:flex; gap:7px; padding:0 20px 16px; overflow-x:auto; }
+.cat-row::-webkit-scrollbar { display:none; }
+.cat-chip {
+  flex-shrink:0; padding:6px 14px; border-radius:20px;
+  font-family:var(--font-b); font-size:.75rem; font-weight:700;
+  border:1.5px solid var(--border); background:none; color:var(--muted);
+  cursor:pointer; transition:all .18s; white-space:nowrap;
+}
+.cat-chip.active { background:var(--gold); color:#1A0E00; border-color:var(--gold); }
+
+.product-grid {
+  padding:0 20px; display:grid;
+  grid-template-columns:repeat(2,1fr); gap:14px; margin-bottom:24px;
+}
+.prod-card {
+  background:rgba(255,255,255,.03); border:1px solid var(--border);
+  border-radius:var(--r); overflow:hidden; cursor:pointer;
+  transition:transform .2s, border-color .2s;
+}
+.prod-card:hover { transform:translateY(-3px); border-color:var(--border-hi); }
+.prod-img-wrap { width:100%; aspect-ratio:1; position:relative; overflow:hidden; background:rgba(255,255,255,.04); }
+.prod-img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .4s; }
+.prod-card:hover .prod-img { transform:scale(1.05); }
+.prod-img-ph { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:44px; }
+.prod-vip-flag {
+  position:absolute; top:8px; left:8px;
+  background:linear-gradient(135deg,var(--gold-d),var(--gold));
+  color:#1A0E00; font-size:.58rem; font-weight:800; padding:2px 7px; border-radius:5px;
+  letter-spacing:.6px; text-transform:uppercase;
+}
+.prod-body { padding:12px; }
+.prod-cat  { font-size:.62rem; color:var(--muted); font-weight:700; letter-spacing:.6px; text-transform:uppercase; margin-bottom:4px; }
+.prod-name { font-size:.88rem; font-weight:700; line-height:1.3; margin-bottom:8px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.prod-foot { display:flex; align-items:center; justify-content:space-between; }
+.prod-price { font-family:var(--font-d); font-size:1.1rem; font-weight:700; background:linear-gradient(135deg,var(--gold-l),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.btn-pick {
+  background:linear-gradient(135deg,var(--gold-d),var(--gold)); color:#1A0E00;
+  border:none; border-radius:8px; padding:5px 11px;
+  font-size:.65rem; font-weight:800; cursor:pointer; transition:all .2s;
+  letter-spacing:.3px;
+}
+.btn-pick:hover { filter:brightness(1.1); }
+
+/* ══════════════════════════════════════════
+   PAGE: PROFILE
+══════════════════════════════════════════ */
+.profile-top {
+  padding:28px 20px 24px; text-align:center;
+  background:radial-gradient(ellipse 70% 50% at 50% -10%,rgba(201,168,76,.07) 0%,transparent 65%);
+}
+.profile-ava {
+  width:82px; height:82px; border-radius:24px; margin:0 auto 16px;
+  background:linear-gradient(135deg,var(--gold-d),var(--gold),var(--gold-l));
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-d); font-size:2.2rem; font-weight:800; color:#1A0E00;
+  box-shadow:0 8px 30px rgba(201,168,76,.32), 0 0 0 1px rgba(201,168,76,.12);
+}
+.profile-uname { font-family:var(--font-d); font-size:1.8rem; font-weight:800; color:var(--cream); margin-bottom:3px; }
+.profile-phone { font-size:.8rem; color:var(--muted); }
+
+.p-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:20px 20px 0; }
+.p-stat-box {
+  background:rgba(255,255,255,.03); border:1px solid var(--border);
+  border-radius:12px; padding:14px 8px; text-align:center;
+}
+.p-stat-val { font-family:var(--font-d); font-size:1.55rem; font-weight:800; background:linear-gradient(135deg,var(--gold-l),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; display:block; margin-bottom:3px; }
+.p-stat-lbl { font-size:.6rem; color:var(--muted); font-weight:700; letter-spacing:.5px; text-transform:uppercase; }
+
+.p-section-lbl { padding:20px 20px 10px; font-size:.65rem; font-weight:700; letter-spacing:1.8px; text-transform:uppercase; color:var(--muted); }
+.p-menu { margin:0 20px 20px; background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; }
+.p-menu-item {
+  display:flex; align-items:center; gap:14px; padding:15px 18px;
+  border-bottom:1px solid rgba(255,255,255,.04); cursor:pointer; transition:background .18s;
+}
+.p-menu-item:last-child { border-bottom:none; }
+.p-menu-item:hover { background:rgba(201,168,76,.04); }
+.pmi-ico { width:38px; height:38px; border-radius:10px; background:rgba(201,168,76,.07); display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; }
+.pmi-lbl { font-size:.88rem; font-weight:600; }
+.pmi-sub { font-size:.7rem; color:var(--muted); margin-top:1px; }
+.pmi-chev { color:rgba(201,168,76,.3); font-size:13px; margin-left:auto; }
+
+.logout-btn {
+  margin:0 20px 36px; width:calc(100% - 40px); padding:13px;
+  border-radius:12px; border:1px solid rgba(232,69,60,.25);
+  background:rgba(232,69,60,.06); color:var(--danger);
+  font-family:var(--font-b); font-size:.85rem; font-weight:700;
+  cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.logout-btn:hover { background:rgba(232,69,60,.13); }
+
+/* ══════════════════════════════════════════
+   MODALS
+══════════════════════════════════════════ */
+.modal-bg {
+  position:fixed; inset:0; z-index:800;
+  background:rgba(0,0,0,.75); backdrop-filter:blur(12px);
+  display:none; align-items:flex-end; justify-content:center;
+  padding:0; opacity:0; transition:opacity .3s;
+}
+.modal-bg.open { display:flex; opacity:1; }
+
+.bottom-sheet {
+  background:linear-gradient(180deg,#130B00,#0A0700);
+  border:1px solid rgba(201,168,76,.3); border-bottom:none;
+  border-radius:26px 26px 0 0;
+  width:100%; max-width:480px;
+  max-height:90dvh; overflow-y:auto;
+  padding-bottom:max(var(--safe-b),20px);
+  transform:translateY(100%); transition:transform .42s var(--ease-out);
+}
+.modal-bg.open .bottom-sheet { transform:translateY(0); }
+.bottom-sheet-handle { width:40px; height:4px; background:rgba(255,255,255,.12); border-radius:2px; margin:14px auto 0; }
+.bottom-sheet-hdr { padding:18px 22px 0; display:flex; align-items:center; justify-content:space-between; }
+.bottom-sheet-title { font-family:var(--font-d); font-size:1.5rem; font-weight:700; background:linear-gradient(135deg,var(--gold-l),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.sheet-close-btn { background:none; border:none; color:var(--muted); font-size:22px; cursor:pointer; padding:2px; transition:color .2s; }
+.sheet-close-btn:hover { color:var(--text); }
+.bottom-sheet-body { padding:20px 22px 24px; }
+
+.modal-hint {
+  background:rgba(201,168,76,.07); border:1px solid rgba(201,168,76,.18);
+  border-radius:10px; padding:12px 14px;
+  font-size:.78rem; color:rgba(201,168,76,.85); line-height:1.6; margin-bottom:16px;
+}
+.modal-hint b { color:var(--gold); }
+
+.preset-row { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+.preset-btn {
+  flex:1; min-width:58px; padding:10px 8px; border-radius:10px;
+  border:1.5px solid var(--border); background:rgba(255,255,255,.03);
+  font-family:var(--font-b); font-size:.82rem; font-weight:700; color:var(--muted);
+  cursor:pointer; transition:all .18s; text-align:center;
+}
+.preset-btn.sel { background:rgba(201,168,76,.15); border-color:var(--gold); color:var(--gold); }
+
+.amount-row { position:relative; margin-bottom:14px; }
+.amount-row input {
+  width:100%; padding:14px 50px 14px 18px;
+  background:rgba(255,255,255,.04); border:1.5px solid rgba(201,168,76,.2);
+  border-radius:12px; color:var(--text); font-family:var(--font-d);
+  font-size:1.6rem; font-weight:700; text-align:center; outline:none; transition:all .2s;
+}
+.amount-row input:focus { border-color:var(--gold); background:rgba(255,255,255,.07); }
+.amount-azn { position:absolute; right:16px; top:50%; transform:translateY(-50%); color:var(--gold); font-weight:700; font-size:.9rem; }
+
+/* Product modal */
+.pm-img { width:100%; border-radius:14px; display:block; margin-bottom:16px; max-height:240px; object-fit:cover; }
+.pm-ph { font-size:70px; text-align:center; margin-bottom:14px; }
+.pm-name { font-family:var(--font-d); font-size:1.5rem; font-weight:800; color:var(--cream); margin-bottom:5px; }
+.pm-desc { font-size:.82rem; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+.pm-price { font-family:var(--font-d); font-size:2.2rem; font-weight:800; background:linear-gradient(135deg,var(--gold-l),var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:14px; display:block; }
+.pm-free { font-size:.7rem; font-family:var(--font-b); font-weight:700; color:var(--success); vertical-align:super; margin-left:6px; }
+
+/* WIN MODAL */
+.win-overlay {
+  position:fixed; inset:0; z-index:2000;
+  background:rgba(0,0,0,.88); backdrop-filter:blur(18px);
+  display:none; align-items:center; justify-content:center; padding:20px;
+  opacity:0; transition:opacity .4s;
+}
+.win-overlay.open { display:flex; opacity:1; }
+.win-box {
+  background:linear-gradient(145deg,#1A1400,#110B00,#060410);
+  border:1px solid rgba(201,168,76,.45); border-radius:var(--r-lg);
+  padding:32px 24px 28px; max-width:380px; width:100%;
+  text-align:center; position:relative; overflow:hidden;
+  box-shadow:0 0 60px rgba(201,168,76,.08), 0 30px 80px rgba(0,0,0,.7);
+  transform:scale(.85) translateY(30px); transition:transform .4s var(--ease-b);
+}
+.win-overlay.open .win-box { transform:scale(1) translateY(0); }
+.win-box::before { content:''; position:absolute; top:0; left:5%; right:5%; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); }
+.win-emoji-big { font-size:58px; display:block; margin-bottom:8px; animation:winPop .7s var(--ease-b) forwards; transform:scale(0); }
+@keyframes winPop { to{transform:scale(1) rotate(5deg)} }
+.win-congrats { font-size:.72rem; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; color:var(--gold); margin-bottom:8px; }
+.win-prize { font-family:var(--font-d); font-size:1.55rem; font-weight:800; background:linear-gradient(135deg,var(--cream) 20%,var(--gold-l) 60%,var(--gold)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1.2; margin-bottom:8px; }
+.win-detail { font-size:.8rem; color:var(--muted); line-height:1.65; margin-bottom:18px; }
+.win-hr { height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:14px 0; }
+.win-cashback-note { background:rgba(201,168,76,.07); border:1px solid rgba(201,168,76,.15); border-radius:10px; padding:10px 13px; font-size:.75rem; color:rgba(201,168,76,.85); line-height:1.55; margin-bottom:16px; text-align:left; }
+.win-actions { display:flex; flex-direction:column; gap:8px; }
+.win-wa-btn { padding:13px; border:none; border-radius:12px; background:linear-gradient(135deg,#128C7E,#25D366); color:#fff; font-family:var(--font-b); font-size:.9rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; transition:all .2s; }
+.win-wa-btn:hover { filter:brightness(1.08); }
+.win-close-btn { padding:11px; border:1.5px solid var(--border); border-radius:12px; background:none; color:var(--muted); font-family:var(--font-b); font-size:.82rem; font-weight:700; cursor:pointer; transition:all .2s; }
+.win-close-btn:hover { border-color:var(--border-hi); color:var(--text); }
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+#toastWrap {
+  position:fixed; bottom:calc(var(--nav-h) + 14px + var(--safe-b));
+  left:50%; transform:translateX(-50%); z-index:5000;
+  display:flex; flex-direction:column; gap:8px; align-items:center; pointer-events:none;
+}
+.toast {
+  background:rgba(10,7,24,.96); border:1px solid var(--border);
+  border-radius:30px; padding:10px 20px;
+  font-size:.82rem; font-weight:500; color:var(--text);
+  display:flex; align-items:center; gap:7px;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);
+  animation:toastIn .3s var(--ease-b); white-space:nowrap;
+}
+.toast.ok  { border-color:rgba(39,214,123,.3); color:var(--success); }
+.toast.err { border-color:rgba(232,69,60,.3);  color:var(--danger); }
+@keyframes toastIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* Confetti */
+#cCanvas { position:fixed; inset:0; z-index:1999; pointer-events:none; width:100%; height:100%; }
+</style>
+</head>
+<body>
+<div class="ambient"></div>
+<canvas id="cCanvas"></canvas>
+<div id="toastWrap"></div>
+
+<!-- ═══════ LOGIN OVERLAY ═══════ -->
+<div id="loginOverlay" onclick="if(event.target===this)closeLogin()">
+  <div class="login-sheet">
+    <div class="sheet-handle"></div>
+    <div class="login-sheet-body">
+      <div class="login-sheet-icon">🪄</div>
+      <div class="login-sheet-title">VIP Girişi</div>
+      <div class="login-sheet-sub">Hədiyyə Sehrbazı — Eksklüziv Portal</div>
+      <div class="input-field-wrap">
+        <i class="fa-solid fa-phone" style="position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--gold);font-size:15px;pointer-events:none"></i>
+        <input type="tel" id="phoneInput" placeholder="501234567" autocomplete="tel"
+          style="width:100%;padding:14px 16px 14px 44px;background:rgba(255,255,255,.04);border:1.5px solid rgba(201,168,76,.2);border-radius:12px;color:var(--text);font-family:var(--font-b);font-size:1rem;font-weight:500;transition:all .25s;outline:none;">
+      </div>
+      <div class="login-error" id="loginErr" style="font-size:.75rem;color:var(--danger);margin:-6px 0 10px 4px;display:none"></div>
+      <button class="btn-primary" id="loginSubmitBtn" onclick="doLogin()" style="margin-bottom:0">
+        <span id="loginBtnTxt">
+          <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>
+          VIP Giriş Et
+        </span>
+      </button>
+      <div class="login-note">
+        VIP üzv deyilsiniz?
+        <a href="https://wa.me/994707260429?text=VIP+kluba+qoşulmaq+istəyirəm" target="_blank">WhatsApp ilə müraciət edin →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ APP HEADER ═══════ -->
+<header class="app-header">
+  <div class="hdr-brand" onclick="goHome()">
+    <div class="hdr-gem">🪄</div>
+    <div>
+      <div class="hdr-name">Hədiyyə Sehrbazı</div>
+      <div class="hdr-sub">VIP Portal</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-balance-pill" id="hdrBalPill" style="display:none" onclick="openCashbackModal()">
+      <div class="live-dot"></div>
+      <span id="hdrBalAmt">0.00 ₼</span>
+    </div>
+    <button class="hdr-login-btn" id="hdrLoginBtn" onclick="openLogin()">
+      <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      Giriş
+    </button>
+    <button class="hdr-login-btn" id="hdrLogoutBtn" style="display:none;background:rgba(232,69,60,.15);color:var(--danger);border:1px solid rgba(232,69,60,.25);box-shadow:none" onclick="doLogout()">Çıxış</button>
+  </div>
+</header>
+
+<!-- ═══════ PAGES ═══════ -->
+<div id="appPages">
+
+<!-- ─── LANDING PAGE ─── -->
+<div id="pageLanding" class="page active">
+  <div class="scroll-area">
+    <div class="landing-hero">
+      <div class="vip-crown-badge"><span class="crown-spin">👑</span> VIP Eksklüziv Üzvlük</div>
+      <h1 class="hero-headline">
+        Hədiyyə Ver,<br>
+        <span class="line-gold">Sehrli Şəkildə</span>
+      </h1>
+      <p class="hero-sub">Hədiyyə sehrbazının VIP klubuna qoşulun — pulsuz hədiyyələr, kəşbek balansı, şans oyunları və çox daha artığı sizi gözləyir.</p>
+      <div class="hero-cta-row">
+        <button class="btn-hero-primary" onclick="openLogin()">
+          👑 VIP Girişi
+        </button>
+        <a class="btn-hero-outline" href="https://wa.me/994707260429?text=VIP+kluba+qoşulmaq+istəyirəm" target="_blank">
+          🤝 Qoşul
+        </a>
+      </div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="stat-block">
+        <span class="stat-num">100+</span>
+        <span class="stat-txt">Aktiv VIP</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-num">10%</span>
+        <span class="stat-txt">Kəşbek</span>
+      </div>
+      <div class="stat-block">
+        <span class="stat-num">2 Ay</span>
+        <span class="stat-txt">Pulsuz</span>
+      </div>
+    </div>
+
+    <!-- Benefits -->
+    <div class="benefits-section" style="padding-top:28px">
+      <div style="padding:0 0 18px">
+        <div class="section-label" style="margin-bottom:8px">VIP Üstünlüklər</div>
+        <div class="section-heading">Niyə VIP?</div>
+      </div>
+      <div class="benefit-item" style="animation-delay:.05s">
+        <div class="bi-icon">🎁</div>
+        <div class="bi-content">
+          <div class="bi-title">Aylıq Pulsuz Aksesuar</div>
+          <div class="bi-desc">Hər ay xüsusi seçilmiş hədiyyəlik aksesuar tamamilə pulsuz çatdırılır. VIP mağazamızdan istədiyiniz məhsulu seçin.</div>
+        </div>
+        <div class="bi-badge">Hər ay</div>
+      </div>
+      <div class="benefit-item" style="animation-delay:.1s">
+        <div class="bi-icon">💰</div>
+        <div class="bi-content">
+          <div class="bi-title">10% Kəşbek Balansı</div>
+          <div class="bi-desc">Hər alış-verişdən sonra məbləğin 10%-i avtomatik balansınıza qayıdır. Növbəti sifarişdə hər sifarişdə maks. 8 ₼ istifadə edin.</div>
+        </div>
+        <div class="bi-badge">Avtomatik</div>
+      </div>
+      <div class="benefit-item" style="animation-delay:.15s">
+        <div class="bi-icon">⭐</div>
+        <div class="bi-content">
+          <div class="bi-title">Gizli VIP Mağaza</div>
+          <div class="bi-desc">Yalnız VIP üzvlərə açıq eksklüziv kataloq. 50 ₼ və üzəri sifarişdə bu kataloqdan 1 məhsul tamamilə pulsuz əlavə olunur.</div>
+        </div>
+        <div class="bi-badge">Eksklüziv</div>
+      </div>
+      <div class="benefit-item" style="animation-delay:.2s">
+        <div class="bi-icon">🎊</div>
+        <div class="bi-content">
+          <div class="bi-title">Xoşgəldin Hədiyyəsi</div>
+          <div class="bi-desc">VIP qeydiyyatdan sonra ilk sifarişinizə 15% endirim + pulsuz çatdırılma əldə edirsiniz.</div>
+        </div>
+        <div class="bi-badge">Bir dəfə</div>
+      </div>
+      <div class="benefit-item" style="animation-delay:.25s">
+        <div class="bi-icon">🎟️</div>
+        <div class="bi-content">
+          <div class="bi-title">Poz-Qazan & Şans Çarxı</div>
+          <div class="bi-desc">Hər gün sehrli bilet pozun, şans çarxını fırladın — kəşbek balansı və premium hədiyyələr qazanın.</div>
+        </div>
+        <div class="bi-badge">Gündəlik</div>
+      </div>
+      <div class="benefit-item" style="animation-delay:.3s">
+        <div class="bi-icon">📦</div>
+        <div class="bi-content">
+          <div class="bi-title">Premium Qablaşdırma</div>
+          <div class="bi-desc">Hər sifarişdə pulsuz premium qablaşdırma + xüsusi əl yazısı ilə doldurulmuş təbrik kartı.</div>
+        </div>
+        <div class="bi-badge">Həmişə</div>
+      </div>
+      <div class="benefit-item" style="animation-delay:.35s">
+        <div class="bi-icon">🎂</div>
+        <div class="bi-content">
+          <div class="bi-title">Ad Günü Sürprizi</div>
+          <div class="bi-desc">Ad gününüzdə xüsusi endirim kodu və sürpriz hədiyyə. Sevdiklərinizin günlərini bildirin — xatırlatma alın.</div>
+        </div>
+        <div class="bi-badge">İllik</div>
+      </div>
+      <div class="benefit-item" style="animation-delay:.4s">
+        <div class="bi-icon">🏆</div>
+        <div class="bi-content">
+          <div class="bi-title">VIP Hədiyyə Çəkilişləri</div>
+          <div class="bi-desc">Yalnız VIP üzvlərə açıq qapalı çəkilişlər. Hər ay premium hədiyyələr mükafat kimi verilir.</div>
+        </div>
+        <div class="bi-badge">Aylıq</div>
+      </div>
+      <div class="benefit-item" style="animation-delay:.45s">
+        <div class="bi-icon">⚡</div>
+        <div class="bi-content">
+          <div class="bi-title">Prioritet WhatsApp Dəstəyi</div>
+          <div class="bi-desc">VIP üzvlərin sualları və sifarişləri adi müştərilərdən çox daha sürətli cavablandırılır.</div>
+        </div>
+        <div class="bi-badge">7/24</div>
+      </div>
+    </div>
+
+    <!-- Pricing -->
+    <div class="pricing-card">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">VIP Üzvlük Qiyməti</div>
+      <div class="price-free-note">🎉 İlk 2 ay tamamilə pulsuz!</div>
+      <div class="price-main"><sup>5</sup> ₼<sub>/ay</sub></div>
+      <div class="price-note">2 aylıq pulsuz sınaqdan sonra aylıq 5 ₼</div>
+      <button class="btn-primary" onclick="window.open('https://wa.me/994707260429?text=VIP+kluba+qoşulmaq+istəyirəm','_blank')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        İndi Qoşul — WhatsApp
+      </button>
+    </div>
+
+    <div style="height:32px"></div>
+  </div>
+</div>
+
+<!-- ─── HOME PAGE (logged in) ─── -->
+<div id="pageHome" class="page">
+  <div class="scroll-area">
+    <div class="user-hero">
+      <div class="welcome-line">Xoş Gəlmisiniz</div>
+      <div class="user-name-display" id="uiName">VIP Üzv</div>
+      <div class="plan-chip">👑 <span id="uiPlan">VIP Premium</span></div>
+    </div>
+
+    <div class="balance-card">
+      <div class="balance-card-label">Kəşbek Balansı</div>
+      <div class="balance-card-amt"><span id="uiBalance">0.00</span> <span style="font-size:1.4rem;opacity:.7">₼</span></div>
+      <div class="balance-card-note">Hər sifarişdə maks. 8 ₼ istifadə edilə bilər</div>
+      <div class="balance-actions">
+        <button class="ba-btn ba-use" onclick="openCashbackModal()">
+          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Kəşbek İstifadə Et
+        </button>
+        <a class="ba-btn ba-wa" href="#" id="baWaLink" target="_blank" style="text-decoration:none">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Sifariş Ver
+        </a>
+      </div>
+    </div>
+
+    <div class="quick-row">
+      <div class="quick-item" onclick="switchPage('games');openGame('scratch')">
+        <div class="quick-item-icon">🎟️</div>
+        <div class="quick-item-label">Poz-Qazan</div>
+      </div>
+      <div class="quick-item" onclick="switchPage('games');openGame('wheel')">
+        <div class="quick-item-icon">🎡</div>
+        <div class="quick-item-label">Şans Çarxı</div>
+      </div>
+      <div class="quick-item" onclick="switchPage('store')">
+        <div class="quick-item-icon">🎁</div>
+        <div class="quick-item-label">Mağaza</div>
+      </div>
+      <div class="quick-item" onclick="window.open('https://wa.me/994707260429','_blank')">
+        <div class="quick-item-icon">💬</div>
+        <div class="quick-item-label">Dəstək</div>
+      </div>
+    </div>
+
+    <div class="membership-strip">
+      <div class="ms-icon">👑</div>
+      <div>
+        <div class="ms-plan" id="uiMsPlan">VIP Premium</div>
+        <div class="ms-since">Qeydiyyat: <span id="uiMsSince">—</span></div>
+      </div>
+      <div class="ms-status" id="uiMsStatus">Aktiv</div>
+    </div>
+
+    <div style="padding:0 20px 14px">
+      <div class="section-label" style="margin-bottom:14px">VIP Üstünlükləriniz</div>
+    </div>
+    <div class="home-benefits">
+      <div class="hb-item"><div class="hb-icon">🎁</div><div class="hb-text"><div class="hb-title">Aylıq Pulsuz Aksesuar</div><div class="hb-desc">VIP Mağazadan 1 məhsul tamamilə pulsuz</div></div><div class="hb-pill">Hər ay</div></div>
+      <div class="hb-item"><div class="hb-icon">💰</div><div class="hb-text"><div class="hb-title">10% Kəşbek</div><div class="hb-desc">Hər alışdan sonra balansınıza 10% qayıdır</div></div><div class="hb-pill">Avtomatik</div></div>
+      <div class="hb-item"><div class="hb-icon">⭐</div><div class="hb-text"><div class="hb-title">Gizli VIP Mağaza</div><div class="hb-desc">50 ₼+ sifarişdə bu kataloqdan 1 məhsul pulsuz</div></div><div class="hb-pill">Eksklüziv</div></div>
+      <div class="hb-item"><div class="hb-icon">📦</div><div class="hb-text"><div class="hb-title">Premium Qablaşdırma</div><div class="hb-desc">Hər sifarişdə pulsuz premium qablaşdırma + kart</div></div><div class="hb-pill">Həmişə</div></div>
+      <div class="hb-item"><div class="hb-icon">🎂</div><div class="hb-text"><div class="hb-title">Ad Günü Sürprizi</div><div class="hb-desc">Xüsusi endirim kodu + sürpriz hədiyyə</div></div><div class="hb-pill">İllik</div></div>
+      <div class="hb-item"><div class="hb-icon">🏆</div><div class="hb-text"><div class="hb-title">VIP Çəkilişlər</div><div class="hb-desc">Yalnız VIP üzvlər üçün aylıq çəkilişlər</div></div><div class="hb-pill">Aylıq</div></div>
+      <div class="hb-item"><div class="hb-icon">⚡</div><div class="hb-text"><div class="hb-title">Prioritet Dəstək</div><div class="hb-desc">Suallarınız ən sürətli şəkildə cavablandırılır</div></div><div class="hb-pill">7/24</div></div>
+    </div>
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+<!-- ─── GAMES PAGE ─── -->
+<div id="pageGames" class="page">
+  <div class="scroll-area">
+    <div class="games-top">
+      <div class="section-label" style="margin-bottom:6px">Hər gün yeni şans</div>
+      <div class="section-heading">Oyunlar & Şans</div>
+    </div>
+
+    <div class="games-tab-row">
+      <button class="g-tab active" onclick="gameTabSwitch('all',this)">🎮 Hamısı</button>
+      <button class="g-tab" onclick="gameTabSwitch('scratch',this)">🎟️ Poz-Qazan</button>
+      <button class="g-tab" onclick="gameTabSwitch('wheel',this)">🎡 Şans Çarxı</button>
+      <button class="g-tab" onclick="gameTabSwitch('partner',this)">🤝 Əməkdaşlıq</button>
+    </div>
+
+    <!-- POZ-QAZAN card -->
+    <div class="g-card" id="gCardScratch" onclick="openGame('scratch')">
+      <div class="g-card-inner">
+        <div class="g-card-icon g-icon-red">🎟️</div>
+        <div>
+          <div class="g-card-title">Poz & Qazan</div>
+          <div class="g-card-desc">Sehrli bileti poz, gizli hədiyyəni aç! Hər gün 1 cəhd. 10 fərqli mükafat sizi gözləyir.</div>
+        </div>
+        <svg class="g-card-arrow" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </div>
+    </div>
+    <!-- Inline Scratch -->
+    <div class="g-panel" id="panelScratch">
+      <div class="g-panel-header">
+        <div class="g-panel-title">🎟️ Sehrli Bilet <div class="tag-gold" style="font-size:.6rem;padding:2px 8px">CANLI</div></div>
+        <button class="g-panel-close" onclick="closeGame('scratch')">✕</button>
+      </div>
+      <div class="scratch-body">
+        <div class="scratch-stage" id="scratchStage">
+          <div class="scratch-reveal" id="scratchReveal">
+            <div class="scratch-reveal-emoji" id="sEmoji">🎁</div>
+            <div class="scratch-reveal-name" id="sName">Yüklənir...</div>
+            <div class="scratch-reveal-desc" id="sDesc"></div>
+          </div>
+          <canvas id="scratchCanvas"></canvas>
+        </div>
+        <div class="scratch-progress-wrap">
+          <div class="s-prog-bar"><div class="s-prog-fill" id="sProgFill"></div></div>
+          <div class="s-prog-labels">
+            <div class="s-hint">✏️ Hədiyyəni açmaq üçün 50%-ni qazıyın</div>
+            <div class="s-pct" id="sProgPct">0%</div>
+          </div>
+        </div>
+        <div class="scratch-actions">
+          <button class="s-btn s-reveal" id="sBtnReveal" onclick="autoReveal()">Hamısını Aç ↗</button>
+          <div id="sBtnUsed" class="s-btn s-used" style="display:none">✓ Bu gün istifadə edildi</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ŞANS ÇARXI card -->
+    <div class="g-card" id="gCardWheel" onclick="openGame('wheel')">
+      <div class="g-card-inner">
+        <div class="g-card-icon g-icon-purple">🎡</div>
+        <div>
+          <div class="g-card-title">Şans Çarxı</div>
+          <div class="g-card-desc">Çarxı fırlat, premium hədiyyə və kəşbek qazan! Gündə 3 şansın var.</div>
+        </div>
+        <svg class="g-card-arrow" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </div>
+    </div>
+    <!-- Inline Wheel -->
+    <div class="g-panel" id="panelWheel">
+      <div class="g-panel-header">
+        <div class="g-panel-title">🎡 Şans Çarxı <div class="tag-gold" style="font-size:.6rem;padding:2px 8px">3 ŞANS/GÜN</div></div>
+        <button class="g-panel-close" onclick="closeGame('wheel')">✕</button>
+      </div>
+      <div class="wheel-body">
+        <div class="wheel-outer">
+          <div class="wheel-ring-deco"></div>
+          <div class="wheel-ring-deco2"></div>
+          <div class="wheel-pointer-el">
+            <svg width="44" height="50" viewBox="0 0 44 50" fill="none">
+              <path d="M22 50L3 18C.5 13 4 0 22 0C40 0 43.5 13 41 18L22 50Z" fill="var(--gold)"/>
+              <path d="M22 44L5 17C3 12.5 6.5 2 22 2C37.5 2 41 12.5 39 17L22 44Z" fill="var(--gold-l)" opacity=".5"/>
+              <circle cx="22" cy="12" r="5" fill="rgba(255,255,255,.75)"/>
+            </svg>
+          </div>
+          <div class="wheel-canvas-frame">
+            <canvas id="vipWheelCanvas" width="320" height="320"></canvas>
+            <button id="vipSpinBtn" disabled>ÇEVİR</button>
+          </div>
+        </div>
+        <div class="spin-badges-row">
+          <div class="spi-badge" id="sb1"><span class="spi-n">1</span>Şans</div>
+          <div class="spi-badge" id="sb2"><span class="spi-n">2</span>Şans</div>
+          <div class="spi-badge" id="sb3"><span class="spi-n">3</span>Şans</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Əməkdaşlıq card -->
+    <div class="g-card" id="gCardPartner" onclick="window.open('https://wa.me/994707260429?text=Əməkdaşlıq+proqramı+haqqında+məlumat+almaq+istəyirəm','_blank')">
+      <div class="g-card-inner">
+        <div class="g-card-icon g-icon-gold">🤝</div>
+        <div>
+          <div class="g-card-title">Əməkdaşlıq Proqramı</div>
+          <div class="g-card-desc">Brendimo ilə əməkdaşlıq edin, rəqəmsal satışdan əlavə gəlir qazanın. Remote iş imkanı.</div>
+        </div>
+        <svg class="g-card-arrow" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </div>
+    </div>
+
+    <div style="height:16px"></div>
+  </div>
+</div>
+
+<!-- ─── STORE PAGE ─── -->
+<div id="pageStore" class="page">
+  <div class="scroll-area">
+    <div class="store-top">
+      <div class="section-label" style="margin-bottom:6px">Aylıq Pulsuz</div>
+      <div class="section-heading">VIP Mağaza</div>
+    </div>
+    <div class="store-notice">
+      <div style="font-size:18px;flex-shrink:0;margin-top:1px">👑</div>
+      <div class="store-notice-txt">
+        <b>Aylıq Pulsuz Hədiyyə:</b> Aşağıdakı məhsullardan birini seçin.
+        <b>50 ₼+ sifarişinizlə</b> birlikdə seçdiyiniz məhsul tamamilə pulsuz çatdırılır.
+        WhatsApp ilə müraciət edin.
+      </div>
+    </div>
+    <div class="free-used-bar" id="freeUsedBar">⏰ Bu ay pulsuz hədiyyə hüququnuzu artıq istifadə etmisiniz. Növbəti ay yeniləcək.</div>
+    <div class="cat-row" id="catRow">
+      <button class="cat-chip active" onclick="filterCat('all',this)">Hamısı</button>
+    </div>
+    <div class="product-grid" id="productGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
+        <svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24" style="animation:spin .8s linear infinite;display:block;margin:0 auto 10px"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+        Məhsullar yüklənir...
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── PROFILE PAGE ─── -->
+<div id="pageProfile" class="page">
+  <div class="scroll-area">
+    <div class="profile-top">
+      <div class="profile-ava" id="profAva">?</div>
+      <div class="profile-uname" id="profName">VIP Üzv</div>
+      <div class="profile-phone" id="profPhone"></div>
+    </div>
+    <div class="p-stats">
+      <div class="p-stat-box"><span class="p-stat-val" id="pBalVal">0.00</span><div class="p-stat-lbl">Balans ₼</div></div>
+      <div class="p-stat-box"><span class="p-stat-val" id="pPlanVal">VIP</span><div class="p-stat-lbl">Plan</div></div>
+      <div class="p-stat-box"><span class="p-stat-val" id="pSpinsVal">0</span><div class="p-stat-lbl">Fırlanma</div></div>
+    </div>
+    <div class="p-section-lbl">Hesabım</div>
+    <div class="p-menu">
+      <div class="p-menu-item" onclick="openCashbackModal()">
+        <div class="pmi-ico">💳</div>
+        <div><div class="pmi-lbl">Kəşbek İstifadə Et</div><div class="pmi-sub">Balansınızdan sifarişdə endirim</div></div>
+        <svg class="pmi-chev" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </div>
+      <div class="p-menu-item" onclick="switchPage('store')">
+        <div class="pmi-ico">🎁</div>
+        <div><div class="pmi-lbl">VIP Mağaza</div><div class="pmi-sub">Pulsuz aylıq hədiyyənizi seçin</div></div>
+        <svg class="pmi-chev" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </div>
+      <div class="p-menu-item" onclick="switchPage('games')">
+        <div class="pmi-ico">🎡</div>
+        <div><div class="pmi-lbl">Oyunlar</div><div class="pmi-sub">Poz-Qazan, Şans Çarxı</div></div>
+        <svg class="pmi-chev" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </div>
+      <div class="p-menu-item" onclick="window.open('https://sehrbaz.com','_blank')">
+        <div class="pmi-ico">🛍️</div>
+        <div><div class="pmi-lbl">Brendimo Kataloq</div><div class="pmi-sub">Bütün məhsullara bax</div></div>
+        <svg class="pmi-chev" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </div>
+      <div class="p-menu-item" onclick="window.open('https://wa.me/994707260429','_blank')">
+        <div class="pmi-ico">💬</div>
+        <div><div class="pmi-lbl">WhatsApp Dəstəyi</div><div class="pmi-sub">Prioritet müştəri xidməti</div></div>
+        <svg class="pmi-chev" width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">
+      <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+      Çıxış Et
+    </button>
+  </div>
+</div>
+
+</div><!-- end appPages -->
+
+<!-- ═══════ BOTTOM NAV ═══════ -->
+<nav class="bottom-nav">
+  <button class="nav-btn" id="navLanding" onclick="showLanding()" style="display:none">
+    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    Ana Səhifə
+  </button>
+  <button class="nav-btn active" id="navHome" onclick="switchPage('home')">
+    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    Ana Səhifə
+  </button>
+  <button class="nav-btn" id="navGames" onclick="switchPage('games')">
+    <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5S14.67 12 15.5 12s1.5.67 1.5 1.5S16.33 15 15.5 15zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5S19.33 12 18.5 12z"/></svg>
+    Oyunlar
+  </button>
+  <button class="nav-btn" id="navStore" onclick="switchPage('store')">
+    <svg viewBox="0 0 24 24"><path d="M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/></svg>
+    Mağaza
+  </button>
+  <button class="nav-btn" id="navProfile" onclick="switchPage('profile')">
+    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+    Hesabım
+  </button>
+</nav>
+
+<!-- ═══════ CASHBACK MODAL ═══════ -->
+<div class="modal-bg" id="cashbackModal" onclick="if(event.target===this)closeCashback()">
+  <div class="bottom-sheet">
+    <div class="bottom-sheet-handle"></div>
+    <div class="bottom-sheet-hdr">
+      <div class="bottom-sheet-title">💳 Kəşbek İstifadə Et</div>
+      <button class="sheet-close-btn" onclick="closeCashback()">✕</button>
+    </div>
+    <div class="bottom-sheet-body">
+      <div class="modal-hint">
+        💡 Kəşbek balansınızı sifarişdə endirim olaraq tətbiq edin. Hər sifarişdə maksimum
+        <b>8 ₼</b> silinə bilər. WhatsApp-dan sifariş verərkən istifadə etmək istədiyiniz məbləği bildirin.
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Mövcud Balans</div>
+        <div style="font-family:var(--font-d);font-size:2.8rem;font-weight:800;background:linear-gradient(135deg,var(--gold-l),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1"><span id="cbBalDisplay">0.00</span> ₼</div>
+      </div>
+      <div style="font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Məbləğ Seçin</div>
+      <div class="preset-row" id="presetRow"></div>
+      <div class="amount-row">
+        <input type="number" id="cbAmount" placeholder="0.00" min="0.5" step="0.5">
+        <span class="amount-azn">₼</span>
+      </div>
+      <a id="cbWaBtn" href="#" target="_blank" class="btn-wa" style="margin-top:4px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp ilə Sifarişdə Tətbiq Et
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PRODUCT MODAL ═══════ -->
+<div class="modal-bg" id="productModal" onclick="if(event.target===this)closeProdModal()">
+  <div class="bottom-sheet">
+    <div class="bottom-sheet-handle"></div>
+    <div class="bottom-sheet-hdr">
+      <div class="bottom-sheet-title">🎁 Pulsuz Hədiyyə Seç</div>
+      <button class="sheet-close-btn" onclick="closeProdModal()">✕</button>
+    </div>
+    <div class="bottom-sheet-body">
+      <img id="pmImg" class="pm-img" src="" alt="" style="display:none">
+      <div id="pmPh" class="pm-ph">🎁</div>
+      <div class="pm-name" id="pmName"></div>
+      <div class="pm-desc" id="pmDesc"></div>
+      <div class="pm-price" id="pmPrice">0.00 ₼<span class="pm-free">✓ VIP Üçün Pulsuz</span></div>
+      <div class="modal-hint" id="pmHint">
+        👑 Bu məhsulu <b>aylıq pulsuz hədiyyə</b> olaraq seçirsiniz.
+        50 ₼+ sifarişinizlə birlikdə tamamilə pulsuz çatdırılır.
+      </div>
+      <a id="pmWaBtn" href="#" target="_blank" class="btn-wa">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp ilə Bu Hədiyyəni Seç
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ WIN MODAL ═══════ -->
+<div class="win-overlay" id="winOverlay">
+  <div class="win-box">
+    <span class="win-emoji-big" id="winEmojiBig">🎉</span>
+    <div class="win-congrats">TƏBRİKLƏR!</div>
+    <div class="win-prize" id="winPrize"></div>
+    <div class="win-detail" id="winDetail"></div>
+    <div class="win-hr"></div>
+    <div class="win-cashback-note" id="winNote">Qazanılan bütün keşbeklər növbəti alış-verişlərinizdə hissə-hissə, hər sifarişdə maksimum 8 AZN silinməklə istifadə edilə bilər.</div>
+    <div class="win-actions">
+      <button class="win-wa-btn" id="winWaBtn" onclick="openWinWa()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp ilə Hədiyyəni Al
+      </button>
+      <button class="win-close-btn" onclick="closeWin()">Bağla</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+/* ════════════════════════════════════════════
+   CONFIG
+════════════════════════════════════════════ */
+const API = 'https://script.google.com/macros/s/AKfycbyqxusdk5LfAmDnVWXCe7KXfowpi0l99R4IqlZhheb2vpSzS-gNaCHsGvPMaId0sdbHiw/exec';
+const WA  = '994707260429';
+const MAX_CB = 8;
+
+/* ════════════════════════════════════════════
+   EXACT PRIZES — from sehrlibilet.html
+════════════════════════════════════════════ */
+const SCRATCH_PRIZES = [
+  { emoji:'💯', name:'Nə alsan, Məbləğin Tamamı Keşbek kimi qayıdır!',
+    desc:'Bu gün ödədiyiniz məbləğ tam 100% keşbek olaraq balansınıza oturur. Maks. 100 AZN.', amount:0 },
+  { emoji:'💳', name:'50 AZN-lik Qızıl Keşbek Kartı',
+    desc:'Balansınıza şərtsiz 50 AZN yüklənir. Növbəti sifarişlərinizdə istifadə edə bilərsiniz.', amount:50 },
+  { emoji:'🎁', name:'8 AZN Endirim + 10 AZN Keşbek',
+    desc:'60 AZN və üzəri alış-veriş etdikdə ümumi qiymətdən anında 8 AZN silinir və balansınıza əlavə 8 AZN keşbek qayıdır.', amount:8 },
+  { emoji:'🛍️', name:'100 AZN-lik məhsul seç, 80 AZN ödə!',
+    desc:'Səbətiniz 100 AZN-ə çatdıqda, biz dərhal 20 AZN endirim edirik.', amount:0 },
+  { emoji:'✨', name:'5 AZN Endirim + 15 AZN Keşbek',
+    desc:'40 AZN və üzəri sifarişlərdə dərhal 5 AZN az ödəyirsiniz, gələcək üçün 15 AZN qazanırsınız.', amount:5 },
+  { emoji:'🏆', name:'150 AZN-lik səbət topla, cəmi 120 AZN ödə!',
+    desc:'150 AZN-lik səbətə anında 40 AZN nağd endirim tətbiq edilir.', amount:0 },
+  { emoji:'🔥', name:'Ödənişin Yarısı (-50%) Keşbek Kimi Qayıdır!',
+    desc:'Bu gün etdiyiniz alış-verişin 50%-i dərhal keşbek balansınıza yüklənir.', amount:0 },
+  { emoji:'⭐', name:'15 AZN Endirim + 20 AZN Keşbek',
+    desc:'80 AZN və üzəri alış-verişlərdə böyük nağd endirim alır və balansınıza yüksək keşbek qazanırsınız.', amount:10 },
+  { emoji:'🎀', name:'2-ci məhsula 15 AZN Endirim + 10 AZN Keşbek',
+    desc:'Səbətinizdəki ikinci məhsul yarı qiymətinə düşür və balansınıza 10 AZN keşbek əlavə olunur.', amount:5 },
+  { emoji:'💰', name:'70 AZN ödəniş et, Anında 30 AZN Keşbek qazan!',
+    desc:'70 AZN və üzəri sifarişinizi tamamlayın, növbəti alış-verişlər üçün balansınızda dərhal 30 AZN yaransın.', amount:10 }
+];
+
+/* ════════════════════════════════════════════
+   EXACT WHEEL GIFTS — from vipaccount.html
+════════════════════════════════════════════ */
+const WHEEL_GIFTS = [
+  { id:'C1',  name:'Armani Portmone',      color:'#3B82F6', weight:1,
+    img:'https://github.com/Brendimo-co/sanscarxi/raw/main/5465259246539705479.jpg' },
+  { id:'C2',  name:'Tommy Portmone',       color:'#8B5CF6', weight:1,
+    img:'https://github.com/Brendimo-co/sanscarxi/raw/main/5465259246539705534.jpg' },
+  { id:'C3',  name:'Qolbaq',               color:'#6366F1', weight:1,
+    img:'https://github.com/Brendimo-co/sanscarxi/raw/main/5465259246539705480.jpg' },
+  { id:'C5',  name:'Boss Parfüm',          color:'#EC4899', weight:1,
+    img:'https://github.com/Brendimo-co/sanscarxi/raw/main/5465259246539705478.jpg' },
+  { id:'C6',  name:'Qadın Kaşelok',        color:'#10B981', weight:1,
+    img:'https://github.com/Brendimo-co/sanscarxi/raw/main/5465259246539705475.jpg' },
+  { id:'C7',  name:'Klassik Saat',         color:'#3B82F6', weight:1,
+    img:'https://github.com/Brendimo-co/sanscarxi/raw/main/5465259246539705477.jpg' },
+  { id:'C8',  name:'Cütlük Qolbaq',        color:'#8B5CF6', weight:1,
+    img:'https://github.com/Brendimo-co/sanscarxi/raw/main/5465259246539705476.jpg' },
+  { id:'C11', name:'Qulaqlıq',             color:'#6366F1', weight:1,
+    img:'https://github.com/Brendimo-co/sanscarxi/raw/main/5465259246539705487.jpg' },
+  { id:'C14', name:'Curren Kişi Saatı',    color:'#3B82F6', weight:1,
+    img:'https://github.com/Brendimo-co/sanscarxi/raw/main/5463046208805868119.jpg' },
+  { id:'C16', name:'Casio Qadın Saatı',    color:'#F59E0B', weight:1,
+    img:'https://github.com/Brendimo-co/sanscarxi/raw/main/5463046208805868120.jpg' },
+  { id:'C19', name:'Armani Saat',          color:'#10B981', weight:1,
+    img:'https://github.com/Brendimo-co/sanscarxi/raw/main/5463046208805868118.jpg' },
+  { id:'C20', name:'Kişi Boyunbağı',       color:'#3B82F6', weight:1,
+    img:'https://github.com/Brendimo-co/sanscarxi/raw/main/5463046208805868117.jpg' }
+];
+
+/* ════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════ */
+let _user       = null;
+let _allProds   = [];
+let _activePage = 'landing';
+let _winData    = null;
+let _currentProd = null;
+
+/* ════════════════════════════════════════════
+   LOGIN
+════════════════════════════════════════════ */
+function openLogin()  { document.getElementById('loginOverlay').classList.add('open'); document.getElementById('phoneInput').focus(); }
+function closeLogin() { document.getElementById('loginOverlay').classList.remove('open'); }
+
+document.getElementById('phoneInput').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+async function doLogin() {
+  const raw = document.getElementById('phoneInput').value.trim();
+  const err = document.getElementById('loginErr');
+  const btn = document.getElementById('loginSubmitBtn');
+  const txt = document.getElementById('loginBtnTxt');
+  err.style.display = 'none';
+  if (!raw) { showErr('Nömrəni daxil edin'); return; }
+
+  btn.disabled = true;
+  txt.innerHTML = '<span class="loader-spinner-sm"></span>';
+
+  try {
+    const phone = cleanPhone(raw);
+    const res   = await apiFetch(`?action=login&phone=${encodeURIComponent(phone)}`);
+    if (res.success) {
+      _user = res.user;
+      sessionStorage.setItem('vip_u', JSON.stringify(_user));
+      closeLogin();
+      bootApp();
+    } else {
+      showErr(res.message || 'Bu nömrə VIP üzv kimi qeydiyyatda yoxdur.');
+    }
+  } catch(e) {
+    showErr('İnternet bağlantısını yoxlayın.');
+  }
+  btn.disabled = false;
+  txt.innerHTML = '<svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg> VIP Giriş Et';
+
+  function showErr(m) { err.textContent = m; err.style.display='block'; }
+}
+
+function bootApp() {
+  // Show app pages
+  document.getElementById('hdrLoginBtn').style.display  = 'none';
+  document.getElementById('hdrLogoutBtn').style.display = 'block';
+  document.getElementById('hdrBalPill').style.display   = 'flex';
+
+  // Update nav: hide landing, show home
+  document.getElementById('navLanding').style.display = 'none';
+  document.getElementById('navHome').style.display    = 'block';
+
+  fillUserUI();
+  loadProducts();
+  initScratch();
+  initWheel();
+  switchPage('home');
+}
+
+function fillUserUI() {
+  const u = _user;
+  const bal = (+u.balance || 0).toFixed(2);
+  const name = u.name || 'VIP Üzv';
+  const ini = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
+
+  // header
+  document.getElementById('hdrBalAmt').textContent = bal + ' ₼';
+
+  // home
+  document.getElementById('uiName').textContent    = name;
+  document.getElementById('uiPlan').textContent    = u.plan || 'VIP Premium';
+  document.getElementById('uiBalance').textContent = bal;
+  document.getElementById('uiMsPlan').textContent  = u.plan || 'VIP Premium';
+  document.getElementById('uiMsSince').textContent = u.regDate || '—';
+  const st = document.getElementById('uiMsStatus');
+  if (u.isPaid) { st.textContent='Aktiv'; st.className='ms-status ms-active'; }
+  else          { st.textContent='Gözlənir'; st.className='ms-status ms-inactive'; }
+
+  // profile
+  document.getElementById('profAva').textContent   = ini;
+  document.getElementById('profName').textContent  = name;
+  document.getElementById('profPhone').textContent = u.phone || '';
+  document.getElementById('pBalVal').textContent   = bal;
+  document.getElementById('pPlanVal').textContent  = (u.plan||'VIP').split(' ')[0];
+  document.getElementById('pSpinsVal').textContent = u.spinCount || 0;
+
+  // WA links
+  const waMsg = `Salam! VIP üzv olaraq sifariş vermək istəyirəm.\nAd: ${name}\nNömrə: ${u.phone}`;
+  document.getElementById('baWaLink').href = `https://wa.me/${WA}?text=${enc(waMsg)}`;
+
+  // free product
+  if (u.freeProductUsed) document.getElementById('freeUsedBar').classList.add('show');
+
+  // cashback modal
+  document.getElementById('cbBalDisplay').textContent = bal;
+  buildPresets();
+}
+
+/* ════════════════════════════════════════════
+   NAV / PAGE SWITCHING
+════════════════════════════════════════════ */
+const pageMap = { landing:'pageLanding', home:'pageHome', games:'pageGames', store:'pageStore', profile:'pageProfile' };
+const navMap  = { home:'navHome', games:'navGames', store:'navStore', profile:'navProfile', landing:'navLanding' };
+
+function switchPage(name) {
+  _activePage = name;
+  Object.values(pageMap).forEach(id => document.getElementById(id).classList.remove('active'));
+  Object.values(navMap).forEach(id  => document.getElementById(id).classList.remove('active'));
+  document.getElementById(pageMap[name])?.classList.add('active');
+  document.getElementById(navMap[name])?.classList.add('active');
+  document.getElementById(pageMap[name])?.querySelector('.scroll-area')?.scrollTo(0,0);
+  if (name==='store' && _allProds.length===0) loadProducts();
+}
+
+function showLanding() { switchPage('landing'); }
+function goHome()      { if(_user) switchPage('home'); else switchPage('landing'); }
+
+/* ════════════════════════════════════════════
+   PRODUCTS
+════════════════════════════════════════════ */
+async function loadProducts() {
+  try {
+    const r = await apiFetch('?action=getProducts');
+    if (r.success) { _allProds = r.products||[]; renderProds(_allProds); buildCats(); }
+    else renderProdsEmpty('Məhsullar yüklənə bilmədi.');
+  } catch(e) { renderProdsEmpty('İnternet xətası.'); }
+}
+
+function buildCats() {
+  const cats = [...new Set(_allProds.map(p=>p.category).filter(Boolean))];
+  const row  = document.getElementById('catRow');
+  row.innerHTML = '<button class="cat-chip active" onclick="filterCat(\'all\',this)">Hamısı</button>';
+  cats.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'cat-chip';
+    b.textContent = c;
+    b.onclick = () => filterCat(c, b);
+    row.appendChild(b);
+  });
+}
+
+function filterCat(cat, btn) {
+  document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  renderProds(cat==='all' ? _allProds : _allProds.filter(p=>p.category===cat));
+}
+
+function renderProds(list) {
+  const grid = document.getElementById('productGrid');
+  if (!list||!list.length) { renderProdsEmpty('Bu kategoriyada məhsul yoxdur.'); return; }
+  grid.innerHTML = list.map(p=>`
+    <div class="prod-card" onclick="openProdModal(${idx(p)})">
+      <div class="prod-img-wrap">
+        ${p.imageUrl
+          ? `<img class="prod-img" src="${esc(p.imageUrl)}" alt="${esc(p.name)}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'prod-img-ph\\'>🎁</div>'">`
+          : `<div class="prod-img-ph">🎁</div>`}
+        ${p.isVipExclusive ? '<div class="prod-vip-flag">VIP</div>' : ''}
+      </div>
+      <div class="prod-body">
+        <div class="prod-cat">${esc(p.category||'')}</div>
+        <div class="prod-name">${esc(p.name||'')}</div>
+        <div class="prod-foot">
+          <div class="prod-price">${(+p.price||0).toFixed(2)} ₼</div>
+          <button class="btn-pick">Seç →</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderProdsEmpty(m) {
+  document.getElementById('productGrid').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)"><div style="font-size:36px;margin-bottom:10px">📦</div><p>${m}</p></div>`;
+}
+
+/* Store product indices */
+function idx(p) {
+  const i = _allProds.indexOf(p);
+  return i; // used in onclick
+}
+window._openProdByIdx = function(i){ openProdModal(i); };
+
+function openProdModal(i) {
+  const p = typeof i === 'number' ? _allProds[i] : i;
+  if (!p) return;
+  _currentProd = p;
+  const imgEl = document.getElementById('pmImg');
+  const phEl  = document.getElementById('pmPh');
+  if (p.imageUrl) { imgEl.src=p.imageUrl; imgEl.style.display='block'; phEl.style.display='none'; }
+  else { imgEl.style.display='none'; phEl.style.display='block'; }
+  document.getElementById('pmName').textContent = p.name||'';
+  document.getElementById('pmDesc').textContent = p.description||'';
+  document.getElementById('pmPrice').innerHTML  = `${(+p.price||0).toFixed(2)} ₼<span class="pm-free">✓ VIP Üçün Pulsuz</span>`;
+  const hint = document.getElementById('pmHint');
+  if (_user?.freeProductUsed) {
+    hint.innerHTML = '⏰ Bu ay pulsuz hədiyyə hüququnuzu istifadə etmisiniz.';
+    hint.style.cssText = 'background:rgba(232,69,60,.07);border-color:rgba(232,69,60,.2);color:rgba(232,69,60,.85)';
+  } else {
+    hint.innerHTML = '👑 Bu məhsulu <b>aylıq pulsuz hədiyyə</b> olaraq seçirsiniz. 50 ₼+ sifarişinizlə birlikdə tamamilə pulsuz çatdırılır.';
+    hint.style.cssText = '';
+  }
+  const msg = `Salam! VIP üzv olaraq pulsuz aylıq hədiyyəmi seçmək istəyirəm:\n🎁 ${p.name}\nAd: ${_user?.name||''}\nNömrə: ${_user?.phone||''}`;
+  document.getElementById('pmWaBtn').href = `https://wa.me/${WA}?text=${enc(msg)}`;
+  document.getElementById('productModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeProdModal(e) {
+  if (e&&e.target!==e.currentTarget) return;
+  document.getElementById('productModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ════════════════════════════════════════════
+   CASHBACK MODAL
+════════════════════════════════════════════ */
+function openCashbackModal() {
+  document.getElementById('cbAmount').value = '';
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('sel'));
+  document.getElementById('cashbackModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  updateCbWaBtn();
+}
+function closeCashback(e) {
+  if (e&&e.target!==e.currentTarget) return;
+  document.getElementById('cashbackModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function buildPresets() {
+  const bal  = +_user?.balance||0;
+  const pr   = document.getElementById('presetRow');
+  pr.innerHTML = '';
+  [2,4,6,8].filter(a=>a<=Math.min(bal,MAX_CB)).forEach(a=>{
+    const b = document.createElement('button');
+    b.className = 'preset-btn';
+    b.textContent = a + ' ₼';
+    b.onclick = () => { document.querySelectorAll('.preset-btn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); document.getElementById('cbAmount').value=a; updateCbWaBtn(); };
+    pr.appendChild(b);
+  });
+  document.getElementById('cbAmount').addEventListener('input', () => {
+    document.querySelectorAll('.preset-btn').forEach(x=>x.classList.remove('sel'));
+    updateCbWaBtn();
+  });
+}
+function updateCbWaBtn() {
+  const amt  = Math.min(+document.getElementById('cbAmount').value||0, Math.min(+_user?.balance||0, MAX_CB));
+  const msg  = `Salam! VIP üzv olaraq sifarişimdə ${amt.toFixed(2)} ₼ kəşbek tətbiq etmək istəyirəm.\nAd: ${_user?.name||''}\nNömrə: ${_user?.phone||''}`;
+  document.getElementById('cbWaBtn').href = `https://wa.me/${WA}?text=${enc(msg)}`;
+}
+document.getElementById('cbAmount')?.addEventListener('input', updateCbWaBtn);
+
+/* ════════════════════════════════════════════
+   GAMES TAB
+════════════════════════════════════════════ */
+function gameTabSwitch(tab, btn) {
+  document.querySelectorAll('.g-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const cards = { scratch:'gCardScratch', wheel:'gCardWheel', partner:'gCardPartner' };
+  Object.values(cards).forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.style.display = (tab==='all'||tab===Object.keys(cards).find(k=>cards[k]===id)) ? 'block' : 'none';
+  });
+  if (tab !== 'all') {
+    // also close open panels that don't match
+    if (tab==='scratch') closeGame('wheel');
+    else if (tab==='wheel') closeGame('scratch');
+  }
+}
+
+function openGame(name) {
+  const ids = { scratch:'panelScratch', wheel:'panelWheel' };
+  Object.entries(ids).forEach(([k,id]) => {
+    document.getElementById(id).classList.toggle('open', k===name);
+  });
+  if (name==='wheel') {
+    setTimeout(()=>{ drawWheel(); document.getElementById('vipSpinBtn').disabled = spinsLeft()<=0; }, 50);
+  }
+  if (name==='scratch') {
+    setTimeout(initScratch, 50);
+  }
+  // scroll panel into view
+  const pan = document.getElementById(ids[name]);
+  if (pan) setTimeout(()=>pan.scrollIntoView({behavior:'smooth',block:'nearest'}), 300);
+}
+
+function closeGame(name) {
+  const ids = { scratch:'panelScratch', wheel:'panelWheel' };
+  document.getElementById(ids[name])?.classList.remove('open');
+}
+
+/* ════════════════════════════════════════════
+   SCRATCH CARD — exact same prize pool
+════════════════════════════════════════════ */
+let _sc_canvas, _sc_ctx, _sc_drawing=false, _sc_revealed=false;
+let _sc_pxArr=null, _sc_pxCount=0, _sc_total=0;
+let _sc_prize=null;
+
+function scratchKey() { return `sc_used_${_user?.phone||'guest'}`; }
+
+function initScratch() {
+  _sc_canvas   = document.getElementById('scratchCanvas');
+  if (!_sc_canvas) return;
+  _sc_ctx      = _sc_canvas.getContext('2d');
+  _sc_revealed = false;
+  _sc_pxCount  = 0;
+
+  const today  = new Date().toDateString();
+  const used   = localStorage.getItem(scratchKey());
+
+  // Pick prize
+  _sc_prize = SCRATCH_PRIZES[Math.floor(Math.random()*SCRATCH_PRIZES.length)];
+  setScratchPrizeUI(_sc_prize);
+
+  if (used === today) {
+    // Already used: show result directly, disable
+    revealScratchInstant();
+    document.getElementById('sBtnReveal').style.display = 'none';
+    document.getElementById('sBtnUsed').style.display   = 'block';
+    return;
+  }
+
+  buildScratchLayer();
+  bindScratchEvents();
+  document.getElementById('sBtnReveal').style.display = 'block';
+  document.getElementById('sBtnUsed').style.display   = 'none';
+}
+
+function setScratchPrizeUI(p) {
+  document.getElementById('sEmoji').textContent = p.emoji;
+  document.getElementById('sName').textContent  = p.name;
+  document.getElementById('sDesc').textContent  = p.desc;
+}
+
+function revealScratchInstant() {
+  _sc_revealed = true;
+  if (!_sc_canvas) return;
+  const w = _sc_canvas.offsetWidth||340;
+  _sc_canvas.width=w; _sc_canvas.height=220;
+  _sc_canvas.style.opacity = '0';
+  document.getElementById('sProgFill').style.width = '100%';
+  document.getElementById('sProgPct').textContent  = '100%';
+}
+
+function buildScratchLayer() {
+  const stage = document.getElementById('scratchStage');
+  const w = stage.offsetWidth || 340;
+  _sc_canvas.width  = w;
+  _sc_canvas.height = 220;
+  _sc_total  = w * 220;
+  _sc_pxArr  = new Uint8Array(_sc_total);
+  _sc_pxCount = 0;
+  _sc_revealed = false;
+
+  const ctx = _sc_ctx;
+  // Background fill
+  const g = ctx.createLinearGradient(0,0,w,220);
+  g.addColorStop(0,'#2A1A00'); g.addColorStop(.5,'#3A2500'); g.addColorStop(1,'#1A1000');
+  ctx.fillStyle = g; ctx.fillRect(0,0,w,220);
+
+  // Noise dots
+  for(let i=0;i<2000;i++){
+    ctx.beginPath();
+    ctx.arc(Math.random()*w,Math.random()*220,Math.random()*1.3,0,Math.PI*2);
+    ctx.fillStyle = Math.random()>.5?'rgba(201,168,76,.07)':'rgba(0,0,0,.12)';
+    ctx.fill();
+  }
+  // Grid lines
+  ctx.strokeStyle='rgba(201,168,76,.04)'; ctx.lineWidth=1;
+  for(let x=0;x<w;x+=28){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,220);ctx.stroke(); }
+  for(let y=0;y<220;y+=28){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke(); }
+
+  // Text
+  ctx.save();
+  ctx.fillStyle='rgba(201,168,76,.9)';
+  ctx.font=`bold ${Math.min(19,w*.056)}px Playfair Display,serif`;
+  ctx.textAlign='center'; ctx.shadowColor='rgba(201,168,76,.4)'; ctx.shadowBlur=14;
+  ctx.fillText('🪙  POZUN & QAZANIN  🪙',w/2,88);
+  ctx.shadowBlur=0;
+  ctx.font=`${Math.min(13,w*.038)}px Outfit,sans-serif`;
+  ctx.fillStyle='rgba(237,232,216,.55)';
+  ctx.fillText('50%-ni qazıyın, hədiyyəni açın',w/2,116);
+  // Corner deco
+  ctx.font='16px serif'; ctx.fillStyle='rgba(201,168,76,.22)';
+  ctx.fillText('💎',22,28); ctx.fillText('⭐',w-22,28);
+  ctx.fillText('🎁',22,200); ctx.fillText('✨',w-22,200);
+  ctx.restore();
+
+  ctx.globalCompositeOperation='destination-out';
+}
+
+function bindScratchEvents() {
+  const c   = _sc_canvas;
+  const R   = 24;
+  const pos = e => {
+    const r=c.getBoundingClientRect(), sx=c.width/r.width, sy=c.height/r.height;
+    if(e.touches?.[0]) return {x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy};
+    return {x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy};
+  };
+  const doScratch=(x,y)=>{
+    if(_sc_revealed) return;
+    _sc_ctx.beginPath(); _sc_ctx.arc(x,y,R,0,Math.PI*2); _sc_ctx.fill();
+    for(let dx=-R;dx<=R;dx+=2) for(let dy=-R;dy<=R;dy+=2)
+      if(dx*dx+dy*dy<=R*R){ const px=Math.max(0,Math.min(_sc_canvas.width-1,Math.round(x+dx))),py=Math.max(0,Math.min(219,Math.round(y+dy)));const i=py*_sc_canvas.width+px;if(!_sc_pxArr[i]){_sc_pxArr[i]=1;_sc_pxCount++;} }
+    const pct=Math.min(100,Math.round(_sc_pxCount/_sc_total*100));
+    document.getElementById('sProgFill').style.width=pct+'%';
+    document.getElementById('sProgPct').textContent=pct+'%';
+    if(pct>=50&&!_sc_revealed) autoReveal();
+  };
+  c.addEventListener('mousedown',e=>{_sc_drawing=true;doScratch(...Object.values(pos(e)));});
+  c.addEventListener('mousemove',e=>{if(!_sc_drawing)return;e.preventDefault();doScratch(...Object.values(pos(e)));});
+  c.addEventListener('mouseup',()=>_sc_drawing=false);
+  c.addEventListener('mouseleave',()=>_sc_drawing=false);
+  c.addEventListener('touchstart',e=>{e.preventDefault();_sc_drawing=true;doScratch(...Object.values(pos(e)));},{passive:false});
+  c.addEventListener('touchmove',e=>{if(!_sc_drawing)return;e.preventDefault();doScratch(...Object.values(pos(e)));},{passive:false});
+  c.addEventListener('touchend',()=>_sc_drawing=false);
+}
+
+function autoReveal() {
+  if(_sc_revealed) return;
+  _sc_revealed = true;
+  let a=0;
+  const fade=setInterval(()=>{
+    a+=.09;
+    _sc_ctx.globalAlpha=Math.min(a,1);
+    _sc_ctx.fillStyle='rgba(0,0,0,1)';
+    _sc_ctx.fillRect(0,0,_sc_canvas.width,_sc_canvas.height);
+    if(a>=1){
+      clearInterval(fade);
+      _sc_canvas.style.opacity='0';
+      _sc_canvas.style.transition='opacity .4s';
+      document.getElementById('sProgFill').style.width='100%';
+      document.getElementById('sProgPct').textContent='100%';
+      localStorage.setItem(scratchKey(),new Date().toDateString());
+      document.getElementById('sBtnReveal').style.display='none';
+      document.getElementById('sBtnUsed').style.display='block';
+      setTimeout(()=>{
+        burst();
+        if(_sc_prize?.amount>0) recordSpin(_sc_prize.name,_sc_prize.amount);
+        showWin(_sc_prize.emoji,_sc_prize.name,_sc_prize.desc,_sc_prize.amount);
+      },400);
+    }
+  },18);
+}
+
+/* ════════════════════════════════════════════
+   WHEEL — exact WHEEL_GIFTS pool
+════════════════════════════════════════════ */
+let _wCtx, _wRot=0, _wSpinning=false;
+const W=320;
+
+function spinsLeft() {
+  const today=new Date().toDateString();
+  const k=`spins_${_user?.phone||'g'}`;
+  const s=JSON.parse(localStorage.getItem(k)||'{"d":"","n":0}');
+  return s.d===today ? Math.max(0,3-s.n) : 3;
+}
+function spinsUsed() { return 3 - spinsLeft(); }
+function incSpin() {
+  const today=new Date().toDateString();
+  const k=`spins_${_user?.phone||'g'}`;
+  const s=JSON.parse(localStorage.getItem(k)||'{"d":"","n":0}');
+  const n=(s.d===today?s.n:0)+1;
+  localStorage.setItem(k,JSON.stringify({d:today,n}));
+}
+
+function initWheel() {
+  const c=document.getElementById('vipWheelCanvas');
+  if(!c) return;
+  _wCtx=c.getContext('2d');
+  drawWheel();
+  updateSpinBadges();
+  const btn=document.getElementById('vipSpinBtn');
+  if(spinsLeft()>0){ btn.disabled=false; btn.onclick=doSpin; }
+  else { btn.disabled=true; btn.textContent='BİTDİ'; }
+}
+
+function drawWheel(rot) {
+  if(!_wCtx) return;
+  const r = rot ?? _wRot;
+  const n=WHEEL_GIFTS.length, slice=(Math.PI*2)/n;
+  const cx=W/2,cy=W/2,rad=W/2-5;
+  _wCtx.clearRect(0,0,W,W);
+  WHEEL_GIFTS.forEach((g,i)=>{
+    const s=i*slice+r, e=s+slice;
+    _wCtx.save();
+    _wCtx.beginPath();_wCtx.moveTo(cx,cy);_wCtx.arc(cx,cy,rad,s,e);_wCtx.closePath();
+    const gr=_wCtx.createRadialGradient(cx,cy,6,cx,cy,rad);
+    gr.addColorStop(0,lighten(g.color,32)); gr.addColorStop(1,g.color);
+    _wCtx.fillStyle=gr; _wCtx.fill();
+    _wCtx.strokeStyle='rgba(255,255,255,.14)'; _wCtx.lineWidth=1.5; _wCtx.stroke();
+    // text
+    _wCtx.translate(cx,cy); _wCtx.rotate(s+slice/2);
+    _wCtx.textAlign='right'; _wCtx.fillStyle='#fff';
+    const fs=Math.max(9,W*0.042);
+    _wCtx.font=`700 ${fs}px Outfit,sans-serif`;
+    _wCtx.shadowColor='rgba(0,0,0,.85)'; _wCtx.shadowBlur=4;
+    let txt=g.name;
+    const maxW=rad-16;
+    if(_wCtx.measureText(txt).width>maxW){ const sc=maxW/_wCtx.measureText(txt).width; _wCtx.font=`700 ${fs*sc}px Outfit,sans-serif`; }
+    _wCtx.fillText(txt,rad-12,fs*.38);
+    _wCtx.restore();
+  });
+  // Hub
+  const hg=_wCtx.createRadialGradient(cx,cy,4,cx,cy,28);
+  hg.addColorStop(0,'#2A1800'); hg.addColorStop(1,'#0D0500');
+  _wCtx.beginPath();_wCtx.arc(cx,cy,27,0,Math.PI*2);
+  _wCtx.fillStyle=hg;_wCtx.fill();
+  _wCtx.strokeStyle='rgba(201,168,76,.3)';_wCtx.lineWidth=2;_wCtx.stroke();
+}
+
+function lighten(hex,pct) {
+  hex=hex.replace('#','');
+  const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
+  return `rgb(${Math.min(255,r+(255-r)*pct/100)},${Math.min(255,g+(255-g)*pct/100)},${Math.min(255,b+(255-b)*pct/100)})`;
+}
+
+function doSpin() {
+  if(_wSpinning||spinsLeft()<=0) return;
+  const btn=document.getElementById('vipSpinBtn');
+  btn.disabled=true;
+
+  // Pick random gift
+  const idx=Math.floor(Math.random()*WHEEL_GIFTS.length);
+  spinTo(idx,()=>{
+    const won=WHEEL_GIFTS[idx];
+    incSpin();
+    updateSpinBadges();
+    if(spinsLeft()>0){ btn.disabled=false; }
+    else { btn.disabled=true; btn.textContent='BİTDİ'; }
+    setTimeout(()=>{
+      burst();
+      recordSpin(won.name,0);
+      showWin('🎡',won.name,`${won.name} qazandınız! 🎉 WhatsApp ilə müraciət edib hədiyyənizi alın.`,0);
+    },300);
+  });
+}
+
+function spinTo(idx,done) {
+  _wSpinning=true;
+  const n=WHEEL_GIFTS.length, slice=360/n;
+  const target=idx*slice+slice/2+(Math.random()-.5)*slice*.7;
+  const startD=(_wRot*180/Math.PI)%360;
+  const endD=startD+8*360+(270-target-startD%360+360)%360;
+  const dur=5800,t0=performance.now();
+  const tick=now=>{
+    const t=Math.min(1,(now-t0)/dur);
+    const e=1-Math.pow(1-t,5);
+    _wRot=(startD+(endD-startD)*e)*Math.PI/180;
+    drawWheel(_wRot);
+    if(t<1) requestAnimationFrame(tick);
+    else{ _wSpinning=false; _wRot=(endD%360)*Math.PI/180; drawWheel(_wRot); done&&done(); }
+  };
+  requestAnimationFrame(tick);
+}
+
+function updateSpinBadges() {
+  const used=spinsUsed();
+  [1,2,3].forEach(i=>{
+    const el=document.getElementById('sb'+i);
+    el.className='spi-badge';
+    if(i<=used) el.classList.add('done');
+    else if(i===used+1) el.classList.add('curr');
+  });
+}
+
+/* ════════════════════════════════════════════
+   WIN MODAL
+════════════════════════════════════════════ */
+function showWin(emoji,name,desc,amount) {
+  _winData={emoji,name,desc,amount};
+  document.getElementById('winEmojiBig').textContent = emoji;
+  document.getElementById('winPrize').textContent    = name;
+  document.getElementById('winDetail').textContent   = desc;
+  document.getElementById('winOverlay').classList.add('open');
+}
+function openWinWa() {
+  if(!_winData) return;
+  const msg=`Salam! VIP üzv olaraq qazandım:\n${_winData.emoji} ${_winData.name}\n\nAd: ${_user?.name||''}\nNömrə: ${_user?.phone||''}`;
+  window.open(`https://wa.me/${WA}?text=${enc(msg)}`,'_blank');
+}
+function closeWin() { document.getElementById('winOverlay').classList.remove('open'); }
+
+/* ════════════════════════════════════════════
+   RECORD SPIN (API)
+════════════════════════════════════════════ */
+async function recordSpin(prize,amount) {
+  if(!_user) return;
+  try {
+    const res = await apiFetch('',{method:'POST',body:JSON.stringify({action:'spinResult',phone:_user.phone,prize,amount})});
+    if(res.success&&res.newBalance) {
+      _user.balance = res.newBalance;
+      document.getElementById('hdrBalAmt').textContent = (+res.newBalance).toFixed(2)+' ₼';
+      document.getElementById('uiBalance').textContent = (+res.newBalance).toFixed(2);
+      document.getElementById('cbBalDisplay').textContent = (+res.newBalance).toFixed(2);
+      document.getElementById('pBalVal').textContent = (+res.newBalance).toFixed(2);
+    }
+  } catch(e) { /* silent */ }
+}
+
+/* ════════════════════════════════════════════
+   CONFETTI
+════════════════════════════════════════════ */
+const _cc=document.getElementById('cCanvas');
+const _cx=_cc.getContext('2d');
+let _cp=[],_craf=null;
+const COLS=['#C9A84C','#F5D97A','#FF6B9D','#8B5CF6','#27D67B','#F0D060','#FF9D5C'];
+
+function burst(){
+  _cc.width=innerWidth; _cc.height=innerHeight;
+  _cp=[];
+  for(let i=0;i<160;i++){
+    const ang=-Math.PI/2+(Math.random()-.5)*Math.PI*1.3;
+    const sp=5+Math.random()*10;
+    _cp.push({x:innerWidth*.25+Math.random()*innerWidth*.5,y:innerHeight*.4,
+      vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp-Math.random()*3,
+      w:5+Math.random()*9,h:3+Math.random()*5,
+      col:COLS[Math.floor(Math.random()*COLS.length)],
+      rot:Math.random()*360,rs:(Math.random()-.5)*.14,
+      op:1,g:.12+Math.random()*.1,dy:false
+    });
+  }
+  cancelAnimationFrame(_craf); animC();
+  setTimeout(()=>_cp.forEach(p=>p.dy=true),3200);
+}
+function animC(){
+  _cx.clearRect(0,0,_cc.width,_cc.height);
+  _cp.forEach(p=>{
+    p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.rot+=p.rs;
+    if(p.dy)p.op-=.011;
+    _cx.save();_cx.globalAlpha=Math.max(0,p.op);
+    _cx.translate(p.x,p.y);_cx.rotate(p.rot*Math.PI/180);
+    _cx.fillStyle=p.col;_cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+    _cx.restore();
+  });
+  _cp=_cp.filter(p=>p.y<_cc.height+30&&p.op>0);
+  if(_cp.length) _craf=requestAnimationFrame(animC);
+}
+
+/* ════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════ */
+function toast(msg,type=''){
+  const el=document.createElement('div');
+  el.className='toast'+(type?' '+type:'');
+  el.textContent=msg;
+  document.getElementById('toastWrap').appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='opacity .3s';setTimeout(()=>el.remove(),350);},2700);
+}
+
+/* ════════════════════════════════════════════
+   LOGOUT
+════════════════════════════════════════════ */
+function doLogout(){
+  _user=null; sessionStorage.removeItem('vip_u');
+  document.getElementById('hdrLoginBtn').style.display  = 'block';
+  document.getElementById('hdrLogoutBtn').style.display = 'none';
+  document.getElementById('hdrBalPill').style.display   = 'none';
+  document.getElementById('navLanding').style.display   = 'block';
+  document.getElementById('navHome').style.display      = 'none';
+  switchPage('landing');
+  toast('Çıxış edildi');
+}
+
+/* ════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════ */
+async function apiFetch(path,opts={}){
+  const r=await fetch(API+path,{...opts,headers:{...opts.headers,'Content-Type':'application/json'}});
+  return r.json();
+}
+function cleanPhone(s){
+  s=(s||'').trim().replace(/[^\d+]/g,'');
+  if(s.startsWith('00'))s='+'+s.slice(2);
+  if(!s.startsWith('+')&&/^\d{9}$/.test(s))s='+994'+s;
+  if(/^0\d{9}$/.test(s))s='+994'+s.slice(1);
+  return s;
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function enc(s){return encodeURIComponent(s);}
+
+/* ════════════════════════════════════════════
+   BOOT — check session
+════════════════════════════════════════════ */
+(function(){
+  const saved=sessionStorage.getItem('vip_u');
+  if(saved){ try{ _user=JSON.parse(saved); if(_user?.phone) bootApp(); }catch(e){} }
+
+  // Landing is always visible to non-logged-in (home nav hidden by default for logged out)
+  if(!_user){
+    document.getElementById('navHome').style.display='none';
+    // Show a special landing tab
+    const nl=document.getElementById('navLanding');
+    nl.style.display='block'; nl.classList.add('active');
+    switchPage('landing');
+  }
+})();
+
+window.addEventListener('resize',()=>{ drawWheel(); _cc.width=innerWidth; _cc.height=innerHeight; });
+</script>
+</body>
+</html>
