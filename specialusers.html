@@ -550,6 +550,7 @@ body::before {
   padding:16px 18px;
   background:rgba(255,255,255,.025); border:1px solid var(--border);
   border-radius:var(--r); display:flex; align-items:center; gap:14px;
+  transition:all .3s ease;
 }
 .ms-icon {
   width:48px; height:48px; border-radius:14px; flex-shrink:0;
@@ -1629,17 +1630,7 @@ async function doLogin() {
 
   const phone = cleanPhone(raw);
 
-  /* ── Try demo users first (for testing before GAS setup) ── */
-  if (DEMO_USERS[phone]) {
-    _user = DEMO_USERS[phone];
-    sessionStorage.setItem('vip_u', JSON.stringify(_user));
-    resetLoginBtn();
-    closeLogin();
-    bootApp();
-    return;
-  }
-
-  /* ── Try live API ── */
+  /* ── Only load from the live API (No Demo Fallback) ── */
   try {
     const res = await gasGet({ action: 'login', phone });
     if (res && res.success) {
@@ -2336,14 +2327,6 @@ async function apiFetch(path, opts={}) {
   }
 }
 
-/* ── DEMO USERS (fallback when API is not yet set up) ──
-   Remove or leave empty once your GAS sheet has real VIP users.
-   Format: phone (sanitized) → user object  */
-const DEMO_USERS = {
-  '+994501234567': { phone:'+994501234567', name:'Test VIP Üzv',     balance:'25.50', regDate:'01.01.2025', plan:'VIP Premium', isPaid:true,  freeProductUsed:false, spinCount:5 },
-  '+994551234567': { phone:'+994551234567', name:'Aynur Əliyeva',    balance:'48.00', regDate:'15.03.2025', plan:'VIP Premium', isPaid:true,  freeProductUsed:false, spinCount:12 },
-  '+994701234567': { phone:'+994701234567', name:'Elvin Musayev',     balance:'10.00', regDate:'20.02.2025', plan:'VIP Standard', isPaid:false, freeProductUsed:true,  spinCount:3 },
-};
 function cleanPhone(s){
   s=(s||'').trim().replace(/[^\d+]/g,'');
   if(s.startsWith('00'))s='+'+s.slice(2);
@@ -2355,11 +2338,25 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 function enc(s){return encodeURIComponent(s);}
 
 /* ════════════════════════════════════════════
-   BOOT — check session
+   BOOT — check session & sync silently with GAS
 ════════════════════════════════════════════ */
-(function(){
+(async function(){
   const saved=sessionStorage.getItem('vip_u');
-  if(saved){ try{ _user=JSON.parse(saved); if(_user?.phone) bootApp(); }catch(e){} }
+  if(saved){ 
+    try{ 
+      _user=JSON.parse(saved); 
+      if(_user?.phone) {
+        bootApp(); 
+        // Silently fetch exact, latest balance from API in the background every refresh
+        const res = await gasGet({ action: 'login', phone: _user.phone });
+        if (res && res.success) {
+          _user = res.user;
+          sessionStorage.setItem('vip_u', JSON.stringify(_user));
+          fillUserUI(); 
+        }
+      } 
+    }catch(e){} 
+  }
 
   // Landing is always visible to non-logged-in (home nav hidden by default for logged out)
   if(!_user){
