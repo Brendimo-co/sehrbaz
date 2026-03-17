@@ -1606,35 +1606,57 @@ function closeLogin() { document.getElementById('loginOverlay').classList.remove
 
 document.getElementById('phoneInput').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 
-async function doLogin() {
-  const raw = document.getElementById('phoneInput').value.trim();
+function showLoginErr(m) {
   const err = document.getElementById('loginErr');
+  err.textContent = m; err.style.display = 'block';
+}
+function resetLoginBtn() {
   const btn = document.getElementById('loginSubmitBtn');
   const txt = document.getElementById('loginBtnTxt');
-  err.style.display = 'none';
-  if (!raw) { showErr('Nömrəni daxil edin'); return; }
+  btn.disabled = false;
+  txt.innerHTML = '<svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg> VIP Giriş Et';
+}
 
+async function doLogin() {
+  const raw = document.getElementById('phoneInput').value.trim();
+  document.getElementById('loginErr').style.display = 'none';
+  if (!raw) { showLoginErr('Nömrəni daxil edin'); return; }
+
+  const btn = document.getElementById('loginSubmitBtn');
+  const txt = document.getElementById('loginBtnTxt');
   btn.disabled = true;
   txt.innerHTML = '<span class="loader-spinner-sm"></span>';
 
+  const phone = cleanPhone(raw);
+
+  /* ── Try demo users first (for testing before GAS setup) ── */
+  if (DEMO_USERS[phone]) {
+    _user = DEMO_USERS[phone];
+    sessionStorage.setItem('vip_u', JSON.stringify(_user));
+    resetLoginBtn();
+    closeLogin();
+    bootApp();
+    return;
+  }
+
+  /* ── Try live API ── */
   try {
-    const phone = cleanPhone(raw);
-    const res   = await apiFetch(`?action=login&phone=${encodeURIComponent(phone)}`);
-    if (res.success) {
+    const res = await gasGet({ action: 'login', phone });
+    if (res && res.success) {
       _user = res.user;
       sessionStorage.setItem('vip_u', JSON.stringify(_user));
+      resetLoginBtn();
       closeLogin();
       bootApp();
     } else {
-      showErr(res.message || 'Bu nömrə VIP üzv kimi qeydiyyatda yoxdur.');
+      showLoginErr((res && res.message) ? res.message : 'Bu nömrə VIP üzv kimi qeydiyyatda yoxdur.');
+      resetLoginBtn();
     }
   } catch(e) {
-    showErr('İnternet bağlantısını yoxlayın.');
+    console.error('Login error:', e);
+    showLoginErr('Bağlantı xətası. Zəhmət olmasa yenidən cəhd edin.');
+    resetLoginBtn();
   }
-  btn.disabled = false;
-  txt.innerHTML = '<svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" style="vertical-align:middle;margin-right:4px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg> VIP Giriş Et';
-
-  function showErr(m) { err.textContent = m; err.style.display='block'; }
 }
 
 function bootApp() {
@@ -1717,10 +1739,13 @@ function goHome()      { if(_user) switchPage('home'); else switchPage('landing'
 ════════════════════════════════════════════ */
 async function loadProducts() {
   try {
-    const r = await apiFetch('?action=getProducts');
-    if (r.success) { _allProds = r.products||[]; renderProds(_allProds); buildCats(); }
+    const r = await gasGet({ action: 'getProducts' });
+    if (r && r.success) { _allProds = r.products || []; renderProds(_allProds); buildCats(); }
     else renderProdsEmpty('Məhsullar yüklənə bilmədi.');
-  } catch(e) { renderProdsEmpty('İnternet xətası.'); }
+  } catch(e) {
+    console.error('loadProducts:', e);
+    renderProdsEmpty('İnternet xətası. Yenidən cəhd edin.');
+  }
 }
 
 function buildCats() {
@@ -2178,18 +2203,21 @@ function closeWin() { document.getElementById('winOverlay').classList.remove('op
 /* ════════════════════════════════════════════
    RECORD SPIN (API)
 ════════════════════════════════════════════ */
-async function recordSpin(prize,amount) {
-  if(!_user) return;
+async function recordSpin(prize, amount) {
+  if (!_user) return;
   try {
-    const res = await apiFetch('',{method:'POST',body:JSON.stringify({action:'spinResult',phone:_user.phone,prize,amount})});
-    if(res.success&&res.newBalance) {
+    const res = await gasPost({ action:'spinResult', phone:_user.phone, prize, amount });
+    if (res && res.success && res.newBalance) {
       _user.balance = res.newBalance;
-      document.getElementById('hdrBalAmt').textContent = (+res.newBalance).toFixed(2)+' ₼';
-      document.getElementById('uiBalance').textContent = (+res.newBalance).toFixed(2);
-      document.getElementById('cbBalDisplay').textContent = (+res.newBalance).toFixed(2);
-      document.getElementById('pBalVal').textContent = (+res.newBalance).toFixed(2);
+      sessionStorage.setItem('vip_u', JSON.stringify(_user));
+      const bal = (+res.newBalance).toFixed(2);
+      document.getElementById('hdrBalAmt').textContent  = bal + ' ₼';
+      document.getElementById('uiBalance').textContent  = bal;
+      document.getElementById('cbBalDisplay').textContent = bal;
+      document.getElementById('pBalVal').textContent    = bal;
+      if (document.getElementById('mainBalance')) document.getElementById('mainBalance').textContent = bal;
     }
-  } catch(e) { /* silent */ }
+  } catch(e) { console.warn('recordSpin:', e); }
 }
 
 /* ════════════════════════════════════════════
@@ -2259,10 +2287,63 @@ function doLogout(){
 /* ════════════════════════════════════════════
    HELPERS
 ════════════════════════════════════════════ */
-async function apiFetch(path,opts={}){
-  const r=await fetch(API+path,{...opts,headers:{...opts.headers,'Content-Type':'application/json'}});
-  return r.json();
+/* ════════════════════════════════════════════
+   API — Google Apps Script helpers
+   GAS deployed web apps return redirects.
+   We must NOT send Content-Type on GETs,
+   and must handle text→json parsing carefully.
+════════════════════════════════════════════ */
+
+/* GET — params as plain object */
+async function gasGet(params) {
+  const qs = Object.entries(params)
+    .map(([k,v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))
+    .join('&');
+  const url = API + '?' + qs;
+  const r = await fetch(url, { redirect: 'follow' });
+  const txt = await r.text();
+  try { return JSON.parse(txt); }
+  catch(e) {
+    const m = txt.match(/\{[\s\S]*\}/);
+    if (m) return JSON.parse(m[0]);
+    throw new Error('Bad JSON: ' + txt.slice(0, 200));
+  }
 }
+
+/* POST — URLSearchParams body (most compatible with GAS) */
+async function gasPost(params) {
+  const body = new URLSearchParams(params);
+  const r = await fetch(API, { method: 'POST', body, redirect: 'follow' });
+  const txt = await r.text();
+  try { return JSON.parse(txt); }
+  catch(e) {
+    const m = txt.match(/\{[\s\S]*\}/);
+    if (m) return JSON.parse(m[0]);
+    throw new Error('Bad JSON: ' + txt.slice(0, 200));
+  }
+}
+
+/* Legacy wrapper */
+async function apiFetch(path, opts={}) {
+  if (!opts.method || opts.method === 'GET') {
+    const qs = path.replace(/^\?/,'');
+    const params = Object.fromEntries(new URLSearchParams(qs));
+    return gasGet(params);
+  } else {
+    let body = {};
+    try { body = JSON.parse(opts.body||'{}'); } catch(e) {}
+    return gasPost(body);
+  }
+}
+
+/* ── DEMO USERS (fallback when API is not yet set up) ──
+   Remove or leave empty once your GAS sheet has real VIP users.
+   Format: phone (sanitized) → user object  */
+const DEMO_USERS = {
+  '+994501234567': { phone:'+994501234567', name:'Test VIP Üzv',     balance:'25.50', regDate:'01.01.2025', plan:'VIP Premium', isPaid:true,  freeProductUsed:false, spinCount:5 },
+  '+994551234567': { phone:'+994551234567', name:'Aynur Əliyeva',    balance:'48.00', regDate:'15.03.2025', plan:'VIP Premium', isPaid:true,  freeProductUsed:false, spinCount:12 },
+  '+994701234567': { phone:'+994701234567', name:'Elvin Musayev',     balance:'10.00', regDate:'20.02.2025', plan:'VIP Standard', isPaid:false, freeProductUsed:true,  spinCount:3 },
+};
 function cleanPhone(s){
   s=(s||'').trim().replace(/[^\d+]/g,'');
   if(s.startsWith('00'))s='+'+s.slice(2);
