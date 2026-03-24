@@ -1,1228 +1,1481 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mardakan City Builder - Educational Edition</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+<meta charset="UTF-8">
+<!-- Optimized viewport for mobile games to prevent zooming and handle notches -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Murad's Discovery Dash 🎮</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --roblox-red:#E53E3E;--roblox-blue:#1E88E5;--roblox-green:#43A047;
+  --roblox-yellow:#FFD600;--roblox-orange:#FF6D00;--roblox-purple:#7C3AED;
+  --roblox-teal:#00BCD4;--dark:#0A0E1A;--panel:#111827;--card:#1E2533;
+  --border:rgba(255,255,255,0.08);--white:#F8FAFF;--gold:#FFD700;
+  --shadow-glow:0 0 30px rgba(30,136,229,0.4);
+}
 
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; background-color: #000;
-            font-family: 'Press Start 2P', cursive;
-            user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
-            touch-action: none;
-        }
+/* Base mobile resets */
+*{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+body {
+  background:var(--dark);font-family:'Nunito',sans-serif;overflow:hidden;
+  height:100vh;width:100vw;color:var(--white);
+  /* Prevent pull-to-refresh and bounce scrolling */
+  touch-action:none;overscroll-behavior:none;
+}
 
-        #game-canvas { display: block; width: 100vw; height: 100vh; }
+/* ── GAME WRAP (Responsively Centered & Scaled) ── */
+#wrap {
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%, -50%);
+  transform-origin:center center;
+  width:960px;height:540px;
+}
+canvas {
+  display:block;border-radius:16px;
+  box-shadow:0 0 0 3px rgba(30,136,229,0.5),0 0 80px rgba(30,136,229,0.2);
+}
 
-        #crosshair {
-            position: absolute; top: 50%; left: 50%;
-            width: 20px; height: 20px;
-            margin-top: -10px; margin-left: -10px;
-            color: rgba(255, 255, 255, 0.9); font-size: 20px;
-            text-align: center; line-height: 20px;
-            pointer-events: none; z-index: 10; text-shadow: 1px 1px 0 #000;
-        }
+/* ── HUD ── */
+#hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;
+  align-items:center;padding:10px 16px;background:linear-gradient(180deg,rgba(0,0,0,.75) 0%,transparent 100%);
+  pointer-events:none;z-index:10;gap:8px;}
+.hud-block{display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.4);
+  border:1px solid var(--border);border-radius:8px;padding:4px 10px;}
+.hud-label{font-size:9px;font-family:'Press Start 2P',monospace;color:rgba(255,255,255,.5);letter-spacing:.5px;}
+.hud-val{font-family:'Press Start 2P',monospace;font-size:12px;}
+.hud-icon{font-size:16px;}
+#livesDisplay{display:flex;gap:4px;}
+.heart{font-size:18px;transition:transform .2s;}
+.heart.lost{filter:grayscale(1);opacity:.3;}
 
-        /* UI Overlays */
-        #blocker {
-            position: absolute; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            z-index: 100; color: white; text-align: center;
-        }
+/* ── PROGRESS BAR ── */
+#progressWrap{position:absolute;bottom:0;left:0;right:0;height:6px;background:rgba(0,0,0,.5);z-index:10;}
+#progressBar{height:100%;background:linear-gradient(90deg,var(--roblox-blue),var(--roblox-teal));
+  border-radius:0 3px 3px 0;transition:width .3s;box-shadow:0 0 8px var(--roblox-teal);}
+#milestoneMarkers{position:absolute;top:-14px;left:0;right:0;pointer-events:none;}
+.milestone-marker{position:absolute;transform:translateX(-50%);font-size:16px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.8));}
 
-        #instructions {
-            background: linear-gradient(135deg, #0b3d1b, #112240);
-            padding: 30px; border: 4px solid #4CAF50;
-            border-radius: 15px; box-shadow: 0 0 40px rgba(76, 175, 80, 0.4);
-            width: 90%; max-width: 600px; box-sizing: border-box;
-        }
+/* ── CHAR PANEL ── */
+#charPanel{position:absolute;top:54px;right:12px;z-index:10;pointer-events:none;
+  background:rgba(0,0,0,.55);border:1px solid var(--border);border-radius:12px;padding:8px 10px;
+  display:flex;flex-direction:column;gap:6px;}
+.char-slot{display:flex;align-items:center;gap:6px;opacity:.35;transition:opacity .3s;}
+.char-slot.active{opacity:1;}
+.char-avatar{font-size:22px;width:30px;text-align:center;}
+.char-name-s{font-size:10px;font-family:'Press Start 2P',monospace;color:var(--white);}
+.char-bar-wrap{width:60px;height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;}
+.char-bar{height:100%;border-radius:3px;transition:width 0.3s;}
 
-        h1 { color: #4CAF50; text-shadow: 3px 3px 0 #000; margin-bottom: 20px; font-size: 22px; line-height: 1.4; }
-        p { line-height: 1.8; font-size: 11px; color: #ccc; margin-bottom: 20px; }
+/* ── POWER METER ── */
+#powerWrap{position:absolute;top:110px;left:12px;z-index:10;pointer-events:none;
+  display:flex;align-items:center;gap:8px;}
+#powerLabel{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--roblox-yellow);}
+#powerTrack{width:120px;height:12px;background:rgba(255,255,255,.1);border-radius:6px;
+  border:1px solid rgba(255,255,255,.15);overflow:hidden;}
+#powerFill{height:100%;background:linear-gradient(90deg,var(--roblox-purple),var(--roblox-teal));
+  border-radius:6px;width:0%;transition:width .2s;box-shadow:0 0 6px var(--roblox-teal);}
+#powerReady{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--roblox-teal);display:none;
+  animation:blink .5s infinite;}
+@keyframes blink{50%{opacity:0;}}
 
-        .start-btn {
-            display: block; width: 100%; padding: 15px; margin-bottom: 15px;
-            font-family: inherit; font-size: 12px;
-            color: white; background: #4CAF50;
-            border: 2px solid #fff; border-radius: 8px;
-            cursor: pointer; box-shadow: 0 5px 0 #2E7D32;
-            transition: transform 0.1s, box-shadow 0.1s;
-        }
-        .start-btn:active { transform: translateY(5px); box-shadow: 0 0 0 #2E7D32; }
-        #btn-mobile { background: #2196F3; box-shadow: 0 5px 0 #1565C0; }
-        #btn-mobile:active { box-shadow: 0 0 0 #1565C0; }
+/* ── MISSION TICKER ── */
+#missionBar{position:absolute;top:54px;left:12px;z-index:10;pointer-events:none;
+  background:rgba(0,0,0,.6);border:1px solid rgba(255,214,0,.3);border-radius:10px;
+  padding:6px 12px;max-width:260px;}
+#missionTitle{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--gold);margin-bottom:3px;}
+#missionDesc{font-size:11px;font-weight:700;color:rgba(255,255,255,.8);line-height:1.3;}
+#missionProgress{margin-top:4px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;}
+#missionFill{height:100%;background:var(--gold);border-radius:2px;transition:width .3s;}
 
-        /* Hotbar */
-        #hotbar-container {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 95%; max-width: 800px; overflow-x: auto;
-            background: rgba(0, 0, 0, 0.6); padding: 8px; 
-            border: 3px solid #333; border-radius: 10px; z-index: 10;
-        }
-        #hotbar-container::-webkit-scrollbar { height: 8px; }
-        #hotbar-container::-webkit-scrollbar-thumb { background: #4CAF50; border-radius: 4px; }
-        
-        #hotbar { display: flex; gap: 5px; width: max-content; }
+/* ── SCREENS ── */
+.screen{position:absolute;inset:0;border-radius:16px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;z-index:30;
+  background:linear-gradient(135deg,rgba(10,14,26,.97),rgba(17,24,39,.97));
+  backdrop-filter:blur(12px);}
+.screen.hidden{display:none;}
 
-        .slot {
-            width: 45px; height: 45px; border: 3px solid #555;
-            position: relative; box-sizing: border-box;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 10px; color: white; text-shadow: 1px 1px 0 #000;
-            cursor: pointer; border-radius: 5px; transition: 0.1s;
-            flex-shrink: 0; text-align: center; line-height: 1.2;
-        }
-        .slot.active { border-color: #FFF; transform: scale(1.1); box-shadow: 0 0 15px rgba(255,255,255,0.7); z-index: 2; }
-        .slot.locked { filter: grayscale(100%) brightness(0.4); cursor: not-allowed; }
-        .slot.locked::after { content: '🔒'; position: absolute; font-size: 18px; }
-        
-        .builder-icon { font-size: 18px; }
+/* TITLE */
+#titleScreen .game-logo{font-family:'Press Start 2P',monospace;font-size:28px;text-align:center;
+  line-height:1.4;margin-bottom:4px;
+  background:linear-gradient(135deg,var(--roblox-red),var(--roblox-yellow),var(--roblox-teal));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 4px 24px rgba(30,136,229,.6));
+  animation:logoPulse 2s ease-in-out infinite;}
+@keyframes logoPulse{0%,100%{filter:drop-shadow(0 4px 24px rgba(233,69,96,.5));}
+  50%{filter:drop-shadow(0 4px 40px rgba(0,188,212,.8));}}
+.tagline{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:24px;letter-spacing:1px;}
+.roblox-badge{background:rgba(229,62,62,.2);border:2px solid var(--roblox-red);border-radius:8px;
+  padding:6px 16px;font-size:11px;font-weight:800;color:var(--roblox-red);margin-bottom:20px;letter-spacing:1px;}
 
-        /* Mobile Controls */
-        #mobile-controls {
-            display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none; z-index: 5;
-        }
-        .touch-zone { position: absolute; top: 0; bottom: 0; pointer-events: auto; }
-        #touch-left { left: 0; width: 50%; }
-        #touch-right { right: 0; width: 50%; }
+/* CHAR SELECT */
+.chars-grid{display:flex;gap:14px;margin-bottom:22px;}
+.char-card{width:190px;background:var(--card);border:2px solid var(--border);border-radius:16px;
+  padding:18px 14px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;touch-action:manipulation;}
+.char-card::before{content:'';position:absolute;inset:0;opacity:0;
+  background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.08),transparent 70%);transition:opacity .2s;}
+.char-card:hover::before{opacity:1;}
+.char-card.selected{border-color:var(--roblox-yellow);box-shadow:0 0 24px rgba(255,214,0,.3);transform:translateY(-4px);}
+.char-card.locked{opacity:.5;filter:grayscale(.7);cursor:not-allowed;}
+.char-card .big-emoji{font-size:52px;display:block;margin-bottom:8px;}
+.char-card h3{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--gold);margin-bottom:6px;}
+.char-card .role{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;}
+.char-card .power-tag{background:rgba(124,58,237,.3);border:1px solid var(--roblox-purple);
+  border-radius:20px;padding:3px 10px;font-size:10px;font-weight:800;color:#c4b5fd;display:inline-block;margin-bottom:6px;}
+.char-card .stats{font-size:10px;color:rgba(255,255,255,.6);line-height:1.8;text-align:left;}
+.char-card .lock-tag{position:absolute;top:10px;right:10px;font-size:20px;}
+.unlock-hint{font-size:10px;color:rgba(255,255,255,.3);margin-bottom:20px;text-align:center;line-height:1.6;}
 
-        #joystick-base {
-            position: absolute; width: 120px; height: 120px;
-            background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%; display: none; transform: translate(-50%, -50%); pointer-events: none;
-        }
-        #joystick-stick {
-            position: absolute; width: 50px; height: 50px;
-            background: rgba(255,255,255,0.8); border-radius: 50%;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-        }
+/* BUTTONS */
+.btn{font-family:'Press Start 2P',monospace;cursor:pointer;border:none;border-radius:10px;
+  transition:all .15s;letter-spacing:.5px;touch-action:manipulation;}
+.btn-play{font-size:14px;padding:16px 48px;
+  background:linear-gradient(135deg,var(--roblox-green),#2E7D32);color:white;
+  box-shadow:0 6px 0 #1B5E20,0 0 24px rgba(67,160,71,.4);}
+.btn-play:hover{transform:translateY(-2px);box-shadow:0 8px 0 #1B5E20,0 0 40px rgba(67,160,71,.6);}
+.btn-play:active{transform:translateY(2px);box-shadow:0 4px 0 #1B5E20;}
+.btn-sm{font-size:9px;padding:10px 24px;background:rgba(255,255,255,.08);
+  color:var(--white);border:1px solid var(--border);margin:6px 4px;}
+.btn-sm:hover{background:rgba(255,255,255,.16);}
+.btn-red{background:linear-gradient(135deg,var(--roblox-red),#C62828);color:white;
+  box-shadow:0 4px 0 #B71C1C;font-size:11px;padding:12px 32px;}
+.btn-red:hover{transform:translateY(-2px);}
 
-        .action-btn {
-            position: absolute; background: rgba(0,0,0,0.4);
-            border: 2px solid rgba(255,255,255,0.6); border-radius: 50%;
-            color: white; font-size: 20px; display: flex;
-            justify-content: center; align-items: center;
-            pointer-events: auto; text-shadow: 2px 2px 0 #000;
-        }
-        .action-btn:active { background: rgba(255,255,255,0.4); transform: scale(0.95); }
+/* FIGHT/PUZZLE OVERLAY */
+#fightOverlay{position:absolute;inset:0;z-index:20;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(4px);}
+#fightOverlay.hidden{display:none;}
+.fight-box{background:var(--card);border:3px solid var(--roblox-red);border-radius:20px;
+  padding:28px 36px;text-align:center;max-width:480px;width:100%;
+  box-shadow:0 0 40px rgba(229,62,62,.4),0 0 80px rgba(229,62,62,.1);
+  animation:fightIn .3s ease;}
+@keyframes fightIn{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+.enemy-display{font-size:60px;margin-bottom:8px;animation:enemyFloat 1s ease-in-out infinite alternate;}
+@keyframes enemyFloat{from{transform:translateY(0);}to{transform:translateY(-8px);}}
+.enemy-name{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--roblox-red);
+  margin-bottom:4px;text-shadow:0 0 20px rgba(229,62,62,.7);}
+.enemy-hp-wrap{width:100%;height:16px;background:rgba(255,255,255,.1);border-radius:8px;
+  margin:10px 0;overflow:hidden;border:1px solid rgba(229,62,62,.3);}
+.enemy-hp-fill{height:100%;background:linear-gradient(90deg,var(--roblox-red),#FF5252);
+  border-radius:8px;transition:width .4s;box-shadow:0 0 8px var(--roblox-red);}
+.question-text{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--white);
+  margin:16px 0 12px;line-height:1.6;background:rgba(0,0,0,.3);border-radius:10px;
+  padding:12px;border:1px solid var(--border);}
+.subject-tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:9px;
+  font-weight:800;margin-bottom:10px;font-family:'Press Start 2P',monospace;}
+.tag-math{background:rgba(30,136,229,.2);color:var(--roblox-blue);border:1px solid var(--roblox-blue);}
+.tag-science{background:rgba(67,160,71,.2);color:var(--roblox-green);border:1px solid var(--roblox-green);}
+.tag-english{background:rgba(124,58,237,.2);color:#a78bfa;border:1px solid var(--roblox-purple);}
+.tag-general{background:rgba(255,109,0,.2);color:var(--roblox-orange);border:1px solid var(--roblox-orange);}
+.answer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
+.ans-btn{font-family:'Press Start 2P',monospace;font-size:11px;padding:16px 10px;
+  background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.15);
+  border-radius:12px;color:var(--white);cursor:pointer;transition:all .15s;line-height:1.4;}
+.ans-btn:hover:not(:disabled){background:rgba(30,136,229,.2);border-color:var(--roblox-blue);
+  transform:scale(1.03);box-shadow:0 0 16px rgba(30,136,229,.3);}
+.ans-btn.correct{background:rgba(67,160,71,.3);border-color:var(--roblox-green);
+  box-shadow:0 0 20px rgba(67,160,71,.5);}
+.ans-btn.wrong{background:rgba(229,62,62,.3);border-color:var(--roblox-red);
+  box-shadow:0 0 20px rgba(229,62,62,.5);}
+.fight-timer{font-family:'Press Start 2P',monospace;font-size:22px;color:var(--roblox-yellow);
+  margin-bottom:8px;text-shadow:0 0 16px rgba(255,214,0,.5);}
+.fight-streak{font-size:12px;font-weight:800;color:var(--roblox-orange);margin-top:8px;}
 
-        #btn-jump { bottom: 90px; right: 20px; width: 70px; height: 70px; font-size: 24px; }
-        #btn-place { bottom: 170px; right: 20px; width: 55px; height: 55px; font-size: 18px; }
-        #btn-break { bottom: 90px; right: 100px; width: 55px; height: 55px; font-size: 18px; }
-        
-        #btn-quiz { top: 20px; right: 20px; width: auto; padding: 0 15px; height: 45px; font-size: 12px; border-radius: 12px; background: #FF9800; border-color: #FFF; box-shadow: 0 0 15px #FF9800;}
-        #btn-cam { top: 75px; right: 20px; width: 45px; height: 45px; font-size: 18px; border-radius: 12px; }
+/* MILESTONE POPUP */
+#milestonePopup{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);
+  z-index:25;text-align:center;pointer-events:none;transition:transform .3s ease;}
+#milestonePopup.show{transform:translate(-50%,-50%) scale(1);}
+.milestone-box{background:linear-gradient(135deg,rgba(255,214,0,.15),rgba(255,109,0,.15));
+  border:3px solid var(--gold);border-radius:20px;padding:20px 32px;
+  box-shadow:0 0 60px rgba(255,214,0,.4);}
+.ms-title{font-family:'Press Start 2P',monospace;font-size:18px;color:var(--gold);
+  text-shadow:0 0 20px rgba(255,214,0,.8);}
+.ms-reward{font-size:13px;font-weight:800;color:rgba(255,255,255,.8);margin-top:8px;}
 
-        /* UI Stats & Editor */
-        #stats-display {
-            position: absolute; top: 20px; left: 20px; color: white;
-            font-size: 10px; text-shadow: 2px 2px 0 #000; line-height: 2.0;
-            pointer-events: none; z-index: 10;
-        }
+/* TOAST NOTIFICATIONS */
+#toastArea{position:absolute;top:100px;left:50%;transform:translateX(-50%);
+  z-index:22;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.toast{background:rgba(0,0,0,.85);border-radius:20px;padding:8px 20px;font-weight:800;
+  font-size:13px;border:1px solid rgba(255,255,255,.1);animation:toastAnim .3s ease;
+  white-space:nowrap;backdrop-filter:blur(8px);}
+@keyframes toastAnim{from{transform:translateY(-10px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.toast-good{border-color:rgba(67,160,71,.5);color:#86efac;}
+.toast-bad{border-color:rgba(229,62,62,.5);color:#fca5a5;}
+.toast-info{border-color:rgba(255,214,0,.5);color:var(--gold);}
 
-        /* Quiz UI */
-        #quiz-ui {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #1e1e1e; border: 4px solid #FF9800;
-            padding: 25px; color: white; z-index: 200; display: none;
-            width: 90%; max-width: 500px; border-radius: 15px; box-shadow: 0 0 50px rgba(0,0,0,0.9);
-            text-align: center;
-        }
-        #quiz-question { font-size: 14px; margin-bottom: 25px; line-height: 1.6; color: #FFF; }
-        .quiz-opt {
-            display: block; width: 100%; padding: 15px; margin-bottom: 10px;
-            font-family: inherit; font-size: 11px; color: white;
-            background: #333; border: 2px solid #555; border-radius: 8px;
-            cursor: pointer; transition: 0.2s;
-        }
-        .quiz-opt:hover { background: #555; border-color: #FF9800; }
-        
-        #quiz-progress-box {
-            background: #000; border: 2px solid #555; padding: 10px;
-            margin-top: 20px; border-radius: 8px;
-        }
-        #quiz-status { font-size: 10px; color: #4CAF50; margin-bottom: 5px; }
-        #next-unlock { font-size: 10px; color: #FFD700; line-height: 1.5; }
-        
-        #notification {
-            position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
-            background: rgba(76, 175, 80, 0.95); color: white; padding: 15px 30px;
-            border-radius: 10px; border: 2px solid #FFF; font-size: 12px;
-            z-index: 300; display: none; text-align: center; line-height: 1.5;
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
-        }
-    </style>
+/* GAME OVER */
+#gameOverScreen h2{font-family:'Press Start 2P',monospace;font-size:32px;color:var(--roblox-red);
+  text-shadow:0 0 30px rgba(229,62,62,.7);margin-bottom:8px;}
+.go-char{font-size:72px;margin-bottom:8px;animation:wobble 1s ease-in-out infinite;}
+@keyframes wobble{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;width:380px;max-width:90%;}
+.stat-cell{background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:12px;text-align:center;}
+.stat-cell .sv{font-family:'Press Start 2P',monospace;font-size:18px;color:var(--gold);}
+.stat-cell .sk{font-size:10px;color:rgba(255,255,255,.5);margin-top:4px;}
+.milestones-earned{margin:10px 0;font-size:11px;color:rgba(255,255,255,.6);line-height:1.8;}
+
+/* WIN SCREEN */
+#winScreen h2{font-family:'Press Start 2P',monospace;font-size:24px;color:var(--gold);text-align:center;}
+.confetti-area{font-size:32px;letter-spacing:4px;animation:confettiBounce .6s ease-in-out infinite alternate;}
+@keyframes confettiBounce{from{transform:translateY(0);}to{transform:translateY(-8px);}}
+
+/* CONTROLS HINT (DESKTOP) */
+#keysHint{position:absolute;bottom:18px;right:14px;z-index:10;pointer-events:none;
+  font-family:'Press Start 2P',monospace;font-size:7px;color:rgba(255,255,255,.4);line-height:2;text-align:right;}
+
+/* ── MOBILE ONSCREEN CONTROLS ── */
+.mobile-controls { display: none; }
+body.is-touch .mobile-controls { display: block; }
+body.is-touch #keysHint { display: none; }
+
+.mobile-btn {
+  position:absolute; background:rgba(0,0,0,0.5); border:2px solid rgba(255,255,255,0.2);
+  border-radius:50%; color:white; display:flex; align-items:center; justify-content:center;
+  font-size:34px; z-index:15; backdrop-filter:blur(6px); box-shadow:0 4px 16px rgba(0,0,0,0.5);
+  touch-action:none; transition:transform 0.1s, background 0.1s; cursor:pointer;
+}
+.mobile-btn:active { transform:scale(0.85); background:rgba(255,255,255,0.25); }
+
+#btnSlide { bottom:20px; left:20px; width:85px; height:85px; }
+#btnJump  { bottom:20px; right:20px; width:85px; height:85px; }
+#btnPower { bottom:120px; right:20px; width:65px; height:65px; font-size:30px; border-color:rgba(255, 214, 0, 0.5); }
+
+.char-nav-btn {
+  position:absolute; top:125px; width:44px; height:44px; border-radius:22px;
+  background:rgba(0,0,0,0.6); border:2px solid rgba(255,255,255,0.2); color:white;
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+  z-index:15; touch-action:none; transition:transform 0.1s; cursor:pointer;
+}
+.char-nav-btn:active { transform:scale(0.85); }
+#btnCharL { right:65px; }
+#btnCharR { right:12px; }
+
+/* ── PORTRAIT MODE WARNING ── */
+#portraitWarning {
+  display:none; position:fixed; inset:0; z-index:99999;
+  background:var(--dark); flex-direction:column; align-items:center;
+  justify-content:center; text-align:center; padding:30px;
+}
+#portraitWarning .icon { font-size:60px; margin-bottom:20px; animation:rotatePhone 2s infinite ease-in-out; }
+@keyframes rotatePhone { 0% { transform:rotate(0deg); } 50% { transform:rotate(-90deg); } 100% { transform:rotate(-90deg); } }
+#portraitWarning h2 { font-family:'Press Start 2P',monospace; font-size:16px; color:var(--roblox-yellow); margin-bottom:12px; line-height:1.5; }
+#portraitWarning p { font-size:14px; color:var(--white); opacity:0.8; }
+
+@media (orientation: portrait) {
+  #wrap { display:none !important; }
+  #portraitWarning { display:flex; }
+}
+</style>
 </head>
 <body>
 
-    <div id="crosshair">+</div>
+<!-- Portrait Warning -->
+<div id="portraitWarning">
+  <div class="icon">📱</div>
+  <h2>PLEASE ROTATE<br>YOUR DEVICE</h2>
+  <p>Murad's Discovery Dash is best played in landscape mode!</p>
+</div>
 
-    <div id="stats-display">
-        FPS: <span id="fps">0</span><br>
-        Score: <span id="hud-score" style="color:#FF9800">0 Correct</span><br>
-        Biome: <span id="hud-biome" style="color:#aaddff">Loading...</span><br>
-        <span style="color:#ccc">[V] Toggle Camera</span>
+<div id="wrap">
+  <canvas id="gc" width="960" height="540"></canvas>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hud-block">
+      <span class="hud-icon">⭐</span>
+      <div><div class="hud-label">SCORE</div><div class="hud-val" id="hScore" style="color:var(--gold)">0</div></div>
     </div>
-
-    <!-- Notification Toast -->
-    <div id="notification">Notification Text</div>
-
-    <!-- Mobile Touch Controls -->
-    <div id="mobile-controls">
-        <div id="touch-left" class="touch-zone"></div>
-        <div id="touch-right" class="touch-zone"></div>
-        <div id="joystick-base"><div id="joystick-stick"></div></div>
-        
-        <div id="btn-jump" class="action-btn">▲</div>
-        <div id="btn-place" class="action-btn">🧱</div>
-        <div id="btn-break" class="action-btn">⚒</div>
-        <div id="btn-quiz" class="action-btn">🎓 EARN POWERS</div>
-        <div id="btn-cam" class="action-btn">👁️</div>
+    <div class="hud-block">
+      <span class="hud-icon">📏</span>
+      <div><div class="hud-label">DIST</div><div class="hud-val" id="hDist" style="color:var(--roblox-teal)">0m</div></div>
     </div>
-
-    <!-- Scrollable Hotbar -->
-    <div id="hotbar-container">
-        <div id="hotbar">
-            <!-- Basic Materials -->
-            <div class="slot active" id="slot-1" style="background: #4d8a28;">Grass</div>
-            <div class="slot" id="slot-2" style="background: #6b4d3a;">Dirt</div>
-            <div class="slot" id="slot-3" style="background: #7a7a7a;">Stone</div>
-            <div class="slot" id="slot-4" style="background: #4a331c;">Wood</div>
-            <div class="slot" id="slot-5" style="background: #235e20;">Leaves</div>
-            <div class="slot" id="slot-6" style="background: #d2b48c;">Sand</div>
-            <!-- City Materials -->
-            <div class="slot" id="slot-8" style="background: #b22222;">Brick</div>
-            <div class="slot" id="slot-9" style="background: #aaddff; color: #000;">Glass</div>
-            <div class="slot" id="slot-10" style="background: #aaaaaa; color: #000;">Wall</div>
-            <div class="slot" id="slot-11" style="background: #333333;">Road</div>
-            <div class="slot" id="slot-12" style="background: #c2a47c; color: #000;">Plank</div>
-            <div class="slot" id="slot-14" style="background: #ffffaa; color: #000;">Lamp</div>
-            <!-- Special Auto-Builders -->
-            <div class="slot locked" id="slot-15" style="background: #e74c3c; border-color: #FFF;"><span class="builder-icon">🏠</span><br>House</div>
-            <div class="slot locked" id="slot-16" style="background: #2ecc71; border-color: #FFF;"><span class="builder-icon">🌲</span><br>Park</div>
-            <div class="slot locked" id="slot-17" style="background: #f1c40f; border-color: #FFF; color: #000;"><span class="builder-icon">🏫</span><br>School</div>
-            <div class="slot locked" id="slot-18" style="background: #ecf0f1; border-color: #FFF; color: #000;"><span class="builder-icon">🏥</span><br>Clinic</div>
-            <div class="slot locked" id="slot-19" style="background: #3498db; border-color: #FFF;"><span class="builder-icon">🏢</span><br>Tower</div>
-        </div>
+    <div class="hud-block" id="livesBlock">
+      <div class="hud-label" style="margin-right:4px">LIVES</div>
+      <div id="livesDisplay">
+        <span class="heart" id="h1">❤️</span>
+        <span class="heart" id="h2">❤️</span>
+        <span class="heart" id="h3">❤️</span>
+        <span class="heart" id="h4">❤️</span>
+        <span class="heart" id="h5">❤️</span>
+      </div>
     </div>
-
-    <!-- Main Menu -->
-    <div id="blocker">
-        <div id="instructions">
-            <h1>MARDAKAN CITY BUILDER</h1>
-            <p>Welcome to Mardakan! Build your city between the mountains, the dense forest, and the Caspian Sea.</p>
-            <p style="color: #FF9800;">Answer educational questions to unlock magical Auto-Builders that instantly construct Houses, Schools, and Hospitals!</p>
-            <button class="start-btn" id="btn-pc">Play on PC (Mouse/Keyboard)</button>
-            <button class="start-btn" id="btn-mobile">Play on Mobile (Touch)</button>
-        </div>
+    <div class="hud-block">
+      <span class="hud-icon">🔥</span>
+      <div><div class="hud-label">STREAK</div><div class="hud-val" id="hStreak" style="color:var(--roblox-orange)">0</div></div>
     </div>
-
-    <!-- Quiz UI -->
-    <div id="quiz-ui">
-        <h2 style="color: #FF9800; margin-top:0;">🎓 Learning Terminal</h2>
-        <div id="quiz-question">Loading question...</div>
-        <button class="quiz-opt" id="opt-0">A</button>
-        <button class="quiz-opt" id="opt-1">B</button>
-        <button class="quiz-opt" id="opt-2">C</button>
-        <button class="quiz-opt" id="opt-3">D</button>
-        
-        <div id="quiz-progress-box">
-            <div id="quiz-status">Correct Answers: <span id="quiz-score">0</span></div>
-            <div id="next-unlock">Next Reward: Small House Builder (Requires 2 pts)</div>
-        </div>
-
-        <button class="start-btn" id="close-quiz" style="margin-top: 15px; background: #d32f2f;">Resume Game</button>
+    <div class="hud-block">
+      <span class="hud-icon">✨</span>
+      <div><div class="hud-label">SPARKS</div><div class="hud-val" id="hSparks" style="color:var(--roblox-purple)">0</div></div>
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-    <script>
-        /**
-         * MARDAKAN CITY BUILDER - ULTIMATE EXACT-POINTER EDITION
-         * Features: 3rd Person Visible Character, Exact DDA Raycasting, Advanced AI Quiz, AutoBuilders.
-         */
-
-        // --- 1. GLOBALS & STATE ---
-        let gameActive = false;
-        let inputMode = 'none'; 
-        let isThirdPerson = true; // Default to 3rd person to show off the character model
-        
-        const WORLD_SIZE = 80; 
-        const BLOCK_SIZE = 1;
-        
-        let camera, scene, renderer, dirLight, hemiLight;
-        let pitchObject, yawObject;
-        let outlineMesh;
-        
-        // Character Model Parts
-        let characterGroup, head, leftArmGroup, rightArmGroup, leftLegGroup, rightLegGroup;
-        
-        let lastTime = performance.now();
-        let frames = 0, lastFpsTime = lastTime;
-        let gameTime = 400; 
-        
-        const velocity = new THREE.Vector3();
-        const direction = new THREE.Vector3();
-        let isGrounded = false;
-        let isFlying = false;
-
-        const keys = { w: false, a: false, s: false, d: false, space: false };
-        const joyMove = { x: 0, y: 0 };
-
-        let audioCtx = null;
-        let quizScore = 0;
-        let currentQuestion = null;
-        let lastQuestionIndex = -1;
-
-        // --- 2. ADVANCED QUESTION BANK ---
-        const quizBank = [
-            { q: "I have keys but no locks. I have a space but no room. You can enter, but can't go outside. What am I?", opts: ["A Keyboard", "A Piano", "A House", "A Computer"], a: "A Keyboard" },
-            { q: "What has to be broken before you can use it?", opts: ["An egg", "A window", "A promise", "A code"], a: "An egg" },
-            { q: "I'm tall when I'm young, and I'm short when I'm old. What am I?", opts: ["A candle", "A tree", "A human", "A pencil"], a: "A candle" },
-            { q: "What is full of holes but still holds water?", opts: ["A sponge", "A net", "A bucket", "A cloud"], a: "A sponge" },
-            { q: "What gets wetter as it dries?", opts: ["A towel", "A sponge", "A drop of water", "The sun"], a: "A towel" },
-            { q: "What goes up but never comes down?", opts: ["Your age", "A balloon", "A bird", "The sky"], a: "Your age" },
-            { q: "If a brother has two sisters, how many children are in the family?", opts: ["3", "2", "4", "5"], a: "3" },
-            { q: "Which month of the year has 28 days?", opts: ["All of them", "February", "January", "None"], a: "All of them" },
-            { q: "What has legs, but doesn't walk?", opts: ["A table", "A snake", "A worm", "A tree"], a: "A table" },
-            { q: "I shave every day, but my beard stays the same. What am I?", opts: ["A barber", "A wizard", "A bear", "An actor"], a: "A barber" },
-            { q: "What goes up when rain comes down?", opts: ["An umbrella", "A cloud", "A bird", "The sun"], a: "An umbrella" },
-            // Regional / Azerbaijan (Mardakan context)
-            { q: "What is the capital city of Azerbaijan?", opts: ["Baku", "Ganja", "Sumqayit", "Lankaran"], a: "Baku" },
-            { q: "Which massive body of water is located next to Baku?", opts: ["Caspian Sea", "Black Sea", "Red Sea", "Mediterranean Sea"], a: "Caspian Sea" },
-            { q: "What colors are on the flag of Azerbaijan?", opts: ["Blue, Red, Green", "Red, White, Blue", "Green, White, Orange", "Yellow, Red, Black"], a: "Blue, Red, Green" },
-            // Word Problems / Math
-            { q: "You have 5 apples. You buy 7 more, then eat 2. How many are left?", opts: ["10", "12", "5", "14"], a: "10" },
-            { q: "A train leaves at 3:00 PM and takes 2 hours to arrive. What time does it arrive?", opts: ["5:00 PM", "6:00 PM", "4:00 PM", "2:00 PM"], a: "5:00 PM" },
-            { q: "If one square has 4 sides, how many sides do 3 squares have?", opts: ["12", "10", "8", "16"], a: "12" },
-            // Science
-            { q: "Which of these is a source of light?", opts: ["The Sun", "A rock", "A mirror", "The Moon"], a: "The Sun" },
-            { q: "What do plants need to grow?", opts: ["Water and Sunlight", "Juice and Soil", "Rocks and Air", "Fire and Water"], a: "Water and Sunlight" },
-            { q: "What freezes to become ice?", opts: ["Water", "Air", "Lava", "Juice"], a: "Water" },
-            { q: "Which animal is known as the King of the Jungle?", opts: ["Lion", "Tiger", "Elephant", "Monkey"], a: "Lion" }
-        ];
-
-        for(let i=4; i<=9; i++) {
-            for(let j=3; j<=11; j++) {
-                let ans = (i*j).toString();
-                let f1 = (i*j + i).toString(), f2 = (i*j - j).toString(), f3 = (i*j + 2).toString();
-                if(f1 === f2) f1 = (i*j + 5).toString();
-                quizBank.push({ q: `Solve the math: What is ${i} × ${j}?`, opts: [ans, f1, f2, f3], a: ans });
-            }
-        }
-
-        // --- 3. BLOCK & TOOL DEFINITIONS ---
-        const BLOCKS = {
-            1: { name: 'Grass', color1: '#4d8a28', color2: '#3d6e20', top: true },
-            2: { name: 'Dirt', color1: '#6b4d3a', color2: '#543b2b' },
-            3: { name: 'Stone', color1: '#7a7a7a', color2: '#636363' },
-            4: { name: 'Wood', color1: '#4a331c', color2: '#362413' },
-            5: { name: 'Leaves', color1: '#235e20', color2: '#194517', transparent: true },
-            6: { name: 'Sand', color1: '#d2b48c', color2: '#c2a47c' },
-            7: { name: 'Water', color1: '#3498db', color2: '#2980b9', transparent: true, noCollision: true },
-            8: { name: 'Brick', color1: '#b22222', color2: '#8b0000', pattern: 'brick' },
-            9: { name: 'Glass', color1: '#aaddff', color2: '#ffffff', transparent: true, opacity: 0.4 },
-            10: { name: 'Concrete', color1: '#e0e0e0', color2: '#cccccc' },
-            11: { name: 'Road', color1: '#333333', color2: '#222222', pattern: 'road' },
-            12: { name: 'Planks', color1: '#d2b48c', color2: '#c2a47c', pattern: 'wood' },
-            13: { name: 'Metal', color1: '#ffffff', color2: '#dddddd', pattern: 'metal' },
-            14: { name: 'Lamp', color1: '#ffffaa', color2: '#ffffff', light: true },
-            15: { name: 'HouseBuilder', weapon: true, shape: 'house' },
-            16: { name: 'ParkBuilder', weapon: true, shape: 'park' },
-            17: { name: 'SchoolBuilder', weapon: true, shape: 'school' },
-            18: { name: 'HospitalBuilder', weapon: true, shape: 'hospital' },
-            19: { name: 'SkyBuilder', weapon: true, shape: 'skyscraper' }
-        };
-        
-        let currentBlockType = 1;
-        let unlockedBlocks = [1,2,3,4,5,6,7,8,9,10,11,12,13,14];
-        
-        const worldData = new Map();
-        const instancedMeshes = {};
-        const maxInstancesPerType = 40000;
-        const dummy = new THREE.Object3D();
-
-        let playerStats = { speed: 40, jump: 15, reach: 7 };
-
-        // --- 4. AUDIO ---
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        }
-
-        function playSound(type) {
-            if (!audioCtx) return;
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-
-            if (type === 'break') {
-                osc.type = 'square'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(40, now + 0.1);
-                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now); osc.stop(now + 0.1);
-            } else if (type === 'place') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(450, now + 0.05);
-                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-                osc.start(now); osc.stop(now + 0.05);
-            } else if (type === 'success') {
-                osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.setValueAtTime(600, now + 0.1); osc.frequency.setValueAtTime(800, now + 0.2);
-                gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.4);
-                osc.start(now); osc.stop(now + 0.4);
-            } else if (type === 'fail') {
-                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, now); osc.frequency.linearRampToValueAtTime(100, now + 0.2);
-                gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.2);
-                osc.start(now); osc.stop(now + 0.2);
-            }
-        }
-
-        // --- 5. TEXTURES ---
-        function generatePixelTexture(typeInfo) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 16; canvas.height = 16;
-            const ctx = canvas.getContext('2d');
-            
-            for (let x = 0; x < 16; x++) {
-                for (let y = 0; y < 16; y++) {
-                    ctx.fillStyle = Math.random() > 0.4 ? typeInfo.color1 : typeInfo.color2;
-                    ctx.fillRect(x, y, 1, 1);
-                    
-                    if (typeInfo.pattern === 'brick' && (y % 4 === 0 || (y % 8 === 4 && x % 8 === 0))) ctx.fillStyle = '#dddddd';
-                    if (typeInfo.pattern === 'road' && x === 8 && y % 4 !== 0) ctx.fillStyle = '#ffffff'; 
-                    if (typeInfo.pattern === 'wood' && x % 4 === 0) ctx.fillStyle = '#221100';
-                    if (typeInfo.pattern === 'metal' && (x+y)%4 === 0) ctx.fillStyle = '#999999';
-                    
-                    if (x === 0 || y === 0) { ctx.fillStyle = 'rgba(255,255,255,0.1)'; }
-                    if (x === 15 || y === 15) { ctx.fillStyle = 'rgba(0,0,0,0.2)'; }
-                    ctx.fillRect(x, y, 1, 1);
-                }
-            }
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.magFilter = THREE.NearestFilter; texture.minFilter = THREE.NearestFilter;
-            return texture;
-        }
-
-        function createMaterials() {
-            const materials = {};
-            for (const key in BLOCKS) {
-                const b = BLOCKS[key];
-                if(b.weapon) continue;
-
-                const tex = generatePixelTexture(b);
-                if (b.top) {
-                    const sideTex = generatePixelTexture(BLOCKS[2]);
-                    materials[key] = [
-                        new THREE.MeshLambertMaterial({ map: sideTex }), new THREE.MeshLambertMaterial({ map: sideTex }),
-                        new THREE.MeshLambertMaterial({ map: tex }), new THREE.MeshLambertMaterial({ map: sideTex }),
-                        new THREE.MeshLambertMaterial({ map: sideTex }), new THREE.MeshLambertMaterial({ map: sideTex })
-                    ];
-                } else {
-                    materials[key] = new THREE.MeshLambertMaterial({ 
-                        map: tex, transparent: b.transparent || false, opacity: b.transparent ? (b.opacity || 0.6) : 1
-                    });
-                    if(b.light) materials[key].emissive = new THREE.Color(b.color1);
-                }
-            }
-            return materials;
-        }
-
-        // --- 6. ENGINE & CHARACTER INIT ---
-        function init() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87CEEB);
-            scene.fog = new THREE.FogExp2(0x87CEEB, 0.015);
-
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            
-            pitchObject = new THREE.Object3D(); 
-            pitchObject.position.y = 1.5; // Eye Level Pivot
-            pitchObject.add(camera);
-            
-            yawObject = new THREE.Object3D(); 
-            yawObject.add(pitchObject);
-            scene.add(yawObject);
-
-            // Construct Visible Character Mesh (3rd Person View)
-            buildCharacterModel();
-
-            hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
-            scene.add(hemiLight);
-
-            dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.castShadow = true;
-            dirLight.shadow.camera.left = -50; dirLight.shadow.camera.right = 50;
-            dirLight.shadow.camera.top = 50; dirLight.shadow.camera.bottom = -50;
-            scene.add(dirLight);
-
-            renderer = new THREE.WebGLRenderer({ antialias: false });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
-            renderer.shadowMap.enabled = true;
-            document.body.appendChild(renderer.domElement);
-
-            const outlineGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.02, 1.02, 1.02));
-            const outlineMat = new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 });
-            outlineMesh = new THREE.LineSegments(outlineGeo, outlineMat);
-            outlineMesh.visible = false;
-            scene.add(outlineMesh);
-
-            const geometry = new THREE.BoxGeometry(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-            const materials = createMaterials();
-
-            for (const key in BLOCKS) {
-                if(BLOCKS[key].weapon) continue;
-                const mesh = new THREE.InstancedMesh(geometry, materials[key], maxInstancesPerType);
-                mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-                mesh.castShadow = true; mesh.receiveShadow = true;
-                mesh.count = 0;
-                scene.add(mesh);
-                instancedMeshes[key] = { mesh: mesh, positions: [] };
-            }
-
-            generateMardakanWorld();
-            setupInput();
-            setupQuizUI();
-            updateUnlockText();
-            
-            window.addEventListener('resize', onWindowResize);
-            animate();
-        }
-
-        function buildCharacterModel() {
-            characterGroup = new THREE.Group();
-            
-            const skinMat = new THREE.MeshLambertMaterial({color: 0xffe0bd});
-            const shirtMat = new THREE.MeshLambertMaterial({color: 0x0055ff});
-            const pantsMat = new THREE.MeshLambertMaterial({color: 0x002288});
-
-            // Head (Pivot at neck for looking up/down)
-            head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat);
-            head.position.y = 0.25; 
-            
-            let neckGroup = new THREE.Group();
-            neckGroup.position.y = 1.5; 
-            neckGroup.add(head);
-            characterGroup.add(neckGroup);
-            
-            // To sync head with camera pitch without disrupting the camera logic, we link it in the animate loop
-            head.userData.neckGroup = neckGroup;
-
-            // Body
-            const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 0.25), shirtMat);
-            body.position.y = 1.125;
-            characterGroup.add(body);
-
-            // Left Arm
-            leftArmGroup = new THREE.Group();
-            leftArmGroup.position.set(-0.4, 1.4, 0); // Shoulder joint
-            const lArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), skinMat);
-            lArmMesh.position.y = -0.375;
-            leftArmGroup.add(lArmMesh);
-            characterGroup.add(leftArmGroup);
-
-            // Right Arm
-            rightArmGroup = new THREE.Group();
-            rightArmGroup.position.set(0.4, 1.4, 0); // Shoulder joint
-            const rArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), skinMat);
-            rArmMesh.position.y = -0.375;
-            rightArmGroup.add(rArmMesh);
-            characterGroup.add(rightArmGroup);
-
-            // Left Leg
-            leftLegGroup = new THREE.Group();
-            leftLegGroup.position.set(-0.15, 0.75, 0); // Hip joint
-            const lLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), pantsMat);
-            lLegMesh.position.y = -0.375;
-            leftLegGroup.add(lLegMesh);
-            characterGroup.add(leftLegGroup);
-
-            // Right Leg
-            rightLegGroup = new THREE.Group();
-            rightLegGroup.position.set(0.15, 0.75, 0); // Hip joint
-            const rLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), pantsMat);
-            rLegMesh.position.y = -0.375;
-            rightLegGroup.add(rLegMesh);
-            characterGroup.add(rightLegGroup);
-
-            yawObject.add(characterGroup);
-        }
-
-        // --- 7. MARDAKAN GEOGRAPHY GENERATION ---
-        function seededRandom(x, z) {
-            let n = x * 331 + z * 339; n = (n << 13) ^ n;
-            return (1.0 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);
-        }
-
-        function getElevation(x, z) {
-            let e = Math.sin(x * 0.1) * 2 + Math.cos(z * 0.1) * 2;
-            e += Math.sin(x * 0.05 + z * 0.04) * 3 + seededRandom(x, z) * 1.5;
-            
-            if (z < -10) e += Math.pow(Math.abs(z + 10), 1.15) * 0.4;
-            else if (z > 15) e -= Math.pow(z - 15, 1.1) * 0.5; 
-            return Math.floor(e);
-        }
-
-        function addBlockData(x, y, z, type) {
-            const key = `${Math.floor(x)},${Math.floor(y)},${Math.floor(z)}`;
-            if (!worldData.has(key)) {
-                worldData.set(key, parseInt(type));
-                if(instancedMeshes[type]) instancedMeshes[type].positions.push({x, y, z});
-            }
-        }
-
-        function removeBlockData(x, y, z) {
-            const key = `${Math.floor(x)},${Math.floor(y)},${Math.floor(z)}`;
-            if (worldData.has(key)) {
-                const type = worldData.get(key);
-                worldData.delete(key);
-                if(instancedMeshes[type]) {
-                    const arr = instancedMeshes[type].positions;
-                    for (let i = 0; i < arr.length; i++) {
-                        if (arr[i].x === x && arr[i].y === y && arr[i].z === z) { arr.splice(i, 1); break; }
-                    }
-                    updateInstancedMesh(type);
-                }
-            }
-        }
-
-        function updateInstancedMesh(type) {
-            if(!instancedMeshes[type]) return;
-            const data = instancedMeshes[type];
-            data.mesh.count = data.positions.length;
-            for (let i = 0; i < data.positions.length; i++) {
-                dummy.position.set(data.positions[i].x, data.positions[i].y, data.positions[i].z);
-                dummy.updateMatrix();
-                data.mesh.setMatrixAt(i, dummy.matrix);
-            }
-            data.mesh.instanceMatrix.needsUpdate = true;
-        }
-
-        function generateMardakanWorld() {
-            const halfSize = WORLD_SIZE / 2;
-            for (let x = -halfSize; x < halfSize; x++) {
-                for (let z = -halfSize; z < halfSize; z++) {
-                    const h = getElevation(x, z);
-                    
-                    if (h < -2) {
-                        addBlockData(x, h, z, 6); // Sand
-                        for (let wy = h + 1; wy <= -2; wy++) addBlockData(x, wy, z, 7); // Water
-                    } else if (z < -15 && h > 8) {
-                        addBlockData(x, h, z, 3); // Stone
-                    } else {
-                        addBlockData(x, h, z, 1); // Grass
-                        let isForest = (z >= -15 && z <= 15);
-                        let treeChance = isForest ? 0.08 : 0.01;
-                        
-                        if (Math.random() < treeChance) {
-                            const height = 4 + Math.floor(Math.random() * 3);
-                            for (let i = 0; i < height; i++) addBlockData(x, h + 1 + i, z, 4); 
-                            for (let lx = -2; lx <= 2; lx++) {
-                                for (let ly = height - 2; ly <= height + 1; ly++) {
-                                    for (let lz = -2; lz <= 2; lz++) {
-                                        if (Math.abs(lx) === 2 && Math.abs(lz) === 2) continue;
-                                        if (lx === 0 && lz === 0 && ly < height) continue;
-                                        const k = `${x+lx},${h+1+ly},${z+lz}`;
-                                        if (!worldData.has(k)) addBlockData(x + lx, h + 1 + ly, z + lz, 5);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    let surfaceType = worldData.get(`${x},${h},${z}`);
-                    let underType = (surfaceType === 6) ? 6 : 2; 
-                    for (let y = h - 1; y >= h - 3; y--) addBlockData(x, y, z, underType);
-                    for (let y = h - 4; y >= h - 10; y--) addBlockData(x, y, z, 3); 
-                }
-            }
-            
-            for (const key in instancedMeshes) updateInstancedMesh(key);
-            yawObject.position.set(0, getElevation(0,0) + 5, 0);
-        }
-
-        // --- 8. AUTO-BUILDER BLUEPRINTS ---
-        function constructFacility(px, py, pz, shape) {
-            let blocksUsed = new Set();
-            
-            const putBlock = (dx, dy, dz, type) => {
-                removeBlockData(px+dx, py+dy, pz+dz);
-                if(type !== 0) {
-                    addBlockData(px+dx, py+dy, pz+dz, type);
-                    blocksUsed.add(type);
-                }
-            };
-
-            if (shape === 'house') {
-                for(let x=-2; x<=2; x++) {
-                    for(let y=0; y<=3; y++) {
-                        for(let z=-2; z<=2; z++) {
-                            if (x===0 && y<2 && z===2) putBlock(x,y,z,0); 
-                            else if (y===0 || y===3) putBlock(x,y,z,12); 
-                            else if (y===1 && (x===-2 || x===2)) putBlock(x,y,z,9); 
-                            else if (x===-2 || x===2 || z===-2 || z===2) putBlock(x,y,z,8); 
-                            else if (x===0 && y===2 && z===0) putBlock(x,y,z,14); 
-                            else putBlock(x,y,z,0); 
-                        }
-                    }
-                }
-                showNotification("🏠 House Constructed!");
-            } 
-            else if (shape === 'park') {
-                for(let x=-3; x<=3; x++) {
-                    for(let z=-3; z<=3; z++) {
-                        for(let y=1; y<=5; y++) putBlock(x,y,z,0);
-                        if (x===0 || z===0) putBlock(x,0,z,11); 
-                        else putBlock(x,0,z,1); 
-                        if(Math.abs(x)===2 && Math.abs(z)===2) putBlock(x,1,z,12);
-                        if(Math.abs(x)===3 && Math.abs(z)===3) {
-                            putBlock(x,1,z,4); putBlock(x,2,z,4); putBlock(x,3,z,5);
-                            putBlock(x+1,2,z,5); putBlock(x-1,2,z,5); putBlock(x,2,z+1,5); putBlock(x,2,z-1,5);
-                        }
-                    }
-                }
-                showNotification("🌲 City Park Constructed!");
-            }
-            else if (shape === 'school') {
-                for(let x=-4; x<=4; x++) {
-                    for(let y=0; y<=4; y++) {
-                        for(let z=-2; z<=2; z++) {
-                            if (x===0 && y<2 && z===2) putBlock(x,y,z,0); 
-                            else if (y===0 || y===4) putBlock(x,y,z,10); 
-                            else if (y>=1 && y<=2 && z===2 && x!==0) putBlock(x,y,z,9); 
-                            else if (x===-4 || x===4 || z===-2 || z===2) putBlock(x,y,z,10); 
-                            else if (y===3 && x%2===0 && z===0) putBlock(x,y,z,14); 
-                            else putBlock(x,y,z,0); 
-                        }
-                    }
-                }
-                showNotification("🏫 School Constructed!");
-            }
-            else if (shape === 'hospital') {
-                for(let x=-3; x<=3; x++) {
-                    for(let y=0; y<=5; y++) {
-                        for(let z=-3; z<=3; z++) {
-                            if (Math.abs(x)===3 && Math.abs(z)===3) { putBlock(x,y,z,0); continue; }
-                            if (x===0 && y<2 && z===3) putBlock(x,y,z,0); 
-                            else if (y===0 || y===5) putBlock(x,y,z,13); 
-                            else if (y===2 && x===0 && z===-3) putBlock(x,y,z,8); 
-                            else if (x===-3 || x===3 || z===-3 || z===3) putBlock(x,y,z,13); 
-                            else if (y===4 && x===0 && z===0) putBlock(x,y,z,14); 
-                            else putBlock(x,y,z,0);
-                        }
-                    }
-                }
-                showNotification("🏥 Hospital Clinic Constructed!");
-            }
-            else if (shape === 'skyscraper') {
-                for(let x=-2; x<=2; x++) {
-                    for(let y=0; y<=15; y++) {
-                        for(let z=-2; z<=2; z++) {
-                            if (x===0 && y<2 && z===2) putBlock(x,y,z,0); 
-                            else if (y===0 || y===15) putBlock(x,y,z,13); 
-                            else if (y%4===0) putBlock(x,y,z,10); 
-                            else if (x===-2 || x===2 || z===-2 || z===2) {
-                                if(Math.abs(x)===2 && Math.abs(z)===2) putBlock(x,y,z,13);
-                                else putBlock(x,y,z,9);
-                            }
-                            else if (y%4===3 && x===0 && z===0) putBlock(x,y,z,14); 
-                            else putBlock(x,y,z,0);
-                        }
-                    }
-                }
-                showNotification("🏢 Skyscraper Constructed!");
-            }
-            blocksUsed.forEach(t => updateInstancedMesh(t));
-            playSound('success');
-        }
-
-        // --- 9. INPUT & QUIZ SYSTEM ---
-        function toggleCameraView() {
-            isThirdPerson = !isThirdPerson;
-            characterGroup.visible = isThirdPerson;
-        }
-
-        function setupInput() {
-            document.getElementById('btn-pc').addEventListener('click', (e) => {
-                e.stopPropagation(); initAudio(); inputMode = 'pc';
-                document.getElementById('blocker').style.display = 'none';
-                document.body.requestPointerLock();
-            });
-
-            document.getElementById('btn-mobile').addEventListener('touchstart', (e) => {
-                e.preventDefault(); e.stopPropagation(); initAudio(); inputMode = 'mobile';
-                document.getElementById('blocker').style.display = 'none';
-                document.getElementById('mobile-controls').style.display = 'block';
-                gameActive = true;
-            });
-
-            document.addEventListener('pointerlockchange', () => {
-                if (inputMode === 'pc' && document.getElementById('quiz-ui').style.display !== 'block') {
-                    gameActive = (document.pointerLockElement === document.body);
-                    document.getElementById('blocker').style.display = gameActive ? 'none' : 'flex';
-                }
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (!gameActive) return;
-                switch (e.code) {
-                    case 'KeyW': keys.w = true; break; case 'KeyA': keys.a = true; break;
-                    case 'KeyS': keys.s = true; break; case 'KeyD': keys.d = true; break;
-                    case 'Space': doJump(); break;
-                    case 'KeyQ': toggleQuiz(); break;
-                    case 'KeyV': toggleCameraView(); break;
-                }
-                if(e.key >= '1' && e.key <= '9') {
-                    let num = parseInt(e.key);
-                    if (num === 7) num = 8; 
-                    if (unlockedBlocks.includes(num)) selectBlock(num);
-                }
-            });
-            document.addEventListener('keyup', (e) => {
-                switch (e.code) {
-                    case 'KeyW': keys.w = false; break; case 'KeyA': keys.a = false; break;
-                    case 'KeyS': keys.s = false; break; case 'KeyD': keys.d = false; break;
-                }
-            });
-
-            document.addEventListener('mousemove', (e) => {
-                if (!gameActive || inputMode !== 'pc') return;
-                yawObject.rotation.y -= e.movementX * 0.002;
-                pitchObject.rotation.x -= e.movementY * 0.002;
-                pitchObject.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, pitchObject.rotation.x));
-            });
-            document.addEventListener('mousedown', (e) => {
-                if (!gameActive || inputMode !== 'pc') return;
-                if (e.button === 0) doBreak();
-                if (e.button === 2) doPlace();
-            });
-
-            // Mobile Controls Setup
-            const touchLeft = document.getElementById('touch-left');
-            const touchRight = document.getElementById('touch-right');
-            const joyBase = document.getElementById('joystick-base');
-            const joyStick = document.getElementById('joystick-stick');
-            
-            let leftTouchId = null, rightTouchId = null, lastRightX = 0, lastRightY = 0, joyStartX = 0, joyStartY = 0;
-
-            touchLeft.addEventListener('touchstart', (e) => {
-                if (!gameActive) return; e.preventDefault();
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (leftTouchId === null) {
-                        const t = e.changedTouches[i]; leftTouchId = t.identifier;
-                        joyStartX = t.clientX; joyStartY = t.clientY;
-                        joyBase.style.display = 'block'; joyBase.style.left = joyStartX + 'px'; joyBase.style.top = joyStartY + 'px';
-                        joyStick.style.transform = `translate(-50%, -50%)`; joyMove.x = 0; joyMove.y = 0;
-                    }
-                }
-            });
-
-            touchLeft.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    const t = e.changedTouches[i];
-                    if (t.identifier === leftTouchId) {
-                        let dx = t.clientX - joyStartX, dy = t.clientY - joyStartY;
-                        const dist = Math.sqrt(dx*dx + dy*dy); const maxDist = 50;
-                        if (dist > maxDist) { dx = (dx/dist)*maxDist; dy = (dy/dist)*maxDist; }
-                        joyStick.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-                        joyMove.x = dx / maxDist; joyMove.y = dy / maxDist;
-                    }
-                }
-            });
-
-            const endLeftTouch = (e) => {
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (e.changedTouches[i].identifier === leftTouchId) {
-                        leftTouchId = null; joyBase.style.display = 'none'; joyMove.x = 0; joyMove.y = 0;
-                    }
-                }
-            };
-            touchLeft.addEventListener('touchend', endLeftTouch); touchLeft.addEventListener('touchcancel', endLeftTouch);
-
-            touchRight.addEventListener('touchstart', (e) => {
-                if (!gameActive) return; e.preventDefault();
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (rightTouchId === null) {
-                        const t = e.changedTouches[i]; rightTouchId = t.identifier;
-                        lastRightX = t.clientX; lastRightY = t.clientY;
-                    }
-                }
-            });
-
-            touchRight.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    const t = e.changedTouches[i];
-                    if (t.identifier === rightTouchId) {
-                        const dx = t.clientX - lastRightX, dy = t.clientY - lastRightY;
-                        lastRightX = t.clientX; lastRightY = t.clientY;
-                        yawObject.rotation.y -= dx * 0.005; pitchObject.rotation.x -= dy * 0.005;
-                        pitchObject.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, pitchObject.rotation.x));
-                    }
-                }
-            });
-
-            const endRightTouch = (e) => {
-                for (let i = 0; i < e.changedTouches.length; i++) {
-                    if (e.changedTouches[i].identifier === rightTouchId) rightTouchId = null;
-                }
-            };
-            touchRight.addEventListener('touchend', endRightTouch); touchRight.addEventListener('touchcancel', endRightTouch);
-
-            document.getElementById('btn-jump').addEventListener('touchstart', (e) => { e.preventDefault(); doJump(); });
-            document.getElementById('btn-break').addEventListener('touchstart', (e) => { e.preventDefault(); doBreak(); });
-            document.getElementById('btn-place').addEventListener('touchstart', (e) => { e.preventDefault(); doPlace(); });
-            document.getElementById('btn-quiz').addEventListener('touchstart', (e) => { e.preventDefault(); toggleQuiz(); });
-            document.getElementById('btn-cam').addEventListener('touchstart', (e) => { e.preventDefault(); toggleCameraView(); });
-            
-            document.querySelectorAll('.slot').forEach(el => {
-                el.addEventListener('pointerdown', (e) => {
-                    e.preventDefault();
-                    let id = parseInt(el.id.replace('slot-', ''));
-                    if (unlockedBlocks.includes(id)) selectBlock(id);
-                    else showNotification("Answer questions to unlock this builder!");
-                });
-            });
-        }
-
-        // --- 10. PROGRESSION LOGIC ---
-        function toggleQuiz() {
-            const ui = document.getElementById('quiz-ui');
-            if (ui.style.display === 'block') {
-                ui.style.display = 'none';
-                if (inputMode === 'pc') document.body.requestPointerLock();
-                else gameActive = true;
-            } else {
-                gameActive = false;
-                if (inputMode === 'pc') document.exitPointerLock();
-                ui.style.display = 'block';
-                document.getElementById('blocker').style.display = 'none';
-                loadNewQuestion();
-            }
-        }
-
-        function loadNewQuestion() {
-            let randIdx;
-            do { randIdx = Math.floor(Math.random() * quizBank.length); } while (randIdx === lastQuestionIndex && quizBank.length > 1);
-            lastQuestionIndex = randIdx;
-
-            currentQuestion = quizBank[randIdx];
-            document.getElementById('quiz-question').innerText = currentQuestion.q;
-            
-            let opts = [...currentQuestion.opts];
-            opts.sort(() => Math.random() - 0.5);
-            
-            for(let i=0; i<4; i++) {
-                const btn = document.getElementById(`opt-${i}`);
-                btn.innerText = opts[i];
-                btn.onclick = () => checkAnswer(opts[i]);
-            }
-        }
-
-        function checkAnswer(selected) {
-            if (selected === currentQuestion.a) {
-                quizScore++;
-                document.getElementById('quiz-score').innerText = quizScore;
-                document.getElementById('hud-score').innerText = quizScore + " Correct";
-                playSound('success');
-                checkRewards();
-                setTimeout(loadNewQuestion, 500);
-            } else {
-                playSound('fail');
-                showNotification(`Wrong! The answer was: ${currentQuestion.a}`);
-                setTimeout(loadNewQuestion, 1500);
-            }
-        }
-
-        function updateUnlockText() {
-            let nextText = "All Master Builders Unlocked!";
-            if(quizScore < 2) nextText = "Next Reward: Small House Builder (2 pts)";
-            else if(quizScore < 5) nextText = "Next Reward: Park Builder & Speed (5 pts)";
-            else if(quizScore < 8) nextText = "Next Reward: School Builder (8 pts)";
-            else if(quizScore < 12) nextText = "Next Reward: Hospital Builder (12 pts)";
-            else if(quizScore < 15) nextText = "Next Reward: Skyscraper & Flight (15 pts)";
-            document.getElementById('next-unlock').innerText = nextText;
-        }
-
-        function checkRewards() {
-            const unlock = (id, msg) => {
-                if(!unlockedBlocks.includes(id)) {
-                    unlockedBlocks.push(id);
-                    document.getElementById(`slot-${id}`).classList.remove('locked');
-                    showNotification(msg);
-                }
-            };
-            if (quizScore >= 2) unlock(15, "🏠 LEVEL 1: House Builder Unlocked!");
-            if (quizScore >= 5) { unlock(16, "🌲 LEVEL 2: Park Builder & Super Speed Unlocked!"); playerStats.speed = 80; playerStats.jump = 25; }
-            if (quizScore >= 8) unlock(17, "🏫 LEVEL 3: School Builder Unlocked!");
-            if (quizScore >= 12) unlock(18, "🏥 LEVEL 4: Hospital Clinic Unlocked!");
-            if (quizScore >= 15 && !isFlying) { unlock(19, "🏢 LEVEL 5: Skyscraper Builder & God Mode (Flight)!"); isFlying = true; playerStats.reach = 20; }
-            updateUnlockText();
-        }
-
-        function showNotification(msg) {
-            const notif = document.getElementById('notification');
-            notif.innerText = msg;
-            notif.style.display = 'block';
-            setTimeout(() => { notif.style.display = 'none'; }, 3000);
-        }
-
-        function setupQuizUI() { document.getElementById('close-quiz').addEventListener('click', toggleQuiz); }
-
-        // --- 11. EXACT EXACT-POINTER DDA PHYSICS ---
-        // Perfect 3D DDA (Digital Differential Analyzer) algorithm for zero-error crosshair raycasting.
-        function raycastExactDDA(origin, direction, maxDist) {
-            let x = Math.floor(origin.x), y = Math.floor(origin.y), z = Math.floor(origin.z);
-            const stepX = direction.x > 0 ? 1 : (direction.x < 0 ? -1 : 0);
-            const stepY = direction.y > 0 ? 1 : (direction.y < 0 ? -1 : 0);
-            const stepZ = direction.z > 0 ? 1 : (direction.z < 0 ? -1 : 0);
-            
-            const tDeltaX = stepX !== 0 ? Math.abs(1 / direction.x) : Infinity;
-            const tDeltaY = stepY !== 0 ? Math.abs(1 / direction.y) : Infinity;
-            const tDeltaZ = stepZ !== 0 ? Math.abs(1 / direction.z) : Infinity;
-            
-            let tMaxX = stepX > 0 ? (x + 1 - origin.x) * tDeltaX : (stepX < 0 ? (origin.x - x) * tDeltaX : Infinity);
-            let tMaxY = stepY > 0 ? (y + 1 - origin.y) * tDeltaY : (stepY < 0 ? (origin.y - y) * tDeltaY : Infinity);
-            let tMaxZ = stepZ > 0 ? (z + 1 - origin.z) * tDeltaZ : (stepZ < 0 ? (origin.z - z) * tDeltaZ : Infinity);
-
-            let face = new THREE.Vector3();
-            let dist = 0;
-
-            if (direction.lengthSq() === 0) return null;
-
-            // Check starting block first
-            if (worldData.has(`${x},${y},${z}`) && !BLOCKS[worldData.get(`${x},${y},${z}`)].noCollision) {
-                return { voxel: { x, y, z }, normal: face.clone(), distance: 0 };
-            }
-
-            while (dist <= maxDist) {
-                if (tMaxX < tMaxY) {
-                    if (tMaxX < tMaxZ) { dist = tMaxX; tMaxX += tDeltaX; x += stepX; face.set(-stepX, 0, 0); }
-                    else { dist = tMaxZ; tMaxZ += tDeltaZ; z += stepZ; face.set(0, 0, -stepZ); }
-                } else {
-                    if (tMaxY < tMaxZ) { dist = tMaxY; tMaxY += tDeltaY; y += stepY; face.set(0, -stepY, 0); }
-                    else { dist = tMaxZ; tMaxZ += tDeltaZ; z += stepZ; face.set(0, 0, -stepZ); }
-                }
-
-                if (dist > maxDist) return null;
-
-                if (worldData.has(`${x},${y},${z}`)) {
-                    const blockId = worldData.get(`${x},${y},${z}`);
-                    if (!BLOCKS[blockId].noCollision) {
-                        return { voxel: { x, y, z }, normal: face.clone(), distance: dist }; 
-                    }
-                }
-            }
-            return null;
-        }
-
-        // To ensure the pointer places block perfectly via the crosshair, we shoot the ray directly from the camera!
-        function getRaycastHit() {
-            camera.updateMatrixWorld();
-            let origin = camera.getWorldPosition(new THREE.Vector3());
-            let dir = camera.getWorldDirection(new THREE.Vector3());
-            let effectiveReach = playerStats.reach + (isThirdPerson ? camera.position.z : 0);
-            return raycastExactDDA(origin, dir, effectiveReach);
-        }
-
-        function doJump() {
-            if ((isGrounded || isFlying) && gameActive) {
-                velocity.y = playerStats.jump;
-                isGrounded = false;
-                playSound('jump');
-            }
-        }
-
-        function doBreak() {
-            const hit = getRaycastHit();
-            if (hit) removeBlockData(hit.voxel.x, hit.voxel.y, hit.voxel.z);
-        }
-
-        function doPlace() {
-            const hit = getRaycastHit();
-            if (hit) {
-                const px = hit.voxel.x + hit.normal.x;
-                const py = hit.voxel.y + hit.normal.y;
-                const pz = hit.voxel.z + hit.normal.z;
-                
-                if (BLOCKS[currentBlockType].weapon) {
-                    constructFacility(px, py, pz, BLOCKS[currentBlockType].shape);
-                    return;
-                }
-
-                const blockBox = new THREE.Box3(
-                    new THREE.Vector3(px - 0.49, py - 0.49, pz - 0.49),
-                    new THREE.Vector3(px + 0.49, py + 0.49, pz + 0.49)
-                );
-                // Tightened bounding box to exactly match the 0.5x0.5 player size for precise placement near feet
-                const playerBox = new THREE.Box3(
-                    new THREE.Vector3(yawObject.position.x - 0.25, yawObject.position.y, yawObject.position.z - 0.25),
-                    new THREE.Vector3(yawObject.position.x + 0.25, yawObject.position.y + 1.8, yawObject.position.z + 0.25)
-                );
-
-                if (!blockBox.intersectsBox(playerBox) || BLOCKS[currentBlockType].noCollision) {
-                    addBlockData(px, py, pz, currentBlockType);
-                    updateInstancedMesh(currentBlockType);
-                    playSound('place');
-                }
-            }
-        }
-
-        function selectBlock(type) {
-            currentBlockType = type;
-            document.querySelectorAll('.slot').forEach(el => el.classList.remove('active'));
-            document.getElementById('slot-' + type).classList.add('active');
-        }
-
-        function checkCollision(pos) {
-            const eps = 0.001;
-            // Precise character bounding box check (width: 0.5, height: 1.8)
-            const minX = Math.floor(pos.x - 0.25 + 0.5 + eps), maxX = Math.floor(pos.x + 0.25 + 0.5 - eps);
-            const minY = Math.floor(pos.y + 0.5 + eps), maxY = Math.floor(pos.y + 1.8 + 0.5 - eps); 
-            const minZ = Math.floor(pos.z - 0.25 + 0.5 + eps), maxZ = Math.floor(pos.z + 0.25 + 0.5 - eps);
-
-            for (let x = minX; x <= maxX; x++) {
-                for (let y = minY; y <= maxY; y++) {
-                    for (let z = minZ; z <= maxZ; z++) {
-                        const blockId = worldData.get(`${x},${y},${z}`);
-                        if (blockId && !BLOCKS[blockId].noCollision) return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        function getBiomeName(z) {
-            if (z < -10) return "🏔️ Mountain Heights";
-            if (z > 12) return "🏖️ Caspian Sea Coast";
-            return "🌲 Mardakan Forest Plains";
-        }
-
-        // --- 12. MAIN LOOP ---
-        function animate() {
-            requestAnimationFrame(animate);
-
-            const time = performance.now();
-            const delta = Math.min((time - lastTime) / 1000, 0.1); 
-            lastTime = time;
-
-            frames++;
-            if (time >= lastFpsTime + 1000) { document.getElementById('fps').innerText = frames; frames = 0; lastFpsTime = time; }
-
-            // Day / Night
-            gameTime += delta * 0.1;
-            const sunAngle = gameTime;
-            dirLight.position.set(Math.cos(sunAngle) * 100, Math.sin(sunAngle) * 100, Math.sin(sunAngle) * 50);
-            const sunHeight = Math.max(0, Math.sin(sunAngle));
-            
-            scene.background.setHSL(0.55, 0.6, Math.max(0.2, 0.05 + sunHeight * 0.55));
-            scene.fog.color.copy(scene.background);
-            dirLight.intensity = Math.max(0.3, sunHeight * 1.5);
-            hemiLight.intensity = Math.max(0.5, sunHeight * 0.7);
-
-            if (gameActive) {
-                // Determine Camera Mode & Intelligent Anti-Clipping
-                if (isThirdPerson) {
-                    let backDir = pitchObject.getWorldDirection(new THREE.Vector3()).negate();
-                    let headWorldPos = yawObject.position.clone();
-                    headWorldPos.y += 1.5; 
-                    
-                    let camHit = raycastExactDDA(headWorldPos, backDir, 5);
-                    let finalDist = camHit ? Math.max(0.1, camHit.distance - 0.3) : 5;
-                    camera.position.set(0, 0, finalDist);
-                    
-                    // Sync the Character's Head Pitch visually with camera
-                    head.userData.neckGroup.rotation.x = pitchObject.rotation.x;
-                } else {
-                    camera.position.set(0, 0, 0); // 1st Person Eyes
-                }
-
-                const hit = getRaycastHit();
-                if (hit) {
-                    outlineMesh.position.set(hit.voxel.x, hit.voxel.y, hit.voxel.z);
-                    outlineMesh.visible = true;
-                } else outlineMesh.visible = false;
-
-                if (!isFlying) velocity.y -= 30 * delta; 
-                else if (Math.abs(velocity.y) < 1) velocity.y = 0;
-
-                velocity.x -= velocity.x * 10.0 * delta; 
-                velocity.z -= velocity.z * 10.0 * delta; 
-
-                let moveX = Number(keys.d) - Number(keys.a) + joyMove.x;
-                let moveZ = Number(keys.w) - Number(keys.s) - joyMove.y;
-                
-                direction.set(moveX, 0, moveZ);
-                if (direction.lengthSq() > 0) direction.normalize(); else direction.set(0, 0, 0);
-
-                if (direction.z !== 0) velocity.z -= direction.z * playerStats.speed * delta;
-                if (direction.x !== 0) velocity.x -= direction.x * playerStats.speed * delta;
-
-                const oldPos = yawObject.position.clone();
-                yawObject.translateX(velocity.x * delta);
-                yawObject.translateZ(velocity.z * delta);
-                
-                const newPos = yawObject.position.clone();
-                newPos.y = oldPos.y; 
-                yawObject.position.copy(oldPos); 
-
-                yawObject.position.x = newPos.x;
-                if (checkCollision(yawObject.position)) { yawObject.position.x = oldPos.x; velocity.x = 0; }
-                oldPos.x = yawObject.position.x;
-
-                yawObject.position.z = newPos.z;
-                if (checkCollision(yawObject.position)) { yawObject.position.z = oldPos.z; velocity.z = 0; }
-                oldPos.z = yawObject.position.z;
-
-                yawObject.position.y += velocity.y * delta;
-                if (checkCollision(yawObject.position)) {
-                    if (velocity.y < 0) {
-                        isGrounded = true;
-                        yawObject.position.y = Math.ceil(yawObject.position.y - 0.5) + 0.5; 
-                    } else {
-                        yawObject.position.y = oldPos.y; 
-                    }
-                    velocity.y = 0;
-                } else isGrounded = false;
-
-                if (yawObject.position.y < -30) {
-                    yawObject.position.set(0, 20, 0); velocity.set(0,0,0);
-                }
-
-                // Smooth Walk Animations
-                let speed = Math.sqrt(velocity.x*velocity.x + velocity.z*velocity.z);
-                if (speed > 0.5 && isGrounded) {
-                    let legSwing = Math.sin(time * 0.012) * 0.6;
-                    leftLegGroup.rotation.x = legSwing;
-                    rightLegGroup.rotation.x = -legSwing;
-                    leftArmGroup.rotation.x = -legSwing;
-                    rightArmGroup.rotation.x = legSwing;
-                } else {
-                    leftLegGroup.rotation.x = 0;
-                    rightLegGroup.rotation.x = 0;
-                    leftArmGroup.rotation.x = 0;
-                    rightArmGroup.rotation.x = 0;
-                }
-
-                document.getElementById('hud-biome').innerText = getBiomeName(yawObject.position.z);
-            }
-
-            renderer.render(scene, camera);
-        }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        window.onload = init;
-    </script>
+  </div>
+
+  <!-- Char panel -->
+  <div id="charPanel">
+    <div class="char-slot active" id="cp0">
+      <div class="char-avatar">🧭</div>
+      <div><div class="char-name-s">MURAD</div>
+        <div class="char-bar-wrap"><div class="char-bar" style="background:var(--roblox-yellow);width:100%;"></div></div>
+      </div>
+    </div>
+    <div class="char-slot" id="cp1">
+      <div class="char-avatar">🛹</div>
+      <div><div class="char-name-s">SANAN</div>
+        <div class="char-bar-wrap"><div class="char-bar" style="background:var(--roblox-teal);width:0%;"></div></div>
+      </div>
+    </div>
+    <div class="char-slot" id="cp2">
+      <div class="char-avatar">🔮</div>
+      <div><div class="char-name-s">LEYLA</div>
+        <div class="char-bar-wrap"><div class="char-bar" style="background:var(--roblox-purple);width:0%;"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mission bar -->
+  <div id="missionBar">
+    <div id="missionTitle">📋 CURRENT MISSION</div>
+    <div id="missionDesc">Loading...</div>
+    <div id="missionProgress"><div id="missionFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- Progress bar -->
+  <div id="progressWrap">
+    <div id="progressBar" style="width:0%"></div>
+    <div id="milestoneMarkers"></div>
+  </div>
+
+  <!-- Power meter -->
+  <div id="powerWrap">
+    <span id="powerLabel">⚡ POWER</span>
+    <div id="powerTrack"><div id="powerFill"></div></div>
+    <span id="powerReady">PRESS P!</span>
+  </div>
+
+  <!-- Desktop Keys hint -->
+  <div id="keysHint">↑ SPACE = JUMP<br>↓ = SLIDE<br>P = POWER<br>← → = AIM</div>
+
+  <!-- Mobile Onscreen Controls -->
+  <div class="mobile-controls">
+    <div class="mobile-btn" id="btnSlide">👇</div>
+    <div class="mobile-btn" id="btnJump">⏫</div>
+    <div class="mobile-btn" id="btnPower">⚡</div>
+    <div class="char-nav-btn" id="btnCharL">◀</div>
+    <div class="char-nav-btn" id="btnCharR">▶</div>
+  </div>
+
+  <!-- Toast area -->
+  <div id="toastArea"></div>
+
+  <!-- Milestone popup -->
+  <div id="milestonePopup">
+    <div class="milestone-box">
+      <div class="ms-title" id="msTitle">🏆 MILESTONE!</div>
+      <div class="ms-reward" id="msReward"></div>
+    </div>
+  </div>
+
+  <!-- FIGHT OVERLAY -->
+  <div id="fightOverlay" class="hidden">
+    <div class="fight-box">
+      <div class="fight-timer" id="fightTimer">⏱ 15</div>
+      <div class="enemy-display" id="enemyEmoji">👾</div>
+      <div class="enemy-name" id="enemyName">GLITCH MONSTER</div>
+      <div class="enemy-hp-wrap"><div class="enemy-hp-fill" id="enemyHp" style="width:100%"></div></div>
+      <span class="subject-tag" id="subjectTag">MATH</span>
+      <div class="question-text" id="questionText">Loading...</div>
+      <div class="answer-grid" id="answerGrid"></div>
+      <div class="fight-streak" id="fightStreak"></div>
+    </div>
+  </div>
+
+  <!-- TITLE SCREEN -->
+  <div class="screen" id="titleScreen">
+    <div class="game-logo">MURAD'S<br>DISCOVERY DASH</div>
+    <div class="tagline">⚡ The Ultimate Knowledge Adventure ⚡</div>
+    <div class="roblox-badge">🎮 ROBLOX-STYLE RUNNER</div>
+    <div class="chars-grid">
+      <div class="char-card selected" id="titleCard0" onclick="pickChar(0)">
+        <span class="big-emoji">🧭</span>
+        <h3>MURAD</h3>
+        <div class="role">The Brave Explorer</div>
+        <div class="power-tag">⚡ DOUBLE JUMP</div>
+        <div class="stats">🏃 Speed: ★★★★☆<br>💪 Power: ★★★☆☆<br>🎯 Luck: ★★☆☆☆</div>
+      </div>
+      <div class="char-card" id="titleCard1" onclick="pickChar(1)">
+        <span class="big-emoji">🛹</span>
+        <h3>SANAN</h3>
+        <div class="role">The Gadget Master</div>
+        <div class="power-tag">🧲 MAGNET MODE</div>
+        <div class="stats">🏃 Speed: ★★★☆☆<br>💪 Power: ★★★★★<br>🎯 Luck: ★★★☆☆</div>
+        <div class="lock-tag" id="lock1">🔒</div>
+      </div>
+      <div class="char-card" id="titleCard2" onclick="pickChar(2)">
+        <span class="big-emoji">🔮</span>
+        <h3>LEYLA</h3>
+        <div class="role">The Magic Scholar</div>
+        <div class="power-tag">🕐 TIME FREEZE</div>
+        <div class="stats">🏃 Speed: ★★★☆☆<br>💪 Power: ★★★☆☆<br>🎯 Luck: ★★★★★</div>
+        <div class="lock-tag" id="lock2">🔒</div>
+      </div>
+    </div>
+    <div class="unlock-hint">🔓 Score 1000+ to unlock Sanan &nbsp;|&nbsp; Answer 10 questions correctly to unlock Leyla</div>
+    <button class="btn btn-play" onclick="startGame()">▶ START GAME</button>
+  </div>
+
+  <!-- GAME OVER -->
+  <div class="screen hidden" id="gameOverScreen">
+    <div class="go-char" id="goEmoji">💀</div>
+    <h2>GAME OVER</h2>
+    <div class="stat-grid">
+      <div class="stat-cell"><div class="sv" id="goScore">0</div><div class="sk">FINAL SCORE</div></div>
+      <div class="stat-cell"><div class="sv" id="goDist">0m</div><div class="sk">DISTANCE</div></div>
+      <div class="stat-cell"><div class="sv" id="goCorrect">0</div><div class="sk">CORRECT ANS</div></div>
+      <div class="stat-cell"><div class="sv" id="goStreak">0</div><div class="sk">BEST STREAK</div></div>
+    </div>
+    <div class="milestones-earned" id="goMilestones"></div>
+    <button class="btn btn-play" style="font-size:11px;padding:12px 36px;" onclick="startGame()">🔄 PLAY AGAIN</button>
+    <button class="btn btn-sm" onclick="showTitle()">🏠 MAIN MENU</button>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div class="screen hidden" id="winScreen">
+    <div class="confetti-area">🎉🏆🎊✨🌟</div>
+    <h2 style="margin:16px 0 8px;">YOU WIN!</h2>
+    <p style="font-size:13px;color:rgba(255,255,255,.6);margin-bottom:20px;">Amazing job, Knowledge Hero!</p>
+    <div class="stat-grid">
+      <div class="stat-cell"><div class="sv" id="winScore">0</div><div class="sk">FINAL SCORE</div></div>
+      <div class="stat-cell"><div class="sv" id="winCorrect">0</div><div class="sk">CORRECT ANS</div></div>
+    </div>
+    <button class="btn btn-play" style="font-size:11px;padding:12px 36px;margin-top:16px;" onclick="startGame()">🔄 PLAY AGAIN</button>
+    <button class="btn btn-sm" onclick="showTitle()">🏠 MENU</button>
+  </div>
+</div>
+
+<script>
+// Responsive wrapper scaling logic (Fits game proportionally inside any screen)
+function resize() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  // Calculate scale maintaining the 960x540 16:9 aspect ratio
+  const scale = Math.min(w / 960, h / 540);
+  document.getElementById('wrap').style.transform = `translate(-50%, -50%) scale(${scale})`;
+}
+window.addEventListener('resize', resize);
+resize(); // Trigger initially
+
+// Enable touch controls automatically if a touch interface is detected
+if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+  document.body.classList.add('is-touch');
+}
+
+// ═══════════════════════════════════════════════
+// CONSTANTS & CONFIG
+// ═══════════════════════════════════════════════
+const W=960, H=540;
+const GROUND=400; // Y coordinate where the ground surface is
+const TOTAL_DIST = 8000; // Massive increase for a longer, more engaging run
+
+const CHARS=[
+  {name:'Murad',emoji:'🧭',color:'#FFD600',ability:'double_jump',maxJumps:2,speed:1.0,luck:0.3},
+  {name:'Sanan',emoji:'🛹',color:'#00BCD4',ability:'magnet',maxJumps:1,speed:0.9,luck:0.5},
+  {name:'Leyla',emoji:'🔮',color:'#7C3AED',ability:'time_freeze',maxJumps:1,speed:0.95,luck:0.8},
+];
+
+// ── ENEMY TYPES (each triggers an educational fight) ──
+const ENEMIES=[
+  {name:'MATH GOBLIN',emoji:'👺',color:'#E53E3E',hp:3,subject:'math',desc:'A sneaky goblin that loves stealing number knowledge!'},
+  {name:'WORD WITCH',emoji:'🧙‍♀️',color:'#7C3AED',hp:3,subject:'english',desc:'A tricky witch that scrambles your spelling!'},
+  {name:'SCIENCE SLIME',emoji:'🧪',color:'#43A047',hp:3,subject:'science',desc:'A gooey slime made of wrong facts!'},
+  {name:'RIDDLE ROBOT',emoji:'🤖',color:'#1E88E5',hp:3,subject:'general',desc:'An old robot full of tricky riddles!'},
+  {name:'FRACTION PHANTOM',emoji:'👻',color:'#FF6D00',hp:4,subject:'math',desc:'A ghost that haunts your fractions!'},
+  {name:'GRAMMAR GREMLIN',emoji:'😈',color:'#EC4899',hp:3,subject:'english',desc:'A gremlin that breaks your grammar!'},
+  {name:'SPACE SPECTER',emoji:'🛸',color:'#06B6D4',hp:4,subject:'science',desc:'An alien testing your space knowledge!'},
+  {name:'HISTORY HYDRA',emoji:'🐉',color:'#F59E0B',hp:5,subject:'general',desc:'A mighty dragon of forgotten facts!'},
+];
+
+// ── QUESTION BANK (age 8, curriculum aligned) ──
+const QB={
+  math:[
+    {q:'What is 7 + 8?',a:'15',w:['13','16','14']},
+    {q:'What is 5 × 4?',a:'20',w:['24','15','16']},
+    {q:'What is 36 ÷ 6?',a:'6',w:['4','7','5']},
+    {q:'What is 12 - 7?',a:'5',w:['6','4','3']},
+    {q:'What is half of 18?',a:'9',w:['8','10','7']},
+    {q:'What is 9 × 3?',a:'27',w:['24','30','21']},
+    {q:'What is 100 - 45?',a:'55',w:['50','65','45']},
+    {q:'What is 3 + 6 + 4?',a:'13',w:['12','14','15']},
+    {q:'What is 8²?',a:'64',w:['16','56','72']},
+    {q:'What is 1/2 of 20?',a:'10',w:['5','15','8']},
+    {q:'What is 25 + 38?',a:'63',w:['53','73','62']},
+    {q:'What is 7 × 7?',a:'49',w:['42','56','48']},
+    {q:'What is 81 ÷ 9?',a:'9',w:['7','8','10']},
+    {q:'Round 47 to nearest 10:',a:'50',w:['40','45','60']},
+    {q:'What is 15 × 2?',a:'30',w:['25','20','35']},
+  ],
+  english:[
+    {q:'Which word rhymes with CAT?',a:'BAT',w:['DOG','CUP','RUN']},
+    {q:'What is the plural of CHILD?',a:'CHILDREN',w:['CHILDS','CHILDES','CHILDRE']},
+    {q:'Which is a verb?',a:'JUMP',w:['BLUE','TABLE','HAPPY']},
+    {q:'Opposite of FAST is...?',a:'SLOW',w:['QUICK','LOUD','BIG']},
+    {q:'Which word is spelled correctly?',a:'FRIEND',w:['FREIND','FREND','FIEND']},
+    {q:'A word that describes a noun is a...?',a:'ADJECTIVE',w:['VERB','ADVERB','PRONOUN']},
+    {q:'Which is a noun?',a:'APPLE',w:['RUN','HAPPY','QUICKLY']},
+    {q:'"She __ to school." (go)',a:'GOES',w:['GOING','GONE','GOED']},
+    {q:'What punctuation ends a question?',a:'?',w:['!','.', ',']},
+    {q:'Synonym of HAPPY is...?',a:'JOYFUL',w:['SAD','ANGRY','TIRED']},
+    {q:'What is the opposite of HOT?',a:'COLD',w:['WARM','COOL','CHILLY']},
+    {q:'Which word has 3 syllables?',a:'BANANA',w:['CAT','TREE','JUMP']},
+  ],
+  science:[
+    {q:'How many planets are in our solar system?',a:'8',w:['9','7','10']},
+    {q:'What do plants need to make food?',a:'SUNLIGHT',w:['DARKNESS','SALT','SAND']},
+    {q:'What gas do humans breathe in?',a:'OXYGEN',w:['CARBON DIOXIDE','NITROGEN','HELIUM']},
+    {q:'Which animal is a mammal?',a:'DOLPHIN',w:['CROCODILE','EAGLE','FROG']},
+    {q:'What is the closest star to Earth?',a:'THE SUN',w:['SIRIUS','POLARIS','PROXIMA']},
+    {q:'How many bones in a human body?',a:'206',w:['198','210','250']},
+    {q:'What do caterpillars turn into?',a:'BUTTERFLIES',w:['MOTHS... wait, BOTH!','BEETLES','FLIES']},
+    {q:'What is H₂O?',a:'WATER',w:['OXYGEN','SALT','SUGAR']},
+    {q:'Which planet is closest to the Sun?',a:'MERCURY',w:['VENUS','MARS','EARTH']},
+    {q:'What is the largest organ in the body?',a:'SKIN',w:['HEART','BRAIN','LIVER']},
+    {q:'Light travels at about...?',a:'300,000 KM/S',w:['3,000 KM/S','30,000 KM/S','3 MILLION KM/S']},
+    {q:'What is the powerhouse of the cell?',a:'MITOCHONDRIA',w:['NUCLEUS','RIBOSOME','VACUOLE']},
+  ],
+  general:[
+    {q:'How many sides does a hexagon have?',a:'6',w:['5','7','8']},
+    {q:'What color do you get mixing red+blue?',a:'PURPLE',w:['GREEN','ORANGE','BROWN']},
+    {q:'How many continents are there?',a:'7',w:['5','6','8']},
+    {q:'What is the capital of France?',a:'PARIS',w:['LONDON','BERLIN','ROME']},
+    {q:'What comes after a BILLION?',a:'TRILLION',w:['MILLION','ZILLION','BAZILLION']},
+    {q:'How many hours in a day?',a:'24',w:['12','20','48']},
+    {q:'Which is the longest river?',a:'NILE',w:['AMAZON','AMAZON','YANGTZE']},
+    {q:'How many legs does a spider have?',a:'8',w:['6','10','4']},
+    {q:'What is the fastest land animal?',a:'CHEETAH',w:['LION','HORSE','GAZELLE']},
+    {q:'How many days in a leap year?',a:'366',w:['365','367','360']},
+    {q:'What instrument has 88 keys?',a:'PIANO',w:['GUITAR','VIOLIN','HARP']},
+    {q:'How many zeros in one million?',a:'6',w:['5','7','9']},
+  ]
+};
+
+// ── MILESTONES ──
+const MILESTONES=[
+  {dist:500,  label:'🏃 FAST MOVER!',     reward:'+1 Life & +50 points',  bonus:'life'},
+  {dist:1500, label:'🧠 KNOWLEDGE SPARK!', reward:'+100 points, Power Full!',bonus:'power'},
+  {dist:2500, label:'🌟 COMBO KING!',      reward:'Invincible for 10 sec!',  bonus:'invincible'},
+  {dist:3500, label:'⚡ SPEED RUNNER!',    reward:'+100 points & Shield!',   bonus:'shield'},
+  {dist:4500, label:'🏆 HALFWAY HERO!',    reward:'ALL powers charged!',     bonus:'all'},
+  {dist:6000, label:'🎯 EXPERT DASHER!',   reward:'+200 points & Extra Life!',bonus:'biglife'},
+  {dist:7000, label:'👑 ALMOST THERE!',    reward:'Super Invincible 15 sec!', bonus:'superinv'},
+  {dist:8000, label:'🎉 LEGEND!',          reward:'YOU WIN THE GAME!',        bonus:'win'},
+];
+
+// ── MISSIONS ──
+const MISSIONS=[
+  {id:'run200',    desc:'Run 200m without getting hit',   type:'dist_no_hit',  target:200, reward:50},
+  {id:'correct3',  desc:'Answer 3 questions correctly',   type:'correct',      target:3,   reward:60},
+  {id:'sparks10',  desc:'Collect 10 Knowledge Sparks',    type:'sparks',       target:10,  reward:40},
+  {id:'streak3',   desc:'Answer 3 in a row correctly!',   type:'streak',       target:3,   reward:80},
+  {id:'defeat2',   desc:'Defeat 2 enemies in a row',      type:'enemies',      target:2,   reward:70},
+  {id:'slide5',    desc:'Slide under 5 obstacles',        type:'slides',       target:5,   reward:50},
+  {id:'nopower',   desc:'Reach 500m without using power', type:'dist_nopower', target:500, reward:100},
+];
+
+// ── STATE ──
+const canvas=document.getElementById('gc');
+const ctx=canvas.getContext('2d');
+let sel=0, gRunning=false, paused=false, fightActive=false;
+let score,dist,lives,sparks,streak,bestStreak;
+let powerCharge,powerActive,powerTimer;
+let shieldActive,invincible,invincibleTimer;
+let charSwitchTimers=[0,0,0], activeChar=0;
+let charHPs=[100,100,100];
+let correctAnswers=0, wrongAnswers=0, enemiesDefeated=0;
+let slidesCount=0, distNoHit=0, distNoPower=0, powerUsed=false;
+let earnedMilestones=[], hitMilestones=new Set();
+let currentMission=null, missionProgress=0;
+let rafId; // track animation frame
+const maxLives = 5; // Updated maximum life capacity
+
+let bestScores={best:0, sananUnlocked:false, leylaUnlocked:false};
+try {
+  bestScores.best = parseInt(localStorage.getItem('best')||'0');
+  bestScores.sananUnlocked = localStorage.getItem('sananU')==='1';
+  bestScores.leylaUnlocked = localStorage.getItem('leylaU')==='1';
+} catch(e) { console.warn("Local storage blocked"); }
+
+function saveScores() {
+  try {
+    localStorage.setItem('best', bestScores.best);
+    localStorage.setItem('sananU', bestScores.sananUnlocked ? '1' : '0');
+    localStorage.setItem('leylaU', bestScores.leylaUnlocked ? '1' : '0');
+  } catch(e){}
+}
+
+// Entities
+let player, obstacles=[], enemies=[], collectibles=[], particles=[];
+let bgStars=[], bgMtns=[];
+let worldOff=0;
+let spawnTimer=0, collectTimer=0, enemySpawnTimer=0;
+let currentEnemy=null, fightCountdown=0, fightCountdownI=null;
+let questionObj=null, enemyHP=0, enemyMaxHP=0;
+
+// ── INIT ──
+function initPlayer(){
+  const ch=CHARS[activeChar];
+  // player.y is the top of the normal running hitbox. Base sits exactly on GROUND.
+  player={x:140,y:GROUND-52,w:44,h:52,vy:0,
+    jumpsLeft:ch.maxJumps,maxJumps:ch.maxJumps,
+    sliding:false,slideTimer:0,
+    facing:1,runFrame:0,runTimer:0,
+    char:ch};
+}
+
+function initGame(){
+  score=0;dist=0;lives=3; // Starts with 3, can heal up to 5
+  sparks=0;streak=0;bestStreak=0;
+  powerCharge=0;powerActive=false;powerTimer=0;
+  shieldActive=false;invincible=false;invincibleTimer=0;
+  charSwitchTimers=[0,0,0];
+  charHPs=[100,100,100];
+  correctAnswers=0;wrongAnswers=0;enemiesDefeated=0;
+  slidesCount=0;distNoHit=0;distNoPower=0;powerUsed=false;
+  earnedMilestones=[];hitMilestones=new Set();
+  obstacles=[];enemies=[];collectibles=[];particles=[];
+  worldOff=0;spawnTimer=0;collectTimer=0;enemySpawnTimer=0;
+  currentEnemy=null;fightActive=false;
+  initBg();
+  initPlayer();
+  setMission();
+  updateHUD();
+  buildMilestoneMarkers();
+}
+
+function initBg(){
+  bgStars=Array.from({length:100},()=>({x:Math.random()*W,y:Math.random()*220,r:Math.random()*2+.3,s:Math.random()*0.15+.05}));
+  bgMtns=Array.from({length:8},()=>({x:Math.random()*W*2,h:60+Math.random()*100,w:100+Math.random()*120,s:0.25}));
+}
+
+function setMission(){
+  const m=MISSIONS[Math.floor(Math.random()*MISSIONS.length)];
+  currentMission={...m};missionProgress=0;
+  document.getElementById('missionDesc').textContent=m.desc;
+  document.getElementById('missionFill').style.width='0%';
+  if(m.type==='dist_no_hit') distNoHit=0;
+  if(m.type==='dist_nopower') distNoPower=0;
+}
+
+function buildMilestoneMarkers(){
+  const area=document.getElementById('milestoneMarkers');
+  area.innerHTML='';
+  MILESTONES.forEach(m=>{
+    if(m.bonus==='win') return;
+    const pct=(m.dist/TOTAL_DIST)*100;
+    const el=document.createElement('div');
+    el.className='milestone-marker';
+    el.style.left=pct+'%';
+    el.textContent=['🏃','🧠','🌟','⚡','🏆','🎯','👑'][MILESTONES.indexOf(m)]||'🏅';
+    el.title=m.label;
+    area.appendChild(el);
+  });
+}
+
+// ── INPUTS (Mobile Buttons & Desktop Keyboard) ──
+const keys={};
+document.addEventListener('keydown',e=>{
+  if(keys[e.code]) return;
+  keys[e.code]=true;
+  if(!gRunning||fightActive) return;
+  if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();doJump();}
+  if(e.code==='ArrowDown'){e.preventDefault();doSlide();}
+  if(e.code==='KeyP'){e.preventDefault();doPower();}
+  if(e.code==='ArrowLeft'){e.preventDefault();switchChar(-1);}
+  if(e.code==='ArrowRight'){e.preventDefault();switchChar(1);}
+});
+document.addEventListener('keyup',e=>{keys[e.code]=false;});
+
+// Smart UI Button Binder (handles multi-touch instantly)
+function bindBtn(id, actionFn) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  const handler = (e) => {
+    e.preventDefault();
+    if(!gRunning || fightActive || paused) return;
+    actionFn();
+  };
+  el.addEventListener('touchstart', handler, {passive: false});
+  el.addEventListener('mousedown', handler);
+}
+bindBtn('btnJump', doJump);
+bindBtn('btnSlide', doSlide);
+bindBtn('btnPower', doPower);
+bindBtn('btnCharL', () => switchChar(-1));
+bindBtn('btnCharR', () => switchChar(1));
+
+function doJump(){
+  if(player.jumpsLeft>0&&!player.sliding){
+    player.vy=-15;player.jumpsLeft--;
+    spawnParts(player.x+player.w/2,player.y+player.h,'#00BCD4',6);
+  }
+}
+function doSlide(){
+  // Only allow slide if on or very close to the ground
+  if(player.y >= GROUND - player.h - 5){
+    player.sliding=true;player.slideTimer=50;slidesCount++;
+    updateMission('slides',1);
+  }
+}
+function switchChar(dir){
+  let next=(activeChar+dir+3)%3;
+  if(!isCharUnlocked(next)){
+    toast('🔒 Unlock '+CHARS[next].name+' first!','info');return;
+  }
+  activeChar=next;player.char=CHARS[activeChar];
+  player.maxJumps=player.char.maxJumps;
+  player.jumpsLeft=player.maxJumps;
+  updateCharPanel();
+  toast('🔄 Switched to '+CHARS[activeChar].name+'!','info');
+}
+function isCharUnlocked(i){
+  if(i===0) return true;
+  // Adjusted thresholds for a longer gameplay loop
+  if(i===1) return score>=1000||bestScores.sananUnlocked;
+  if(i===2) return correctAnswers>=10||bestScores.leylaUnlocked;
+  return false;
+}
+function doPower(){
+  if(powerCharge<100) return;
+  powerCharge=0;powerActive=true;powerTimer=360;powerUsed=true;
+  const ab=player.char.ability;
+  if(ab==='double_jump'){invincible=true;invincibleTimer=360;toast('⚡ MURAD: INVINCIBLE RUSH!','good');}
+  else if(ab==='magnet'){toast('🧲 SANAN: MEGA MAGNET!','good');}
+  else if(ab==='time_freeze'){toast('🕐 LEYLA: TIME FREEZE!','good');}
+  document.getElementById('powerReady').style.display='none';
+  spawnParts(player.x+player.w/2,player.y,'#FFD700',20);
+}
+
+// ── SPAWNING ──
+function spawnObstacle(){
+  const t=Math.random();
+  const spd=getSpeed();
+  // We align all objects to sit exactly on top of GROUND=400
+  if(t<0.25){
+    obstacles.push({type:'laser',x:W+20,y:GROUND-50,w:22,h:50,color:'#E53E3E',spd});
+  } else if(t<0.5){
+    // Highbar is positioned so sliding (h=26) passes under, but normal running hits.
+    obstacles.push({type:'highbar',x:W+20,y:GROUND-53,w:180,h:18,color:'#FF6D00',spd});
+  } else if(t<0.7){
+    obstacles.push({type:'block',x:W+20,y:GROUND-55,w:48,h:55,color:'#7C3AED',spd});
+  } else if(t<0.85){
+    obstacles.push({type:'spike',x:W+20,y:GROUND-34,w:34,h:34,color:'#06B6D4',spd});
+  } else {
+    // Double obstacle
+    obstacles.push({type:'laser',x:W+20,y:GROUND-50,w:22,h:50,color:'#E53E3E',spd});
+    obstacles.push({type:'highbar',x:W+160,y:GROUND-53,w:140,h:18,color:'#FF6D00',spd});
+  }
+}
+
+function spawnEnemy(){
+  if(currentEnemy) return;
+  const e=ENEMIES[Math.floor(Math.random()*ENEMIES.length)];
+  currentEnemy={...e,x:W+20,y:GROUND-60,w:52,h:60,spd:getSpeed()*0.8,
+    angle:0,hitFlash:0};
+}
+
+function spawnCollectible(){
+  const r=Math.random();
+  const ys=[GROUND-30,GROUND-80,GROUND-130];
+  const y=ys[Math.floor(Math.random()*ys.length)];
+  let type='spark';
+  if(r<0.05) type='golden';
+  else if(r<0.15) type='shield';
+  else if(r<0.22) type='power';
+  else if(r<0.30) type='life'; // Greatly increased chance for extra lives (hearts)
+  collectibles.push({type,x:W+20,y,w:26,h:26,angle:0,collected:false,bobT:Math.random()*100});
+}
+
+function getSpeed(){
+  const base=2.8;
+  // Slower difficulty acceleration, but a higher ultimate top speed
+  const distBonus=Math.min(dist/1200, 4.0);
+  const charMult=player.char.speed||1;
+  const slow=(powerActive&&player.char.ability==='time_freeze')?0.35:1;
+  return (base+distBonus)*charMult*slow;
+}
+
+// ── PARTICLES ──
+function spawnParts(x,y,col,n=8,size=4){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2,s=1+Math.random()*5;
+    particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-2,
+      color:col,life:1,size:size*(0.5+Math.random()),grav:.15});
+  }
+}
+
+// ── FIGHT SYSTEM ──
+function startFight(enemy){
+  fightActive=true;paused=true;
+  document.getElementById('fightOverlay').classList.remove('hidden');
+  document.getElementById('enemyEmoji').textContent=enemy.emoji;
+  document.getElementById('enemyName').textContent=enemy.name;
+  document.getElementById('fightStreak').textContent='';
+  enemyHP=enemy.hp;enemyMaxHP=enemy.hp;
+  updateEnemyHPBar();
+  askQuestion(enemy.subject);
+  startFightCountdown();
+}
+
+function askQuestion(subject){
+  const pool=QB[subject];
+  const q=pool[Math.floor(Math.random()*pool.length)];
+  questionObj={...q,subject};
+  const tagMap={math:'tag-math',english:'tag-english',science:'tag-science',general:'tag-general'};
+  const tagLabel={math:'🔢 MATH',english:'📚 ENGLISH',science:'🔬 SCIENCE',general:'🌍 GENERAL'};
+  document.getElementById('subjectTag').className='subject-tag '+tagMap[subject];
+  document.getElementById('subjectTag').textContent=tagLabel[subject];
+  document.getElementById('questionText').textContent=q.q;
+  const grid=document.getElementById('answerGrid');
+  grid.innerHTML='';
+  const opts=[q.a,...q.w].sort(()=>Math.random()-.5);
+  opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='ans-btn';b.textContent=o;
+    b.onclick=()=>answerFight(o===q.a,b,grid,q.a);
+    grid.appendChild(b);
+  });
+  // Show fun fact below question
+  const factsForSubject={
+    math:["💡 Did you know? Zero is the only number that can't be represented in Roman numerals!",
+          "💡 Pi (π) goes on forever — it never repeats!",
+          "💡 A 'googol' is 1 followed by 100 zeros!"],
+    english:["💡 English has over 170,000 words!",
+             "💡 'Rhythm' is the longest English word with no vowels!",
+             "💡 The word 'set' has over 430 definitions!"],
+    science:["💡 A bolt of lightning is 5x hotter than the Sun's surface!",
+             "💡 Octopuses have 3 hearts and blue blood!",
+             "💡 Honey never expires — 3000-year-old honey is still edible!"],
+    general:["💡 The Eiffel Tower grows 15cm taller in summer (heat expands metal)!",
+             "💡 A group of flamingos is called a 'flamboyance'!",
+             "💡 Bananas are technically berries, but strawberries are not!"]
+  };
+  const facts=factsForSubject[subject];
+  const fact=facts[Math.floor(Math.random()*facts.length)];
+  document.getElementById('fightStreak').textContent=fact;
+}
+
+function startFightCountdown(){
+  let t=15;
+  document.getElementById('fightTimer').textContent='⏱ '+t;
+  clearInterval(fightCountdownI);
+  fightCountdownI=setInterval(()=>{
+    t--;document.getElementById('fightTimer').textContent='⏱ '+t;
+    document.getElementById('fightTimer').style.color=t<=5?'#E53E3E':'var(--roblox-yellow)';
+    if(t<=0){clearInterval(fightCountdownI);timeoutFight();}
+  },1000);
+}
+
+function answerFight(correct,btn,grid,ans){
+  clearInterval(fightCountdownI);
+  Array.from(grid.children).forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===ans) b.classList.add('correct');
+  });
+  if(correct){
+    btn.classList.add('correct');
+    correctAnswers++;streak++;if(streak>bestStreak) bestStreak=streak;
+    enemyHP--;powerCharge=Math.min(100,powerCharge+20);
+    score+=20+streak*5;sparks+=2;
+    updateEnemyHPBar();
+    spawnParts(W/2,H/2,'#43A047',12);
+    document.getElementById('fightStreak').textContent=streak>=3?'🔥 '+streak+'x STREAK! +BONUS!':'✅ Correct! +'+( 20+streak*5)+' pts';
+    updateMission('correct',1);updateMission('streak',streak);
+
+    if(enemyHP<=0){
+      // Enemy defeated!
+      setTimeout(()=>{
+        enemiesDefeated++;updateMission('enemies',1);
+        toast('💥 '+currentEnemy.name+' DEFEATED! +50 pts','good');
+        score+=50;
+        spawnParts(W/2,H/2,'#FFD700',25);
+        endFight();
+      },600);
+    } else {
+      // Enemy still has HP — ask another question
+      setTimeout(()=>{ askQuestion(currentEnemy.subject);startFightCountdown(); },800);
+    }
+  } else {
+    btn.classList.add('wrong');
+    wrongAnswers++;streak=0;
+    loseLife();
+    document.getElementById('fightStreak').textContent='❌ Wrong! The answer was: '+ans;
+    setTimeout(endFight,1200);
+  }
+}
+
+function timeoutFight(){
+  toast('⏰ Too slow! Enemy escaped!','bad');
+  streak=0;loseLife();
+  endFight();
+}
+
+function updateEnemyHPBar(){
+  const pct=Math.max(0, Math.min(100, (enemyHP/enemyMaxHP)*100));
+  document.getElementById('enemyHp').style.width=pct+'%';
+}
+
+function endFight(){
+  clearInterval(fightCountdownI);
+  document.getElementById('fightOverlay').classList.add('hidden');
+  fightActive=false;paused=false;currentEnemy=null;
+  updateHUD();
+}
+
+// ── LIVES ──
+function loseLife(){
+  if(invincible||shieldActive){
+    if(shieldActive){shieldActive=false;toast('🛡️ Shield saved you!','good');}
+    return;
+  }
+  lives--;
+  distNoHit=0;// reset no-hit mission
+  invincible=true;invincibleTimer=150;
+  spawnParts(player.x+player.w/2,player.y+player.h/2,'#E53E3E',20);
+  updateHUD();
+  if(lives<=0) doGameOver();
+}
+
+// ── MISSIONS ──
+function updateMission(type,val){
+  if(!currentMission) return;
+  const m=currentMission;
+  let progress=false;
+  if(m.type===type){
+    if(type==='streak') {missionProgress=Math.max(missionProgress,val);}
+    else missionProgress=Math.min(m.target,missionProgress+val);
+    progress=true;
+  }
+  if(progress){
+    const pct=(missionProgress/m.target)*100;
+    document.getElementById('missionFill').style.width=pct+'%';
+    if(missionProgress>=m.target){
+      score+=m.reward;
+      toast('✅ MISSION DONE! +'+m.reward+' pts','info');
+      spawnParts(player.x+player.w/2,player.y,'#FFD700',15);
+      setTimeout(setMission,1500);
+    }
+  }
+}
+
+// ── MILESTONES ──
+function checkMilestones(){
+  MILESTONES.forEach(m=>{
+    if(!hitMilestones.has(m.dist)&&dist>=m.dist){
+      hitMilestones.add(m.dist);
+      triggerMilestone(m);
+    }
+  });
+}
+
+function triggerMilestone(m){
+  if(m.bonus==='win'){doWin();return;}
+  earnedMilestones.push(m.label);
+  // Apply bonus
+  if(m.bonus==='life'&&lives<maxLives){lives++;updateHUD();}
+  if(m.bonus==='power'){powerCharge=100;document.getElementById('powerReady').style.display='inline';}
+  if(m.bonus==='invincible'){invincible=true;invincibleTimer=600;}
+  if(m.bonus==='shield'){shieldActive=true;}
+  if(m.bonus==='all'){powerCharge=100;invincible=true;invincibleTimer=300;shieldActive=true;document.getElementById('powerReady').style.display='inline';}
+  if(m.bonus==='biglife'){if(lives<maxLives)lives++;score+=200;updateHUD();}
+  if(m.bonus==='superinv'){invincible=true;invincibleTimer=900;}
+  score+=100;updateHUD();
+  // Show popup
+  const pop=document.getElementById('milestonePopup');
+  document.getElementById('msTitle').textContent=m.label;
+  document.getElementById('msReward').textContent=m.reward;
+  pop.classList.add('show');
+  spawnParts(W/2,H/2,'#FFD700',30);
+  setTimeout(()=>pop.classList.remove('show'),2500);
+}
+
+// ── COLLISION ──
+function overlaps(ax,ay,aw,ah,bx,by,bw,bh,pad=10){
+  return ax+pad<bx+bw-pad&&ax+aw-pad>bx+pad&&ay+pad<by+bh-pad&&ay+ah-pad>by+pad;
+}
+
+// ── UPDATE ──
+function update(){
+  if(paused||fightActive) return;
+  const spd=getSpeed();
+  worldOff+=spd;
+  dist+=spd*0.05;
+  score+=0.04;
+  distNoHit+=spd*0.05;
+  if(!powerUsed) distNoPower+=spd*0.05;
+
+  // Update missions that track dist
+  if(currentMission&&currentMission.type==='dist_no_hit'){
+    missionProgress=distNoHit;
+    document.getElementById('missionFill').style.width=Math.min(100,(distNoHit/currentMission.target)*100)+'%';
+    if(distNoHit>=currentMission.target){score+=currentMission.reward;toast('✅ MISSION DONE! +'+currentMission.reward+' pts','info');setMission();}
+  }
+  if(currentMission&&currentMission.type==='dist_nopower'){
+    missionProgress=distNoPower;
+    document.getElementById('missionFill').style.width=Math.min(100,(distNoPower/currentMission.target)*100)+'%';
+    if(distNoPower>=currentMission.target){score+=currentMission.reward;toast('✅ MISSION DONE! +'+currentMission.reward+' pts','info');setMission();}
+  }
+
+  // Player physics setup to ensure player rests on top of GROUND
+  player.vy+=0.75;
+  player.y+=player.vy;
+  if(player.y >= GROUND - player.h){
+    player.y = GROUND - player.h;
+    player.vy = 0;
+    player.jumpsLeft = player.maxJumps;
+  }
+
+  // Slide physics
+  if(player.sliding){player.slideTimer--;if(player.slideTimer<=0){player.sliding=false;}}
+
+  // Invincible/power timers
+  if(invincible){invincibleTimer--;if(invincibleTimer<=0)invincible=false;}
+  if(powerActive){powerTimer--;if(powerTimer<=0){powerActive=false;}}
+
+  // Char switch cooldowns
+  charSwitchTimers=charSwitchTimers.map(t=>Math.max(0,t-1));
+
+  // Animate player
+  player.runTimer++;if(player.runTimer>8){player.runTimer=0;player.runFrame=(player.runFrame+1)%4;}
+
+  // BG parallax stars
+  bgStars.forEach(s=>{s.x-=s.s*spd*0.3;if(s.x<0)s.x=W;});
+  bgMtns.forEach(m=>{m.x-=m.s*spd;if(m.x+m.w<0)m.x=W+Math.random()*300;});
+
+  // Spawn timers adjusted for longer game distance
+  spawnTimer--;
+  if(spawnTimer<=0){spawnObstacle();spawnTimer=Math.max(35,120-dist/60);}
+  collectTimer--;
+  if(collectTimer<=0){spawnCollectible();collectTimer=55+Math.random()*35;}
+  enemySpawnTimer--;
+  if(enemySpawnTimer<=0&&!currentEnemy){
+    spawnEnemy();enemySpawnTimer=Math.max(180,400-dist/20);
+  }
+
+  // Move obstacles
+  obstacles.forEach(o=>{o.x-=o.spd;});
+  obstacles=obstacles.filter(o=>o.x+o.w>-20);
+
+  // Move enemy on screen
+  if(currentEnemy&&!fightActive){
+    currentEnemy.x-=currentEnemy.spd;
+    currentEnemy.angle+=0.06;
+    if(currentEnemy.hitFlash>0) currentEnemy.hitFlash--;
+    // When enemy reaches player zone → trigger fight!
+    if(currentEnemy.x<=200){
+      const e=currentEnemy;
+      paused=true;
+      setTimeout(()=>startFight(e),200);
+    }
+  }
+
+  // Define player hit box for collision
+  const px = player.x;
+  const pw = player.w;
+  const ph = player.sliding ? 26 : player.h; // Slide makes height smaller
+  // Shift Y down when sliding so player stays grounded visually
+  const py = player.sliding ? player.y + (player.h - 26) : player.y;
+
+  // Move collectibles
+  const magnetOn=powerActive&&player.char.ability==='magnet';
+  collectibles.forEach(c=>{
+    if(magnetOn){
+      const dx=px-c.x,dy=py-c.y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<300){c.x+=dx/d*7;c.y+=dy/d*7;}
+    }
+    c.x-=spd*0.9; c.angle+=0.06; c.bobT+=0.05;
+    if(!c.collected&&overlaps(px,py,pw,ph,c.x,c.y,c.w,c.h,4)){
+      c.collected=true;collectCollectible(c);
+    }
+  });
+  collectibles=collectibles.filter(c=>c.x+c.w>-10&&!c.collected);
+
+  // Obstacle collisions
+  if(!invincible&&!shieldActive){
+    obstacles.forEach(o=>{
+      if(overlaps(px,py,pw,ph,o.x,o.y,o.w,o.h,6)){
+        loseLife();o.x=-200;// remove it
+      }
+    });
+  }
+
+  // Particles
+  particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=p.grav;p.life-=0.025;p.size*=0.96;});
+  particles=particles.filter(p=>p.life>0);
+
+  // Unlock chars mid-game
+  if(score>=1000&&!bestScores.sananUnlocked){
+    bestScores.sananUnlocked=true;saveScores();
+    toast('🔓 SANAN UNLOCKED! Press ▶ to switch!','info');
+  }
+  if(correctAnswers>=10&&!bestScores.leylaUnlocked){
+    bestScores.leylaUnlocked=true;saveScores();
+    toast('🔓 LEYLA UNLOCKED! Press ◀ ▶ to switch!','info');
+  }
+
+  updateHUD();
+  checkMilestones();
+  updateProgressBar();
+  updateCharPanel();
+}
+
+function collectCollectible(c){
+  const emojis={spark:'✨',golden:'🌟',shield:'🛡️',power:'⚡',life:'❤️'};
+  spawnParts(c.x,c.y,c.type==='golden'?'#FFD700':c.type==='shield'?'#00BCD4':'#7C3AED',8);
+  
+  if(c.type==='spark'){
+    sparks++;score+=8;powerCharge=Math.min(100,powerCharge+4);updateMission('sparks',1);
+  } else if(c.type==='golden'){
+    sparks+=5;score+=40;powerCharge=Math.min(100,powerCharge+15);updateMission('sparks',5);toast('🌟 GOLDEN SPARK! +40pts','good');
+  } else if(c.type==='shield'){
+    shieldActive=true;toast('🛡️ Shield Ready!','good');
+  } else if(c.type==='power'){
+    powerCharge=Math.min(100,powerCharge+30);toast('⚡ Power +30%!','good');
+  } else if(c.type==='life'){
+    // Completely revamped logic to handle hearts better
+    if(lives < maxLives){
+      lives++;
+      toast('❤️ Extra Life!','good');
+    } else {
+      score += 50; // Overheal gives a score bonus instead of being wasted
+      toast('❤️ Full Lives! +50pts','good');
+    }
+    updateHUD();
+  }
+  
+  if(powerCharge>=100) document.getElementById('powerReady').style.display='inline';
+}
+
+// ── HUD ──
+function updateHUD(){
+  document.getElementById('hScore').textContent=Math.floor(score);
+  document.getElementById('hDist').textContent=Math.floor(dist)+'m';
+  document.getElementById('hStreak').textContent=streak;
+  document.getElementById('hSparks').textContent=sparks;
+  document.getElementById('powerFill').style.width=powerCharge+'%';
+  // Setup 5 maximum hearts
+  for(let i=1;i<=maxLives;i++){
+    const h=document.getElementById('h'+i);
+    if(h) h.classList.toggle('lost',i>lives);
+  }
+}
+
+function updateProgressBar(){
+  const pct=Math.min(100,(dist/TOTAL_DIST)*100);
+  document.getElementById('progressBar').style.width=pct+'%';
+}
+
+function updateCharPanel(){
+  for(let i=0;i<3;i++){
+    const slot=document.getElementById('cp'+i);
+    slot.classList.toggle('active',i===activeChar);
+    // HP bar fill based on invincibility / shield
+    const bar=slot.querySelector('.char-bar');
+    let hp=i===activeChar?(invincible?100:shieldActive?70:50):30;
+    bar.style.width=hp+'%';
+  }
+}
+
+// ── DRAW ──
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  drawBg();
+  drawObstacles();
+  drawCollectibles();
+  drawEnemy();
+  drawParticles();
+  drawPlayer();
+  // Screen flash for invincibility
+  if(invincible&&Math.floor(Date.now()/80)%2===0){
+    ctx.fillStyle='rgba(255,215,0,0.06)';ctx.fillRect(0,0,W,H);
+  }
+  // Speed lines
+  const spd=getSpeed();
+  if(spd>5.5){
+    ctx.strokeStyle=`rgba(0,188,212,${Math.min(.3,(spd-5.5)*0.06)})`;
+    ctx.lineWidth=1;
+    for(let i=0;i<10;i++){
+      const y=50+Math.random()*(H-100),l=30+Math.random()*80;
+      ctx.beginPath();ctx.moveTo(W*0.25,y);ctx.lineTo(W*0.25-l,y);ctx.stroke();
+    }
+  }
+}
+
+function drawBg(){
+  // Sky
+  const sg=ctx.createLinearGradient(0,0,0,H);
+  sg.addColorStop(0,'#080c16');sg.addColorStop(.5,'#0f1520');sg.addColorStop(1,'#131e30');
+  ctx.fillStyle=sg;ctx.fillRect(0,0,W,H);
+
+  // Stars
+  bgStars.forEach(s=>{
+    const twinkle=.4+Math.sin(Date.now()*.001+s.x)*.3;
+    ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,255,255,${twinkle})`;ctx.fill();
+  });
+
+  // Mountains
+  bgMtns.forEach(m=>{
+    ctx.beginPath();ctx.moveTo(m.x,GROUND);
+    ctx.lineTo(m.x+m.w*.5,GROUND-m.h);ctx.lineTo(m.x+m.w,GROUND);ctx.closePath();
+    ctx.fillStyle='rgba(20,30,55,0.9)';ctx.fill();
+    // Snow cap
+    ctx.beginPath();ctx.moveTo(m.x+m.w*.4,GROUND-m.h+20);
+    ctx.lineTo(m.x+m.w*.5,GROUND-m.h);ctx.lineTo(m.x+m.w*.6,GROUND-m.h+20);ctx.closePath();
+    ctx.fillStyle='rgba(200,220,255,.3)';ctx.fill();
+  });
+
+  // Ground layers (visually align surface to GROUND physics)
+  const gg=ctx.createLinearGradient(0,GROUND,0,H);
+  gg.addColorStop(0,'#1a2744');gg.addColorStop(1,'#0a1020');
+  ctx.fillStyle=gg;ctx.fillRect(0,GROUND,W,H-GROUND);
+
+  // Ground glow line (sits directly on GROUND)
+  ctx.shadowColor='#00BCD4';ctx.shadowBlur=12;
+  ctx.fillStyle='#00BCD4';ctx.fillRect(0,GROUND-2,W,3);
+  ctx.shadowBlur=0;
+
+  // Track dashes
+  ctx.strokeStyle='rgba(0,188,212,.1)';ctx.lineWidth=2;ctx.setLineDash([30,40]);
+  ctx.beginPath();ctx.moveTo(0,GROUND+15);ctx.lineTo(W,GROUND+15);ctx.stroke();
+  ctx.setLineDash([]);
+}
+
+function drawObstacles(){
+  obstacles.forEach(o=>{
+    ctx.save();ctx.translate(o.x+o.w/2,o.y+o.h/2);
+    if(o.type==='laser'){
+      const t=Date.now()*.006;
+      ctx.shadowColor=o.color;ctx.shadowBlur=16;
+      ctx.fillStyle=o.color;ctx.fillRect(-o.w/2,-o.h/2,o.w,o.h);
+      ctx.fillStyle=`rgba(255,255,255,${.3+Math.sin(t)*.25})`;
+      ctx.fillRect(-o.w/2+5,-o.h/2+5,o.w-10,o.h-10);
+      // Warning label
+      ctx.font='bold 10px Nunito';ctx.fillStyle='#fff';ctx.textAlign='center';
+      ctx.fillText('⚡',0,o.h/2+16);
+    } else if(o.type==='highbar'){
+      ctx.shadowColor=o.color;ctx.shadowBlur=8;
+      ctx.fillStyle=o.color+'88';
+      ctx.fillRect(-o.w/2,-o.h/2,o.w,o.h);
+      ctx.strokeStyle=o.color;ctx.lineWidth=3;
+      ctx.strokeRect(-o.w/2,-o.h/2,o.w,o.h);
+      ctx.font='11px Nunito';ctx.fillStyle='#fff';ctx.textAlign='center';
+      ctx.fillText('↓ SLIDE ↓',0,4);
+    } else if(o.type==='block'){
+      ctx.fillStyle=o.color+'cc';ctx.fillRect(-o.w/2,-o.h/2,o.w,o.h);
+      ctx.fillStyle='rgba(255,255,255,.1)';ctx.fillRect(-o.w/2,-o.h/2,o.w,10);
+      ctx.font='24px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('🧱',0,0);
+    } else if(o.type==='spike'){
+      ctx.shadowColor=o.color;ctx.shadowBlur=8;
+      ctx.fillStyle=o.color;
+      ctx.beginPath();ctx.moveTo(-o.w/2,o.h/2);ctx.lineTo(0,-o.h/2);ctx.lineTo(o.w/2,o.h/2);ctx.closePath();ctx.fill();
+    }
+    ctx.shadowBlur=0;ctx.restore();
+  });
+}
+
+function drawEnemy(){
+  if(!currentEnemy||fightActive) return;
+  const e=currentEnemy;
+  ctx.save();ctx.translate(e.x+e.w/2,e.y+e.h/2+Math.sin(Date.now()*.004)*6);
+  ctx.rotate(Math.sin(e.angle)*.15);
+  if(e.hitFlash>0){ctx.shadowColor='#fff';ctx.shadowBlur=20;}
+  else{ctx.shadowColor=e.color;ctx.shadowBlur=18;}
+  // HP hearts above enemy
+  const hpPct=enemyHP/enemyMaxHP||1;
+  ctx.shadowBlur=0;
+  // HP bar
+  ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(-25,-e.h/2-16,50,8);
+  ctx.fillStyle=e.color;ctx.fillRect(-25,-e.h/2-16,50*hpPct,8);
+  ctx.strokeStyle=e.color;ctx.lineWidth=1;ctx.strokeRect(-25,-e.h/2-16,50,8);
+  // Emoji
+  ctx.font='44px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.shadowColor=e.color;ctx.shadowBlur=16;
+  ctx.fillText(e.emoji,0,0);
+  // Name
+  ctx.shadowBlur=0;ctx.font='bold 11px Nunito';ctx.fillStyle=e.color;
+  ctx.fillText(e.name,0,e.h/2+14);
+  // Warning: when close
+  if(e.x<350){
+    ctx.font='bold 13px Nunito';ctx.fillStyle='#FFD700';
+    ctx.fillText('⚠️ INCOMING!',0,-e.h/2-30);
+  }
+  ctx.restore();
+}
+
+function drawCollectibles(){
+  collectibles.filter(c=>!c.collected).forEach(c=>{
+    ctx.save();
+    const bob=Math.sin(c.bobT)*6;
+    ctx.translate(c.x+c.w/2,c.y+bob);
+    ctx.rotate(c.angle);
+    const emojis={spark:'✨',golden:'🌟',shield:'🛡️',power:'⚡',life:'❤️'};
+    const glows={spark:'#7C3AED',golden:'#FFD700',shield:'#00BCD4',power:'#FFD600',life:'#E53E3E'};
+    ctx.shadowColor=glows[c.type]||'#fff';ctx.shadowBlur=14;
+    ctx.font=c.type==='golden'?'28px serif':'22px serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(emojis[c.type],0,0);
+    ctx.shadowBlur=0;ctx.restore();
+  });
+}
+
+function drawParticles(){
+  particles.forEach(p=>{
+    ctx.save();ctx.globalAlpha=p.life;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);
+    ctx.fillStyle=p.color;ctx.fill();ctx.restore();
+  });
+}
+
+function drawPlayer(){
+  const p=player;
+  const ph = p.sliding ? 26 : p.h; // Visual box height
+  const py = p.sliding ? p.y + (p.h - 26) : p.y; // Shift Y top visually
+  const ch=p.char;
+
+  ctx.save();
+  ctx.translate(p.x+p.w/2, py+ph/2 + (gRunning && !p.sliding ? Math.sin(Date.now()*.012)*2.5 : 0));
+
+  // Shadow on ground
+  if(py+ph <= GROUND+5){
+    const groundDist=GROUND-(py+ph);const shadowAlpha=Math.max(0,.6-groundDist*.006);
+    ctx.fillStyle=`rgba(0,0,0,${shadowAlpha})`;
+    ctx.ellipse(0,GROUND-(py+ph/2)+2,p.w*.35,5*shadowAlpha,0,0,Math.PI*2);ctx.fill();
+  }
+
+  // Shield ring
+  if(shieldActive){
+    ctx.beginPath();ctx.arc(0,0,p.w*.9,0,Math.PI*2);
+    ctx.strokeStyle='rgba(0,188,212,.8)';ctx.lineWidth=3;
+    ctx.setLineDash([8,4]);ctx.stroke();ctx.setLineDash([]);
+  }
+
+  // Invincible aura
+  if(invincible){
+    const aura=ctx.createRadialGradient(0,0,0,0,0,p.w);
+    aura.addColorStop(0,ch.color+'44');aura.addColorStop(1,'transparent');
+    ctx.beginPath();ctx.arc(0,0,p.w,0,Math.PI*2);
+    ctx.fillStyle=aura;ctx.fill();
+    ctx.shadowColor=ch.color;ctx.shadowBlur=20;
+  }
+  if(powerActive){ctx.shadowColor=ch.color;ctx.shadowBlur=25;}
+
+  // Body background
+  const bg=ctx.createRadialGradient(-6,-8,2,0,0,p.w*.6);
+  bg.addColorStop(0,'rgba(255,255,255,.2)');bg.addColorStop(1,ch.color+'88');
+  ctx.beginPath();ctx.roundRect(-p.w/2,-ph/2,p.w,ph,10);
+  ctx.fillStyle=bg;ctx.fill();
+  ctx.strokeStyle=ch.color;ctx.lineWidth=2;ctx.stroke();
+
+  // Character emoji
+  ctx.font=(p.sliding?'24px':'30px')+' serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  // Running bob
+  const runBob=gRunning&&!p.sliding?[0,-3,0,3][p.runFrame]:0;
+  ctx.fillText(ch.emoji,0,runBob);
+
+  // Active char indicator
+  ctx.shadowBlur=0;
+  ctx.font='bold 8px Nunito';ctx.fillStyle=ch.color;ctx.textAlign='center';
+  ctx.fillText(ch.name.toUpperCase(),0,-ph/2-10);
+
+  ctx.shadowBlur=0;ctx.restore();
+}
+
+// ── TOASTS ──
+function toast(msg,type='info'){
+  const area=document.getElementById('toastArea');
+  const t=document.createElement('div');
+  t.className='toast toast-'+type;t.textContent=msg;
+  area.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';
+    setTimeout(()=>t.remove(),300);},2200);
+}
+
+// ── CHAR SELECT ──
+function pickChar(i){
+  if(i===1&&!bestScores.sananUnlocked){toast('🔒 Score 1000+ to unlock Sanan!','bad');return;}
+  if(i===2&&!bestScores.leylaUnlocked){toast('🔒 Answer 10 questions correctly to unlock Leyla!','bad');return;}
+  sel=i;
+  document.querySelectorAll('.char-card').forEach((c,j)=>c.classList.toggle('selected',j===i));
+}
+
+// ── GAME FLOW ──
+function startGame(){
+  document.getElementById('titleScreen').classList.add('hidden');
+  document.getElementById('gameOverScreen').classList.add('hidden');
+  document.getElementById('winScreen').classList.add('hidden');
+  activeChar=sel;
+  initGame();
+  gRunning=true;
+  cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(loop);
+}
+
+function loop(t=0){
+  if(!gRunning) return;
+  update();draw();
+  rafId = requestAnimationFrame(loop);
+}
+
+function doGameOver(){
+  gRunning=false;
+  document.getElementById('gameOverScreen').classList.remove('hidden');
+  document.getElementById('goEmoji').textContent=CHARS[activeChar].emoji;
+  document.getElementById('goScore').textContent=Math.floor(score);
+  document.getElementById('goDist').textContent=Math.floor(dist)+'m';
+  document.getElementById('goCorrect').textContent=correctAnswers;
+  document.getElementById('goStreak').textContent=bestStreak;
+  if(score>bestScores.best){bestScores.best=Math.floor(score);saveScores();}
+  const msHtml=earnedMilestones.length?'🏅 Milestones: '+earnedMilestones.join(' · '):'No milestones reached this run.';
+  document.getElementById('goMilestones').innerHTML=msHtml;
+}
+
+function doWin(){
+  gRunning=false;
+  document.getElementById('winScreen').classList.remove('hidden');
+  document.getElementById('winScore').textContent=Math.floor(score);
+  document.getElementById('winCorrect').textContent=correctAnswers;
+  spawnParts(W/2,H/2,'#FFD700',50);
+}
+
+function showTitle(){
+  document.getElementById('gameOverScreen').classList.add('hidden');
+  document.getElementById('winScreen').classList.add('hidden');
+  document.getElementById('titleScreen').classList.remove('hidden');
+  // Update lock badges
+  if(bestScores.sananUnlocked){
+    document.getElementById('lock1')?.remove();
+    document.getElementById('titleCard1')?.classList.remove('locked');
+  }
+  if(bestScores.leylaUnlocked){
+    document.getElementById('lock2')?.remove();
+    document.getElementById('titleCard2')?.classList.remove('locked');
+  }
+}
+
+// Init lock state on load
+window.addEventListener('load',()=>{
+  if(bestScores.sananUnlocked){
+    document.getElementById('lock1')?.remove();
+    document.getElementById('titleCard1')?.classList.remove('locked');
+  }
+  if(bestScores.leylaUnlocked){
+    document.getElementById('lock2')?.remove();
+    document.getElementById('titleCard2')?.classList.remove('locked');
+  }
+});
+</script>
 </body>
 </html>
