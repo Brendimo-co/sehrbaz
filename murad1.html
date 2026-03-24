@@ -245,13 +245,13 @@
     <script>
         /**
          * MARDAKAN CITY BUILDER - ULTIMATE EXACT-POINTER EDITION
-         * Features: 3rd Person Visible Character, Exact DDA Raycasting, Advanced AI Quiz, AutoBuilders.
+         * Features: Reduced Forest Density, Flattened Plains, Exact DDA Raycasting, Advanced AI Quiz, AutoBuilders.
          */
 
         // --- 1. GLOBALS & STATE ---
         let gameActive = false;
         let inputMode = 'none'; 
-        let isThirdPerson = true; // Default to 3rd person to show off the character model
+        let isThirdPerson = true; 
         
         const WORLD_SIZE = 80; 
         const BLOCK_SIZE = 1;
@@ -293,11 +293,11 @@
             { q: "What has legs, but doesn't walk?", opts: ["A table", "A snake", "A worm", "A tree"], a: "A table" },
             { q: "I shave every day, but my beard stays the same. What am I?", opts: ["A barber", "A wizard", "A bear", "An actor"], a: "A barber" },
             { q: "What goes up when rain comes down?", opts: ["An umbrella", "A cloud", "A bird", "The sun"], a: "An umbrella" },
-            // Regional / Azerbaijan (Mardakan context)
+            // Regional / Azerbaijan
             { q: "What is the capital city of Azerbaijan?", opts: ["Baku", "Ganja", "Sumqayit", "Lankaran"], a: "Baku" },
             { q: "Which massive body of water is located next to Baku?", opts: ["Caspian Sea", "Black Sea", "Red Sea", "Mediterranean Sea"], a: "Caspian Sea" },
             { q: "What colors are on the flag of Azerbaijan?", opts: ["Blue, Red, Green", "Red, White, Blue", "Green, White, Orange", "Yellow, Red, Black"], a: "Blue, Red, Green" },
-            // Word Problems / Math
+            // Word Problems
             { q: "You have 5 apples. You buy 7 more, then eat 2. How many are left?", opts: ["10", "12", "5", "14"], a: "10" },
             { q: "A train leaves at 3:00 PM and takes 2 hours to arrive. What time does it arrive?", opts: ["5:00 PM", "6:00 PM", "4:00 PM", "2:00 PM"], a: "5:00 PM" },
             { q: "If one square has 4 sides, how many sides do 3 squares have?", opts: ["12", "10", "8", "16"], a: "12" },
@@ -441,14 +441,13 @@
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             
             pitchObject = new THREE.Object3D(); 
-            pitchObject.position.y = 1.5; // Eye Level Pivot
+            pitchObject.position.y = 1.5; 
             pitchObject.add(camera);
             
             yawObject = new THREE.Object3D(); 
             yawObject.add(pitchObject);
             scene.add(yawObject);
 
-            // Construct Visible Character Mesh (3rd Person View)
             buildCharacterModel();
 
             hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
@@ -501,7 +500,6 @@
             const shirtMat = new THREE.MeshLambertMaterial({color: 0x0055ff});
             const pantsMat = new THREE.MeshLambertMaterial({color: 0x002288});
 
-            // Head (Pivot at neck for looking up/down)
             head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat);
             head.position.y = 0.25; 
             
@@ -510,41 +508,35 @@
             neckGroup.add(head);
             characterGroup.add(neckGroup);
             
-            // To sync head with camera pitch without disrupting the camera logic, we link it in the animate loop
             head.userData.neckGroup = neckGroup;
 
-            // Body
             const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 0.25), shirtMat);
             body.position.y = 1.125;
             characterGroup.add(body);
 
-            // Left Arm
             leftArmGroup = new THREE.Group();
-            leftArmGroup.position.set(-0.4, 1.4, 0); // Shoulder joint
+            leftArmGroup.position.set(-0.4, 1.4, 0); 
             const lArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), skinMat);
             lArmMesh.position.y = -0.375;
             leftArmGroup.add(lArmMesh);
             characterGroup.add(leftArmGroup);
 
-            // Right Arm
             rightArmGroup = new THREE.Group();
-            rightArmGroup.position.set(0.4, 1.4, 0); // Shoulder joint
+            rightArmGroup.position.set(0.4, 1.4, 0); 
             const rArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), skinMat);
             rArmMesh.position.y = -0.375;
             rightArmGroup.add(rArmMesh);
             characterGroup.add(rightArmGroup);
 
-            // Left Leg
             leftLegGroup = new THREE.Group();
-            leftLegGroup.position.set(-0.15, 0.75, 0); // Hip joint
+            leftLegGroup.position.set(-0.15, 0.75, 0); 
             const lLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), pantsMat);
             lLegMesh.position.y = -0.375;
             leftLegGroup.add(lLegMesh);
             characterGroup.add(leftLegGroup);
 
-            // Right Leg
             rightLegGroup = new THREE.Group();
-            rightLegGroup.position.set(0.15, 0.75, 0); // Hip joint
+            rightLegGroup.position.set(0.15, 0.75, 0); 
             const rLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), pantsMat);
             rLegMesh.position.y = -0.375;
             rightLegGroup.add(rLegMesh);
@@ -553,18 +545,27 @@
             yawObject.add(characterGroup);
         }
 
-        // --- 7. MARDAKAN GEOGRAPHY GENERATION ---
+        // --- 7. MARDAKAN GEOGRAPHY GENERATION (Flattened Plains & Less Trees) ---
         function seededRandom(x, z) {
             let n = x * 331 + z * 339; n = (n << 13) ^ n;
             return (1.0 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0);
         }
 
         function getElevation(x, z) {
+            // Check if we are in the central city building zone
+            let isCityZone = (z >= -10 && z <= 10);
+            
             let e = Math.sin(x * 0.1) * 2 + Math.cos(z * 0.1) * 2;
             e += Math.sin(x * 0.05 + z * 0.04) * 3 + seededRandom(x, z) * 1.5;
             
+            if (isCityZone) {
+                // Flatten the center plains for much easier city building
+                e *= 0.3; 
+            }
+            
             if (z < -10) e += Math.pow(Math.abs(z + 10), 1.15) * 0.4;
             else if (z > 15) e -= Math.pow(z - 15, 1.1) * 0.5; 
+            
             return Math.floor(e);
         }
 
@@ -617,7 +618,9 @@
                     } else {
                         addBlockData(x, h, z, 1); // Grass
                         let isForest = (z >= -15 && z <= 15);
-                        let treeChance = isForest ? 0.08 : 0.01;
+                        
+                        // Dramatically reduced tree generation (from 8% to 1.5%) to allow easy city building
+                        let treeChance = isForest ? 0.015 : 0.002;
                         
                         if (Math.random() < treeChance) {
                             const height = 4 + Math.floor(Math.random() * 3);
@@ -976,7 +979,6 @@
         function setupQuizUI() { document.getElementById('close-quiz').addEventListener('click', toggleQuiz); }
 
         // --- 11. EXACT EXACT-POINTER DDA PHYSICS ---
-        // Perfect 3D DDA (Digital Differential Analyzer) algorithm for zero-error crosshair raycasting.
         function raycastExactDDA(origin, direction, maxDist) {
             let x = Math.floor(origin.x), y = Math.floor(origin.y), z = Math.floor(origin.z);
             const stepX = direction.x > 0 ? 1 : (direction.x < 0 ? -1 : 0);
@@ -996,7 +998,6 @@
 
             if (direction.lengthSq() === 0) return null;
 
-            // Check starting block first
             if (worldData.has(`${x},${y},${z}`) && !BLOCKS[worldData.get(`${x},${y},${z}`)].noCollision) {
                 return { voxel: { x, y, z }, normal: face.clone(), distance: 0 };
             }
@@ -1022,7 +1023,6 @@
             return null;
         }
 
-        // To ensure the pointer places block perfectly via the crosshair, we shoot the ray directly from the camera!
         function getRaycastHit() {
             camera.updateMatrixWorld();
             let origin = camera.getWorldPosition(new THREE.Vector3());
@@ -1060,7 +1060,6 @@
                     new THREE.Vector3(px - 0.49, py - 0.49, pz - 0.49),
                     new THREE.Vector3(px + 0.49, py + 0.49, pz + 0.49)
                 );
-                // Tightened bounding box to exactly match the 0.5x0.5 player size for precise placement near feet
                 const playerBox = new THREE.Box3(
                     new THREE.Vector3(yawObject.position.x - 0.25, yawObject.position.y, yawObject.position.z - 0.25),
                     new THREE.Vector3(yawObject.position.x + 0.25, yawObject.position.y + 1.8, yawObject.position.z + 0.25)
@@ -1082,7 +1081,6 @@
 
         function checkCollision(pos) {
             const eps = 0.001;
-            // Precise character bounding box check (width: 0.5, height: 1.8)
             const minX = Math.floor(pos.x - 0.25 + 0.5 + eps), maxX = Math.floor(pos.x + 0.25 + 0.5 - eps);
             const minY = Math.floor(pos.y + 0.5 + eps), maxY = Math.floor(pos.y + 1.8 + 0.5 - eps); 
             const minZ = Math.floor(pos.z - 0.25 + 0.5 + eps), maxZ = Math.floor(pos.z + 0.25 + 0.5 - eps);
@@ -1115,7 +1113,6 @@
             frames++;
             if (time >= lastFpsTime + 1000) { document.getElementById('fps').innerText = frames; frames = 0; lastFpsTime = time; }
 
-            // Day / Night
             gameTime += delta * 0.1;
             const sunAngle = gameTime;
             dirLight.position.set(Math.cos(sunAngle) * 100, Math.sin(sunAngle) * 100, Math.sin(sunAngle) * 50);
@@ -1127,7 +1124,6 @@
             hemiLight.intensity = Math.max(0.5, sunHeight * 0.7);
 
             if (gameActive) {
-                // Determine Camera Mode & Intelligent Anti-Clipping
                 if (isThirdPerson) {
                     let backDir = pitchObject.getWorldDirection(new THREE.Vector3()).negate();
                     let headWorldPos = yawObject.position.clone();
@@ -1137,10 +1133,9 @@
                     let finalDist = camHit ? Math.max(0.1, camHit.distance - 0.3) : 5;
                     camera.position.set(0, 0, finalDist);
                     
-                    // Sync the Character's Head Pitch visually with camera
                     head.userData.neckGroup.rotation.x = pitchObject.rotation.x;
                 } else {
-                    camera.position.set(0, 0, 0); // 1st Person Eyes
+                    camera.position.set(0, 0, 0); 
                 }
 
                 const hit = getRaycastHit();
@@ -1195,7 +1190,6 @@
                     yawObject.position.set(0, 20, 0); velocity.set(0,0,0);
                 }
 
-                // Smooth Walk Animations
                 let speed = Math.sqrt(velocity.x*velocity.x + velocity.z*velocity.z);
                 if (speed > 0.5 && isGrounded) {
                     let legSwing = Math.sin(time * 0.012) * 0.6;
