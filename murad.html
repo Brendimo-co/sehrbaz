@@ -81,7 +81,6 @@
         .slot.locked { filter: grayscale(100%) brightness(0.4); cursor: not-allowed; }
         .slot.locked::after { content: '🔒'; position: absolute; font-size: 18px; }
         
-        /* Auto-Builder Icons */
         .builder-icon { font-size: 18px; }
 
         /* Mobile Controls */
@@ -118,6 +117,7 @@
         #btn-break { bottom: 90px; right: 100px; width: 55px; height: 55px; font-size: 18px; }
         
         #btn-quiz { top: 20px; right: 20px; width: auto; padding: 0 15px; height: 45px; font-size: 12px; border-radius: 12px; background: #FF9800; border-color: #FFF; box-shadow: 0 0 15px #FF9800;}
+        #btn-cam { top: 75px; right: 20px; width: 45px; height: 45px; font-size: 18px; border-radius: 12px; }
 
         /* UI Stats & Editor */
         #stats-display {
@@ -166,7 +166,8 @@
     <div id="stats-display">
         FPS: <span id="fps">0</span><br>
         Score: <span id="hud-score" style="color:#FF9800">0 Correct</span><br>
-        Biome: <span id="hud-biome" style="color:#aaddff">Loading...</span>
+        Biome: <span id="hud-biome" style="color:#aaddff">Loading...</span><br>
+        <span style="color:#ccc">[V] Toggle Camera</span>
     </div>
 
     <!-- Notification Toast -->
@@ -182,6 +183,7 @@
         <div id="btn-place" class="action-btn">🧱</div>
         <div id="btn-break" class="action-btn">⚒</div>
         <div id="btn-quiz" class="action-btn">🎓 EARN POWERS</div>
+        <div id="btn-cam" class="action-btn">👁️</div>
     </div>
 
     <!-- Scrollable Hotbar -->
@@ -194,14 +196,14 @@
             <div class="slot" id="slot-4" style="background: #4a331c;">Wood</div>
             <div class="slot" id="slot-5" style="background: #235e20;">Leaves</div>
             <div class="slot" id="slot-6" style="background: #d2b48c;">Sand</div>
-            <!-- City Materials (Unlocked immediately or start with them) -->
+            <!-- City Materials -->
             <div class="slot" id="slot-8" style="background: #b22222;">Brick</div>
             <div class="slot" id="slot-9" style="background: #aaddff; color: #000;">Glass</div>
             <div class="slot" id="slot-10" style="background: #aaaaaa; color: #000;">Wall</div>
             <div class="slot" id="slot-11" style="background: #333333;">Road</div>
             <div class="slot" id="slot-12" style="background: #c2a47c; color: #000;">Plank</div>
             <div class="slot" id="slot-14" style="background: #ffffaa; color: #000;">Lamp</div>
-            <!-- Special Auto-Builders (Locked initially) -->
+            <!-- Special Auto-Builders -->
             <div class="slot locked" id="slot-15" style="background: #e74c3c; border-color: #FFF;"><span class="builder-icon">🏠</span><br>House</div>
             <div class="slot locked" id="slot-16" style="background: #2ecc71; border-color: #FFF;"><span class="builder-icon">🌲</span><br>Park</div>
             <div class="slot locked" id="slot-17" style="background: #f1c40f; border-color: #FFF; color: #000;"><span class="builder-icon">🏫</span><br>School</div>
@@ -242,20 +244,24 @@
 
     <script>
         /**
-         * MARDAKAN CITY BUILDER
-         * Structured Geography, Advanced Question Bank (Logic/Local), Multiple Auto-Builders
+         * MARDAKAN CITY BUILDER - ULTIMATE EXACT-POINTER EDITION
+         * Features: 3rd Person Visible Character, Exact DDA Raycasting, Advanced AI Quiz, AutoBuilders.
          */
 
         // --- 1. GLOBALS & STATE ---
         let gameActive = false;
         let inputMode = 'none'; 
+        let isThirdPerson = true; // Default to 3rd person to show off the character model
         
-        const WORLD_SIZE = 80; // Bigger world for distinct biomes
+        const WORLD_SIZE = 80; 
         const BLOCK_SIZE = 1;
         
         let camera, scene, renderer, dirLight, hemiLight;
         let pitchObject, yawObject;
         let outlineMesh;
+        
+        // Character Model Parts
+        let characterGroup, head, leftArmGroup, rightArmGroup, leftLegGroup, rightLegGroup;
         
         let lastTime = performance.now();
         let frames = 0, lastFpsTime = lastTime;
@@ -274,9 +280,8 @@
         let currentQuestion = null;
         let lastQuestionIndex = -1;
 
-        // --- 2. ADVANCED QUESTION BANK (Logic, Local Geo, Science, Word Math) ---
+        // --- 2. ADVANCED QUESTION BANK ---
         const quizBank = [
-            // Logical & Riddles
             { q: "I have keys but no locks. I have a space but no room. You can enter, but can't go outside. What am I?", opts: ["A Keyboard", "A Piano", "A House", "A Computer"], a: "A Keyboard" },
             { q: "What has to be broken before you can use it?", opts: ["An egg", "A window", "A promise", "A code"], a: "An egg" },
             { q: "I'm tall when I'm young, and I'm short when I'm old. What am I?", opts: ["A candle", "A tree", "A human", "A pencil"], a: "A candle" },
@@ -286,6 +291,8 @@
             { q: "If a brother has two sisters, how many children are in the family?", opts: ["3", "2", "4", "5"], a: "3" },
             { q: "Which month of the year has 28 days?", opts: ["All of them", "February", "January", "None"], a: "All of them" },
             { q: "What has legs, but doesn't walk?", opts: ["A table", "A snake", "A worm", "A tree"], a: "A table" },
+            { q: "I shave every day, but my beard stays the same. What am I?", opts: ["A barber", "A wizard", "A bear", "An actor"], a: "A barber" },
+            { q: "What goes up when rain comes down?", opts: ["An umbrella", "A cloud", "A bird", "The sun"], a: "An umbrella" },
             // Regional / Azerbaijan (Mardakan context)
             { q: "What is the capital city of Azerbaijan?", opts: ["Baku", "Ganja", "Sumqayit", "Lankaran"], a: "Baku" },
             { q: "Which massive body of water is located next to Baku?", opts: ["Caspian Sea", "Black Sea", "Red Sea", "Mediterranean Sea"], a: "Caspian Sea" },
@@ -301,7 +308,6 @@
             { q: "Which animal is known as the King of the Jungle?", opts: ["Lion", "Tiger", "Elephant", "Monkey"], a: "Lion" }
         ];
 
-        // Add dynamically generated Math to reach 100+ total
         for(let i=4; i<=9; i++) {
             for(let j=3; j<=11; j++) {
                 let ans = (i*j).toString();
@@ -327,7 +333,6 @@
             12: { name: 'Planks', color1: '#d2b48c', color2: '#c2a47c', pattern: 'wood' },
             13: { name: 'Metal', color1: '#ffffff', color2: '#dddddd', pattern: 'metal' },
             14: { name: 'Lamp', color1: '#ffffaa', color2: '#ffffff', light: true },
-            // Super Auto-Builders (These are logical tools, not rendered blocks)
             15: { name: 'HouseBuilder', weapon: true, shape: 'house' },
             16: { name: 'ParkBuilder', weapon: true, shape: 'park' },
             17: { name: 'SchoolBuilder', weapon: true, shape: 'school' },
@@ -336,7 +341,6 @@
         };
         
         let currentBlockType = 1;
-        // Start with basic materials + building materials
         let unlockedBlocks = [1,2,3,4,5,6,7,8,9,10,11,12,13,14];
         
         const worldData = new Map();
@@ -408,7 +412,7 @@
             const materials = {};
             for (const key in BLOCKS) {
                 const b = BLOCKS[key];
-                if(b.weapon) continue; // Don't render meshes for logical tools
+                if(b.weapon) continue;
 
                 const tex = generatePixelTexture(b);
                 if (b.top) {
@@ -428,7 +432,7 @@
             return materials;
         }
 
-        // --- 6. ENGINE INIT ---
+        // --- 6. ENGINE & CHARACTER INIT ---
         function init() {
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x87CEEB);
@@ -436,9 +440,16 @@
 
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             
-            pitchObject = new THREE.Object3D(); pitchObject.add(camera);
-            yawObject = new THREE.Object3D(); yawObject.add(pitchObject);
+            pitchObject = new THREE.Object3D(); 
+            pitchObject.position.y = 1.5; // Eye Level Pivot
+            pitchObject.add(camera);
+            
+            yawObject = new THREE.Object3D(); 
+            yawObject.add(pitchObject);
             scene.add(yawObject);
+
+            // Construct Visible Character Mesh (3rd Person View)
+            buildCharacterModel();
 
             hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
             scene.add(hemiLight);
@@ -483,6 +494,65 @@
             animate();
         }
 
+        function buildCharacterModel() {
+            characterGroup = new THREE.Group();
+            
+            const skinMat = new THREE.MeshLambertMaterial({color: 0xffe0bd});
+            const shirtMat = new THREE.MeshLambertMaterial({color: 0x0055ff});
+            const pantsMat = new THREE.MeshLambertMaterial({color: 0x002288});
+
+            // Head (Pivot at neck for looking up/down)
+            head = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), skinMat);
+            head.position.y = 0.25; 
+            
+            let neckGroup = new THREE.Group();
+            neckGroup.position.y = 1.5; 
+            neckGroup.add(head);
+            characterGroup.add(neckGroup);
+            
+            // To sync head with camera pitch without disrupting the camera logic, we link it in the animate loop
+            head.userData.neckGroup = neckGroup;
+
+            // Body
+            const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.75, 0.25), shirtMat);
+            body.position.y = 1.125;
+            characterGroup.add(body);
+
+            // Left Arm
+            leftArmGroup = new THREE.Group();
+            leftArmGroup.position.set(-0.4, 1.4, 0); // Shoulder joint
+            const lArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), skinMat);
+            lArmMesh.position.y = -0.375;
+            leftArmGroup.add(lArmMesh);
+            characterGroup.add(leftArmGroup);
+
+            // Right Arm
+            rightArmGroup = new THREE.Group();
+            rightArmGroup.position.set(0.4, 1.4, 0); // Shoulder joint
+            const rArmMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), skinMat);
+            rArmMesh.position.y = -0.375;
+            rightArmGroup.add(rArmMesh);
+            characterGroup.add(rightArmGroup);
+
+            // Left Leg
+            leftLegGroup = new THREE.Group();
+            leftLegGroup.position.set(-0.15, 0.75, 0); // Hip joint
+            const lLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), pantsMat);
+            lLegMesh.position.y = -0.375;
+            leftLegGroup.add(lLegMesh);
+            characterGroup.add(leftLegGroup);
+
+            // Right Leg
+            rightLegGroup = new THREE.Group();
+            rightLegGroup.position.set(0.15, 0.75, 0); // Hip joint
+            const rLegMesh = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.25), pantsMat);
+            rLegMesh.position.y = -0.375;
+            rightLegGroup.add(rLegMesh);
+            characterGroup.add(rightLegGroup);
+
+            yawObject.add(characterGroup);
+        }
+
         // --- 7. MARDAKAN GEOGRAPHY GENERATION ---
         function seededRandom(x, z) {
             let n = x * 331 + z * 339; n = (n << 13) ^ n;
@@ -493,12 +563,8 @@
             let e = Math.sin(x * 0.1) * 2 + Math.cos(z * 0.1) * 2;
             e += Math.sin(x * 0.05 + z * 0.04) * 3 + seededRandom(x, z) * 1.5;
             
-            // Mardakan Shape: Mountains North (-Z), Sea South (+Z)
-            if (z < -10) {
-                e += Math.pow(Math.abs(z + 10), 1.15) * 0.4; // Mountains rise up
-            } else if (z > 15) {
-                e -= Math.pow(z - 15, 1.1) * 0.5; // Beach slopes down to sea
-            }
+            if (z < -10) e += Math.pow(Math.abs(z + 10), 1.15) * 0.4;
+            else if (z > 15) e -= Math.pow(z - 15, 1.1) * 0.5; 
             return Math.floor(e);
         }
 
@@ -544,51 +610,43 @@
                     const h = getElevation(x, z);
                     
                     if (h < -2) {
-                        // Sea / Beach
                         addBlockData(x, h, z, 6); // Sand
                         for (let wy = h + 1; wy <= -2; wy++) addBlockData(x, wy, z, 7); // Water
                     } else if (z < -15 && h > 8) {
-                        // Mountains Peak
-                        addBlockData(x, h, z, 3); // Stone top
+                        addBlockData(x, h, z, 3); // Stone
                     } else {
-                        // Forest / Plains
                         addBlockData(x, h, z, 1); // Grass
-                        
-                        // Forest Density (Heavy in center, none in sea, rare in mountains)
                         let isForest = (z >= -15 && z <= 15);
                         let treeChance = isForest ? 0.08 : 0.01;
                         
                         if (Math.random() < treeChance) {
                             const height = 4 + Math.floor(Math.random() * 3);
-                            for (let i = 0; i < height; i++) addBlockData(x, h + 1 + i, z, 4); // Trunk
+                            for (let i = 0; i < height; i++) addBlockData(x, h + 1 + i, z, 4); 
                             for (let lx = -2; lx <= 2; lx++) {
                                 for (let ly = height - 2; ly <= height + 1; ly++) {
                                     for (let lz = -2; lz <= 2; lz++) {
                                         if (Math.abs(lx) === 2 && Math.abs(lz) === 2) continue;
                                         if (lx === 0 && lz === 0 && ly < height) continue;
                                         const k = `${x+lx},${h+1+ly},${z+lz}`;
-                                        if (!worldData.has(k)) addBlockData(x + lx, h + 1 + ly, z + lz, 5); // Leaves
+                                        if (!worldData.has(k)) addBlockData(x + lx, h + 1 + ly, z + lz, 5);
                                     }
                                 }
                             }
                         }
                     }
                     
-                    // Underground
                     let surfaceType = worldData.get(`${x},${h},${z}`);
-                    let underType = (surfaceType === 6) ? 6 : 2; // Sand under sand, dirt under grass
+                    let underType = (surfaceType === 6) ? 6 : 2; 
                     for (let y = h - 1; y >= h - 3; y--) addBlockData(x, y, z, underType);
-                    for (let y = h - 4; y >= h - 10; y--) addBlockData(x, y, z, 3); // Stone base
+                    for (let y = h - 4; y >= h - 10; y--) addBlockData(x, y, z, 3); 
                 }
             }
             
             for (const key in instancedMeshes) updateInstancedMesh(key);
-            
-            // Spawn Point (Middle of forest)
             yawObject.position.set(0, getElevation(0,0) + 5, 0);
         }
 
-        // --- 8. AUTO-BUILDER BLUEPRINTS (Superpowers) ---
+        // --- 8. AUTO-BUILDER BLUEPRINTS ---
         function constructFacility(px, py, pz, shape) {
             let blocksUsed = new Set();
             
@@ -601,36 +659,27 @@
             };
 
             if (shape === 'house') {
-                // 5x5 Brick House
                 for(let x=-2; x<=2; x++) {
                     for(let y=0; y<=3; y++) {
                         for(let z=-2; z<=2; z++) {
-                            if (x===0 && y<2 && z===2) putBlock(x,y,z,0); // Door
-                            else if (y===0) putBlock(x,y,z,12); // Wood Floor
-                            else if (y===3) putBlock(x,y,z,12); // Wood Roof
-                            else if (y===1 && (x===-2 || x===2)) putBlock(x,y,z,9); // Windows
-                            else if (x===-2 || x===2 || z===-2 || z===2) putBlock(x,y,z,8); // Brick Wall
-                            else if (x===0 && y===2 && z===0) putBlock(x,y,z,14); // Lamp
-                            else putBlock(x,y,z,0); // Empty inside
+                            if (x===0 && y<2 && z===2) putBlock(x,y,z,0); 
+                            else if (y===0 || y===3) putBlock(x,y,z,12); 
+                            else if (y===1 && (x===-2 || x===2)) putBlock(x,y,z,9); 
+                            else if (x===-2 || x===2 || z===-2 || z===2) putBlock(x,y,z,8); 
+                            else if (x===0 && y===2 && z===0) putBlock(x,y,z,14); 
+                            else putBlock(x,y,z,0); 
                         }
                     }
                 }
                 showNotification("🏠 House Constructed!");
             } 
             else if (shape === 'park') {
-                // 7x7 Open Park with pathways, trees, and benches
                 for(let x=-3; x<=3; x++) {
                     for(let z=-3; z<=3; z++) {
-                        // Clear space above
                         for(let y=1; y<=5; y++) putBlock(x,y,z,0);
-                        
-                        if (x===0 || z===0) putBlock(x,0,z,11); // Road path cross
-                        else putBlock(x,0,z,1); // Grass
-                        
-                        // Corner benches
+                        if (x===0 || z===0) putBlock(x,0,z,11); 
+                        else putBlock(x,0,z,1); 
                         if(Math.abs(x)===2 && Math.abs(z)===2) putBlock(x,1,z,12);
-                        
-                        // Corner Trees
                         if(Math.abs(x)===3 && Math.abs(z)===3) {
                             putBlock(x,1,z,4); putBlock(x,2,z,4); putBlock(x,3,z,5);
                             putBlock(x+1,2,z,5); putBlock(x-1,2,z,5); putBlock(x,2,z+1,5); putBlock(x,2,z-1,5);
@@ -640,35 +689,30 @@
                 showNotification("🌲 City Park Constructed!");
             }
             else if (shape === 'school') {
-                // 9x5 Concrete School with lots of glass
                 for(let x=-4; x<=4; x++) {
                     for(let y=0; y<=4; y++) {
                         for(let z=-2; z<=2; z++) {
-                            if (x===0 && y<2 && z===2) putBlock(x,y,z,0); // Door
-                            else if (y===0) putBlock(x,y,z,10); // Floor
-                            else if (y===4) putBlock(x,y,z,10); // Roof
-                            else if (y>=1 && y<=2 && z===2 && x!==0) putBlock(x,y,z,9); // Front Windows
-                            else if (x===-4 || x===4 || z===-2 || z===2) putBlock(x,y,z,10); // Concrete Wall
-                            else if (y===3 && x%2===0 && z===0) putBlock(x,y,z,14); // Multiple Lamps
-                            else putBlock(x,y,z,0); // Empty inside
+                            if (x===0 && y<2 && z===2) putBlock(x,y,z,0); 
+                            else if (y===0 || y===4) putBlock(x,y,z,10); 
+                            else if (y>=1 && y<=2 && z===2 && x!==0) putBlock(x,y,z,9); 
+                            else if (x===-4 || x===4 || z===-2 || z===2) putBlock(x,y,z,10); 
+                            else if (y===3 && x%2===0 && z===0) putBlock(x,y,z,14); 
+                            else putBlock(x,y,z,0); 
                         }
                     }
                 }
                 showNotification("🏫 School Constructed!");
             }
             else if (shape === 'hospital') {
-                // 7x7 White Metal Cross-shaped building
                 for(let x=-3; x<=3; x++) {
                     for(let y=0; y<=5; y++) {
                         for(let z=-3; z<=3; z++) {
-                            // Make it slightly cross shaped by cutting corners
                             if (Math.abs(x)===3 && Math.abs(z)===3) { putBlock(x,y,z,0); continue; }
-                            
-                            if (x===0 && y<2 && z===3) putBlock(x,y,z,0); // Door
-                            else if (y===0 || y===5) putBlock(x,y,z,13); // Metal Floor/Roof
-                            else if (y===2 && x===0 && z===-3) putBlock(x,y,z,8); // Red Brick Cross indicator back
-                            else if (x===-3 || x===3 || z===-3 || z===3) putBlock(x,y,z,13); // White Wall
-                            else if (y===4 && x===0 && z===0) putBlock(x,y,z,14); // Lamp
+                            if (x===0 && y<2 && z===3) putBlock(x,y,z,0); 
+                            else if (y===0 || y===5) putBlock(x,y,z,13); 
+                            else if (y===2 && x===0 && z===-3) putBlock(x,y,z,8); 
+                            else if (x===-3 || x===3 || z===-3 || z===3) putBlock(x,y,z,13); 
+                            else if (y===4 && x===0 && z===0) putBlock(x,y,z,14); 
                             else putBlock(x,y,z,0);
                         }
                     }
@@ -676,31 +720,33 @@
                 showNotification("🏥 Hospital Clinic Constructed!");
             }
             else if (shape === 'skyscraper') {
-                // 5x5x15 Glass and Steel Tower
                 for(let x=-2; x<=2; x++) {
                     for(let y=0; y<=15; y++) {
                         for(let z=-2; z<=2; z++) {
-                            if (x===0 && y<2 && z===2) putBlock(x,y,z,0); // Door
-                            else if (y===0 || y===15) putBlock(x,y,z,13); // Base/Roof
-                            else if (y%4===0) putBlock(x,y,z,10); // Floor dividers
+                            if (x===0 && y<2 && z===2) putBlock(x,y,z,0); 
+                            else if (y===0 || y===15) putBlock(x,y,z,13); 
+                            else if (y%4===0) putBlock(x,y,z,10); 
                             else if (x===-2 || x===2 || z===-2 || z===2) {
-                                // Corners are metal, sides are glass
                                 if(Math.abs(x)===2 && Math.abs(z)===2) putBlock(x,y,z,13);
                                 else putBlock(x,y,z,9);
                             }
-                            else if (y%4===3 && x===0 && z===0) putBlock(x,y,z,14); // Lamp on each floor
+                            else if (y%4===3 && x===0 && z===0) putBlock(x,y,z,14); 
                             else putBlock(x,y,z,0);
                         }
                     }
                 }
                 showNotification("🏢 Skyscraper Constructed!");
             }
-
             blocksUsed.forEach(t => updateInstancedMesh(t));
             playSound('success');
         }
 
         // --- 9. INPUT & QUIZ SYSTEM ---
+        function toggleCameraView() {
+            isThirdPerson = !isThirdPerson;
+            characterGroup.visible = isThirdPerson;
+        }
+
         function setupInput() {
             document.getElementById('btn-pc').addEventListener('click', (e) => {
                 e.stopPropagation(); initAudio(); inputMode = 'pc';
@@ -729,11 +775,11 @@
                     case 'KeyS': keys.s = true; break; case 'KeyD': keys.d = true; break;
                     case 'Space': doJump(); break;
                     case 'KeyQ': toggleQuiz(); break;
+                    case 'KeyV': toggleCameraView(); break;
                 }
-                // Hotbar keys
                 if(e.key >= '1' && e.key <= '9') {
                     let num = parseInt(e.key);
-                    if (num === 7) num = 8; // skip water
+                    if (num === 7) num = 8; 
                     if (unlockedBlocks.includes(num)) selectBlock(num);
                 }
             });
@@ -756,7 +802,7 @@
                 if (e.button === 2) doPlace();
             });
 
-            // Mobile Touch Logic
+            // Mobile Controls Setup
             const touchLeft = document.getElementById('touch-left');
             const touchRight = document.getElementById('touch-right');
             const joyBase = document.getElementById('joystick-base');
@@ -829,13 +875,12 @@
             };
             touchRight.addEventListener('touchend', endRightTouch); touchRight.addEventListener('touchcancel', endRightTouch);
 
-            // Action Buttons
             document.getElementById('btn-jump').addEventListener('touchstart', (e) => { e.preventDefault(); doJump(); });
             document.getElementById('btn-break').addEventListener('touchstart', (e) => { e.preventDefault(); doBreak(); });
             document.getElementById('btn-place').addEventListener('touchstart', (e) => { e.preventDefault(); doPlace(); });
             document.getElementById('btn-quiz').addEventListener('touchstart', (e) => { e.preventDefault(); toggleQuiz(); });
+            document.getElementById('btn-cam').addEventListener('touchstart', (e) => { e.preventDefault(); toggleCameraView(); });
             
-            // Hotbar Clicks
             document.querySelectorAll('.slot').forEach(el => {
                 el.addEventListener('pointerdown', (e) => {
                     e.preventDefault();
@@ -846,7 +891,7 @@
             });
         }
 
-        // --- 10. PROGRESSION & REWARDS LOGIC ---
+        // --- 10. PROGRESSION LOGIC ---
         function toggleQuiz() {
             const ui = document.getElementById('quiz-ui');
             if (ui.style.display === 'block') {
@@ -863,7 +908,6 @@
         }
 
         function loadNewQuestion() {
-            // Anti-repeat logic
             let randIdx;
             do { randIdx = Math.floor(Math.random() * quizBank.length); } while (randIdx === lastQuestionIndex && quizBank.length > 1);
             lastQuestionIndex = randIdx;
@@ -914,18 +958,11 @@
                     showNotification(msg);
                 }
             };
-
             if (quizScore >= 2) unlock(15, "🏠 LEVEL 1: House Builder Unlocked!");
-            if (quizScore >= 5) {
-                unlock(16, "🌲 LEVEL 2: Park Builder & Super Speed Unlocked!");
-                playerStats.speed = 80; playerStats.jump = 25;
-            }
+            if (quizScore >= 5) { unlock(16, "🌲 LEVEL 2: Park Builder & Super Speed Unlocked!"); playerStats.speed = 80; playerStats.jump = 25; }
             if (quizScore >= 8) unlock(17, "🏫 LEVEL 3: School Builder Unlocked!");
             if (quizScore >= 12) unlock(18, "🏥 LEVEL 4: Hospital Clinic Unlocked!");
-            if (quizScore >= 15 && !isFlying) {
-                unlock(19, "🏢 LEVEL 5: Skyscraper Builder & God Mode (Flight)!");
-                isFlying = true; playerStats.reach = 20;
-            }
+            if (quizScore >= 15 && !isFlying) { unlock(19, "🏢 LEVEL 5: Skyscraper Builder & God Mode (Flight)!"); isFlying = true; playerStats.reach = 20; }
             updateUnlockText();
         }
 
@@ -936,24 +973,70 @@
             setTimeout(() => { notif.style.display = 'none'; }, 3000);
         }
 
-        function setupQuizUI() {
-            document.getElementById('close-quiz').addEventListener('click', toggleQuiz);
+        function setupQuizUI() { document.getElementById('close-quiz').addEventListener('click', toggleQuiz); }
+
+        // --- 11. EXACT EXACT-POINTER DDA PHYSICS ---
+        // Perfect 3D DDA (Digital Differential Analyzer) algorithm for zero-error crosshair raycasting.
+        function raycastExactDDA(origin, direction, maxDist) {
+            let x = Math.floor(origin.x), y = Math.floor(origin.y), z = Math.floor(origin.z);
+            const stepX = direction.x > 0 ? 1 : (direction.x < 0 ? -1 : 0);
+            const stepY = direction.y > 0 ? 1 : (direction.y < 0 ? -1 : 0);
+            const stepZ = direction.z > 0 ? 1 : (direction.z < 0 ? -1 : 0);
+            
+            const tDeltaX = stepX !== 0 ? Math.abs(1 / direction.x) : Infinity;
+            const tDeltaY = stepY !== 0 ? Math.abs(1 / direction.y) : Infinity;
+            const tDeltaZ = stepZ !== 0 ? Math.abs(1 / direction.z) : Infinity;
+            
+            let tMaxX = stepX > 0 ? (x + 1 - origin.x) * tDeltaX : (stepX < 0 ? (origin.x - x) * tDeltaX : Infinity);
+            let tMaxY = stepY > 0 ? (y + 1 - origin.y) * tDeltaY : (stepY < 0 ? (origin.y - y) * tDeltaY : Infinity);
+            let tMaxZ = stepZ > 0 ? (z + 1 - origin.z) * tDeltaZ : (stepZ < 0 ? (origin.z - z) * tDeltaZ : Infinity);
+
+            let face = new THREE.Vector3();
+            let dist = 0;
+
+            if (direction.lengthSq() === 0) return null;
+
+            // Check starting block first
+            if (worldData.has(`${x},${y},${z}`) && !BLOCKS[worldData.get(`${x},${y},${z}`)].noCollision) {
+                return { voxel: { x, y, z }, normal: face.clone(), distance: 0 };
+            }
+
+            while (dist <= maxDist) {
+                if (tMaxX < tMaxY) {
+                    if (tMaxX < tMaxZ) { dist = tMaxX; tMaxX += tDeltaX; x += stepX; face.set(-stepX, 0, 0); }
+                    else { dist = tMaxZ; tMaxZ += tDeltaZ; z += stepZ; face.set(0, 0, -stepZ); }
+                } else {
+                    if (tMaxY < tMaxZ) { dist = tMaxY; tMaxY += tDeltaY; y += stepY; face.set(0, -stepY, 0); }
+                    else { dist = tMaxZ; tMaxZ += tDeltaZ; z += stepZ; face.set(0, 0, -stepZ); }
+                }
+
+                if (dist > maxDist) return null;
+
+                if (worldData.has(`${x},${y},${z}`)) {
+                    const blockId = worldData.get(`${x},${y},${z}`);
+                    if (!BLOCKS[blockId].noCollision) {
+                        return { voxel: { x, y, z }, normal: face.clone(), distance: dist }; 
+                    }
+                }
+            }
+            return null;
         }
 
-        // --- 11. GAME ACTIONS ---
+        // To ensure the pointer places block perfectly via the crosshair, we shoot the ray directly from the camera!
+        function getRaycastHit() {
+            camera.updateMatrixWorld();
+            let origin = camera.getWorldPosition(new THREE.Vector3());
+            let dir = camera.getWorldDirection(new THREE.Vector3());
+            let effectiveReach = playerStats.reach + (isThirdPerson ? camera.position.z : 0);
+            return raycastExactDDA(origin, dir, effectiveReach);
+        }
+
         function doJump() {
             if ((isGrounded || isFlying) && gameActive) {
                 velocity.y = playerStats.jump;
                 isGrounded = false;
                 playSound('jump');
             }
-        }
-
-        const raycaster = new THREE.Raycaster();
-        function getRaycastHit() {
-            camera.updateMatrixWorld();
-            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-            return raycastGrid(camera.getWorldPosition(new THREE.Vector3()), raycaster.ray.direction, playerStats.reach);
         }
 
         function doBreak() {
@@ -968,7 +1051,6 @@
                 const py = hit.voxel.y + hit.normal.y;
                 const pz = hit.voxel.z + hit.normal.z;
                 
-                // Superpowers Check
                 if (BLOCKS[currentBlockType].weapon) {
                     constructFacility(px, py, pz, BLOCKS[currentBlockType].shape);
                     return;
@@ -978,9 +1060,10 @@
                     new THREE.Vector3(px - 0.49, py - 0.49, pz - 0.49),
                     new THREE.Vector3(px + 0.49, py + 0.49, pz + 0.49)
                 );
+                // Tightened bounding box to exactly match the 0.5x0.5 player size for precise placement near feet
                 const playerBox = new THREE.Box3(
-                    new THREE.Vector3(yawObject.position.x - 0.3, yawObject.position.y, yawObject.position.z - 0.3),
-                    new THREE.Vector3(yawObject.position.x + 0.3, yawObject.position.y + 1.6, yawObject.position.z + 0.3)
+                    new THREE.Vector3(yawObject.position.x - 0.25, yawObject.position.y, yawObject.position.z - 0.25),
+                    new THREE.Vector3(yawObject.position.x + 0.25, yawObject.position.y + 1.8, yawObject.position.z + 0.25)
                 );
 
                 if (!blockBox.intersectsBox(playerBox) || BLOCKS[currentBlockType].noCollision) {
@@ -997,42 +1080,12 @@
             document.getElementById('slot-' + type).classList.add('active');
         }
 
-        function raycastGrid(origin, direction, maxDist) {
-            let x = Math.floor(origin.x), y = Math.floor(origin.y), z = Math.floor(origin.z);
-            const stepX = Math.sign(direction.x), stepY = Math.sign(direction.y), stepZ = Math.sign(direction.z);
-            let tMaxX = intBound(origin.x, direction.x), tMaxY = intBound(origin.y, direction.y), tMaxZ = intBound(origin.z, direction.z);
-            const tDeltaX = stepX / direction.x, tDeltaY = stepY / direction.y, tDeltaZ = stepZ / direction.z;
-            let face = new THREE.Vector3();
-
-            if (direction.x === 0 && direction.y === 0 && direction.z === 0) return null;
-            let radius = maxDist / Math.sqrt(direction.x*direction.x + direction.y*direction.y + direction.z*direction.z);
-
-            while (true) {
-                if (tMaxX < tMaxY) {
-                    if (tMaxX < tMaxZ) { if (tMaxX > radius) break; x += stepX; tMaxX += tDeltaX; face.set(-stepX, 0, 0); }
-                    else { if (tMaxZ > radius) break; z += stepZ; tMaxZ += tDeltaZ; face.set(0, 0, -stepZ); }
-                } else {
-                    if (tMaxY < tMaxZ) { if (tMaxY > radius) break; y += stepY; tMaxY += tDeltaY; face.set(0, -stepY, 0); }
-                    else { if (tMaxZ > radius) break; z += stepZ; tMaxZ += tDeltaZ; face.set(0, 0, -stepZ); }
-                }
-                const key = `${x},${y},${z}`;
-                if (worldData.has(key)) {
-                    const blockId = worldData.get(key);
-                    if (!BLOCKS[blockId].noCollision) return { voxel: { x, y, z }, normal: face }; 
-                }
-            }
-            return null;
-        }
-
-        function intBound(s, ds) {
-            if (ds < 0) return intBound(-s, -ds); s = s % 1; return (1 - s + (s === 0 ? 1 : 0)) / ds;
-        }
-
         function checkCollision(pos) {
             const eps = 0.001;
-            const minX = Math.floor(pos.x - 0.3 + 0.5 + eps), maxX = Math.floor(pos.x + 0.3 + 0.5 - eps);
-            const minY = Math.floor(pos.y + 0.5 + eps), maxY = Math.floor(pos.y + 1.6 + 0.5 - eps); 
-            const minZ = Math.floor(pos.z - 0.3 + 0.5 + eps), maxZ = Math.floor(pos.z + 0.3 + 0.5 - eps);
+            // Precise character bounding box check (width: 0.5, height: 1.8)
+            const minX = Math.floor(pos.x - 0.25 + 0.5 + eps), maxX = Math.floor(pos.x + 0.25 + 0.5 - eps);
+            const minY = Math.floor(pos.y + 0.5 + eps), maxY = Math.floor(pos.y + 1.8 + 0.5 - eps); 
+            const minZ = Math.floor(pos.z - 0.25 + 0.5 + eps), maxZ = Math.floor(pos.z + 0.25 + 0.5 - eps);
 
             for (let x = minX; x <= maxX; x++) {
                 for (let y = minY; y <= maxY; y++) {
@@ -1074,6 +1127,22 @@
             hemiLight.intensity = Math.max(0.5, sunHeight * 0.7);
 
             if (gameActive) {
+                // Determine Camera Mode & Intelligent Anti-Clipping
+                if (isThirdPerson) {
+                    let backDir = pitchObject.getWorldDirection(new THREE.Vector3()).negate();
+                    let headWorldPos = yawObject.position.clone();
+                    headWorldPos.y += 1.5; 
+                    
+                    let camHit = raycastExactDDA(headWorldPos, backDir, 5);
+                    let finalDist = camHit ? Math.max(0.1, camHit.distance - 0.3) : 5;
+                    camera.position.set(0, 0, finalDist);
+                    
+                    // Sync the Character's Head Pitch visually with camera
+                    head.userData.neckGroup.rotation.x = pitchObject.rotation.x;
+                } else {
+                    camera.position.set(0, 0, 0); // 1st Person Eyes
+                }
+
                 const hit = getRaycastHit();
                 if (hit) {
                     outlineMesh.position.set(hit.voxel.x, hit.voxel.y, hit.voxel.z);
@@ -1096,7 +1165,6 @@
                 if (direction.x !== 0) velocity.x -= direction.x * playerStats.speed * delta;
 
                 const oldPos = yawObject.position.clone();
-
                 yawObject.translateX(velocity.x * delta);
                 yawObject.translateZ(velocity.z * delta);
                 
@@ -1127,9 +1195,21 @@
                     yawObject.position.set(0, 20, 0); velocity.set(0,0,0);
                 }
 
-                pitchObject.position.y = 1.5; 
+                // Smooth Walk Animations
+                let speed = Math.sqrt(velocity.x*velocity.x + velocity.z*velocity.z);
+                if (speed > 0.5 && isGrounded) {
+                    let legSwing = Math.sin(time * 0.012) * 0.6;
+                    leftLegGroup.rotation.x = legSwing;
+                    rightLegGroup.rotation.x = -legSwing;
+                    leftArmGroup.rotation.x = -legSwing;
+                    rightArmGroup.rotation.x = legSwing;
+                } else {
+                    leftLegGroup.rotation.x = 0;
+                    rightLegGroup.rotation.x = 0;
+                    leftArmGroup.rotation.x = 0;
+                    rightArmGroup.rotation.x = 0;
+                }
 
-                // Update HUD Strings
                 document.getElementById('hud-biome').innerText = getBiomeName(yawObject.position.z);
             }
 
